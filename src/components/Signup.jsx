@@ -1,18 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import toast from "react-hot-toast";
+import api from "../utils/api";
+import { useAuth } from "../context/AuthProvider";
 function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { setAuthUser } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data) => {
     const userInfo = {
@@ -20,23 +19,34 @@ function Signup() {
       email: data.email,
       password: data.password,
     };
-    await axios
-      .post(`${import.meta.env.VITE_API_URL}/user/signup`, userInfo)
-      .then((res) => {
-        console.log(res.data);
-        if (res.data) {
-          toast.success("Signup Successfully");
+
+    try {
+      setIsSubmitting(true);
+      const response = await api.post('/users/signup', userInfo);
+      
+      if (response.data) {
+        // Store the token if it's returned
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
+        
+        // Update auth context
+        const userData = response.data.user || response.data.data;
+        if (userData) {
+          setAuthUser(userData);
+          toast.success("Signup successful!");
           navigate(from, { replace: true });
         }
-        localStorage.setItem("Users", JSON.stringify(res.data.user));
-      })
-      .catch((err) => {
-        if (err.response) {
-          console.log(err);
-          toast.error("Error: " + err.response.data.message);
-        }
-      });
+      }
+    } catch (err) {
+      console.error('Signup error:', err);
+      const errorMessage = err.response?.data?.message || 'Signup failed. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   return (
     <>
       <div className="flex h-screen items-center justify-center">
@@ -90,7 +100,7 @@ function Signup() {
                 <span>Password</span>
                 <br />
                 <input
-                  type="text"
+                  type="password"
                   placeholder="Enter your password"
                   className="w-80 px-3 py-1 border rounded-md outline-none"
                   {...register("password", { required: true })}
@@ -104,8 +114,12 @@ function Signup() {
               </div>
               {/* Button */}
               <div className="flex justify-around mt-4">
-                <button className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200">
-                  Signup
+                <button 
+                  className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200 disabled:opacity-50"
+                  disabled={isSubmitting}
+                  type="submit"
+                >
+                  {isSubmitting ? 'Signing up...' : 'Signup'}
                 </button>
                 <p className="text-xl">
                   Have account?{" "}

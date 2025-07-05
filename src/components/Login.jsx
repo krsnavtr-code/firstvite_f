@@ -1,40 +1,55 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import api from "../utils/api";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthProvider";
+import { useState } from "react";
+
 function Login() {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
+
+  const { setAuthUser } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data) => {
-    const userInfo = {
-      email: data.email,
-      password: data.password,
-    };
-    await axios
-      .post(`${import.meta.env.VITE_API_URL}/user/login`, userInfo)
-      .then((res) => {
-        console.log(res.data);
-        if (res.data) {
-          toast.success("Loggedin Successfully");
-          document.getElementById("my_modal_3").close();
-          setTimeout(() => {
-            window.location.reload();
-            localStorage.setItem("Users", JSON.stringify(res.data.user));
-          }, 1000);
+    try {
+      setIsSubmitting(true);
+      const response = await api.post('/users/login', data);
+      
+      if (response.data.success) {
+        // Store the token
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
         }
-      })
-      .catch((err) => {
-        if (err.response) {
-          console.log(err);
-          toast.error("Error: " + err.response.data.message);
-          setTimeout(() => {}, 2000);
-        }
-      });
+        
+        // Update auth context
+        const userData = response.data.user || response.data.data;
+        setAuthUser(userData);
+        
+        // Show success message
+        toast.success("Login successful!");
+        
+        // Close the login modal
+        document.getElementById("my_modal_3").close();
+        
+        // Redirect to the intended page or home
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect') || '/';
+        navigate(redirectTo, { replace: true });
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   return (
     <div>
@@ -88,8 +103,11 @@ function Login() {
 
             {/* Button */}
             <div className="flex justify-around mt-6">
-              <button className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200">
-                Login
+              <button 
+                className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200 disabled:opacity-50"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Logging in...' : 'Login'}
               </button>
               <p>
                 Not registered?{" "}

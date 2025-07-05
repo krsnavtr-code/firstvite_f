@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Login from "./Login";
 import Logout from "./Logout";
 import { useAuth } from "../context/AuthProvider";
 
 function Navbar() {
-  const [authUser, setAuthUser] = useAuth();
+  const { authUser } = useAuth();
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
@@ -89,12 +90,24 @@ function Navbar() {
                 className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
               >
                 {navItems}
+                {authUser?.role === 'admin' && (
+                  <li>
+                    <Link to="/admin/dashboard" className="px-3 py-2 text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
+                      Admin Dashboard
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
             <a className=" text-2xl font-bold cursor-pointer">bookStore</a>
           </div>
           <div className="navbar-end space-x-3">
             <div className="navbar-center hidden lg:flex">
+              {authUser?.role === 'admin' && (
+                <Link to="/admin/dashboard" className="px-3 py-2 text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
+                  Admin Dashboard
+                </Link>
+              )}
               <ul className="menu menu-horizontal px-1">{navItems}</ul>
             </div>
             <div className="hidden md:block">
@@ -148,17 +161,40 @@ function Navbar() {
             </label>
 
             {authUser ? (
-              <Logout />
+              <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                  <div className="w-10 rounded-full bg-pink-500 text-white flex items-center justify-center text-lg font-semibold">
+                    {authUser?.fullname?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                </div>
+                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 dark:bg-gray-800 rounded-box w-52">
+                  <li>
+                    <Link to="/profile" className="justify-between">
+                      Profile
+                      <span className="badge">New</span>
+                    </Link>
+                  </li>
+                  {authUser.role === 'admin' && (
+                    <li>
+                      <Link to="/admin/dashboard">Admin Dashboard</Link>
+                    </li>
+                  )}
+                  <li>
+                    <Link to="/settings">Settings</Link>
+                  </li>
+                  <li>
+                    <Logout />
+                  </li>
+                </ul>
+              </div>
             ) : (
-              <div className="">
-                <a
-                  className="bg-black text-white px-3 py-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer"
-                  onClick={() =>
-                    document.getElementById("my_modal_3").showModal()
-                  }
+              <div className="flex items-center gap-2">
+                <button
+                  className="bg-pink-500 text-white px-3 py-2 rounded-md hover:bg-pink-600 duration-300 cursor-pointer"
+                  onClick={() => document.getElementById("my_modal_3").showModal()}
                 >
                   Login
-                </a>
+                </button>
                 <Login />
               </div>
             )}
