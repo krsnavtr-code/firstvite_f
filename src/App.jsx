@@ -1,6 +1,6 @@
 import React from "react";
 import Home from "./home/Home";
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Courses from "./components/Courses";
 import Signup from "./components/Signup";
 import { Toaster } from "react-hot-toast";
@@ -13,50 +13,27 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './components/Login';
 
+// Create a layout component that conditionally renders Navbar and Footer
+const MainLayout = ({ children }) => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  
+  return (
+    <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
+      {!isAdminRoute && <Navbar />}
+      <main className="flex-grow">
+        {children}
+      </main>
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
+};
+
 function App() {
   const { authUser } = useAuth();
   
   return (
-    <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-grow">
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
-
-          {/* Protected routes */}
-          <Route
-            path="/course"
-            element={
-              <PrivateRoute>
-                <Courses />
-              </PrivateRoute>
-            }
-          />
-
-          {/* Admin routes */}
-          <Route
-            path="/admin/*"
-            element={
-              <PrivateRoute roles={['admin']}>
-                <AdminLayout>
-                  <Routes>
-                    <Route path="dashboard" element={<AdminDashboard />} />
-                    <Route index element={<Navigate to="dashboard" replace />} />
-                  </Routes>
-                </AdminLayout>
-              </PrivateRoute>
-            }
-          />
-
-          {/* Catch-all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-      <Footer />
+    <>
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -80,7 +57,63 @@ function App() {
           },
         }}
       />
-    </div>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={
+          <MainLayout>
+            <Home />
+          </MainLayout>
+        } />
+        
+        <Route path="/login" element={
+          <MainLayout>
+            <Login />
+          </MainLayout>
+        } />
+        
+        <Route path="/signup" element={
+          <MainLayout>
+            <Signup />
+          </MainLayout>
+        } />
+        
+        <Route path="/unauthorized" element={
+          <MainLayout>
+            <Unauthorized />
+          </MainLayout>
+        } />
+
+        {/* Protected routes */}
+        <Route
+          path="/course"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <Courses />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Admin routes - No Navbar/Footer */}
+        <Route
+          path="/admin/*"
+          element={
+            <PrivateRoute roles={['admin']}>
+              <AdminLayout>
+                <Routes>
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                </Routes>
+              </AdminLayout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Catch-all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
 
