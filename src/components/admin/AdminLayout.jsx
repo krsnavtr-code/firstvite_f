@@ -1,17 +1,44 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthProvider';
 
 const AdminLayout = () => {
-  const { user, logout } = useAuth();
+  const { authUser, setAuthUser, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
+  // Debug log
+  useEffect(() => {
+    console.log('AdminLayout - Auth State:', { 
+      authUser,
+      isAdmin,
+      loading,
+      hasToken: !!localStorage.getItem('token')
+    });
+  }, [authUser, isAdmin, loading]);
+
   const handleLogout = () => {
-    logout();
+    console.log('AdminLayout - Logging out');
+    setAuthUser(null);
     navigate('/login');
   };
 
-  if (!user || user.role !== 'admin') {
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
+  // Check for admin access
+  if (!authUser || !isAdmin) {
+    console.log('AdminLayout - Access Denied:', { 
+      hasUser: !!authUser, 
+      userRole: authUser?.role,
+      isAdmin,
+      loading 
+    });
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
@@ -35,7 +62,7 @@ const AdminLayout = () => {
         <div className="bg-indigo-800 text-white w-64 flex-shrink-0">
           <div className="p-4">
             <h1 className="text-2xl font-bold">Admin Panel</h1>
-            <p className="text-indigo-200 text-sm">Welcome, {user.fullname || 'Admin'}</p>
+            <p className="text-indigo-200 text-sm">Welcome, {authUser?.fullname || 'Admin'}</p>
           </div>
           
           <nav className="mt-6">
@@ -113,7 +140,7 @@ const AdminLayout = () => {
                   </span>
                   <div className="relative">
                     <div className="h-8 w-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-800 font-semibold">
-                      {user.fullname ? user.fullname.charAt(0).toUpperCase() : 'A'}
+                      {authUser.fullname ? authUser.fullname.charAt(0).toUpperCase() : 'A'}
                     </div>
                   </div>
                 </div>

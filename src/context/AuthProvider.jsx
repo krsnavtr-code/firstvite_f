@@ -6,18 +6,72 @@ export default function AuthProvider({ children }) {
   const [authUser, setAuthUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Update both auth state and localStorage
+  const updateAuthUser = useCallback((userData) => {
+    console.log('Updating auth user:', userData);
+    
+    if (userData) {
+      // Ensure user has required fields
+      const userWithRole = {
+        _id: userData._id,
+        fullname: userData.fullname || userData.name || 'User',
+        email: userData.email,
+        role: userData.role || 'user',
+        ...userData
+      };
+      
+      console.log('Setting auth user with data:', userWithRole);
+      localStorage.setItem("Users", JSON.stringify(userWithRole));
+      setAuthUser(userWithRole);
+    } else {
+      // Logout
+      console.log('Logging out user');
+      localStorage.removeItem("Users");
+      localStorage.removeItem("token");
+      setAuthUser(null);
+    }
+  }, []);
+
   // Load user from localStorage on initial render
   useEffect(() => {
     const loadUser = () => {
       try {
         const userData = localStorage.getItem("Users");
-        if (userData) {
-          const parsedUser = JSON.parse(userData);
-          setAuthUser(parsedUser);
+        const token = localStorage.getItem("token");
+        
+        console.log('Loading user from localStorage:', { 
+          hasUserData: !!userData, 
+          hasToken: !!token 
+        });
+        
+        if (userData && token) {
+          try {
+            const parsedUser = JSON.parse(userData);
+            console.log('Parsed user data:', parsedUser);
+            
+            // Ensure user has required fields
+            const userWithRole = {
+              _id: parsedUser._id,
+              fullname: parsedUser.fullname || parsedUser.name || 'User',
+              email: parsedUser.email,
+              role: parsedUser.role || 'user',
+              ...parsedUser
+            };
+            
+            console.log('Setting initial auth user:', userWithRole);
+            setAuthUser(userWithRole);
+          } catch (parseError) {
+            console.error('Failed to parse user data:', parseError);
+            localStorage.removeItem("Users");
+            localStorage.removeItem("token");
+            setAuthUser(null);
+          }
+        } else {
+          console.log('No valid user data or token found in localStorage');
+          setAuthUser(null);
         }
       } catch (error) {
-        console.error("Failed to parse user data:", error);
-        // Clear invalid data
+        console.error("Error loading user:", error);
         localStorage.removeItem("Users");
         localStorage.removeItem("token");
         setAuthUser(null);
@@ -29,26 +83,32 @@ export default function AuthProvider({ children }) {
     loadUser();
   }, []);
 
-  // Update both auth state and localStorage
-  const updateAuthUser = useCallback((userData) => {
-    if (userData) {
-      localStorage.setItem("Users", JSON.stringify(userData));
-      setAuthUser(userData);
-    } else {
-      // Logout
-      localStorage.removeItem("Users");
-      localStorage.removeItem("token");
-      setAuthUser(null);
-    }
-  }, []);
+  // Debug auth state changes
+  useEffect(() => {
+    console.log('Auth state updated:', { 
+      isAuthenticated: !!authUser,
+      userRole: authUser?.role,
+      loading 
+    });
+  }, [authUser, loading]);
 
   // Only render children once we've tried to load the user
   if (loading) {
-    return <div>Loading...</div>; // Or a loading spinner
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
   }
 
   return (
-    <AuthContext.Provider value={{ authUser, setAuthUser: updateAuthUser }}>
+    <AuthContext.Provider value={{ 
+      authUser, 
+      setAuthUser: updateAuthUser,
+      isAuthenticated: !!authUser,
+      isAdmin: authUser?.role === 'admin',
+      loading
+    }}>
       {children}
     </AuthContext.Provider>
   );
