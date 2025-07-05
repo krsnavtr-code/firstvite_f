@@ -8,6 +8,7 @@ import { useAuth } from "./context/AuthProvider";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import Categories from "./components/admin/categories";
+import AdminCourses from "./components/admin/courses";
 import PrivateRoute from './components/PrivateRoute';
 import Unauthorized from './pages/Unauthorized';
 import Navbar from './components/Navbar';
@@ -108,6 +109,7 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="categories/*" element={<Categories />} />
+          <Route path="courses/*" element={<AdminCourses />} />
         </Route>
 
         {/* Catch-all route */}

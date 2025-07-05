@@ -7,15 +7,25 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:4002', // Your backend server URL
+        target: 'http://localhost:4002',
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api')
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('Sending Request to the Target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+          });
+        }
       }
     },
-    port: 5173, // Your frontend port
-    open: true // Open the browser when starting the server
+    port: 5173,
+    open: true
   },
   build: {
     outDir: 'dist',

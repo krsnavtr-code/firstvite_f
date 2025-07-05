@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { getCategories } from "../../api/categoryApi";
+import { getCourses, deleteCourse } from "../../api/courseApi";
 import { toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
@@ -10,26 +11,50 @@ const AdminDashboard = () => {
   const { authUser } = useAuth();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const handleDeleteCourse = async (id) => {
+    if (window.confirm('Are you sure you want to delete this course?')) {
+      try {
+        await deleteCourse(id);
+        // Refresh the courses list after deletion
+        const response = await getCourses();
+        setCourses(response.data || []);
+        toast.success('Course deleted successfully');
+      } catch (error) {
+        console.error('Error deleting course:', error);
+        toast.error('Failed to delete course');
+      }
+    }
+  };
   
   useEffect(() => {
     console.log('AdminDashboard - useEffect running');
-    const fetchCategories = async () => {
-      console.log('Fetching categories...');
+    const fetchData = async () => {
+      console.log('Fetching dashboard data...');
       try {
         setLoading(true);
-        const response = await getCategories();
-        console.log('Categories response:', response);
-        setCategories(response.data || []);
+        
+        // Fetch categories
+        const categoriesRes = await getCategories();
+        console.log('Categories response:', categoriesRes);
+        setCategories(categoriesRes.data || []);
+        
+        // Fetch courses
+        const coursesRes = await getCourses();
+        console.log('Courses response:', coursesRes);
+        setCourses(coursesRes.data || []);
+        
       } catch (error) {
-        console.error('Error fetching categories:', error);
-        toast.error('Failed to load categories');
+        console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
     };
     
-    fetchCategories();
+    fetchData();
   }, []);
   
   console.log('AdminDashboard - Render with state:', { loading, categories });
@@ -73,13 +98,16 @@ const AdminDashboard = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm font-medium">Categories</h3>
-              <p className="text-2xl font-semibold text-gray-800">Manage</p>
+              <p className="text-2xl font-semibold text-gray-800">{categories.length}</p>
             </div>
           </div>
         </div>
 
         {/* Total Courses Card */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div 
+          className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+          onClick={() => navigate('/admin/courses')}
+        >
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
               <svg
@@ -99,7 +127,35 @@ const AdminDashboard = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm font-medium">Total Courses</h3>
-              <p className="text-2xl font-semibold text-gray-800">42</p>
+              <p className="text-2xl font-semibold text-gray-800">{courses.length}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Published Courses Card */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <svg
+                className="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h3 className="text-gray-500 text-sm font-medium">Published</h3>
+              <p className="text-2xl font-semibold text-gray-800">
+                {courses.filter(course => course.isPublished).length}
+              </p>
             </div>
           </div>
         </div>
@@ -344,6 +400,97 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Recent Courses */}
+      <div className="bg-white shadow rounded-lg p-6 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-medium text-gray-900">Recent Courses</h3>
+          <Link 
+            to="/admin/courses" 
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            View all
+          </Link>
+        </div>
+        
+        {courses.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No courses found. Create your first course to get started.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th scope="col" className="relative px-6 py-3">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {courses.slice(0, 5).map((course) => (
+                  <tr key={course._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {course.image && (
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <img className="h-10 w-10 rounded-full object-cover" src={course.image} alt={course.title} />
+                          </div>
+                        )}
+                        <div className={`${course.image ? 'ml-4' : ''}`}>
+                          <div className="text-sm font-medium text-gray-900">{course.title}</div>
+                          <div className="text-sm text-gray-500">{course.instructor}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{course.category?.name || 'Uncategorized'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        course.isPublished 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {course.isPublished ? 'Published' : 'Draft'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      ${course.price.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Link
+                        to={`/admin/courses/edit/${course._id}`}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteCourse(course._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

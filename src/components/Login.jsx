@@ -23,6 +23,10 @@ function Login() {
       setIsSubmitting(true);
       console.log('Login - Attempting login with:', data);
       
+      // Clear any existing tokens and user data
+      localStorage.removeItem('token');
+      localStorage.removeItem('Users');
+      
       const response = await api.post("/users/login", data);
       console.log('Login - Response received:', response.data);
 
@@ -42,7 +46,7 @@ function Login() {
           throw new Error('No authentication token received');
         }
 
-        // Store the token
+        // Store the token in localStorage
         localStorage.setItem("token", token);
         console.log('Login - Token stored in localStorage');
 
@@ -57,7 +61,10 @@ function Login() {
 
         console.log('Login - Updating auth context with user:', userWithRole);
         
-        // Update auth context and localStorage
+        // Store user data in localStorage
+        localStorage.setItem("Users", JSON.stringify(userWithRole));
+        
+        // Update auth context
         setAuthUser(userWithRole);
         
         // Show success message
@@ -74,7 +81,7 @@ function Login() {
         let redirectTo = urlParams.get("redirect");
         
         // If no redirect specified and user is admin, go to admin dashboard
-        if (!redirectTo && userWithRole.role === 'admin') {
+        if (userWithRole.role === 'admin') {
           redirectTo = '/admin/dashboard';
           console.log('Login - User is admin, redirecting to admin dashboard');
         }

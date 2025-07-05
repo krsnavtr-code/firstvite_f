@@ -3,21 +3,39 @@ import { toast } from 'react-hot-toast';
 
 // Create axios instance with base URL and headers
 const api = axios.create({
-  baseURL: '/api', // Base URL will be prefixed by the proxy in development
+  baseURL: 'http://localhost:4002/api', // Full backend URL with /api
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true
 });
 
 // Add a request interceptor to include the auth token
 api.interceptors.request.use(
   (config) => {
-    console.log('Making request to:', config.url);
-    console.log('Request config:', config);
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Skip for login/register routes
+    if (config.url.includes('/login') || config.url.includes('/register')) {
+      return config;
     }
+    
+    // Get token from localStorage
+    const token = localStorage.getItem('token');
+    console.log('Token from localStorage:', token ? 'Found' : 'Not found');
+    
+    if (token) {
+      // Ensure Authorization header is set correctly
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('Authorization header set with token');
+    } else {
+      console.warn('No token found in localStorage');
+      // If you want to redirect to login when no token is found, uncomment below
+      // window.location.href = '/login';
+      // return Promise.reject('No token found');
+    }
+    
+    console.log('Making request to:', config.method?.toUpperCase(), config.url);
+    console.log('Request headers:', JSON.stringify(config.headers, null, 2));
+    
     return config;
   },
   (error) => {
