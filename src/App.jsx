@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { useAuth } from "./context/AuthProvider";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
+import Categories from "./components/admin/categories";
 import PrivateRoute from './components/PrivateRoute';
 import Unauthorized from './pages/Unauthorized';
 import Navbar from './components/Navbar';
@@ -97,18 +98,17 @@ function App() {
 
         {/* Admin routes - No Navbar/Footer */}
         <Route
-          path="/admin/*"
+          path="/admin"
           element={
             <PrivateRoute roles={['admin']}>
-              <AdminLayout>
-                <Routes>
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route index element={<Navigate to="dashboard" replace />} />
-                </Routes>
-              </AdminLayout>
+              <AdminLayout />
             </PrivateRoute>
           }
-        />
+        >
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="categories/*" element={<Categories />} />
+        </Route>
 
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />

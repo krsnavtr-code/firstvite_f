@@ -1,14 +1,83 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import { getCategories } from "../../api/categoryApi";
+import { toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
+  console.log('AdminDashboard - Rendering...');
+  const { authUser } = useAuth();
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    console.log('AdminDashboard - useEffect running');
+    const fetchCategories = async () => {
+      console.log('Fetching categories...');
+      try {
+        setLoading(true);
+        const response = await getCategories();
+        console.log('Categories response:', response);
+        setCategories(response.data || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        toast.error('Failed to load categories');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+  
+  console.log('AdminDashboard - Render with state:', { loading, categories });
+  
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+  
   return (
-    <div>
+    <div className="p-6">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">
         Dashboard Overview
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Categories Card */}
+        <div 
+          className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+          onClick={() => navigate('/admin/categories')}
+        >
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-green-100 text-green-600">
+              <svg
+                className="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h3 className="text-gray-500 text-sm font-medium">Categories</h3>
+              <p className="text-2xl font-semibold text-gray-800">Manage</p>
+            </div>
+          </div>
+        </div>
+
         {/* Total Courses Card */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center">
@@ -29,10 +98,8 @@ const AdminDashboard = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-gray-500 text-sm font-medium">
-                Total Courses
-              </h3>
-              <p className="text-2xl font-semibold text-gray-800">24</p>
+              <h3 className="text-gray-500 text-sm font-medium">Total Courses</h3>
+              <p className="text-2xl font-semibold text-gray-800">42</p>
             </div>
           </div>
         </div>
@@ -86,7 +153,11 @@ const AdminDashboard = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm font-medium">Categories</h3>
-              <p className="text-2xl font-semibold text-gray-800">8</p>
+              <p className="text-2xl font-semibold text-gray-800">
+                <Link to="/admin/categories" className="hover:text-indigo-600">
+                  Manage
+                </Link>
+              </p>
             </div>
           </div>
         </div>

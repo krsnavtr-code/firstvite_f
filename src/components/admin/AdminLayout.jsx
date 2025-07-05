@@ -57,8 +57,8 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Sidebar */}
       <div className="flex h-screen bg-gray-100">
+        {/* Sidebar */}
         <div className="bg-indigo-800 text-white w-64 flex-shrink-0">
           <div className="p-4">
             <h1 className="text-2xl font-bold">Admin Panel</h1>
@@ -127,7 +127,7 @@ const AdminLayout = () => {
               <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-semibold text-gray-900">
                   {window.location.pathname.split('/').pop().charAt(0).toUpperCase() + 
-                   window.location.pathname.split('/').pop().slice(1)}
+                   window.location.pathname.split('/').pop().slice(1) || 'Dashboard'}
                 </h1>
                 <div className="flex items-center">
                   <span className="text-gray-600 mr-4">
@@ -140,7 +140,7 @@ const AdminLayout = () => {
                   </span>
                   <div className="relative">
                     <div className="h-8 w-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-800 font-semibold">
-                      {authUser.fullname ? authUser.fullname.charAt(0).toUpperCase() : 'A'}
+                      {authUser?.fullname ? authUser.fullname.charAt(0).toUpperCase() : 'A'}
                     </div>
                   </div>
                 </div>
