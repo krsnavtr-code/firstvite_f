@@ -180,18 +180,32 @@ const CourseForm = ({ isEdit = false }) => {
             throw new Error('Course title is required');
           }
           
-          // Prepare minimal required data for course creation
+          // Prepare course data with all fields from sectionData
           const preparedData = {
             title: courseTitle,
-            shortDescription: sectionData.shortDescription || 'Course short description',
-            description: sectionData.description || 'Course description',
+            shortDescription: sectionData.shortDescription || '',
+            description: sectionData.description || '',
             category: sectionData.category || null,
-            instructor: sectionData.instructor || 'Unknown Instructor',
-            price: sectionData.price ?? 0,
-            level: sectionData.level || 'beginner',
-            duration: sectionData.duration ?? 0,
+            instructor: sectionData.instructor || '',
+            price: sectionData.price ? Number(sectionData.price) : 0,
+            originalPrice: sectionData.originalPrice ? Number(sectionData.originalPrice) : undefined,
+            totalHours: sectionData.totalHours ? Number(sectionData.totalHours) : 0,
+            duration: sectionData.duration || '',
+            level: sectionData.level || 'Beginner',
+            language: sectionData.language || 'English',
+            benefits: sectionData.benefits || [],
+            prerequisites: sectionData.prerequisites || [],
+            skills: sectionData.skills || [],
+            certificateIncluded: Boolean(sectionData.certificateIncluded),
             status: 'draft'
           };
+          
+          // Remove undefined values
+          Object.keys(preparedData).forEach(key => {
+            if (preparedData[key] === undefined) {
+              delete preparedData[key];
+            }
+          });
           
           // Log the prepared data for debugging
           console.log('[saveSection] Prepared course data:', JSON.stringify({
@@ -207,14 +221,26 @@ const CourseForm = ({ isEdit = false }) => {
             throw new Error('No course data returned from server');
           }
           
-          if (!newCourse._id) {
-            console.error('[saveSection] Invalid response - missing _id:', newCourse);
+          // Get the course ID from either _id or id field
+          const courseId = newCourse._id || newCourse.id;
+          
+          if (!courseId) {
+            console.error('[saveSection] Invalid response - missing course ID:', newCourse);
             throw new Error('Invalid response: Missing course ID');
           }
           
-          console.log('[saveSection] New course created with ID:', newCourse._id);
-          setCourseId(newCourse._id);
-          setValue('_id', newCourse._id);
+          console.log('[saveSection] New course created with ID:', courseId);
+          setCourseId(courseId);
+          setValue('_id', courseId);
+          
+          // Update the form data with the course ID and other fields from the response
+          if (newCourse) {
+            Object.keys(newCourse).forEach(key => {
+              if (key !== '_id' && key !== '__v') { // Skip internal fields
+                setValue(key, newCourse[key]);
+              }
+            });
+          }
           
           // If this was just creating a new course, we're done
           if (section === 'basic') {
@@ -243,7 +269,9 @@ const CourseForm = ({ isEdit = false }) => {
       try {
         if (isEdit) {
           console.log(`[saveSection] Updating section '${section}' for existing course`);
+          console.log(`[saveSection] Sending data to /courses/${courseId}/section/${section}:`, sectionData);
           response = await updateCourseSection(courseId, section, sectionData);
+          console.log(`[saveSection] Section '${section}' update response:`, response);
         } else {
           console.log(`[saveSection] Updating course with section '${section}' data`);
           const updateData = {
@@ -269,7 +297,14 @@ const CourseForm = ({ isEdit = false }) => {
         );
         return true;
       } catch (error) {
-        console.error(`[saveSection] Error saving section ${section}:`, error);
+        console.error(`[saveSection] Error saving section '${section}':`, error);
+        
+        // Log detailed error information
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          console.error('Error response status:', error.response.status);
+          console.error('Error response headers:', error.response.headers);
+        }
         
         let errorMessage = `Failed to save ${section} section. `;
         if (error.response) {
@@ -301,100 +336,160 @@ const CourseForm = ({ isEdit = false }) => {
 
   // Handle saving the current tab
   const handleSaveSection = async (section) => {
-    console.group(`[handleSaveSection] Starting to save section: ${section}`);
+    console.group(`[handleSaveSection] Starting save for section: ${section}`);
+    console.log(`[handleSaveSection] Current courseId: ${courseId}`);
+    
     try {
-      console.log('Getting form values...');
       const formData = getValues();
-      console.log('[handleSaveSection] Current form data:', formData);
+      console.log(`[handleSaveSection] Form data for ${section}:`, formData);
       
-      if (!formData) {
-        console.error('No form data available');
-        return false;
-      }
+      // Process text area fields - handle both strings and arrays
+      const processTextArea = (input) => {
+        if (!input) return [];
+        
+        // If input is already an array, return a cleaned copy
+        if (Array.isArray(input)) {
+          return input
+            .map(item => String(item).trim())
+            .filter(item => item !== '');
+        }
+        
+        // If input is a string, split by newlines and clean
+        if (typeof input === 'string') {
+          return input
+            .split('\n')
+            .map(item => item.trim())
+            .filter(item => item !== '');
+        }
+        
+        // For any other type, convert to string and process
+        return String(input)
+          .split('\n')
+          .map(item => item.trim())
+          .filter(item => item !== '');
+      };
+      
+      const processedData = {
+        ...formData,
+        benefits: processTextArea(formData.benefits),
+        prerequisites: processTextArea(formData.prerequisites),
+        skills: processTextArea(formData.skills),
+        requirements: processTextArea(formData.requirements),
+        whoIsThisFor: processTextArea(formData.whoIsThisFor)
+      };
       
       let sectionData = {};
-
-      // Extract only the relevant fields for this section
+      
+      // Prepare section data based on the section being saved
       switch (section) {
-        case "basic":
+        case 'basic':
           sectionData = {
-            title: formData.title,
-            shortDescription: formData.shortDescription,
-            description: formData.description,
-            category: formData.category,
-            instructor: formData.instructor,
-            price: Number(formData.price),
-            duration: Number(formData.duration),
-            level: formData.level,
-            language: formData.language,
-            isPublished: formData.isPublished,
-            isFeatured: formData.isFeatured,
-            hasCertificate: formData.hasCertificate,
-        };
-        break;
+            title: processedData.title || '',
+            shortDescription: processedData.shortDescription || '',
+            description: processedData.description || '',
+            category: processedData.category || '',
+            instructor: processedData.instructor || '',
+            duration: processedData.duration || '',
+            totalHours: processedData.totalHours ? Number(processedData.totalHours) : 0,
+            level: processedData.level || 'Beginner',
+            price: processedData.price ? Number(processedData.price) : 0,
+            originalPrice: processedData.originalPrice ? Number(processedData.originalPrice) : 0,
+            certificateIncluded: Boolean(processedData.certificateIncluded),
+            language: processedData.language || 'English',
+            benefits: processedData.benefits,
+            prerequisites: processedData.prerequisites,
+            skills: processedData.skills,
+            status: 'draft'
+          };
+          
+          // Only remove undefined values, keep empty strings
+          Object.keys(sectionData).forEach(key => {
+            if (sectionData[key] === undefined) {
+              delete sectionData[key];
+            } else if (typeof sectionData[key] === 'number' && isNaN(sectionData[key])) {
+              sectionData[key] = 0; // Convert NaN to 0 for number fields
+            }
+          });
+          
+          console.log('Processed basic section data:', sectionData);
+          break;
+          
+        case 'details':
+          sectionData = {
+            benefits: Array.isArray(processedData.benefits) ? processedData.benefits : [],
+            prerequisites: Array.isArray(processedData.prerequisites) ? processedData.prerequisites : [],
+            skills: Array.isArray(processedData.skills) ? processedData.skills : [],
+            requirements: Array.isArray(processedData.requirements) ? processedData.requirements : [],
+            whoIsThisFor: Array.isArray(processedData.whoIsThisFor) ? processedData.whoIsThisFor : [],
+            faqs: Array.isArray(processedData.faqs) ? processedData.faqs : []
+          };
+          
+          // Ensure all array fields are present, even if empty
+          const requiredFields = ['benefits', 'prerequisites', 'skills', 'requirements', 'whoIsThisFor', 'faqs'];
+          requiredFields.forEach(field => {
+            if (!(field in sectionData)) {
+              sectionData[field] = [];
+            }
+          });
+          
+          console.log('Processed details section data:', sectionData);
+          break;
+          
+        case 'curriculum':
+          sectionData = {
+            curriculum: (formData.curriculum || [])
+              .map((week) => ({
+                ...week,
+                topics: (week.topics || []).filter((t) => t.trim() !== ''),
+              }))
+              .filter(
+                (week) =>
+                  (week.title && week.title.trim() !== '') ||
+                  (week.description && week.description.trim() !== '') ||
+                  (week.topics && week.topics.length > 0)
+              ),
+          };
+          break;
+          
+        case 'mentors':
+          sectionData = {
+            mentors: (formData.mentors || [])
+              .filter((mentor) => mentor && mentor.name && mentor.name.trim() !== '')
+              .map((mentor) => ({
+                ...mentor,
+                name: mentor.name.trim()
+              }))
+          };
+          break;
+          
+        case 'media':
+          sectionData = {
+            image: formData.image || '',
+            previewVideo: formData.previewVideo || '',
+            thumbnail: formData.thumbnail || '',
+          };
+          break;
+          
+        case 'seo':
+          sectionData = {
+            metaTitle: formData.metaTitle || '',
+            metaDescription: formData.metaDescription || '',
+            slug: formData.slug || '',
+            tags: (formData.tags || []).filter((t) => t && t.trim() !== ''),
+          };
+          break;
+      }
 
-      case "details":
-        sectionData = {
-          benefits: formData.benefits.filter((b) => b.trim() !== ""),
-          prerequisites: formData.prerequisites.filter((p) => p.trim() !== ""),
-          faqs: formData.faqs.filter(
-            (faq) => faq.question.trim() !== "" && faq.answer.trim() !== ""
-          ),
-        };
-        break;
-
-      case "curriculum":
-        sectionData = {
-          curriculum: formData.curriculum
-            .map((week) => ({
-              ...week,
-              topics: week.topics.filter((t) => t.trim() !== ""),
-            }))
-            .filter(
-              (week) =>
-                week.title.trim() !== "" ||
-                week.description.trim() !== "" ||
-                week.topics.length > 0
-            ),
-        };
-        break;
-
-      case "mentors":
-        sectionData = {
-          mentors: formData.mentors.filter(
-            (mentor) => mentor.name.trim() !== ""
-          ),
-        };
-        break;
-
-      case "media":
-        sectionData = {
-          image: formData.image,
-          previewVideo: formData.previewVideo,
-          thumbnail: formData.thumbnail,
-        };
-        break;
-
-      case "seo":
-        sectionData = {
-          metaTitle: formData.metaTitle,
-          metaDescription: formData.metaDescription,
-          slug: formData.slug,
-          tags: formData.tags.filter((t) => t.trim() !== ""),
-        };
-        break;
+      console.log(`[handleSaveSection] Prepared section data for ${section}:`, sectionData);
+      const result = await saveSection(section, sectionData);
+      console.log(`[handleSaveSection] saveSection result for ${section}:`, result);
+      return result;
+    } catch (error) {
+      console.error(`[handleSaveSection] Error in handleSaveSection for ${section}:`, error);
+      throw error;
+    } finally {
+      console.groupEnd();
     }
-
-    console.log(`[handleSaveSection] Prepared section data for ${section}:`, sectionData);
-    const result = await saveSection(section, sectionData);
-    console.log(`[handleSaveSection] saveSection result for ${section}:`, result);
-    return result;
-  } catch (error) {
-    console.error(`[handleSaveSection] Error in handleSaveSection for ${section}:`, error);
-    throw error;
-  } finally {
-    console.groupEnd();
-  }
   };
 
   // Handle form submission (save all sections)
@@ -607,7 +702,7 @@ const CourseForm = ({ isEdit = false }) => {
     try {
       // Determine which fields to validate based on the current tab
       const tabFields = {
-        basic: ['title', 'shortDescription', 'description', 'category', 'instructor', 'price', 'level'],
+        basic: ['title', 'shortDescription', 'description', 'category', 'instructor', 'duration', 'totalHours', 'price', 'originalPrice', 'certificateIncluded', 'level', 'benefits', 'prerequisites', 'skills', 'language'], 
         details: ['whatYouWillLearn', 'requirements', 'whoIsThisFor'],
         curriculum: ['curriculum'],
         mentors: ['mentors'],
@@ -677,12 +772,12 @@ const CourseForm = ({ isEdit = false }) => {
       <TabContent tab="basic">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="col-span-2">
-            {renderInput("Course Title *", "title", "text", { required: true })}
-            {renderTextarea("Short Description *", "shortDescription", {
+            {renderInput("Course Title", "title", "text", { required: true })}
+            {renderTextarea("Short Description", "shortDescription", {
               required: true,
               maxLength: { value: 300, message: "Maximum 300 characters" },
             })}
-            {renderRichText("Full Description *", "description", {
+            {renderRichText("Full Description", "description", {
               required: true,
             })}
           </div>
@@ -691,7 +786,7 @@ const CourseForm = ({ isEdit = false }) => {
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category *
+                  Category
                 </label>
                 <select
                   {...register("category", { required: true })}
@@ -711,17 +806,17 @@ const CourseForm = ({ isEdit = false }) => {
                 )}
               </div>
 
-              {renderInput("Instructor *", "instructor", "text", {
+              {renderInput("Instructor", "instructor", "text", {
                 required: true,
               })}
-              {renderInput("Duration *", "duration", "text", {
+              {renderInput("Duration", "duration", "text", {
                 required: true,
               })}
               {renderInput("Total Hours", "totalHours", "number")}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Level *
+                  Level
                 </label>
                 <select
                   {...register("level", { required: true })}
@@ -735,7 +830,7 @@ const CourseForm = ({ isEdit = false }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  {renderInput("Price *", "price", "number", {
+                  {renderInput("Price", "price", "number", {
                     required: true,
                     min: { value: 0, message: "Price cannot be negative" },
                   })}
