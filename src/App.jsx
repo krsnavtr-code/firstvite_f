@@ -9,6 +9,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import Categories from "./components/admin/categories";
 import AdminCourses from "./components/admin/courses";
+import Users from "./components/admin/Users";
 import PrivateRoute from './components/PrivateRoute';
 import Unauthorized from './pages/Unauthorized';
 import Navbar from './components/Navbar';
@@ -110,6 +111,7 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="categories/*" element={<Categories />} />
           <Route path="courses/*" element={<AdminCourses />} />
+          <Route path="users" element={<Users />} />
         </Route>
 
         {/* Catch-all route */}
