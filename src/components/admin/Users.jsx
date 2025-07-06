@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { 
-  getUsers, 
-  createUser, 
-  updateUser, 
-  deleteUser, 
-  changeUserPassword,
-  updateUserStatus
-} from '../../api/userApi';
+import userApi from '../../api/userApi';
 
 // Modal components
 const UserModal = ({ user, onClose, onSave, isOpen }) => {
@@ -238,35 +231,23 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      console.log('Attempting to fetch users...');
-      const data = await getUsers();
-      console.log('Received users data:', data);
-      setUsers(Array.isArray(data) ? data : []);
+      const data = await userApi.getUsers();
+      setUsers(data);
     } catch (error) {
-      console.error('Detailed error in fetchUsers:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        config: error.config
-      });
+      console.error('Error fetching users:', error);
+      let errorMessage = 'Failed to load users';
       
-      let errorMessage = 'Failed to fetch users';
       if (error.response) {
         if (error.response.status === 401) {
-          errorMessage = 'Please log in to view users';
+          errorMessage = 'Session expired. Please login again.';
         } else if (error.response.status === 403) {
-          errorMessage = 'You do not have permission to view users';
-        } else if (error.response.status === 404) {
-          errorMessage = 'Users endpoint not found. Please check the API URL.';
+          errorMessage = 'You do not have permission to view users.';
         } else if (error.response.data?.message) {
           errorMessage = error.response.data.message;
         }
-      } else if (error.request) {
-        errorMessage = 'No response from server. Is the backend running?';
       }
       
       toast.error(errorMessage);
-      setUsers([]); // Reset users to empty array on error
     } finally {
       setLoading(false);
     }
@@ -274,11 +255,12 @@ const Users = () => {
 
   const handleCreateUser = async (userData) => {
     try {
-      await createUser(userData);
+      await userApi.create(userData);
       toast.success('User created successfully');
       await fetchUsers();
       setIsModalOpen(false);
     } catch (error) {
+      console.error('Error creating user:', error);
       toast.error(error.response?.data?.message || 'Failed to create user');
     }
   };
@@ -287,12 +269,12 @@ const Users = () => {
     if (!editingUserId) return;
     
     try {
-      await updateUser(editingUserId, userData);
+      await userApi.update(editingUserId, userData);
       toast.success('User updated successfully');
       await fetchUsers();
       setIsModalOpen(false);
-      setEditingUserId(null);
     } catch (error) {
+      console.error('Error updating user:', error);
       toast.error(error.response?.data?.message || 'Failed to update user');
     }
   };
@@ -300,10 +282,11 @@ const Users = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await deleteUser(userId);
+        await userApi.delete(userId);
         toast.success('User deleted successfully');
         await fetchUsers();
       } catch (error) {
+        console.error('Error deleting user:', error);
         toast.error(error.response?.data?.message || 'Failed to delete user');
       }
     }
@@ -311,21 +294,23 @@ const Users = () => {
 
   const handleChangePassword = async (userId, currentPassword, newPassword) => {
     try {
-      await changeUserPassword(userId, currentPassword, newPassword);
+      await userApi.changePassword(userId, currentPassword, newPassword);
       toast.success('Password changed successfully');
       setIsPasswordModalOpen(false);
       setCurrentUser(null);
     } catch (error) {
-      throw error; // Let the modal handle the error
+      console.error('Error changing password:', error);
+      toast.error(error.response?.data?.message || 'Failed to change password');
     }
   };
 
   const handleToggleStatus = async (userId, currentStatus) => {
     try {
-      await updateUserStatus(userId, !currentStatus);
+      await userApi.updateStatus(userId, !currentStatus);
       toast.success(`User ${currentStatus ? 'deactivated' : 'activated'} successfully`);
       await fetchUsers();
     } catch (error) {
+      console.error('Error toggling user status:', error);
       toast.error(error.response?.data?.message || 'Failed to update user status');
     }
   };
@@ -372,8 +357,9 @@ const Users = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -401,28 +387,56 @@ const Users = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.email}
+                      <div className="font-medium">{user.email}</div>
+                      <div className="text-xs text-gray-400">
+                        Last login: {new Date(user.lastLogin).toLocaleDateString()}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         user.role === 'admin' 
                           ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-blue-100 text-blue-800'
+                          : user.role === 'teacher'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-blue-100 text-blue-800'
                       }`}>
-                        {user.role}
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {user.role === 'student' && (
+                        <div>
+                          <div>ID: {user.studentId}</div>
+                          <div>{user.course} (Sem {user.semester})</div>
+                        </div>
+                      )}
+                      {user.role === 'teacher' && (
+                        <div>
+                          <div>ID: {user.employeeId}</div>
+                          <div>{user.department}</div>
+                          <div className="text-xs text-gray-400">
+                            {user.subjects?.join(', ')}
+                          </div>
+                        </div>
+                      )}
+                      {user.role === 'admin' && 'System Administrator'}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span 
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer ${
-                          user.isActive 
-                            ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                            : 'bg-red-100 text-red-800 hover:bg-red-200'
-                        }`}
-                        onClick={() => handleToggleStatus(user._id, user.isActive)}
-                      >
-                        {user.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                      <div className="flex flex-col space-y-1">
+                        <span 
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer ${
+                            user.isActive 
+                              ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                              : 'bg-red-100 text-red-800 hover:bg-red-200'
+                          }`}
+                          onClick={() => handleToggleStatus(user._id, user.isActive)}
+                        >
+                          {user.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          Joined: {new Date(user.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">

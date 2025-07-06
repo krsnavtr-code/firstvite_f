@@ -1,125 +1,110 @@
 import api from '../utils/api';
 
 // Base API path for user endpoints
-// Using just '/users' because the baseURL already includes '/api'
 const API_BASE = '/users';
 
-// Mock data for development
-const mockUsers = [
-  {
-    _id: '1',
-    fullname: 'Admin User',
-    email: 'admin@example.com',
-    role: 'admin',
-    isActive: true,
-    createdAt: new Date().toISOString()
+// Debug: Log the base URL being used
+console.log('API Base URL:', api.defaults.baseURL);
+console.log('Full Users URL:', `${api.defaults.baseURL}${API_BASE}`);
+
+/**
+ * User API Service
+ * Handles all user-related API calls
+ */
+const userApi = {
+  // Get all users with optional filters
+  getUsers: async (filters = {}) => {
+    try {
+      console.log('Sending request to:', API_BASE);
+      const response = await api.get(API_BASE, { params: filters });
+      console.log('Users response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching users:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers,
+        },
+      });
+      throw error;
+    }
   },
-  {
-    _id: '2',
-    fullname: 'Regular User',
-    email: 'user@example.com',
-    role: 'user',
-    isActive: true,
-    createdAt: new Date().toISOString()
-  }
-];
 
-// Get all users
-export const getUsers = async () => {
-  try {
-    console.log('Fetching users from:', API_BASE);
-    // Uncomment this line to use real API when available
-    // const response = await api.get(API_BASE);
-    // return response.data;
-    
-    // Using mock data for now
-    console.log('Using mock data for users');
-    return [...mockUsers];
-  } catch (error) {
-    console.error('Error fetching users:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-      config: {
-        url: error.config?.baseURL + error.config?.url,
-        method: error.config?.method,
-        params: error.config?.params
-      }
-    });
-    
-    // Return mock data even if there's an error for development
-    console.log('Falling back to mock data due to error');
-    return [...mockUsers];
+  // Get single user by ID
+  getById: async (userId) => {
+    try {
+      const response = await api.get(`${API_BASE}/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Create a new user
+  create: async (userData) => {
+    try {
+      const response = await api.post(API_BASE, userData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+  },
+
+  // Update an existing user
+  update: async (userId, userData) => {
+    try {
+      const response = await api.put(`${API_BASE}/${userId}`, userData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Delete a user
+  delete: async (userId) => {
+    try {
+      await api.delete(`${API_BASE}/${userId}`);
+    } catch (error) {
+      console.error(`Error deleting user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Change user password
+  changePassword: async (userId, currentPassword, newPassword) => {
+    try {
+      const response = await api.put(`${API_BASE}/${userId}/change-password`, {
+        currentPassword,
+        newPassword
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error changing password for user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Update user status (active/inactive)
+  updateStatus: async (userId, isActive) => {
+    try {
+      const response = await api.put(`${API_BASE}/${userId}/status`, { isActive });
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating status for user ${userId}:`, error);
+      throw error;
+    }
   }
 };
 
-// Get single user by ID
-export const getUserById = async (userId) => {
-  try {
-    const response = await api.get(`${API_BASE}/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching user ${userId}:`, error);
-    throw error;
-  }
-};
-
-// Create new user
-export const createUser = async (userData) => {
-  try {
-    const response = await api.post(API_BASE, userData);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating user:', error);
-    throw error;
-  }
-};
-
-// Update user
-export const updateUser = async (userId, userData) => {
-  try {
-    const response = await api.put(`${API_BASE}/${userId}`, userData);
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating user ${userId}:`, error);
-    throw error;
-  }
-};
-
-// Delete user
-export const deleteUser = async (userId) => {
-  try {
-    await api.delete(`${API_BASE}/${userId}`);
-  } catch (error) {
-    console.error(`Error deleting user ${userId}:`, error);
-    throw error;
-  }
-};
-
-// Change user password
-export const changeUserPassword = async (userId, currentPassword, newPassword) => {
-  try {
-    const response = await api.put(`${API_BASE}/${userId}/change-password`, {
-      currentPassword,
-      newPassword
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Error changing password for user ${userId}:`, error);
-    throw error;
-  }
-};
-
-// Update user status (active/inactive)
-export const updateUserStatus = async (userId, isActive) => {
-  try {
-    const response = await api.put(`${API_BASE}/${userId}/status`, { isActive });
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating status for user ${userId}:`, error);
-    throw error;
-  }
-};
+export default userApi;
 
 // For debugging: Log the current API configuration
 export const logApiConfig = () => {
