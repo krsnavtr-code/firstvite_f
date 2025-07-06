@@ -41,13 +41,33 @@ export const createCourse = async (courseData) => {
         console.log('Creating course with data:', courseData);
         const response = await axios.post('/courses', courseData, {
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            timeout: 10000 // 10 seconds timeout
         });
+        
+        if (!response.data) {
+            throw new Error('No data received in response');
+        }
+        
         console.log('Course created successfully:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error creating course:', error);
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error('Response data:', error.response.data);
+            console.error('Response status:', error.response.status);
+            console.error('Response headers:', error.response.headers);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received:', error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error message:', error.message);
+        }
         if (error.response) {
             console.error('Response data:', error.response.data);
             console.error('Response status:', error.response.status);
@@ -57,19 +77,41 @@ export const createCourse = async (courseData) => {
     }
 };
 
-// Update a course
-export const updateCourse = async (id, courseData) => {
+// Update a course (full or partial update)
+export const updateCourse = async (id, courseData, isPartial = false) => {
     try {
-        console.log(`Updating course ${id} with data:`, courseData);
-        const response = await axios.put(`/courses/${id}`, courseData, {
+        console.log(`${isPartial ? 'Partially' : 'Fully'} updating course ${id} with data:`, courseData);
+        const method = isPartial ? 'patch' : 'put';
+        const response = await axios[method](`/courses/${id}`, courseData, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
-        console.log('Course updated successfully:', response.data);
+        console.log(`Course ${isPartial ? 'partially ' : ''}updated successfully:`, response.data);
         return response.data;
     } catch (error) {
-        console.error(`Error updating course ${id}:`, error);
+        console.error(`Error ${isPartial ? 'partially ' : ''}updating course ${id}:`, error);
+        if (error.response) {
+            console.error('Response status:', error.response.status);
+            console.error('Response data:', error.response.data);
+        }
+        throw error;
+    }
+};
+
+// Update specific course section
+export const updateCourseSection = async (id, section, sectionData) => {
+    try {
+        console.log(`Updating course ${id} section '${section}' with data:`, sectionData);
+        const response = await axios.patch(`/courses/${id}/section/${section}`, sectionData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log(`Course section '${section}' updated successfully:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error updating course ${id} section '${section}':`, error);
         if (error.response) {
             console.error('Response status:', error.response.status);
             console.error('Response data:', error.response.data);
