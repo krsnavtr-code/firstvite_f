@@ -20,12 +20,12 @@ api.interceptors.request.use(
     
     // Get token from localStorage
     const token = localStorage.getItem('token');
-    console.log('Token from localStorage:', token ? 'Found' : 'Not found');
+    // console.log('Token from localStorage:', token ? 'Found' : 'Not found');
     
     if (token) {
       // Ensure Authorization header is set correctly
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('Authorization header set with token');
+      // console.log('Authorization header set with token');
     } else {
       console.warn('No token found in localStorage');
       // If you want to redirect to login when no token is found, uncomment below
@@ -33,8 +33,8 @@ api.interceptors.request.use(
       // return Promise.reject('No token found');
     }
     
-    console.log('Making request to:', config.method?.toUpperCase(), config.url);
-    console.log('Request headers:', JSON.stringify(config.headers, null, 2));
+    // console.log('Making request to:', config.method?.toUpperCase(), config.url);
+    // console.log('Request headers:', JSON.stringify(config.headers, null, 2));
     
     return config;
   },

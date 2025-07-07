@@ -33,7 +33,7 @@ export const getCourses = async (category = '', isAdmin = false) => {
         if (category) params.category = category;
         if (isAdmin) params.all = 'true'; // This will tell the backend to return all courses
         
-        console.log('Fetching courses with params:', params);
+        // console.log('Fetching courses with params:', params);
         const response = await axios.get('/courses', { params });
         console.log('Courses fetched successfully');
         return response.data;
@@ -313,9 +313,9 @@ export const getCoursesByCategory = async (categoryId = '') => {
       params.category = categoryId;
     }
     
-    console.log('Fetching courses with params:', params);
+    // console.log('Fetching courses with params:', params);
     const response = await axios.get('/courses', { params });
-    console.log('Courses fetched successfully:', response.data);
+    // console.log('Courses fetched successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching courses by category:', error);
@@ -328,7 +328,7 @@ export const getCategoriesForForm = async () => {
     try {
         console.log('Fetching categories for form');
         const response = await axios.get('/categories');
-        console.log('Categories fetched successfully:', response.data);
+        // console.log('Categories fetched successfully:', response.data);
         return response.data.map(cat => ({
             value: cat._id,
             label: cat.name

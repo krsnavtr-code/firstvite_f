@@ -52,7 +52,7 @@ const CoursesByCategory = () => {
         // If no category or category not found, show all courses
         console.log('Fetching all courses');
         const allCourses = await getCoursesByCategory();
-        console.log('Fetched all courses:', allCourses);
+        // console.log('Fetched all courses:', allCourses);
         setCourses(allCourses);
         setCategory(null); // Ensure category is cleared when showing all courses
       } catch (error) {
@@ -178,75 +178,53 @@ const CoursesByCategory = () => {
 };
 
 const CourseCard = ({ course }) => {
-  // Function to get the full image URL with debugging
-  const getImageUrl = (url) => {
-    console.group('getImageUrl Debug');
-    try {
-      if (!url) {
-        console.warn('No image URL provided, using placeholder');
-        return '';
-      }
-      
-      console.log('Original URL from database:', url);
-      
-      // Try direct access first (in case the backend serves from root)
-      const directUrl = `http://localhost:4002${url.startsWith('/') ? '' : '/'}${url}`;
-      console.log('Trying direct URL:', directUrl);
-      
-      // Create a test image to check if the URL is accessible
-      const testImage = new Image();
-      testImage.src = directUrl;
-      
-      // If the image loads successfully, use this URL
-      testImage.onload = () => {
-        console.log('✅ Image loaded successfully:', directUrl);
-        return directUrl;
-      };
-      
-      // If there's an error, try alternative URL formats
-      testImage.onerror = () => {
-        console.warn('❌ Failed to load image from direct URL, trying alternatives...');
-        
-        // Try with /public prefix if it's an upload
-        if (url.startsWith('/uploads/')) {
-          const publicUrl = `http://localhost:4002/public${url}`;
-          console.log('Trying with /public prefix:', publicUrl);
-          return publicUrl;
-        }
-        
-        // Try with base URL
-        const baseUrl = 'http://localhost:4002';
-        const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-        const fullUrl = `${baseUrl}${cleanUrl}`;
-        console.log('Trying with base URL:', fullUrl);
-        return fullUrl;
-      };
-      
-      // Return the direct URL initially, it will update if needed
-      return directUrl;
-    } catch (error) {
-      console.error('Error in getImageUrl:', error);
-      return '/images/course-placeholder.jpg';
-    } finally {
-      console.groupEnd();
+  const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+
+  useEffect(() => {
+    // Reset error state when course changes
+    setImageError(false);
+    
+    if (!course.thumbnail) {
+      setImageUrl('/images/course-placeholder.jpg');
+      return;
     }
+
+    let url = course.thumbnail;
+    
+    // If it's not already a full URL, construct it
+    if (!url.startsWith('http') && !url.startsWith('https') && !url.startsWith('//')) {
+      // Remove any leading slashes to avoid double slashes
+      const cleanPath = url.replace(/^\/+/, '');
+      url = `http://localhost:4002/${cleanPath}`;
+    }
+    setImageUrl(url);
+  }, [course]);
+  
+  const handleImageError = () => {
+    setImageError(true);
+    setImageUrl('/images/course-placeholder.jpg');
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden dark:bg-slate-800 hover:shadow-lg transition-shadow duration-300">
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
-          <img
-            src={getImageUrl(course.thumbnail)}
-            alt={course.title}
-            className="w-full h-48 object-cover"
-            onError={(e) => {
-              console.error('Error loading image:', course.thumbnail);
-              e.target.onerror = null;
-              e.target.src = "/images/course-placeholder.jpg";
-            }}
-            onLoad={() => console.log('Image loaded successfully:', course.thumbnail)}
-          />
+          <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+            {imageError || !course.thumbnail ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-700">
+                <span className="text-gray-500 dark:text-gray-400">No image available</span>
+              </div>
+            ) : (
+              <img
+                src={imageUrl}
+                alt={course.title || 'Course image'}
+                className="w-full h-full object-cover"
+                onError={handleImageError}
+                loading="lazy"
+              />
+            )}
+          </div>
           {course.isFeatured && (
             <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded">
               Featured
