@@ -75,18 +75,22 @@ export const createCourse = async (courseData) => {
             category: courseData.category,
             instructor: courseData.instructor,
             price: Number(courseData.price) || 0,
-            originalPrice: courseData.originalPrice ? Number(courseData.originalPrice) : undefined,
+            originalPrice: courseData.originalPrice ? Number(courseData.originalPrice) : Number(courseData.price) || 0,
             totalHours: courseData.totalHours ? Number(courseData.totalHours) : 0,
             duration: courseData.duration || '',
             level: courseData.level || 'Beginner',
             language: courseData.language || 'English',
             benefits: Array.isArray(courseData.benefits) ? courseData.benefits : 
                      (typeof courseData.benefits === 'string' ? courseData.benefits.split('\n').filter(b => b.trim() !== '') : []),
-            prerequisites: Array.isArray(courseData.prerequisites) ? courseData.prerequisites : 
+            prerequisites: Array.isArray(courseData.prerequisites) ? courseData.prerequisites.filter(p => p.trim() !== '') : 
                          (typeof courseData.prerequisites === 'string' ? courseData.prerequisites.split('\n').filter(p => p.trim() !== '') : []),
-            skills: Array.isArray(courseData.skills) ? courseData.skills : 
+            whatYouWillLearn: Array.isArray(courseData.whatYouWillLearn) ? courseData.whatYouWillLearn.filter(l => l.trim() !== '') : 
+                             (typeof courseData.whatYouWillLearn === 'string' ? courseData.whatYouWillLearn.split('\n').filter(l => l.trim() !== '') : []),
+            skills: Array.isArray(courseData.skills) ? courseData.skills.filter(s => s.trim() !== '') : 
                    (typeof courseData.skills === 'string' ? courseData.skills.split('\n').filter(s => s.trim() !== '') : []),
             certificateIncluded: Boolean(courseData.certificateIncluded),
+            isFeatured: Boolean(courseData.isFeatured),
+            isPublished: Boolean(courseData.isPublished),
             status: courseData.status || 'draft',
             curriculum: courseData.curriculum || [
                 {
@@ -176,12 +180,62 @@ export const createCourse = async (courseData) => {
 export const updateCourse = async (id, courseData, isPartial = false) => {
     try {
         console.log(`${isPartial ? 'Partially' : 'Fully'} updating course ${id} with data:`, courseData);
+        
+        // Clean and format the data similar to createCourse
+        const cleanData = {
+            ...courseData,
+            price: courseData.price !== undefined ? Number(courseData.price) : undefined,
+            originalPrice: courseData.originalPrice !== undefined ? Number(courseData.originalPrice) : undefined,
+            totalHours: courseData.totalHours !== undefined ? Number(courseData.totalHours) : undefined,
+            certificateIncluded: courseData.certificateIncluded !== undefined ? Boolean(courseData.certificateIncluded) : undefined,
+            isFeatured: courseData.isFeatured !== undefined ? Boolean(courseData.isFeatured) : undefined,
+            isPublished: courseData.isPublished !== undefined ? Boolean(courseData.isPublished) : undefined,
+            benefits: courseData.benefits !== undefined ? (
+                Array.isArray(courseData.benefits) 
+                    ? courseData.benefits.filter(b => b && b.trim() !== '') 
+                    : (typeof courseData.benefits === 'string' 
+                        ? courseData.benefits.split('\n').filter(b => b.trim() !== '') 
+                        : [])
+            ) : undefined,
+            prerequisites: courseData.prerequisites !== undefined ? (
+                Array.isArray(courseData.prerequisites) 
+                    ? courseData.prerequisites.filter(p => p && p.trim() !== '') 
+                    : (typeof courseData.prerequisites === 'string' 
+                        ? courseData.prerequisites.split('\n').filter(p => p.trim() !== '') 
+                        : [])
+            ) : undefined,
+            whatYouWillLearn: courseData.whatYouWillLearn !== undefined ? (
+                Array.isArray(courseData.whatYouWillLearn) 
+                    ? courseData.whatYouWillLearn.filter(l => l && l.trim() !== '') 
+                    : (typeof courseData.whatYouWillLearn === 'string' 
+                        ? courseData.whatYouWillLearn.split('\n').filter(l => l.trim() !== '') 
+                        : [])
+            ) : undefined,
+            skills: courseData.skills !== undefined ? (
+                Array.isArray(courseData.skills) 
+                    ? courseData.skills.filter(s => s && s.trim() !== '') 
+                    : (typeof courseData.skills === 'string' 
+                        ? courseData.skills.split('\n').filter(s => s.trim() !== '') 
+                        : [])
+            ) : undefined
+        };
+
+        // Remove undefined values for partial updates
+        const dataToSend = isPartial 
+            ? Object.fromEntries(
+                Object.entries(cleanData).filter(([_, v]) => v !== undefined)
+              )
+            : cleanData;
+
+        console.log('Sending cleaned data:', dataToSend);
+        
         const method = isPartial ? 'patch' : 'put';
-        const response = await axios[method](`/courses/${id}`, courseData, {
+        const response = await axios[method](`/courses/${id}`, dataToSend, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
+        
         console.log(`Course ${isPartial ? 'partially ' : ''}updated successfully:`, response.data);
         return response.data;
     } catch (error) {
