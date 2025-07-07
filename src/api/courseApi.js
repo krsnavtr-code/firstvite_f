@@ -87,8 +87,25 @@ export const createCourse = async (courseData) => {
             skills: Array.isArray(courseData.skills) ? courseData.skills : 
                    (typeof courseData.skills === 'string' ? courseData.skills.split('\n').filter(s => s.trim() !== '') : []),
             certificateIncluded: Boolean(courseData.certificateIncluded),
-            status: courseData.status || 'draft'
+            status: courseData.status || 'draft',
+            curriculum: courseData.curriculum || [
+                {
+                    week: 1,
+                    title: 'Introduction',
+                    description: '',
+                    duration: 0,
+                    topics: ['Course introduction']
+                }
+            ]
         };
+        
+        // Ensure all array fields are present and properly formatted
+        const arrayFields = ['benefits', 'prerequisites', 'skills'];
+        arrayFields.forEach(field => {
+            if (!Array.isArray(cleanData[field])) {
+                cleanData[field] = [];
+            }
+        });
         
         // Remove undefined values
         Object.keys(cleanData).forEach(key => {
@@ -106,19 +123,14 @@ export const createCourse = async (courseData) => {
             },
             timeout: 10000 // 10 seconds timeout
         });
-        
-        if (!response.data) {
+
+        const responseData = response.data;
+        const responseCourseData = responseData.data || responseData;
+
+        if (!responseCourseData) {
             throw new Error('No data received in response');
         }
-        
-        // Extract the course data from the response
-        const responseData = response.data;
-        const responseCourseData = responseData.data || responseData; // Handle both response formats
-        
-        if (!responseCourseData) {
-            throw new Error('Invalid response format: missing course data');
-        }
-        
+
         // Ensure the course ID is available
         if (!responseCourseData._id && !responseCourseData.id) {
             console.error('Invalid response - missing course ID:', responseData);
