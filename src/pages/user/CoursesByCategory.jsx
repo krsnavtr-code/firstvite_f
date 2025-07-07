@@ -16,19 +16,21 @@ const CoursesByCategory = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Fetch all categories for the sidebar
+        console.log('Fetching categories...');
         const categoriesData = await getCategories();
+        console.log('Categories fetched:', categoriesData);
         setAllCategories(categoriesData);
 
-        // If we have a categoryName, fetch courses for that category
+        // Reset category state when component mounts or categoryName changes
+        setCategory(null);
+
         if (categoryName) {
           console.log('Category name from URL:', categoryName);
           // Decode the URL-encoded category name and replace hyphens with spaces
           const decodedCategoryName = decodeURIComponent(categoryName.replace(/-/g, ' '));
           console.log('Decoded category name:', decodedCategoryName);
           
-          // First, find the category by name (case insensitive and trim whitespace)
+          // Find the category by name (case insensitive and trim whitespace)
           const categoryData = categoriesData.find(
             (cat) => cat.name.trim().toLowerCase() === decodedCategoryName.trim().toLowerCase()
           );
@@ -41,17 +43,18 @@ const CoursesByCategory = () => {
             const coursesData = await getCoursesByCategory(categoryData._id);
             console.log('Fetched courses:', coursesData);
             setCourses(coursesData);
+            return; // Exit early after handling category courses
           } else {
-            // If category not found, clear the courses
-            console.log('Category not found');
-            setCategory(null);
-            setCourses([]);
+            console.log('Category not found, showing all courses');
           }
-        } else {
-          // If no categoryId, show all courses or a featured selection
-          const allCourses = await getCoursesByCategory();
-          setCourses(allCourses);
         }
+        
+        // If no category or category not found, show all courses
+        console.log('Fetching all courses');
+        const allCourses = await getCoursesByCategory();
+        console.log('Fetched all courses:', allCourses);
+        setCourses(allCourses);
+        setCategory(null); // Ensure category is cleared when showing all courses
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to load courses. Please try again.");
@@ -109,6 +112,10 @@ const CoursesByCategory = () => {
               <li>
                 <Link
                   to="/courses"
+                  onClick={() => {
+                    setCategory(null);
+                    setCourses([]);
+                  }}
                   className={`block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
                     !categoryName
                       ? "bg-blue-50 text-blue-600 font-medium"
