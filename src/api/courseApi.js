@@ -26,11 +26,15 @@ export const uploadCourseImage = async (formData) => {
 };
 
 // Get all courses with optional category filter
-export const getCourses = async (category = '') => {
+// If isAdmin is true, will include unpublished courses
+export const getCourses = async (category = '', isAdmin = false) => {
     try {
-        const url = category ? `/courses?category=${category}` : '/courses';
-        console.log('Fetching courses from:', url);
-        const response = await axios.get(url);
+        const params = {};
+        if (category) params.category = category;
+        if (isAdmin) params.all = 'true'; // This will tell the backend to return all courses
+        
+        console.log('Fetching courses with params:', params);
+        const response = await axios.get('/courses', { params });
         console.log('Courses fetched successfully');
         return response.data;
     } catch (error) {
@@ -43,11 +47,15 @@ export const getCourses = async (category = '') => {
     }
 };
 
-// Get single course by ID
+// Get single course by ID with all necessary fields
 export const getCourseById = async (id) => {
     try {
         console.log(`Fetching course with ID: ${id}`);
-        const response = await axios.get(`/courses/${id}`);
+        const response = await axios.get(`/courses/${id}`, {
+            params: {
+                fields: 'title,description,shortDescription,category,instructor,price,originalPrice,discount,thumbnail,rating,enrolledStudents,duration,whatYouWillLearn,requirements,whoIsThisFor,curriculum,reviews,isFeatured,slug,status,metaTitle,metaDescription,tags'
+            }
+        });
         console.log('Course fetched successfully:', response.data);
         return response.data;
     } catch (error) {
@@ -297,8 +305,7 @@ export const deleteCourse = async (id) => {
 export const getCoursesByCategory = async (categoryId = '') => {
   try {
     const params = {
-      status: 'published',
-      fields: 'title,description,price,originalPrice,thumbnail,duration,level,instructor,rating,enrolledStudents,isFeatured,category'
+      fields: 'title,description,price,originalPrice,thumbnail,duration,level,instructor,rating,enrolledStudents,isFeatured,category,slug,whatYouWillLearn,requirements,whoIsThisFor,curriculum,reviews,isFeatured,status'
     };
     
     // Add category filter if provided
@@ -306,7 +313,9 @@ export const getCoursesByCategory = async (categoryId = '') => {
       params.category = categoryId;
     }
     
+    console.log('Fetching courses with params:', params);
     const response = await axios.get('/courses', { params });
+    console.log('Courses fetched successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching courses by category:', error);

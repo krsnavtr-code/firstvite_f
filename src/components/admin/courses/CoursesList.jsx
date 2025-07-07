@@ -11,20 +11,22 @@ const CoursesList = () => {
 
   // Fetch courses and categories
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCourses = async () => {
       try {
         setLoading(true);
-        console.log('Selected category:', selectedCategory);
-        
+        // Pass true for isAdmin to get all courses including unpublished ones
+        const data = await getCourses('', true);
+        setCourses(data);
+
         // Fetch categories for filter
         console.log('Fetching categories...');
         const categoriesData = await getCategoriesForForm();
         console.log('Categories fetched:', categoriesData);
         setCategories(categoriesData);
         
-        // Fetch courses with category filter
+        // Fetch courses with category filter and admin flag
         console.log('Fetching courses with category:', selectedCategory);
-        const coursesData = await getCourses(selectedCategory);
+        const coursesData = await getCourses(selectedCategory, true); // true for isAdmin
         console.log('Courses fetched:', coursesData);
         setCourses(coursesData);
       } catch (error) {
@@ -35,7 +37,7 @@ const CoursesList = () => {
       }
     };
 
-    fetchData();
+    fetchCourses();
   }, [selectedCategory]);
 
   const handleDelete = async (id) => {

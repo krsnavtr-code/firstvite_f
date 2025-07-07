@@ -16,6 +16,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
+import CourseDetail from './pages/user/CourseDetail';
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -97,6 +98,12 @@ function App() {
         <Route path="/courses/category/:categoryId" element={
           <MainLayout>
             <CoursesByCategory />
+          </MainLayout>
+        } />
+        
+        <Route path="/course/:id" element={
+          <MainLayout>
+            <CourseDetail />
           </MainLayout>
         } />
 
