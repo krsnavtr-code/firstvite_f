@@ -14,12 +14,18 @@ const CoursesList = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        console.log('Selected category:', selectedCategory);
+        
         // Fetch categories for filter
+        console.log('Fetching categories...');
         const categoriesData = await getCategoriesForForm();
+        console.log('Categories fetched:', categoriesData);
         setCategories(categoriesData);
         
-        // Fetch courses
+        // Fetch courses with category filter
+        console.log('Fetching courses with category:', selectedCategory);
         const coursesData = await getCourses(selectedCategory);
+        console.log('Courses fetched:', coursesData);
         setCourses(coursesData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -83,10 +89,10 @@ const CoursesList = () => {
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
-          <option value="">All Categories</option>
+          <option key="all" value="">All Categories</option>
           {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-              {category.name}
+            <option key={category.value} value={category.value}>
+              {category.label}
             </option>
           ))}
         </select>

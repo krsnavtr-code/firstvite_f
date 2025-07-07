@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { Editor } from "@tinymce/tinymce-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
@@ -7,111 +8,237 @@ import {
   updateCourse,
   getCourseById,
   getCategoriesForForm,
-  updateCourseSection,
+  uploadCourseImage
 } from "../../../api/courseApi";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import userApi from "../../../api/userApi";
+
+// Component to handle each week in the curriculum
+const WeekItem = ({ week, weekIndex, removeWeek, register, control, errors }) => {
+  const {
+    fields: topicFields,
+    append: appendTopic,
+    remove: removeTopic,
+  } = useFieldArray({
+    control,
+    name: `curriculum.${weekIndex}.topics`,
+    keyName: 'topicId' // Ensure we have a unique key for each topic
+  });
+
+  return (
+    <div className="mb-6 border border-gray-200 rounded-lg p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h4 className="text-md font-medium">Week {weekIndex + 1}</h4>
+        <button
+          type="button"
+          onClick={() => removeWeek(weekIndex)}
+          className="text-sm text-red-600 hover:text-red-800"
+        >
+          Remove Week
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Week Title *
+          </label>
+          <input
+            type="text"
+            {...register(`curriculum.${weekIndex}.title`, {
+              required: "Week title is required",
+            })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g., Introduction to React"
+          />
+          {errors.curriculum?.[weekIndex]?.title && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.curriculum[weekIndex].title.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Duration (hours) *
+          </label>
+          <input
+            type="number"
+            {...register(`curriculum.${weekIndex}.duration`, {
+              required: "Duration is required",
+              min: { value: 1, message: "Minimum 1 hour" },
+            })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g., 5"
+          />
+          {errors.curriculum?.[weekIndex]?.duration && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.curriculum[weekIndex].duration.message}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Description
+        </label>
+        <textarea
+          {...register(`curriculum.${weekIndex}.description`)}
+          rows={3}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="What will students learn this week?"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Topics / Lessons
+        </label>
+        <div className="space-y-2">
+          {topicFields.map((topic, topicIndex) => (
+            <div key={topic.topicId} className="flex items-center space-x-2">
+              <input
+                type="text"
+                {...register(`curriculum.${weekIndex}.topics.${topicIndex}`, {
+                  required: "Topic is required"
+                })}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder={`Topic ${topicIndex + 1}`}
+              />
+              <button
+                type="button"
+                onClick={() => removeTopic(topicIndex)}
+                className="px-3 py-2 text-red-600 hover:text-red-800"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => appendTopic("")}
+            className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+          >
+            + Add Topic
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const CourseForm = ({ isEdit = false }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [savingSection, setSavingSection] = useState(null);
-  const [savedSections, setSavedSections] = useState(new Set());
-  const [courseId, setCourseId] = useState(isEdit ? id : null);
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
-  const [courseImage, setCourseImage] = useState(null);
-  const [previewVideo, setPreviewVideo] = useState(null);
-  const [thumbnailImage, setThumbnailImage] = useState(null);
-  // Tab navigation state
-  const [activeTab, setActiveTab] = useState("basic");
+  const [instructors, setInstructors] = useState([]);
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-    reset,
     setValue,
     watch,
+    reset,
     getValues,
-    trigger, // Add trigger for manual validation
+    trigger,
   } = useForm({
     defaultValues: {
-      mentors: [
-        {
-          name: "",
-          title: "",
-          bio: "",
-          image: "",
-          socialLinks: { linkedin: "", twitter: "", github: "" },
-        },
-      ],
-      curriculum: [
-        {
-          week: 1,
-          title: "",
-          description: "",
-          topics: [""],
-          duration: "",
-        },
-      ],
-      faqs: [{ question: "", answer: "" }],
-      benefits: [""],
-      skills: [""],
-      prerequisites: [""],
-      tags: [""],
+      title: "",
+      slug: "",
+      shortDescription: "",
+      description: "",
+      category: "",
+      instructor: "",
+      price: 0,
+      originalPrice: 0,
+      discount: 0,
+      duration: "",
+      totalHours: 0,
+      level: "Beginner",
+      language: "English",
       certificateIncluded: true,
       isFeatured: false,
       isPublished: false,
-      language: "English",
+      prerequisites: [""],
+      whatYouWillLearn: [""],
+      skills: [""],
+      curriculum: [
+        {
+          week: 1,
+          title: "Introduction",
+          description: "",
+          duration: 0,
+          topics: [""],
+        },
+      ],
     },
   });
 
-  // Field arrays for dynamic form sections
-  const {
-    fields: mentorFields,
-    append: appendMentor,
-    remove: removeMentor,
-  } = useFieldArray({
-    control,
-    name: "mentors",
-  });
+  // Fetch course data in edit mode
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        setLoading(true);
 
+        // Fetch categories
+        const categoriesData = await getCategoriesForForm();
+        setCategories(categoriesData);
+
+        // Fetch instructors (assuming we have a way to get instructors)
+        const instructorsData = await userApi.getUsers({ role: "instructor" });
+        setInstructors(instructorsData);
+
+        // If in edit mode, fetch course data
+        if (isEdit && id) {
+          const courseData = await getCourseById(id);
+          // Format the data to match form structure
+          const formattedData = {
+            ...courseData,
+            // Ensure all required arrays exist
+            prerequisites: courseData.prerequisites?.length
+              ? courseData.prerequisites
+              : [""],
+            whatYouWillLearn: courseData.whatYouWillLearn?.length
+              ? courseData.whatYouWillLearn
+              : [""],
+            skills: courseData.skills?.length ? courseData.skills : [""],
+            curriculum: courseData.curriculum?.length
+              ? courseData.curriculum
+              : [
+                {
+                  week: 1,
+                  title: "Introduction",
+                  description: "",
+                  duration: 0,
+                  topics: [""],
+                },
+              ],
+          };
+          reset(formattedData);
+        }
+      } catch (error) {
+        console.error("Error loading form data:", error);
+        toast.error("Failed to load form data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [id, isEdit, reset]);
+
+  // Field arrays for curriculum
   const {
     fields: curriculumFields,
     append: appendWeek,
     remove: removeWeek,
   } = useFieldArray({
     control,
-    name: "curriculum",
-  });
-
-  const {
-    fields: faqFields,
-    append: appendFaq,
-    remove: removeFaq,
-  } = useFieldArray({
-    control,
-    name: "faqs",
-  });
-
-  const {
-    fields: benefitFields,
-    append: appendBenefit,
-    remove: removeBenefit,
-  } = useFieldArray({
-    control,
-    name: "benefits",
-  });
-
-  const {
-    fields: skillFields,
-    append: appendSkill,
-    remove: removeSkill,
-  } = useFieldArray({
-    control,
-    name: "skills",
+    name: 'curriculum',
+    shouldUnregister: true,
   });
 
   const {
@@ -120,734 +247,350 @@ const CourseForm = ({ isEdit = false }) => {
     remove: removePrerequisite,
   } = useFieldArray({
     control,
-    name: "prerequisites",
+    name: 'prerequisites',
   });
 
   const {
-    fields: tagFields,
-    append: appendTag,
-    remove: removeTag,
+    fields: learningsFields,
+    append: appendLearning,
+    remove: removeLearning,
   } = useFieldArray({
     control,
-    name: "tags",
+    name: 'whatYouWillLearn',
   });
 
-  // Fetch categories and course data (if editing)
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch categories for dropdown
-        const categoriesData = await getCategoriesForForm();
-        setCategories(categoriesData);
+  const {
+    fields: skillsFields,
+    append: appendSkill,
+    remove: removeSkill,
+  } = useFieldArray({
+    control,
+    name: 'skills',
+  });
 
-        // If editing, fetch the course data
-        if (isEdit && id) {
-          const course = await getCourseById(id);
-          // Set form values with course data
-          Object.entries(course).forEach(([key, value]) => {
-            if (key === "category") {
-              setValue(key, value._id);
-            } else if (value !== null) {
-              setValue(key, value);
-            }
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to load form data");
-      }
-    };
-
-    fetchData();
-  }, [id, isEdit, setValue]);
-
-  // Save a specific section of the course
-  const saveSection = async (section, sectionData) => {
-    console.group(`[saveSection] Starting to save section: ${section}`);
+  // Handle image upload
+  const handleImageUpload = async (file) => {
     try {
-      console.log('Section data:', JSON.stringify(sectionData, null, 2));
-      
-      // If no course ID exists yet, create a new course first
-      if (!courseId) {
-        console.log('[saveSection] No course ID found, creating new course');
-        try {
-          setSavingSection("basic");
-          const courseTitle = watch("title") || "New Course";
-          console.log('[saveSection] Creating new course with title:', courseTitle);
-          
-          // Basic validation
-          if (!courseTitle) {
-            throw new Error('Course title is required');
-          }
-          
-          // Prepare course data with all fields from sectionData
-          const preparedData = {
-            title: courseTitle,
-            shortDescription: sectionData.shortDescription || '',
-            description: sectionData.description || '',
-            category: sectionData.category || null,
-            instructor: sectionData.instructor || '',
-            price: sectionData.price ? Number(sectionData.price) : 0,
-            originalPrice: sectionData.originalPrice ? Number(sectionData.originalPrice) : undefined,
-            totalHours: sectionData.totalHours ? Number(sectionData.totalHours) : 0,
-            duration: sectionData.duration || '',
-            level: sectionData.level || 'Beginner',
-            language: sectionData.language || 'English',
-            benefits: sectionData.benefits || [],
-            prerequisites: sectionData.prerequisites || [],
-            skills: sectionData.skills || [],
-            certificateIncluded: Boolean(sectionData.certificateIncluded),
-            status: 'draft'
-          };
-          
-          // Remove undefined values
-          Object.keys(preparedData).forEach(key => {
-            if (preparedData[key] === undefined) {
-              delete preparedData[key];
-            }
-          });
-          
-          // Log the prepared data for debugging
-          console.log('[saveSection] Prepared course data:', JSON.stringify({
-            ...preparedData,
-            description: preparedData.description?.substring(0, 50) + '...',
-            shortDescription: preparedData.shortDescription?.substring(0, 50) + '...'
-          }, null, 2));
-          
-          console.log('[saveSection] Sending create course request...');
-          const newCourse = await createCourse(preparedData);
-          
-          if (!newCourse) {
-            throw new Error('No course data returned from server');
-          }
-          
-          // Get the course ID from either _id or id field
-          const courseId = newCourse._id || newCourse.id;
-          
-          if (!courseId) {
-            console.error('[saveSection] Invalid response - missing course ID:', newCourse);
-            throw new Error('Invalid response: Missing course ID');
-          }
-          
-          console.log('[saveSection] New course created with ID:', courseId);
-          setCourseId(courseId);
-          setValue('_id', courseId);
-          
-          // Update the form data with the course ID and other fields from the response
-          if (newCourse) {
-            Object.keys(newCourse).forEach(key => {
-              if (key !== '_id' && key !== '__v') { // Skip internal fields
-                setValue(key, newCourse[key]);
-              }
-            });
-          }
-          
-          // If this was just creating a new course, we're done
-          if (section === 'basic') {
-            toast.success('Course created successfully!');
-            return true;
-          }
-          
-          // Continue with saving the section data
-          console.log(`[saveSection] Now saving section '${section}' data for new course`);
-        } catch (error) {
-          console.error('[saveSection] Error creating new course:', error);
-          toast.error(`Failed to create course: ${error.message}`);
-          return false;
-        } finally {
-          setSavingSection(null);
-        }
-      }
-      
-      // If we have a course ID, update the section
-      console.log(`[saveSection] Updating section '${section}' for course ${courseId}`);
-      console.log('[saveSection] Section data to save:', sectionData);
-      
-      setSavingSection(section);
-      let response;
-
-      try {
-        if (isEdit) {
-          console.log(`[saveSection] Updating section '${section}' for existing course`);
-          console.log(`[saveSection] Sending data to /courses/${courseId}/section/${section}:`, sectionData);
-          response = await updateCourseSection(courseId, section, sectionData);
-          console.log(`[saveSection] Section '${section}' update response:`, response);
-        } else {
-          console.log(`[saveSection] Updating course with section '${section}' data`);
-          const updateData = {
-            ...sectionData,
-            status: section === "basic" ? "draft" : undefined,
-          };
-          console.log('[saveSection] Update data:', updateData);
-          
-          response = await updateCourse(courseId, updateData);
-        }
-      
-        console.log(`[saveSection] Save successful for section '${section}':`, response);
-
-        // Mark this section as saved
-        setSavedSections((prev) => {
-          const updated = new Set([...prev, section]);
-          console.log(`[saveSection] Updated saved sections:`, Array.from(updated));
-          return updated;
-        });
-        
-        toast.success(
-          `${section.charAt(0).toUpperCase() + section.slice(1)} saved successfully`
-        );
-        return true;
-      } catch (error) {
-        console.error(`[saveSection] Error saving section '${section}':`, error);
-        
-        // Log detailed error information
-        if (error.response) {
-          console.error('Error response data:', error.response.data);
-          console.error('Error response status:', error.response.status);
-          console.error('Error response headers:', error.response.headers);
-        }
-        
-        let errorMessage = `Failed to save ${section} section. `;
-        if (error.response) {
-          console.error('[saveSection] Error response data:', error.response.data);
-          console.error('[saveSection] Error response status:', error.response.status);
-          if (error.response.data?.message) {
-            errorMessage += error.response.data.message;
-          }
-        } else if (error.request) {
-          console.error('[saveSection] No response received:', error.request);
-          errorMessage += "No response from server. ";
-        } else {
-          console.error('[saveSection] Error message:', error.message);
-        }
-        
-        errorMessage += error.message || "Please try again.";
-        toast.error(errorMessage);
-        return false;
-      } finally {
-        setSavingSection(null);
-        console.groupEnd();
-      }
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await uploadCourseImage(formData);
+      return { location: response.imageUrl };
     } catch (error) {
-      console.error(`[saveSection] Unexpected error in saveSection:`, error);
-      toast.error('An unexpected error occurred while saving');
-      return false;
+      console.error('Image upload failed:', error);
+      toast.error('Failed to upload image');
+      return { location: '' };
     }
   };
 
-  // Handle saving the current tab
-  const handleSaveSection = async (section) => {
-    console.group(`[handleSaveSection] Starting save for section: ${section}`);
-    console.log(`[handleSaveSection] Current courseId: ${courseId}`);
-    
+  // Form submission
+  const onSubmit = async (data) => {
     try {
-      const formData = getValues();
-      console.log(`[handleSaveSection] Form data for ${section}:`, formData);
-      
-      // Process text area fields - handle both strings and arrays
-      const processTextArea = (input) => {
-        if (!input) return [];
-        
-        // If input is already an array, return a cleaned copy
-        if (Array.isArray(input)) {
-          return input
-            .map(item => String(item).trim())
-            .filter(item => item !== '');
-        }
-        
-        // If input is a string, split by newlines and clean
-        if (typeof input === 'string') {
-          return input
-            .split('\n')
-            .map(item => item.trim())
-            .filter(item => item !== '');
-        }
-        
-        // For any other type, convert to string and process
-        return String(input)
-          .split('\n')
-          .map(item => item.trim())
-          .filter(item => item !== '');
-      };
-      
-      const processedData = {
-        ...formData,
-        benefits: processTextArea(formData.benefits),
-        prerequisites: processTextArea(formData.prerequisites),
-        skills: processTextArea(formData.skills),
-        requirements: processTextArea(formData.requirements),
-        whoIsThisFor: processTextArea(formData.whoIsThisFor)
-      };
-      
-      let sectionData = {};
-      
-      // Prepare section data based on the section being saved
-      switch (section) {
-        case 'basic':
-          sectionData = {
-            title: processedData.title || '',
-            shortDescription: processedData.shortDescription || '',
-            description: processedData.description || '',
-            category: processedData.category || '',
-            instructor: processedData.instructor || '',
-            duration: processedData.duration || '',
-            totalHours: processedData.totalHours ? Number(processedData.totalHours) : 0,
-            level: processedData.level || 'Beginner',
-            price: processedData.price ? Number(processedData.price) : 0,
-            originalPrice: processedData.originalPrice ? Number(processedData.originalPrice) : 0,
-            certificateIncluded: Boolean(processedData.certificateIncluded),
-            language: processedData.language || 'English',
-            benefits: processedData.benefits,
-            prerequisites: processedData.prerequisites,
-            skills: processedData.skills,
-            status: 'draft'
-          };
-          
-          // Only remove undefined values, keep empty strings
-          Object.keys(sectionData).forEach(key => {
-            if (sectionData[key] === undefined) {
-              delete sectionData[key];
-            } else if (typeof sectionData[key] === 'number' && isNaN(sectionData[key])) {
-              sectionData[key] = 0; // Convert NaN to 0 for number fields
-            }
-          });
-          
-          console.log('Processed basic section data:', sectionData);
-          break;
-          
-        case 'details':
-          sectionData = {
-            benefits: Array.isArray(processedData.benefits) ? processedData.benefits : [],
-            prerequisites: Array.isArray(processedData.prerequisites) ? processedData.prerequisites : [],
-            skills: Array.isArray(processedData.skills) ? processedData.skills : [],
-            requirements: Array.isArray(processedData.requirements) ? processedData.requirements : [],
-            whoIsThisFor: Array.isArray(processedData.whoIsThisFor) ? processedData.whoIsThisFor : [],
-            faqs: Array.isArray(processedData.faqs) ? processedData.faqs : []
-          };
-          
-          // Ensure all array fields are present, even if empty
-          const requiredFields = ['benefits', 'prerequisites', 'skills', 'requirements', 'whoIsThisFor', 'faqs'];
-          requiredFields.forEach(field => {
-            if (!(field in sectionData)) {
-              sectionData[field] = [];
-            }
-          });
-          
-          console.log('Processed details section data:', sectionData);
-          break;
-          
-        case 'curriculum':
-          sectionData = {
-            curriculum: (formData.curriculum || [])
-              .map((week) => ({
-                ...week,
-                topics: (week.topics || []).filter((t) => t.trim() !== ''),
-              }))
-              .filter(
-                (week) =>
-                  (week.title && week.title.trim() !== '') ||
-                  (week.description && week.description.trim() !== '') ||
-                  (week.topics && week.topics.length > 0)
-              ),
-          };
-          break;
-          
-        case 'mentors':
-          sectionData = {
-            mentors: (formData.mentors || [])
-              .filter((mentor) => mentor && mentor.name && mentor.name.trim() !== '')
-              .map((mentor) => ({
-                ...mentor,
-                name: mentor.name.trim()
-              }))
-          };
-          break;
-          
-        case 'media':
-          sectionData = {
-            image: formData.image || '',
-            previewVideo: formData.previewVideo || '',
-            thumbnail: formData.thumbnail || '',
-          };
-          break;
-          
-        case 'seo':
-          sectionData = {
-            metaTitle: formData.metaTitle || '',
-            metaDescription: formData.metaDescription || '',
-            slug: formData.slug || '',
-            tags: (formData.tags || []).filter((t) => t && t.trim() !== ''),
-          };
-          break;
+      setLoading(true);
+      if (isEdit) {
+        await updateCourse(id, data);
+        toast.success('Course updated successfully!');
+      } else {
+        await createCourse(data);
+        toast.success('Course created successfully!');
       }
-
-      console.log(`[handleSaveSection] Prepared section data for ${section}:`, sectionData);
-      const result = await saveSection(section, sectionData);
-      console.log(`[handleSaveSection] saveSection result for ${section}:`, result);
-      return result;
+      navigate('/admin/courses');
     } catch (error) {
-      console.error(`[handleSaveSection] Error in handleSaveSection for ${section}:`, error);
-      throw error;
-    } finally {
-      console.groupEnd();
-    }
-  };
-
-  // Handle form submission (save all sections)
-  const onSubmit = async (formData) => {
-    if (!formData) {
-      console.error('No form data provided to onSubmit');
-      return;
-    }
-    console.log('onSubmit called with data:', formData);
-    console.group('[onSubmit] Starting form submission');
-    console.log('Form submitted with data:', formData);
-    setLoading(true);
-
-    try {
-      // Save each section one by one
-      const sections = [
-        "basic",
-        "details",
-        "curriculum",
-        "mentors",
-        "media",
-        "seo",
-      ];
-
-      for (const section of sections) {
-        console.log(`[onSubmit] Processing section: ${section}`);
-        try {
-          console.log(`[onSubmit] Calling handleSaveSection for ${section}`);
-          const success = await handleSaveSection(section);
-          console.log(`[onSubmit] Section ${section} save result:`, success);
-          
-          if (!success) {
-            // If any section fails to save, stop and show error
-            const errorMsg = `[onSubmit] Failed to save section: ${section}`;
-            console.error(errorMsg);
-            toast.error(`Failed to save ${section} section. Please try again.`);
-            console.groupEnd();
-            return;
-          }
-        } catch (error) {
-          const errorMsg = `[onSubmit] Error saving section ${section}:`;
-          console.error(errorMsg, error);
-          toast.error(`Error saving ${section} section. Please check the console for details.`);
-          console.groupEnd();
-          return;
-        }
-      }
-
-      // If we get here, all sections saved successfully
-      console.log('[onSubmit] All sections saved successfully');
-      toast.success("Course saved successfully!");
-      console.groupEnd();
-      navigate("/admin/courses");
-    } catch (error) {
-      const errorMsg = '[onSubmit] Unexpected error in form submission:';
-      console.error(errorMsg, error);
-      toast.error("An unexpected error occurred while saving the course.");
-      console.groupEnd();
+      console.error('Error saving course:', error);
+      toast.error(error.response?.data?.message || 'Failed to save course');
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper function to add a new item to a field array
-  const addNewItem = (appendFn, defaultValue = "") => {
-    appendFn(defaultValue);
+  // Generate slug from title
+  const updateSlug = (title) => {
+    if (!title) return '';
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .trim();
   };
 
-  // Helper function to render input with label and error message
-  const renderInput = (label, name, type = "text", options = {}) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {options.required && <span className="text-red-500">*</span>}
-      </label>
-      <input
-        type={type}
-        {...register(name, { required: options.required, ...options })}
-        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-          errors[name] ? "border-red-500" : "border-gray-300"
-        }`}
-      />
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-600">
-          {errors[name].message || "This field is required"}
-        </p>
-      )}
-    </div>
-  );
-
-  // Helper function to render a dynamic list of items
-  const renderDynamicList = (fields, appendFn, removeFn, placeholder, name) => (
-    <div className="mb-6">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-medium text-gray-900">{name}</h3>
-        <button
-          type="button"
-          onClick={() =>
-            appendFn(name === "faqs" ? { question: "", answer: "" } : "")
-          }
-          className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Add {name}
-        </button>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
+    );
+  }
 
-      <div className="space-y-3">
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex items-center space-x-2">
-            <input
-              {...register(`${name}.${index}`)}
-              placeholder={placeholder}
-              className="flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-            {fields.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeFn(index)}
-                className="text-red-600 hover:text-red-800"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  // Remove any other declarations of activeTab in the file
-
-  // Tab navigation component
-  const TabButton = ({ tab, children }) => (
-    <button
-      type="button"
-      onClick={() => setActiveTab(tab)}
-      className={`px-4 py-2 text-sm font-medium rounded-t-md ${
-        activeTab === tab
-          ? "bg-white border-t border-l border-r border-gray-300 text-indigo-600"
-          : "text-gray-600 hover:text-gray-800 bg-gray-100"
-      }`}
-    >
-      {children}
-    </button>
-  );
-
-  // Tab content component
-  const TabContent = ({ tab, children }) => (
-    <div
-      className={`p-6 border border-t-0 rounded-b-md ${
-        activeTab === tab ? "block" : "hidden"
-      }`}
-    >
-      {children}
-    </div>
-  );
-
-  // Helper function to render textarea
-  const renderTextarea = (label, name, options = {}) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {options.required && <span className="text-red-500">*</span>}
-      </label>
-      <textarea
-        {...register(name, { required: options.required, ...options })}
-        rows={options.rows || 3}
-        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-          errors[name] ? "border-red-500" : "border-gray-300"
-        }`}
-      />
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-600">
-          {errors[name].message || "This field is required"}
-        </p>
-      )}
-    </div>
-  );
-
-  // Helper function to render rich text editor
-  const renderRichText = (label, name, options = {}) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {options.required && <span className="text-red-500">*</span>}
-      </label>
-      <Controller
-        name={name}
-        control={control}
-        rules={{ required: options.required }}
-        render={({ field }) => (
-          <div className={errors[name] ? "border border-red-500 rounded" : ""}>
-            <ReactQuill
-              theme="snow"
-              value={field.value}
-              onChange={field.onChange}
-              className="h-64 mb-12"
-            />
-          </div>
-        )}
-      />
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-600">This field is required</p>
-      )}
-    </div>
-  );
-
-  // Handle form submission with React Hook Form
-  const onFormSubmit = async (formData) => {
-    console.log('=== Form submission started ===');
-    console.log('Form data:', formData);
-    
-    try {
-      // Determine which fields to validate based on the current tab
-      const tabFields = {
-        basic: ['title', 'shortDescription', 'description', 'category', 'instructor', 'duration', 'totalHours', 'price', 'originalPrice', 'certificateIncluded', 'level', 'benefits', 'prerequisites', 'skills', 'language'], 
-        details: ['whatYouWillLearn', 'requirements', 'whoIsThisFor'],
-        curriculum: ['curriculum'],
-        mentors: ['mentors'],
-        media: ['image', 'previewVideo', 'thumbnail'],
-        seo: ['metaTitle', 'metaDescription', 'slug', 'tags']
-      };
-      
-      // Only validate fields in the current tab
-      const fieldsToValidate = tabFields[activeTab] || [];
-      console.log('Validating fields:', fieldsToValidate);
-      
-      // Trigger validation for current tab fields
-      const isValid = await trigger(fieldsToValidate);
-      console.log('Form validation result:', isValid);
-      
-      if (!isValid) {
-        toast.error(`Please fill in all required fields in the ${activeTab} tab`);
-        return;
-      }
-      
-      // If validation passes, proceed with submission
-      console.log('Calling onSubmit with form values...');
-      await onSubmit(formData);
-      
-    } catch (error) {
-      console.error('Error in form submission:', error);
-      toast.error('An error occurred while submitting the form');
-    }
-  };
-
-  // Log when the form is rendered
-  console.log('Rendering form with handleSubmit:', typeof handleSubmit);
-  
-  // Create a memoized submit handler
-  const handleFormSubmit = React.useCallback((e) => {
-    console.log('Form submit event triggered');
-    e.preventDefault();
-    console.log('Calling handleSubmit...');
-    
-    // Get the form data
-    const formData = getValues();
-    console.log('Form data before validation:', formData);
-    
-    // Call the validation and submission logic directly
-    onFormSubmit(formData).catch(error => {
-      console.error('Error in form submission:', error);
-    });
-  }, [getValues, onFormSubmit]);
-  
   return (
-    <form 
-      onSubmit={handleFormSubmit}
-      className="space-y-6" 
-      noValidate
-    >
-      {/* Tab Navigation */}
-      <div className="flex space-x-1 border-b border-gray-200 mb-6">
-        <TabButton tab="basic">Basic Info</TabButton>
-        <TabButton tab="details">Course Details</TabButton>
-        <TabButton tab="curriculum">Curriculum</TabButton>
-        <TabButton tab="mentors">Mentors</TabButton>
-        <TabButton tab="media">Media</TabButton>
-        <TabButton tab="seo">SEO</TabButton>
-      </div>
+    // Your existing form JSX
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">
+        {isEdit ? "Edit Course" : "Create New Course"}
+      </h1>
+      {/* Your form fields here */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Basic Information */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
 
-      {/* Basic Info Tab */}
-      <TabContent tab="basic">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="col-span-2">
-            {renderInput("Course Title", "title", "text", { required: true })}
-            {renderTextarea("Short Description", "shortDescription", {
-              required: true,
-              maxLength: { value: 300, message: "Maximum 300 characters" },
-            })}
-            {renderRichText("Full Description", "description", {
-              required: true,
-            })}
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Course Title *
+              </label>
+              <input
+                type="text"
+                {...register("title", { required: "Title is required" })}
+                onChange={(e) => {
+                  setValue("slug", updateSlug(e.target.value));
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Complete Web Development Bootcamp"
+              />
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.title.message}
+                </p>
+              )}
+            </div>
 
-          <div>
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <select
-                  {...register("category", { required: true })}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((category) => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                URL Slug *
+              </label>
+              <input
+                type="text"
+                {...register("slug", { required: "Slug is required" })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., web-development-bootcamp"
+              />
+              {errors.slug && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.slug.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category *
+              </label>
+              <select
+                {...register("category", { required: "Category is required" })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select a category</option>
+                {Array.isArray(categories) &&
+                  categories.map((category) => (
                     <option key={category.value} value={category.value}>
                       {category.label}
                     </option>
                   ))}
-                </select>
-                {errors.category && (
-                  <p className="mt-1 text-sm text-red-600">
-                    Category is required
-                  </p>
-                )}
-              </div>
+              </select>
+              {errors.category && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.category.message}
+                </p>
+              )}
+            </div>
 
-              {renderInput("Instructor", "instructor", "text", {
-                required: true,
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Instructor *
+              </label>
+              <select
+                {...register("instructor", {
+                  required: "Instructor is required",
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select an instructor</option>
+                {Array.isArray(instructors) &&
+                  instructors.map((instructor, index) => (
+                    <option key={index} value={instructor._id}>
+                      {instructor.fullname || instructor.name}
+                    </option>
+                  ))}
+              </select>
+              {errors.instructor && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.instructor.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Short Description *
+            </label>
+            <textarea
+              {...register("shortDescription", {
+                required: "Short description is required",
+                maxLength: {
+                  value: 300,
+                  message: "Maximum 300 characters",
+                },
               })}
-              {renderInput("Duration", "duration", "text", {
-                required: true,
-              })}
-              {renderInput("Total Hours", "totalHours", "number")}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="A brief summary of the course (max 300 characters)"
+            />
+            {errors.shortDescription && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.shortDescription.message}
+              </p>
+            )}
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Level
-                </label>
-                <select
-                  {...register("level", { required: true })}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
-                </select>
-              </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Detailed Description *
+            </label>
+            <Controller
+              name="description"
+              control={control}
+              rules={{ required: "Description is required" }}
+              render={({ field }) => (
+                <Editor
+                  // apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                  apiKey="pqt3p849mrd0644ple5h621x04w9j3t6npvqkj7322xm4m0j"
+                  value={field.value}
+                  onEditorChange={field.onChange}
+                  init={{
+                    height: 300,
+                    menubar: true,
+                    plugins: [
+                      "advlist autolink lists link image charmap print preview anchor",
+                      "searchreplace visualblocks code fullscreen",
+                      "insertdatetime media table paste code help wordcount",
+                    ],
+                    toolbar:
+                      "undo redo | formatselect | bold italic backcolor | \
+                      alignleft aligncenter alignright alignjustify | \
+                      bullist numlist outdent indent | removeformat | help",
+                    images_upload_handler: handleImageUpload,
+                  }}
+                />
+              )}
+            />
+            {errors.description && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.description.message}
+              </p>
+            )}
+          </div>
+        </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  {renderInput("Price", "price", "number", {
-                    required: true,
-                    min: { value: 0, message: "Price cannot be negative" },
-                  })}
-                </div>
-                <div>
-                  {renderInput("Original Price", "originalPrice", "number", {
-                    min: { value: 0, message: "Price cannot be negative" },
-                  })}
-                </div>
-              </div>
+        {/* Pricing & Duration */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Pricing & Duration</h3>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Price (INR) *
+              </label>
+              <input
+                type="number"
+                {...register("price", {
+                  required: "Price is required",
+                  min: { value: 0, message: "Price cannot be negative" },
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 2999"
+              />
+              {errors.price && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Original Price (INR)
+              </label>
+              <input
+                type="number"
+                {...register("originalPrice", {
+                  min: { value: 0, message: "Price cannot be negative" },
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 4999"
+              />
+              {errors.originalPrice && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.originalPrice.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Duration (weeks) *
+              </label>
+              <input
+                type="number"
+                {...register("duration", {
+                  required: "Duration is required",
+                  min: { value: 1, message: "Minimum 1 week" },
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 12"
+              />
+              {errors.duration && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.duration.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Total Hours *
+              </label>
+              <input
+                type="number"
+                {...register("totalHours", {
+                  required: "Total hours is required",
+                  min: { value: 1, message: "Minimum 1 hour" },
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 40"
+              />
+              {errors.totalHours && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.totalHours.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Difficulty Level *
+              </label>
+              <select
+                {...register("level", { required: "Level is required" })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+              {errors.level && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.level.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-4">
               <div className="flex items-center">
                 <input
-                  id="certificateIncluded"
                   type="checkbox"
+                  id="certificateIncluded"
                   {...register("certificateIncluded")}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="certificateIncluded"
@@ -856,828 +599,217 @@ const CourseForm = ({ isEdit = false }) => {
                   Certificate Included
                 </label>
               </div>
-            </div>
-          </div>
 
-          <div className="space-y-6">
-            {renderTextarea(
-              "What will students learn? (One per line)",
-              "benefits",
-              {
-                rows: 6,
-                placeholder: "Enter each benefit on a new line",
-              }
-            )}
-
-            {renderTextarea("Prerequisites (One per line)", "prerequisites", {
-              rows: 4,
-              placeholder: "Enter each prerequisite on a new line",
-            })}
-
-            {renderTextarea("Skills (One per line)", "skills", {
-              rows: 4,
-              placeholder: "Enter each skill on a new line",
-            })}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Language
-              </label>
-              <input
-                type="text"
-                {...register("language")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                placeholder="e.g., English, Spanish, etc."
-              />
-            </div>
-          </div>
-        </div>
-      </TabContent>
-
-      {/* Course Details Tab */}
-      <TabContent tab="details">
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Course Requirements
-              </h3>
-              <div className="space-y-4">
-                {prerequisiteFields.map((field, index) => (
-                  <div key={field.id} className="flex items-start space-x-2">
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        {...register(`prerequisites.${index}`)}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        placeholder="Enter a requirement"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removePrerequisite(index)}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => appendPrerequisite("")}
-                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Add Requirement
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Target Audience
-              </h3>
-              <div className="space-y-4">
-                {benefitFields.map((field, index) => (
-                  <div key={field.id} className="flex items-start space-x-2">
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        {...register(`benefits.${index}`)}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        placeholder="Who is this course for?"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeBenefit(index)}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => appendBenefit("")}
-                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Add Target Audience
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h3>
-            <div className="space-y-6">
-              {faqFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="border border-gray-200 rounded-lg p-4"
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-medium text-gray-900">
-                      FAQ #{index + 1}
-                    </h4>
-                    <button
-                      type="button"
-                      onClick={() => removeFaq(index)}
-                      className="text-sm text-red-600 hover:text-red-800"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Question *
-                      </label>
-                      <input
-                        type="text"
-                        {...register(`faqs.${index}.question`, {
-                          required: true,
-                        })}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        placeholder="Enter question"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Answer *
-                      </label>
-                      <textarea
-                        {...register(`faqs.${index}.answer`, {
-                          required: true,
-                        })}
-                        rows={3}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        placeholder="Enter answer"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => appendFaq({ question: "", answer: "" })}
-                className="mt-4 inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Add FAQ
-              </button>
-            </div>
-          </div>
-        </div>
-      </TabContent>
-
-      {/* Curriculum Tab */}
-      <TabContent tab="curriculum">
-        <div className="space-y-6">
-          {curriculumFields.map((field, weekIndex) => (
-            <div
-              key={field.id}
-              className="border border-gray-200 rounded-lg p-4"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Week {weekIndex + 1}
-                </h3>
-                {curriculumFields.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeWeek(weekIndex)}
-                    className="text-sm text-red-600 hover:text-red-800"
-                  >
-                    Remove Week
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Week Title *
-                    </label>
-                    <input
-                      type="text"
-                      {...register(`curriculum.${weekIndex}.title`, {
-                        required: true,
-                      })}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="e.g., Introduction to React"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Duration
-                    </label>
-                    <input
-                      type="text"
-                      {...register(`curriculum.${weekIndex}.duration`)}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="e.g., 2 hours"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    {...register(`curriculum.${weekIndex}.description`)}
-                    rows={3}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="What will students learn this week?"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Topics / Lessons
-                  </label>
-                  <div className="space-y-2">
-                    {field.topics?.map((_, topicIndex) => (
-                      <div
-                        key={topicIndex}
-                        className="flex items-center space-x-2"
-                      >
-                        <input
-                          type="text"
-                          {...register(
-                            `curriculum.${weekIndex}.topics.${topicIndex}`
-                          )}
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          placeholder={`Topic ${topicIndex + 1}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const topics = watch(
-                              `curriculum.${weekIndex}.topics`
-                            );
-                            const newTopics = [...topics];
-                            newTopics.splice(topicIndex, 1);
-                            setValue(
-                              `curriculum.${weekIndex}.topics`,
-                              newTopics
-                            );
-                          }}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const topics =
-                          watch(`curriculum.${weekIndex}.topics`) || [];
-                        setValue(`curriculum.${weekIndex}.topics`, [
-                          ...topics,
-                          "",
-                        ]);
-                      }}
-                      className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
-                    >
-                      + Add Topic
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={() =>
-              appendWeek({
-                week: curriculumFields.length + 1,
-                title: "",
-                description: "",
-                topics: [""],
-                duration: "",
-              })
-            }
-            className="w-full flex justify-center py-2 px-4 border border-dashed border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Add Week
-          </button>
-        </div>
-      </TabContent>
-
-      {/* Mentors Tab */}
-      <TabContent tab="mentors">
-        <div className="space-y-6">
-          {mentorFields.map((field, index) => (
-            <div
-              key={field.id}
-              className="border border-gray-200 rounded-lg p-4"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  {field.name || `Mentor ${index + 1}`}
-                </h3>
-                {mentorFields.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeMentor(index)}
-                    className="text-sm text-red-600 hover:text-red-800"
-                  >
-                    Remove Mentor
-                  </button>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  {renderInput("Full Name *", `mentors.${index}.name`, "text", {
-                    required: true,
-                  })}
-                  {renderInput("Title/Role", `mentors.${index}.title`)}
-                  {renderTextarea("Bio", `mentors.${index}.bio`, { rows: 4 })}
-                </div>
-                <div className="space-y-4">
-                  {renderInput(
-                    "Profile Image URL",
-                    `mentors.${index}.image`,
-                    "url"
-                  )}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-gray-700">
-                      Social Links
-                    </h4>
-                    {renderInput(
-                      "LinkedIn",
-                      `mentors.${index}.socialLinks.linkedin`,
-                      "url"
-                    )}
-                    {renderInput(
-                      "Twitter",
-                      `mentors.${index}.socialLinks.twitter`,
-                      "url"
-                    )}
-                    {renderInput(
-                      "GitHub",
-                      `mentors.${index}.socialLinks.github`,
-                      "url"
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={() =>
-              appendMentor({
-                name: "",
-                title: "",
-                bio: "",
-                image: "",
-                socialLinks: {
-                  linkedin: "",
-                  twitter: "",
-                  github: "",
-                },
-              })
-            }
-            className="w-full flex justify-center py-2 px-4 border border-dashed border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Add Another Mentor
-          </button>
-        </div>
-      </TabContent>
-
-      {/* Media Tab */}
-      <TabContent tab="media">
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Course Image
-              </h3>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    stroke="currentColor"
-                    fill="none"
-                    viewBox="0 0 48 48"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <div className="flex text-sm text-gray-600">
-                    <label
-                      htmlFor="course-image"
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                    >
-                      <span>Upload an image</span>
-                      <input
-                        id="course-image"
-                        name="course-image"
-                        type="file"
-                        className="sr-only"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (event) => {
-                              setValue("image", event.target.result);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG, GIF up to 10MB
-                  </p>
-                </div>
-              </div>
-              {watch("image") && (
-                <div className="mt-2">
-                  <img
-                    src={watch("image")}
-                    alt="Course preview"
-                    className="h-40 w-full object-cover rounded-md"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Course Preview Video
-              </h3>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <div className="flex text-sm text-gray-600">
-                    <label
-                      htmlFor="preview-video"
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                    >
-                      <span>Upload a video</span>
-                      <input
-                        id="preview-video"
-                        name="preview-video"
-                        type="file"
-                        className="sr-only"
-                        accept="video/*"
-                      />
-                    </label>
-                    <p className="pl-1">or paste a URL</p>
-                  </div>
-                  <p className="text-xs text-gray-500">MP4 up to 50MB</p>
-                </div>
-              </div>
-              {watch("previewVideo") && (
-                <div className="mt-2">
-                  <video
-                    src={watch("previewVideo")}
-                    controls
-                    className="w-full rounded-md"
-                  />
-                </div>
-              )}
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Or enter video URL
-                </label>
-                <input
-                  type="url"
-                  {...register("previewVideo")}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="https://example.com/video.mp4"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Thumbnail Image
-            </h3>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-              <div className="space-y-1 text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <div className="flex text-sm text-gray-600">
-                  <label
-                    htmlFor="thumbnail-image"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                  >
-                    <span>Upload a thumbnail</span>
-                    <input
-                      id="thumbnail-image"
-                      name="thumbnail-image"
-                      type="file"
-                      className="sr-only"
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (event) => {
-                            setValue("thumbnail", event.target.result);
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                  </label>
-                  <p className="pl-1">or drag and drop</p>
-                </div>
-                <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
-              </div>
-            </div>
-            {watch("thumbnail") && (
-              <div className="mt-2">
-                <img
-                  src={watch("thumbnail")}
-                  alt="Thumbnail preview"
-                  className="h-40 w-64 object-cover rounded-md"
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      </TabContent>
-
-      {/* SEO & Settings Tab */}
-      <TabContent tab="seo">
-        <div className="grid grid-cols-1 gap-6">
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              SEO Settings
-            </h3>
-            <div className="space-y-4">
-              {renderInput("Meta Title", "metaTitle", "text", {
-                maxLength: {
-                  value: 60,
-                  message: "Recommended: 50-60 characters",
-                },
-              })}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Meta Description
-                </label>
-                <textarea
-                  {...register("metaDescription", {
-                    maxLength: {
-                      value: 160,
-                      message: "Recommended: 150-160 characters",
-                    },
-                  })}
-                  rows={3}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="A brief description of the page for search engines"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  {watch("metaDescription")?.length || 0}/160 characters
-                </p>
-                {errors.metaDescription && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.metaDescription.message}
-                  </p>
-                )}
-              </div>
-              {renderTextarea("Keywords (comma-separated)", "tags", {
-                placeholder: "e.g., programming, web development, coding",
-                rows: 2,
-              })}
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Course Settings
-            </h3>
-            <div className="space-y-4">
               <div className="flex items-center">
                 <input
-                  id="isPublished"
                   type="checkbox"
-                  {...register("isPublished")}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="isPublished"
-                  className="ml-2 block text-sm text-gray-700"
-                >
-                  Publish this course
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
                   id="isFeatured"
-                  type="checkbox"
                   {...register("isFeatured")}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="isFeatured"
                   className="ml-2 block text-sm text-gray-700"
                 >
-                  Feature this course on the homepage
+                  Featured Course
                 </label>
               </div>
 
               <div className="flex items-center">
                 <input
-                  id="hasCertificate"
                   type="checkbox"
-                  {...register("hasCertificate")}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  id="isPublished"
+                  {...register("isPublished")}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
-                  htmlFor="hasCertificate"
+                  htmlFor="isPublished"
                   className="ml-2 block text-sm text-gray-700"
                 >
-                  Issue certificate upon completion
+                  Publish Now
                 </label>
-              </div>
-
-              <div className="pt-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Course Access
-                </label>
-                <select
-                  {...register("accessType")}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="free">Free - Anyone can enroll</option>
-                  <option value="paid">Paid - Requires purchase</option>
-                  <option value="subscription">
-                    Subscription - Available to subscribers
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Difficulty Level
-                </label>
-                <select
-                  {...register("difficulty")}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                  <option value="all">All Levels</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estimated Time to Complete (hours)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  {...register("estimatedHours", { min: 1 })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="e.g., 10"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Advanced Settings
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Custom URL Slug
-                </label>
-                <div className="mt-1 flex rounded-md shadow-sm">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    yourwebsite.com/courses/
-                  </span>
-                  <input
-                    type="text"
-                    {...register("slug")}
-                    className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="custom-url-slug"
-                  />
-                </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  Leave blank to auto-generate from course title
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Custom Scripts (Advanced)
-                </label>
-                <textarea
-                  {...register("customScripts")}
-                  rows={4}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono text-sm"
-                  placeholder="<!-- Add custom scripts here (e.g., Google Analytics) -->"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  These scripts will be added to the head section of this course
-                  page
-                </p>
               </div>
             </div>
           </div>
         </div>
-      </TabContent>
-      
-      {/* Form Footer with Save Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-between">
-        <div>
+
+        {/* What You'll Learn */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">
+            What Students Will Learn
+          </h3>
+
+          {learningsFields.map((field, index) => (
+            <div key={field.id} className="flex items-start space-x-2 mb-2">
+              <input
+                type="text"
+                {...register(`whatYouWillLearn.${index}`, {
+                  required: "This field is required",
+                })}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder={`Learning point ${index + 1}`}
+              />
+              <button
+                type="button"
+                onClick={() => removeLearning(index)}
+                className="px-3 py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+
           <button
             type="button"
-            onClick={() => {
-              console.log('Test button clicked');
-              console.log('Form values:', getValues());
-              console.log('Form errors:', errors);
-              console.log('Active tab:', activeTab);
-              console.log('Loading state:', loading);
-            }}
-            className="px-4 py-2 border border-green-500 rounded-md shadow-sm text-sm font-medium text-green-700 bg-green-100 hover:bg-green-200 mr-3"
+            onClick={() => appendLearning("")}
+            className="mt-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Test Button
+            + Add Learning Point
           </button>
+        </div>
+
+        {/* Prerequisites */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Prerequisites</h3>
+
+          {prerequisiteFields.map((field, index) => (
+            <div key={field.id} className="flex items-start space-x-2 mb-2">
+              <input
+                type="text"
+                {...register(`prerequisites.${index}`)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder={`Prerequisite ${index + 1}`}
+              />
+              <button
+                type="button"
+                onClick={() => removePrerequisite(index)}
+                className="px-3 py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+
           <button
             type="button"
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={() => appendPrerequisite("")}
+            className="mt-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            + Add Prerequisite
+          </button>
+        </div>
+
+        {/* Skills Covered */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Skills Covered</h3>
+
+          <div className="flex flex-wrap gap-2 mb-4">
+            {skillsFields.map((field, index) => (
+              <div
+                key={field.id}
+                className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+              >
+                <span>{watch(`skills.${index}`)}</span>
+                <button
+                  type="button"
+                  onClick={() => removeSkill(index)}
+                  className="ml-2 text-blue-500 hover:text-blue-700"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex">
+            <input
+              type="text"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const value = e.target.value.trim();
+                  if (value) {
+                    appendSkill(value);
+                    e.target.value = "";
+                  }
+                }
+              }}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Add a skill and press Enter"
+            />
+            <button
+              type="button"
+              onClick={(e) => {
+                const input = e.target.previousElementSibling;
+                const value = input.value.trim();
+                if (value) {
+                  appendSkill(value);
+                  input.value = "";
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+
+        {/* Curriculum */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Course Curriculum</h3>
+            <button
+              type="button"
+              onClick={() =>
+                appendWeek({
+                  week: curriculumFields.length + 1,
+                  title: "",
+                  description: "",
+                  topics: [""],
+                  duration: 0,
+                })
+              }
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              + Add Week
+            </button>
+          </div>
+
+          {curriculumFields.map((week, weekIndex) => (
+            <WeekItem
+              key={week.id}
+              week={week}
+              weekIndex={weekIndex}
+              removeWeek={removeWeek}
+              register={register}
+              control={control}
+              errors={errors}
+            />
+          ))}
+        </div>
+
+        {/* Form Actions */}
+        <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            onClick={() => navigate("/admin/courses")}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Cancel
-          </button>
-        </div>
-        <div>
-          <button
-            type="button"
-            onClick={async () => {
-              console.log('Manual save button clicked');
-              try {
-                const formData = getValues();
-                console.log('Form data to submit:', formData);
-                await onFormSubmit(formData);
-              } catch (error) {
-                console.error('Error in manual save:', error);
-              }
-            }}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mr-3"
-          >
-            Manual Save
           </button>
           <button
             type="submit"
             disabled={loading}
-            className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className="px-6 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Saving...' : 'Save Course'}
+            {loading ? "Saving..." : isEdit ? "Update Course" : "Create Course"}
           </button>
         </div>
-      </div>
-    </form>
+      </form>
+      ;
+    </div>
   );
 };
 
 export default CourseForm;
+

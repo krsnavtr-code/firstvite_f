@@ -1,5 +1,24 @@
 import axios from './axios';
 
+// Upload course image
+export const uploadCourseImage = async (formData) => {
+    try {
+        const response = await axios.post('/courses/upload-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        if (error.response) {
+            console.error('Response status:', error.response.status);
+            console.error('Response data:', error.response.data);
+        }
+        throw error;
+    }
+};
+
 // Get all courses with optional category filter
 export const getCourses = async (category = '') => {
     try {

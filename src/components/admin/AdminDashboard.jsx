@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { getCategories } from "../../api/categoryApi";
 import { getCourses, deleteCourse } from "../../api/courseApi";
+import userApi from "../../api/userApi";
 import { toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
@@ -12,6 +13,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleDeleteCourse = async (id) => {
@@ -39,12 +41,25 @@ const AdminDashboard = () => {
         // Fetch categories
         const categoriesRes = await getCategories();
         console.log('Categories response:', categoriesRes);
-        setCategories(categoriesRes.data || []);
+        // Handle both array and object with data property
+        const categoriesData = Array.isArray(categoriesRes) ? categoriesRes : (categoriesRes.data || []);
+        setCategories(categoriesData);
+        console.log('Processed categories:', categoriesData);
         
         // Fetch courses
         const coursesRes = await getCourses();
         console.log('Courses response:', coursesRes);
-        setCourses(coursesRes.data || []);
+        // Handle both array and object with data property
+        const coursesData = Array.isArray(coursesRes) ? coursesRes : (coursesRes.data || []);
+        setCourses(coursesData);
+
+        // Fetch users (students only)
+        const usersRes = await userApi.getUsers({ role: 'student' });
+        console.log('Users response:', usersRes);
+        // Handle both array and object with data property
+        const usersData = Array.isArray(usersRes) ? usersRes : (usersRes.data || []);
+        setUsers(usersData);
+        console.log('Processed students:', usersData);
         
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -75,9 +90,9 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Categories Card */}
-        <div 
+        <div
           className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/categories')}
+          onClick={() => navigate("/admin/categories")}
         >
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-green-100 text-green-600">
@@ -98,15 +113,48 @@ const AdminDashboard = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm font-medium">Categories</h3>
-              <p className="text-2xl font-semibold text-gray-800">{categories.length}</p>
+              <p className="text-2xl font-semibold text-gray-800">
+                {Array.isArray(categories) ? categories.length : 0}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Total Students Card */}
+        <div 
+          className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+          onClick={() => navigate("/admin/students")}
+        >
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+              <svg
+                className="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0111.357-3.182M15 21v-1a4 4 0 00-4-4H8m11-9a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h3 className="text-gray-500 text-sm font-medium">Total Students</h3>
+              <p className="text-2xl font-semibold text-gray-800">
+                {Array.isArray(users) ? users.length : 0}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Total Courses Card */}
-        <div 
+        <div
           className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate('/admin/courses')}
+          onClick={() => navigate("/admin/courses")}
         >
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
@@ -126,8 +174,12 @@ const AdminDashboard = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-gray-500 text-sm font-medium">Total Courses</h3>
-              <p className="text-2xl font-semibold text-gray-800">{courses.length}</p>
+              <h3 className="text-gray-500 text-sm font-medium">
+                Total Courses
+              </h3>
+              <p className="text-2xl font-semibold text-gray-800">
+                {courses.length}
+              </p>
             </div>
           </div>
         </div>
@@ -154,7 +206,7 @@ const AdminDashboard = () => {
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm font-medium">Published</h3>
               <p className="text-2xl font-semibold text-gray-800">
-                {courses.filter(course => course.isPublished).length}
+                {courses.filter((course) => course.isPublished).length}
               </p>
             </div>
           </div>
@@ -406,14 +458,14 @@ const AdminDashboard = () => {
       <div className="bg-white shadow rounded-lg p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-medium text-gray-900">Recent Courses</h3>
-          <Link 
-            to="/admin/courses" 
+          <Link
+            to="/admin/courses"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
           >
             View all
           </Link>
         </div>
-        
+
         {courses.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             No courses found. Create your first course to get started.
@@ -423,16 +475,28 @@ const AdminDashboard = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Title
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Category
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Status
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Price
                   </th>
                   <th scope="col" className="relative px-6 py-3">
@@ -447,25 +511,37 @@ const AdminDashboard = () => {
                       <div className="flex items-center">
                         {course.image && (
                           <div className="flex-shrink-0 h-10 w-10">
-                            <img className="h-10 w-10 rounded-full object-cover" src={course.image} alt={course.title} />
+                            <img
+                              className="h-10 w-10 rounded-full object-cover"
+                              src={course.image}
+                              alt={course.title}
+                            />
                           </div>
                         )}
-                        <div className={`${course.image ? 'ml-4' : ''}`}>
-                          <div className="text-sm font-medium text-gray-900">{course.title}</div>
-                          <div className="text-sm text-gray-500">{course.instructor}</div>
+                        <div className={`${course.image ? "ml-4" : ""}`}>
+                          <div className="text-sm font-medium text-gray-900">
+                            {course.title}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {course.instructor}
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{course.category?.name || 'Uncategorized'}</div>
+                      <div className="text-sm text-gray-900">
+                        {course.category?.name || "Uncategorized"}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        course.isPublished 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {course.isPublished ? 'Published' : 'Draft'}
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          course.isPublished
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {course.isPublished ? "Published" : "Draft"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
