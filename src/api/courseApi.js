@@ -3,11 +3,17 @@ import axios from './axios';
 // Upload course image
 export const uploadCourseImage = async (formData) => {
     try {
-        const response = await axios.post('/courses/upload-image', formData, {
+        // Create a new instance of axios without the default JSON content-type
+        const uploadAxios = axios.create({
+            baseURL: 'http://localhost:4002/api',
+            withCredentials: true,
             headers: {
                 'Content-Type': 'multipart/form-data',
-            },
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
         });
+
+        const response = await uploadAxios.post('/courses/upload-image', formData);
         return response.data;
     } catch (error) {
         console.error('Error uploading image:', error);

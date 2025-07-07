@@ -3,14 +3,178 @@ import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { Editor } from "@tinymce/tinymce-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import {
-  createCourse,
-  updateCourse,
-  getCourseById,
-  getCategoriesForForm,
-  uploadCourseImage
+import { 
+  createCourse, 
+  updateCourse, 
+  getCourseById, 
+  getCategoriesForForm, 
+  uploadCourseImage 
 } from "../../../api/courseApi";
 import userApi from "../../../api/userApi";
+
+// Error boundary for the file upload component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error in FileUploadInput:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="text-red-600 p-4 border border-red-300 bg-red-50 rounded">
+          <p>Something went wrong with the file upload.</p>
+          <button 
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className="mt-2 text-sm text-blue-600 hover:underline"
+          >
+            Try again
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Separate component for file input to prevent re-renders and isolate errors
+const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
+  const [isUploading, setIsUploading] = React.useState(false);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size too large. Maximum size is 5MB.');
+        return;
+      }
+      
+      // Reset file input to allow re-uploading the same file
+      e.target.value = '';
+      
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      console.log('Starting file upload...');
+      const response = await uploadCourseImage(formData);
+      console.log('Upload response:', response);
+      
+      if (!response || !response.success) {
+        throw new Error(response?.message || 'Upload failed');
+      }
+      
+      // Make sure we're storing just the path part, not the full URL
+      const imagePath = response.location;
+      console.log('Setting image path:', imagePath);
+      
+      onFileSelect(imagePath);
+      toast.success('Thumbnail uploaded successfully');
+    } catch (error) {
+      console.error('Error in file upload:', error);
+      toast.error(error.response?.data?.message || error.message || 'Failed to upload thumbnail');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Create a safe thumbnail URL
+  const getThumbnailUrl = (thumb) => {
+    if (!thumb) return '';
+    try {
+      if (thumb.startsWith('http')) return thumb;
+      // Ensure there's exactly one slash between domain and path
+      const baseUrl = 'http://localhost:4002';
+      const path = thumb.startsWith('/') ? thumb : `/${thumb}`;
+      return `${baseUrl}${path}`;
+    } catch (error) {
+      console.error('Error creating thumbnail URL:', error);
+      return '';
+    }
+  };
+
+  const thumbnailUrl = getThumbnailUrl(thumbnail);
+  
+  return (
+    <div className="flex items-center space-x-6">
+      {/* Thumbnail Preview */}
+      <div className="flex-shrink-0">
+        <div className="w-40 h-32 bg-gray-100 rounded-md overflow-hidden border border-gray-300 flex items-center justify-center">
+          {thumbnail ? (
+            <img 
+              key={thumbnail} // Force re-render when thumbnail changes
+              src={thumbnailUrl}
+              alt="Course thumbnail" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error('Error loading image:', e);
+                console.error('Failed to load image at URL:', e.target.src);
+                console.error('Current thumbnail value:', thumbnail);
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/400x225?text=Thumbnail+Not+Found';
+              }}
+              onLoad={(e) => {
+                console.log('Image loaded successfully:', e.target.src);
+              }}
+            />
+          ) : (
+            <span className="text-gray-400 text-sm">No thumbnail</span>
+          )}
+        </div>
+      </div>
+      
+      {/* Upload Controls */}
+      <div className="flex-1">
+        <div className="flex items-center space-x-4">
+          <label 
+            className={`relative cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={(e) => {
+              if (isUploading) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
+          >
+            {isUploading ? 'Uploading...' : 'Choose File'}
+            <input
+              type="file"
+              className="sr-only"
+              accept="image/*"
+              disabled={isUploading}
+              onChange={handleFileChange}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </label>
+          {thumbnail && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="text-sm text-red-600 hover:text-red-800"
+            >
+              Remove
+            </button>
+          )}
+        </div>
+        <p className="mt-2 text-sm text-gray-500">
+          Recommended size: 800x450px (16:9 aspect ratio)
+        </p>
+      </div>
+    </div>
+  );
+};
 
 // Component to handle each week in the curriculum
 const WeekItem = ({ week, weekIndex, removeWeek, register, control, errors }) => {
@@ -786,6 +950,24 @@ const CourseForm = ({ isEdit = false }) => {
               errors={errors}
             />
           ))}
+        </div>
+
+        {/* Thumbnail Upload */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+          <h3 className="text-lg font-semibold mb-4">Course Thumbnail</h3>
+          <ErrorBoundary>
+            <FileUploadInput
+              thumbnail={watch('thumbnail')}
+              onFileSelect={(path) => {
+                console.log('Setting thumbnail path:', path);
+                setValue('thumbnail', path, { shouldValidate: true });
+              }}
+              onRemove={() => {
+                console.log('Removing thumbnail');
+                setValue('thumbnail', '', { shouldValidate: true });
+              }}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Form Actions */}
