@@ -98,10 +98,6 @@ const CoursesByCategory = () => {
         </ol>
       </nav>
       
-      <h1 className="text-3xl font-bold mb-6">
-        {category ? `${category.name} Courses` : 'All Courses'}
-      </h1>
-      
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar with categories */}
         <div className="w-full md:w-1/4 lg:w-1/5 mt-14">
@@ -175,18 +171,74 @@ const CoursesByCategory = () => {
 };
 
 const CourseCard = ({ course }) => {
+  // Function to get the full image URL with debugging
+  const getImageUrl = (url) => {
+    console.group('getImageUrl Debug');
+    try {
+      if (!url) {
+        console.warn('No image URL provided, using placeholder');
+        return '';
+      }
+      
+      console.log('Original URL from database:', url);
+      
+      // Try direct access first (in case the backend serves from root)
+      const directUrl = `http://localhost:4002${url.startsWith('/') ? '' : '/'}${url}`;
+      console.log('Trying direct URL:', directUrl);
+      
+      // Create a test image to check if the URL is accessible
+      const testImage = new Image();
+      testImage.src = directUrl;
+      
+      // If the image loads successfully, use this URL
+      testImage.onload = () => {
+        console.log('✅ Image loaded successfully:', directUrl);
+        return directUrl;
+      };
+      
+      // If there's an error, try alternative URL formats
+      testImage.onerror = () => {
+        console.warn('❌ Failed to load image from direct URL, trying alternatives...');
+        
+        // Try with /public prefix if it's an upload
+        if (url.startsWith('/uploads/')) {
+          const publicUrl = `http://localhost:4002/public${url}`;
+          console.log('Trying with /public prefix:', publicUrl);
+          return publicUrl;
+        }
+        
+        // Try with base URL
+        const baseUrl = 'http://localhost:4002';
+        const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+        const fullUrl = `${baseUrl}${cleanUrl}`;
+        console.log('Trying with base URL:', fullUrl);
+        return fullUrl;
+      };
+      
+      // Return the direct URL initially, it will update if needed
+      return directUrl;
+    } catch (error) {
+      console.error('Error in getImageUrl:', error);
+      return '/images/course-placeholder.jpg';
+    } finally {
+      console.groupEnd();
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden dark:bg-slate-800 hover:shadow-lg transition-shadow duration-300">
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
           <img
-            src={course.thumbnail}
+            src={getImageUrl(course.thumbnail)}
             alt={course.title}
             className="w-full h-48 object-cover"
             onError={(e) => {
+              console.error('Error loading image:', course.thumbnail);
               e.target.onerror = null;
               e.target.src = "/images/course-placeholder.jpg";
             }}
+            onLoad={() => console.log('Image loaded successfully:', course.thumbnail)}
           />
           {course.isFeatured && (
             <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded">
