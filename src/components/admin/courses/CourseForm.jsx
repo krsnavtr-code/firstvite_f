@@ -378,9 +378,13 @@ const CourseForm = ({ isEdit = false }) => {
         // If in edit mode, fetch course data
         if (isEdit && id) {
           const courseData = await getCourseById(id);
+          console.log('Fetched course data:', courseData);
+          
           // Format the data to match form structure
           const formattedData = {
             ...courseData,
+            // Ensure category is set correctly (it might be an object or just the ID)
+            category: courseData.category?._id || courseData.category || "",
             // Ensure all required arrays exist
             prerequisites: courseData.prerequisites?.length
               ? courseData.prerequisites
