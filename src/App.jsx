@@ -95,7 +95,7 @@ function App() {
           </MainLayout>
         } />
         
-        <Route path="/courses/category/:categoryId" element={
+        <Route path="/courses/category/:categoryName" element={
           <MainLayout>
             <CoursesByCategory />
           </MainLayout>

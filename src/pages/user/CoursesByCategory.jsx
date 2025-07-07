@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { FaStar, FaUsers, FaClock } from "react-icons/fa";
 
 const CoursesByCategory = () => {
-  const { categoryId } = useParams();
+  const { categoryName } = useParams();
   const [courses, setCourses] = useState([]);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,15 +21,32 @@ const CoursesByCategory = () => {
         const categoriesData = await getCategories();
         setAllCategories(categoriesData);
 
-        // If we have a categoryId, fetch courses for that category
-        if (categoryId) {
+        // If we have a categoryName, fetch courses for that category
+        if (categoryName) {
+          console.log('Category name from URL:', categoryName);
+          // Decode the URL-encoded category name and replace hyphens with spaces
+          const decodedCategoryName = decodeURIComponent(categoryName.replace(/-/g, ' '));
+          console.log('Decoded category name:', decodedCategoryName);
+          
+          // First, find the category by name (case insensitive and trim whitespace)
           const categoryData = categoriesData.find(
-            (cat) => cat._id === categoryId
+            (cat) => cat.name.trim().toLowerCase() === decodedCategoryName.trim().toLowerCase()
           );
-          setCategory(categoryData || null);
-
-          const coursesData = await getCoursesByCategory(categoryId);
-          setCourses(coursesData);
+          
+          console.log('Found category data:', categoryData);
+          
+          if (categoryData) {
+            setCategory(categoryData);
+            console.log('Fetching courses for category ID:', categoryData._id);
+            const coursesData = await getCoursesByCategory(categoryData._id);
+            console.log('Fetched courses:', coursesData);
+            setCourses(coursesData);
+          } else {
+            // If category not found, clear the courses
+            console.log('Category not found');
+            setCategory(null);
+            setCourses([]);
+          }
         } else {
           // If no categoryId, show all courses or a featured selection
           const allCourses = await getCoursesByCategory();
@@ -44,7 +61,7 @@ const CoursesByCategory = () => {
     };
 
     fetchData();
-  }, [categoryId]);
+  }, [categoryName]);
 
   if (loading) {
     return (
@@ -56,6 +73,35 @@ const CoursesByCategory = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 dark:text-white mt-16">
+      {/* Breadcrumb */}
+      <nav className="mb-6 text-sm" aria-label="Breadcrumb">
+        <ol className="flex items-center space-x-2">
+          <li>
+            <Link to="/" className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">
+              Home
+            </Link>
+          </li>
+          <li className="text-gray-500 dark:text-gray-400">/</li>
+          <li>
+            <Link to="/courses" className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">
+              Courses
+            </Link>
+          </li>
+          {category && (
+            <>
+              <li className="text-gray-500 dark:text-gray-400">/</li>
+              <li className="text-blue-600 dark:text-blue-400 font-medium" aria-current="page">
+                {category.name}
+              </li>
+            </>
+          )}
+        </ol>
+      </nav>
+      
+      <h1 className="text-3xl font-bold mb-6">
+        {category ? `${category.name} Courses` : 'All Courses'}
+      </h1>
+      
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar with categories */}
         <div className="w-full md:w-1/4 lg:w-1/5 mt-14">
@@ -68,7 +114,7 @@ const CoursesByCategory = () => {
                 <Link
                   to="/courses"
                   className={`block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                    !categoryId
+                    !categoryName
                       ? "bg-blue-50 text-blue-600 font-medium"
                       : "text-gray-700 dark:text-white"
                   }`}
@@ -79,9 +125,9 @@ const CoursesByCategory = () => {
               {allCategories.map((cat) => (
                 <li key={cat._id}>
                   <Link
-                    to={`/courses/category/${cat._id}`}
+                    to={`/courses/category/${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
                     className={`block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                      categoryId === cat._id
+                      category?._id === cat._id
                         ? "bg-blue-50 text-blue-600 font-medium"
                         : "text-gray-700 dark:text-white"
                     }`}
