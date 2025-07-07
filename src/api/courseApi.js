@@ -292,6 +292,28 @@ export const deleteCourse = async (id) => {
     }
 };
 
+// Get courses by category
+// If no categoryId is provided, returns all published courses
+export const getCoursesByCategory = async (categoryId = '') => {
+  try {
+    const params = {
+      status: 'published',
+      fields: 'title,description,price,originalPrice,thumbnail,duration,level,instructor,rating,enrolledStudents,isFeatured,category'
+    };
+    
+    // Add category filter if provided
+    if (categoryId) {
+      params.category = categoryId;
+    }
+    
+    const response = await axios.get('/courses', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching courses by category:', error);
+    throw error;
+  }
+};
+
 // Get all categories for course form
 export const getCategoriesForForm = async () => {
     try {

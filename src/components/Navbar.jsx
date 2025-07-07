@@ -39,18 +39,38 @@ function Navbar() {
   }, []);
   const navItems = (
     <>
-      <li>
-        <a href="/">Home</a>
-      </li>
-      <li>
-        <a href="/course">Course</a>
-      </li>
-      <li>
-        <a>Contact</a>
-      </li>
-      <li>
-        <a>About</a>
-      </li>
+      <Link
+        to="/"
+        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium dark:text-white"
+      >
+        Home
+      </Link>
+      <Link
+        to="/courses"
+        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium dark:text-white"
+      >
+        Browse Courses
+      </Link>
+      {authUser && (
+        <Link
+          to="/my-courses"
+          className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium dark:text-white"
+        >
+          My Learning
+        </Link>
+      )}
+      <Link
+        to="/contact"
+        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer dark:text-white"
+      >
+        Contact
+      </Link>
+      <Link
+        to="/about"
+        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer dark:text-white"
+      >
+        About
+      </Link>
     </>
   );
   return (
@@ -64,12 +84,8 @@ function Navbar() {
       >
         <div className="navbar ">
           <div className="navbar-start">
-            <div className="dropdown">
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn btn-ghost lg:hidden"
-              >
+            <div className="dropdown md:hidden">
+              <label tabIndex={0} className="btn btn-ghost btn-circle">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -81,33 +97,23 @@ function Navbar() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M4 6h16M4 12h8m-8 6h16"
+                    d="M4 6h16M4 12h16M4 18h7"
                   />
                 </svg>
-              </div>
+              </label>
               <ul
                 tabIndex={0}
                 className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
               >
                 {navItems}
-                {authUser?.role === 'admin' && (
-                  <li>
-                    <Link to="/admin/dashboard" className="px-3 py-2 text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
-                      Admin Dashboard
-                    </Link>
-                  </li>
-                )}
               </ul>
             </div>
-            <a className=" text-2xl font-bold cursor-pointer">bookStore</a>
+            <Link to="/" className=" text-2xl font-bold cursor-pointer">
+              FirstVite
+            </Link>
           </div>
           <div className="navbar-end space-x-3">
             <div className="navbar-center hidden lg:flex">
-              {authUser?.role === 'admin' && (
-                <Link to="/admin/dashboard" className="px-3 py-2 text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
-                  Admin Dashboard
-                </Link>
-              )}
               <ul className="menu menu-horizontal px-1">{navItems}</ul>
             </div>
             <div className="hidden md:block">
@@ -162,19 +168,26 @@ function Navbar() {
 
             {authUser ? (
               <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn btn-ghost btn-circle avatar"
+                >
                   <div className="w-10 rounded-full bg-pink-500 text-white flex items-center justify-center text-lg font-semibold">
-                    {authUser?.fullname?.charAt(0)?.toUpperCase() || 'U'}
+                    {authUser?.fullname?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                 </div>
-                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 dark:bg-gray-800 rounded-box w-52">
+                <ul
+                  tabIndex={0}
+                  className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 dark:bg-gray-800 rounded-box w-52"
+                >
                   <li>
                     <Link to="/profile" className="justify-between">
                       Profile
                       <span className="badge">New</span>
                     </Link>
                   </li>
-                  {authUser.role === 'admin' && (
+                  {authUser.role === "admin" && (
                     <li>
                       <Link to="/admin/dashboard">Admin Dashboard</Link>
                     </li>
@@ -191,7 +204,9 @@ function Navbar() {
               <div className="flex items-center gap-2">
                 <button
                   className="bg-pink-500 text-white px-3 py-2 rounded-md hover:bg-pink-600 duration-300 cursor-pointer"
-                  onClick={() => document.getElementById("my_modal_3").showModal()}
+                  onClick={() =>
+                    document.getElementById("my_modal_3").showModal()
+                  }
                 >
                   Login
                 </button>

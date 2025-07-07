@@ -15,6 +15,7 @@ import Unauthorized from './pages/Unauthorized';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './components/Login';
+import CoursesByCategory from './pages/user/CoursesByCategory';
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -86,9 +87,22 @@ function App() {
           </MainLayout>
         } />
 
+        {/* Public course routes */}
+        <Route path="/courses" element={
+          <MainLayout>
+            <CoursesByCategory />
+          </MainLayout>
+        } />
+        
+        <Route path="/courses/category/:categoryId" element={
+          <MainLayout>
+            <CoursesByCategory />
+          </MainLayout>
+        } />
+
         {/* Protected routes */}
         <Route
-          path="/course"
+          path="/my-courses"
           element={
             <PrivateRoute>
               <MainLayout>
@@ -99,19 +113,16 @@ function App() {
         />
 
         {/* Admin routes - No Navbar/Footer */}
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute roles={['admin']}>
-              <AdminLayout />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="categories/*" element={<Categories />} />
-          <Route path="courses/*" element={<AdminCourses />} />
-          <Route path="users" element={<Users />} />
+        <Route element={
+          <PrivateRoute roles={['admin']}>
+            <AdminLayout />
+          </PrivateRoute>
+        }>
+          <Route path="/admin" element={<Navigate to="dashboard" replace />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/categories/*" element={<Categories />} />
+          <Route path="/admin/courses/*" element={<AdminCourses />} />
+          <Route path="/admin/users" element={<Users />} />
         </Route>
 
         {/* Catch-all route */}

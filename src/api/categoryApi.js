@@ -1,5 +1,23 @@
 import api from './axios';
 
+// Get all categories for user panel
+export const getCategoriesForUser = async () => {
+  try {
+    const response = await api.get('/categories', {
+      params: {
+        status: 'active',
+        fields: '_id,name,slug,description,image',
+        sort: 'name',
+        limit: 100
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching categories for user panel:', error);
+    throw error;
+  }
+};
+
 // Get all categories
 export const getCategories = async () => {
   try {
