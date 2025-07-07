@@ -196,7 +196,7 @@ const CourseCard = ({ course }) => {
     if (!url.startsWith('http') && !url.startsWith('https') && !url.startsWith('//')) {
       // Remove any leading slashes to avoid double slashes
       const cleanPath = url.replace(/^\/+/, '');
-      url = `http://localhost:4002/${cleanPath}`;
+      url = `${import.meta.env.VITE_API_URL}/${cleanPath}`;
     }
     setImageUrl(url);
   }, [course]);

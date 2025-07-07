@@ -97,7 +97,7 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
     try {
       if (thumb.startsWith('http')) return thumb;
       // Ensure there's exactly one slash between domain and path
-      const baseUrl = 'http://localhost:4002';
+      const baseUrl = import.meta.env.VITE_API_URL;
       const path = thumb.startsWith('/') ? thumb : `/${thumb}`;
       return `${baseUrl}${path}`;
     } catch (error) {

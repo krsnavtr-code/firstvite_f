@@ -5,7 +5,7 @@ export const uploadCourseImage = async (formData) => {
     try {
         // Create a new instance of axios without the default JSON content-type
         const uploadAxios = axios.create({
-            baseURL: 'http://localhost:4002/api',
+            baseURL: import.meta.env.VITE_API_BASE_URL,
             withCredentials: true,
             headers: {
                 'Content-Type': 'multipart/form-data',
