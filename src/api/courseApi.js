@@ -68,10 +68,100 @@ export const getCourseById = async (id) => {
     }
 };
 
+// Helper function to clean and format course data
+const prepareCourseData = (courseData) => {
+    // Create a deep copy to avoid mutating the original data
+    const cleanData = JSON.parse(JSON.stringify(courseData));
+    
+    // Ensure all array fields are present and properly formatted
+    const arrayFields = [
+        'benefits', 'prerequisites', 'skills', 
+        'whatYouWillLearn', 'requirements', 'whoIsThisFor',
+        'mentors', 'tags'
+    ];
+    
+    arrayFields.forEach(field => {
+        if (Array.isArray(cleanData[field])) {
+            // Filter out empty strings, null, and undefined values from arrays
+            cleanData[field] = cleanData[field]
+                .filter(item => item !== null && item !== undefined)
+                .map(item => item.toString().trim())
+                .filter(item => item !== '');
+        } else if (cleanData[field] === undefined) {
+            cleanData[field] = [];
+        } else if (typeof cleanData[field] === 'string') {
+            // If it's a string, split by newlines and clean
+            cleanData[field] = cleanData[field]
+                .split('\n')
+                .map(item => item.trim())
+                .filter(item => item !== '');
+        } else {
+            cleanData[field] = [];
+        }
+    });
+    
+    // Ensure curriculum is properly formatted
+    if (Array.isArray(cleanData.curriculum)) {
+        cleanData.curriculum = cleanData.curriculum
+            .filter(week => week && (week.title || week.week))
+            .map((week, index) => ({
+                week: Number(week.week) || index + 1,
+                title: week.title?.toString().trim() || `Week ${index + 1}`,
+                description: week.description?.toString().trim() || '',
+                duration: week.duration?.toString().trim() || '0 min',
+                topics: Array.isArray(week.topics) 
+                    ? week.topics
+                        .map(topic => topic?.toString().trim())
+                        .filter(topic => topic && topic !== '')
+                    : []
+            }));
+    } else {
+        cleanData.curriculum = [{
+            week: 1,
+            title: 'Introduction',
+            description: '',
+            duration: '0 min',
+            topics: ['Course introduction']
+        }];
+    }
+    
+    // Ensure required fields have default values
+    const defaults = {
+        title: 'Untitled Course',
+        description: '',
+        shortDescription: '',
+        price: 0,
+        originalPrice: 0,
+        totalHours: 0,
+        duration: '0 min',
+        level: 'Beginner',
+        language: 'English',
+        certificateIncluded: true,
+        isFeatured: false,
+        isPublished: false,
+        status: 'draft'
+    };
+    
+    Object.entries(defaults).forEach(([key, value]) => {
+        if (cleanData[key] === undefined || cleanData[key] === null || cleanData[key] === '') {
+            cleanData[key] = value;
+        }
+    });
+    
+    // Ensure benefits is never empty
+    if (!cleanData.benefits || cleanData.benefits.length === 0) {
+        cleanData.benefits = ['No specific benefits listed'];
+    }
+    
+    return cleanData;
+};
+
 // Create a new course
 export const createCourse = async (courseData) => {
     try {
-        // Ensure required fields are present
+        console.log('Original course data:', courseData);
+        
+        // Check for required fields
         const requiredFields = ['title', 'description', 'category', 'instructor', 'price', 'level'];
         const missingFields = requiredFields.filter(field => !courseData[field]);
         
@@ -81,78 +171,51 @@ export const createCourse = async (courseData) => {
             throw error;
         }
         
-        // Clean up the data
-        const cleanData = {
-            title: courseData.title,
-            shortDescription: courseData.shortDescription || '',
-            description: courseData.description,
-            category: courseData.category,
-            instructor: courseData.instructor,
-            price: Number(courseData.price) || 0,
-            originalPrice: courseData.originalPrice ? Number(courseData.originalPrice) : Number(courseData.price) || 0,
-            totalHours: courseData.totalHours ? Number(courseData.totalHours) : 0,
-            duration: courseData.duration || '',
-            level: courseData.level || 'Beginner',
-            language: courseData.language || 'English',
-            benefits: Array.isArray(courseData.benefits) ? courseData.benefits : 
-                     (typeof courseData.benefits === 'string' ? courseData.benefits.split('\n').filter(b => b.trim() !== '') : []),
-            prerequisites: Array.isArray(courseData.prerequisites) ? courseData.prerequisites.filter(p => p.trim() !== '') : 
-                         (typeof courseData.prerequisites === 'string' ? courseData.prerequisites.split('\n').filter(p => p.trim() !== '') : []),
-            whatYouWillLearn: Array.isArray(courseData.whatYouWillLearn) ? courseData.whatYouWillLearn.filter(l => l.trim() !== '') : 
-                             (typeof courseData.whatYouWillLearn === 'string' ? courseData.whatYouWillLearn.split('\n').filter(l => l.trim() !== '') : []),
-            skills: Array.isArray(courseData.skills) ? courseData.skills.filter(s => s.trim() !== '') : 
-                   (typeof courseData.skills === 'string' ? courseData.skills.split('\n').filter(s => s.trim() !== '') : []),
-            certificateIncluded: Boolean(courseData.certificateIncluded),
-            isFeatured: Boolean(courseData.isFeatured),
-            isPublished: Boolean(courseData.isPublished),
-            status: courseData.status || 'draft',
-            curriculum: courseData.curriculum || [
-                {
-                    week: 1,
-                    title: 'Introduction',
-                    description: '',
-                    duration: 0,
-                    topics: ['Course introduction']
-                }
-            ]
-        };
+        // Clean and format the course data
+        const cleanData = prepareCourseData(courseData);
+        console.log('Prepared course data:', cleanData);
         
-        // Ensure all array fields are present and properly formatted
-        const arrayFields = ['benefits', 'prerequisites', 'skills'];
-        arrayFields.forEach(field => {
-            if (!Array.isArray(cleanData[field])) {
-                cleanData[field] = [];
-            }
-        });
+        // Log the exact data being sent
+        console.log('Sending to server:', JSON.stringify(cleanData, null, 2));
         
-        // Remove undefined values
-        Object.keys(cleanData).forEach(key => {
-            if (cleanData[key] === undefined) {
-                delete cleanData[key];
-            }
-        });
-        
-        console.log('Creating course with cleaned data:', JSON.stringify(cleanData, null, 2));
-        
-        const response = await axios.post('/courses', cleanData, {
+        const response = await axios({
+            method: 'post',
+            url: '/courses',
+            data: cleanData,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            timeout: 10000 // 10 seconds timeout
+            timeout: 15000, // 15 seconds timeout
+            validateStatus: (status) => status < 500 // Don't throw for 4xx errors
         });
 
+        console.log('Server response status:', response.status);
+        console.log('Server response data:', response.data);
+        
+        if (response.status >= 400) {
+            // Handle 4xx errors
+            const errorMessage = response.data?.message || 'Failed to create course';
+            const errorDetails = response.data?.errors 
+                ? Object.entries(response.data.errors)
+                    .map(([field, message]) => `${field}: ${message}`)
+                    .join('\n')
+                : '';
+            
+            throw new Error(`${errorMessage}${errorDetails ? '\n' + errorDetails : ''}`);
+        }
+        
         const responseData = response.data;
         const responseCourseData = responseData.data || responseData;
 
         if (!responseCourseData) {
-            throw new Error('No data received in response');
+            throw new Error('No data received in the response from the server');
         }
 
         // Ensure the course ID is available
         if (!responseCourseData._id && !responseCourseData.id) {
             console.error('Invalid response - missing course ID:', responseData);
-            throw new Error('Invalid response: Missing course ID');
+            throw new Error('The server response is missing the course ID');
         }
         
         console.log('Course created successfully:', responseCourseData);
@@ -167,26 +230,41 @@ export const createCourse = async (courseData) => {
             console.error('Response status:', error.response.status);
             console.error('Response headers:', error.response.headers);
             
-            // If we have a validation error from the server
+            let errorMessage = 'An error occurred while saving the course';
+            
+            // Handle different types of errors
             if (error.response.status === 400 || error.response.status === 422) {
-                const errorMessage = error.response.data.message || 'Validation failed';
-                throw new Error(`Validation Error: ${errorMessage}`);
+                // Validation error
+                errorMessage = error.response.data.message || 'Validation failed';
+                
+                // If there are validation errors, include them in the message
+                if (error.response.data.errors) {
+                    const errorDetails = Object.entries(error.response.data.errors)
+                        .map(([field, message]) => `${field}: ${message}`)
+                        .join('\n');
+                    errorMessage = `Validation Error: ${errorMessage}\n${errorDetails}`;
+                }
+            } else if (error.response.status === 401) {
+                errorMessage = 'Authentication failed. Please log in again.';
+            } else if (error.response.status === 403) {
+                errorMessage = 'You do not have permission to perform this action.';
+            } else if (error.response.status === 404) {
+                errorMessage = 'The requested resource was not found.';
+            } else if (error.response.status >= 500) {
+                errorMessage = 'A server error occurred. Please try again later.';
             }
+            
+            console.error('Error details:', errorMessage);
+            throw new Error(errorMessage);
         } else if (error.request) {
             // The request was made but no response was received
             console.error('No response received:', error.request);
-            throw new Error('No response received from server. Please check your connection.');
-        } else if (error.name === 'ValidationError') {
-            console.error('Validation Error:', error.message);
-            throw error; // Re-throw validation errors
+            throw new Error('No response received from the server. Please check your internet connection.');
         } else {
             // Something happened in setting up the request that triggered an Error
-            console.error('Error message:', error.message);
+            console.error('Error setting up the request:', error.message);
+            throw new Error(`Failed to create course: ${error.message}`);
         }
-        
-        // Default error message
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to create course';
-        throw new Error(errorMessage);
     }
 };
 
@@ -195,43 +273,50 @@ export const updateCourse = async (id, courseData, isPartial = false) => {
     try {
         console.log(`${isPartial ? 'Partially' : 'Fully'} updating course ${id} with data:`, courseData);
         
-        // Clean and format the data similar to createCourse
+        // Helper function to clean array fields
+        const cleanArrayField = (field) => {
+            if (field === undefined || field === null) return [];
+            if (Array.isArray(field)) {
+                return field.filter(item => item && item.trim() !== '');
+            }
+            if (typeof field === 'string') {
+                return field.split('\n').filter(item => item.trim() !== '');
+            }
+            return [];
+        };
+        
+        // Clean and format the data
         const cleanData = {
             ...courseData,
-            price: courseData.price !== undefined ? Number(courseData.price) : undefined,
-            originalPrice: courseData.originalPrice !== undefined ? Number(courseData.originalPrice) : undefined,
-            totalHours: courseData.totalHours !== undefined ? Number(courseData.totalHours) : undefined,
-            certificateIncluded: courseData.certificateIncluded !== undefined ? Boolean(courseData.certificateIncluded) : undefined,
-            isFeatured: courseData.isFeatured !== undefined ? Boolean(courseData.isFeatured) : undefined,
-            isPublished: courseData.isPublished !== undefined ? Boolean(courseData.isPublished) : undefined,
-            benefits: courseData.benefits !== undefined ? (
-                Array.isArray(courseData.benefits) 
-                    ? courseData.benefits.filter(b => b && b.trim() !== '') 
-                    : (typeof courseData.benefits === 'string' 
-                        ? courseData.benefits.split('\n').filter(b => b.trim() !== '') 
-                        : [])
-            ) : undefined,
-            prerequisites: courseData.prerequisites !== undefined ? (
-                Array.isArray(courseData.prerequisites) 
-                    ? courseData.prerequisites.filter(p => p && p.trim() !== '') 
-                    : (typeof courseData.prerequisites === 'string' 
-                        ? courseData.prerequisites.split('\n').filter(p => p.trim() !== '') 
-                        : [])
-            ) : undefined,
-            whatYouWillLearn: courseData.whatYouWillLearn !== undefined ? (
-                Array.isArray(courseData.whatYouWillLearn) 
-                    ? courseData.whatYouWillLearn.filter(l => l && l.trim() !== '') 
-                    : (typeof courseData.whatYouWillLearn === 'string' 
-                        ? courseData.whatYouWillLearn.split('\n').filter(l => l.trim() !== '') 
-                        : [])
-            ) : undefined,
-            skills: courseData.skills !== undefined ? (
-                Array.isArray(courseData.skills) 
-                    ? courseData.skills.filter(s => s && s.trim() !== '') 
-                    : (typeof courseData.skills === 'string' 
-                        ? courseData.skills.split('\n').filter(s => s.trim() !== '') 
-                        : [])
-            ) : undefined
+            // Convert numbers
+            price: courseData.price !== undefined ? Number(courseData.price) : 0,
+            originalPrice: courseData.originalPrice !== undefined ? Number(courseData.originalPrice) : 0,
+            totalHours: courseData.totalHours !== undefined ? Number(courseData.totalHours) : 0,
+            // Convert booleans
+            certificateIncluded: courseData.certificateIncluded !== false, // default to true if not set
+            isFeatured: Boolean(courseData.isFeatured),
+            isPublished: Boolean(courseData.isPublished),
+            // Clean array fields
+            benefits: cleanArrayField(courseData.benefits),
+            prerequisites: cleanArrayField(courseData.prerequisites),
+            whatYouWillLearn: cleanArrayField(courseData.whatYouWillLearn),
+            skills: cleanArrayField(courseData.skills),
+            requirements: cleanArrayField(courseData.requirements),
+            whoIsThisFor: cleanArrayField(courseData.whoIsThisFor),
+            // Ensure tags is an array
+            tags: Array.isArray(courseData.tags) ? courseData.tags : [],
+            // Ensure curriculum is properly formatted
+            curriculum: Array.isArray(courseData.curriculum) 
+                ? courseData.curriculum.map(week => ({
+                    week: Number(week.week) || 1,
+                    title: week.title || '',
+                    description: week.description || '',
+                    duration: week.duration || '0 min',
+                    topics: Array.isArray(week.topics) 
+                        ? week.topics.filter(t => t && t.trim() !== '')
+                        : []
+                }))
+                : []
         };
 
         // Remove undefined values for partial updates

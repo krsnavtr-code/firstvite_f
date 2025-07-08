@@ -330,27 +330,21 @@ const CourseForm = ({ isEdit = false }) => {
       image: "",
       thumbnail: "",
       previewVideo: "",
-      benefits: [""],
-      whatYouWillLearn: [""],
-      requirements: [""],
-      whoIsThisFor: [""],
+      benefits: ["No specific benefits listed"],
+      whatYouWillLearn: ["Learn valuable skills"],
+      requirements: ["No special requirements"],
+      whoIsThisFor: ["Anyone interested in learning"],
+      prerequisites: ["No prerequisites required"],
       tags: [],
       faqs: [],
-      weeks: [
-        {
-          title: "",
-          description: "",
-          topics: [
-            {
-              title: "",
-              videoUrl: "",
-              duration: 0,
-              isPreview: false,
-            },
-          ],
-        },
-      ],
-    },
+      curriculum: [{
+        week: 1,
+        title: "Introduction",
+        description: "",
+        duration: "0 min",
+        topics: ["Course introduction"]
+      }]
+    }
   });
   
   // FAQ form array methods
@@ -371,31 +365,34 @@ const CourseForm = ({ isEdit = false }) => {
         const categoriesData = await getCategoriesForForm();
         setCategories(categoriesData);
 
-        // Fetch instructors (assuming we have a way to get instructors)
+        // Fetch instructors
         const instructorsData = await userApi.getUsers({ role: "instructor" });
         setInstructors(instructorsData);
 
         // If in edit mode, fetch course data
         if (isEdit && id) {
-          const courseData = await getCourseById(id);
-          console.log('Fetched course data:', courseData);
-          
-          // Format the data to match form structure
-          const formattedData = {
-            ...courseData,
-            // Ensure category is set correctly (it might be an object or just the ID)
-            category: courseData.category?._id || courseData.category || "",
-            // Ensure all required arrays exist
-            prerequisites: courseData.prerequisites?.length
-              ? courseData.prerequisites
-              : [""],
-            whatYouWillLearn: courseData.whatYouWillLearn?.length
-              ? courseData.whatYouWillLearn
-              : [""],
-            skills: courseData.skills?.length ? courseData.skills : [""],
-            curriculum: courseData.curriculum?.length
-              ? courseData.curriculum
-              : [
+          try {
+            const response = await getCourseById(id);
+            const courseData = response.data;
+            console.log('Fetched course data:', courseData);
+            
+            // Helper function to ensure array fields have at least one empty string
+            const ensureArray = (arr) => Array.isArray(arr) && arr.length > 0 ? arr : [''];
+
+            // Format the data to match form structure
+            const formattedData = {
+              ...courseData,
+              // Map category (it might be an object with _id or just the ID)
+              category: courseData.category?._id || courseData.category || "",
+              // Ensure all arrays are properly initialized
+              benefits: ensureArray(courseData.benefits),
+              whatYouWillLearn: ensureArray(courseData.whatYouWillLearn),
+              requirements: ensureArray(courseData.requirements),
+              whoIsThisFor: ensureArray(courseData.whoIsThisFor),
+              prerequisites: ensureArray(courseData.prerequisites),
+              skills: ensureArray(courseData.skills),
+              // Handle curriculum - ensure it has at least one week
+              curriculum: courseData.curriculum?.length ? courseData.curriculum : [
                 {
                   week: 1,
                   title: "Introduction",
@@ -404,8 +401,21 @@ const CourseForm = ({ isEdit = false }) => {
                   topics: [""],
                 },
               ],
-          };
-          reset(formattedData);
+              // Handle other fields
+              tags: courseData.tags || [],
+              faqs: courseData.faqs || [],
+              // Ensure boolean fields are properly set
+              isFeatured: Boolean(courseData.isFeatured),
+              isPublished: Boolean(courseData.isPublished),
+              certificateIncluded: courseData.certificateIncluded !== false, // default to true if not set
+            };
+            
+            console.log('Formatted course data:', formattedData);
+            reset(formattedData);
+          } catch (error) {
+            console.error("Error loading course data:", error);
+            toast.error("Failed to load course data. Please try again.");
+          }
         }
       } catch (error) {
         console.error("Error loading form data:", error);
@@ -414,9 +424,9 @@ const CourseForm = ({ isEdit = false }) => {
         setLoading(false);
       }
     };
-
+    
     fetchCourseData();
-  }, [id, isEdit, reset]);
+  }, [id, isEdit, reset, getCategoriesForForm, userApi, getCourseById, toast]);
 
   // Field arrays for curriculum
   const {
@@ -471,14 +481,95 @@ const CourseForm = ({ isEdit = false }) => {
   };
 
   // Form submission
-  const onSubmit = async (data) => {
+  const onSubmit = async (formData) => {
     try {
       setLoading(true);
+      
+      // Validate required fields
+      if (!formData.title || formData.title.trim().length < 5) {
+        throw new Error('Title must be at least 5 characters long');
+      }
+      
+      if (!formData.description || formData.description.trim().length < 10) {
+        throw new Error('Description must be at least 10 characters long');
+      }
+      
+      if (!formData.category) {
+        throw new Error('Please select a category');
+      }
+      
+      if (!formData.instructor || formData.instructor.trim().length < 2) {
+        throw new Error('Instructor name is required');
+      }
+      
+      // Clean and format the data before sending to API
+      const dataToSend = {
+        ...formData,
+        // Ensure strings are properly trimmed
+        title: formData.title?.toString().trim(),
+        description: formData.description?.toString().trim(),
+        instructor: formData.instructor?.toString().trim(),
+        // Convert string numbers to actual numbers
+        price: Math.max(0, Number(formData.price) || 0),
+        originalPrice: Math.max(0, Number(formData.originalPrice) || 0),
+        totalHours: Math.max(0, Number(formData.totalHours) || 0),
+        // Ensure arrays are properly formatted
+        benefits: Array.isArray(formData.benefits) 
+          ? formData.benefits.filter(b => b && b.toString().trim() !== '')
+          : ['No specific benefits listed'],
+        prerequisites: Array.isArray(formData.prerequisites)
+          ? formData.prerequisites.filter(p => p && p.toString().trim() !== '')
+          : ['No prerequisites required'],
+        whatYouWillLearn: Array.isArray(formData.whatYouWillLearn)
+          ? formData.whatYouWillLearn.filter(w => w && w.toString().trim() !== '')
+          : ['Learn valuable skills'],
+        requirements: Array.isArray(formData.requirements)
+          ? formData.requirements.filter(r => r && r.toString().trim() !== '')
+          : ['No special requirements'],
+        whoIsThisFor: Array.isArray(formData.whoIsThisFor)
+          ? formData.whoIsThisFor.filter(w => w && w.toString().trim() !== '')
+          : ['Anyone interested in learning'],
+        // Ensure curriculum is properly formatted
+        curriculum: Array.isArray(formData.curriculum)
+          ? formData.curriculum
+              .filter(week => week && (week.title || week.week))
+              .map((week, index) => ({
+                week: Number(week.week) || index + 1,
+                title: week.title?.toString().trim() || `Week ${index + 1}`,
+                description: week.description?.toString().trim() || '',
+                duration: week.duration?.toString().trim() || '0 min',
+                topics: Array.isArray(week.topics)
+                  ? week.topics
+                      .map(topic => topic?.toString().trim())
+                      .filter(topic => topic && topic !== '')
+                  : []
+              }))
+          : [{
+              week: 1,
+              title: 'Introduction',
+              description: '',
+              duration: '0 min',
+              topics: ['Course introduction']
+            }],
+        // Ensure boolean fields are properly set
+        certificateIncluded: formData.certificateIncluded !== false,
+        isFeatured: Boolean(formData.isFeatured),
+        isPublished: Boolean(formData.isPublished),
+        // Ensure required fields have values
+        level: ['Beginner', 'Intermediate', 'Advanced'].includes(formData.level) 
+          ? formData.level 
+          : 'Beginner',
+        language: formData.language?.toString().trim() || 'English',
+        duration: formData.duration?.toString().trim() || '0 min'
+      };
+      
+      console.log('Submitting course data:', dataToSend);
+      
       if (isEdit) {
-        await updateCourse(id, data);
+        await updateCourse(id, dataToSend);
         toast.success('Course updated successfully!');
       } else {
-        await createCourse(data);
+        await createCourse(dataToSend);
         toast.success('Course created successfully!');
       }
       navigate('/admin/courses');

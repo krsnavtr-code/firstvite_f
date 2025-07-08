@@ -2,7 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getCourseById } from '../../api/courseApi';
 import { toast } from 'react-hot-toast';
-import { FaStar, FaUsers, FaClock, FaPlay, FaDownload, FaShare, FaBook, FaCertificate, FaMoneyBillWave, FaGlobe } from 'react-icons/fa';
+import { 
+  FaStar, FaUsers, FaClock, FaPlay, FaShare, FaBook, 
+  FaCertificate, FaMoneyBillWave, FaGlobe, FaCheck, 
+  FaFileAlt, FaUserTie, FaGraduationCap, FaTag, FaMobileAlt,
+  FaListOl, FaQuestionCircle, FaPen, FaBookOpen, FaBriefcase,
+  FaTwitter, FaLinkedin, FaGithub
+} from 'react-icons/fa';
+import { formatDuration, formatPrice } from '../../utils/format';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -10,167 +18,313 @@ const CourseDetail = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [activeSection, setActiveSection] = useState(null);
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         setLoading(true);
-        const courseData = await getCourseById(id);
-        setCourse(courseData);
+        const response = await getCourseById(id);
+        if (response.success && response.data) {
+          setCourse(response.data);
+        } else {
+          throw new Error(response.message || 'Failed to load course');
+        }
       } catch (error) {
         console.error('Error fetching course:', error);
-        toast.error('Failed to load course details');
+        toast.error(error.message || 'Failed to load course details');
         navigate('/courses');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCourse();
+    if (id) {
+      fetchCourse();
+    }
   }, [id, navigate]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading course details...</p>
+        </div>
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Course not found</h2>
-          <Link 
-            to="/courses" 
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Browse Courses
-          </Link>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
+        <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Course Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            The course you're looking for doesn't exist or may have been removed.
+          </p>
+          <div className="space-y-3">
+            <Link 
+              to="/courses" 
+              className="inline-block w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Browse All Courses
+            </Link>
+            <Link 
+              to="/" 
+              className="inline-block w-full px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+            >
+              Go to Homepage
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Calculate discount percentage if original price is available
+  const discountPercentage = course.originalPrice > course.price 
+    ? Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)
+    : 0;
+
   return (
-    <div className="bg-gray-50 dark:bg-slate-900 min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Course Header */}
-      <div className="bg-white dark:bg-slate-800 shadow">
-        <div className="container mx-auto px-4 py-8">
-          <nav className="flex mb-4" aria-label="Breadcrumb">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
+      <div className="bg-white dark:bg-slate-800 shadow mt-16">
+        <div className="container mx-auto px-4 py-6 md:py-8">
+          <nav className="flex mb-4 overflow-x-auto" aria-label="Breadcrumb">
+            <ol className="inline-flex items-center space-x-1 md:space-x-3 whitespace-nowrap">
               <li>
-                <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600">
+                <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
                 <div className="flex items-center">
                   <span className="mx-2 text-gray-500">/</span>
-                  <Link to="/courses" className="text-gray-700 dark:text-gray-300 hover:text-blue-600">
+                  <Link to="/courses" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">
                     Courses
+                  </Link>
+                </div>
+              </li>
+              <li>
+                <div className="flex items-center">
+                  <span className="mx-2 text-gray-500">/</span>
+                  <Link 
+                    to={`/courses/category/${course.category?.slug || course.category}`} 
+                    className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
+                  >
+                    {course.category?.name || 'Category'}
                   </Link>
                 </div>
               </li>
               <li aria-current="page">
                 <div className="flex items-center">
                   <span className="mx-2 text-gray-500">/</span>
-                  <span className="text-gray-500">{course.title}</span>
+                  <span className="text-gray-500 font-medium truncate max-w-xs md:max-w-md">
+                    {course.title}
+                  </span>
                 </div>
               </li>
             </ol>
           </nav>
           
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="md:w-2/3">
-              <h1 className="text-3xl font-bold mb-4 dark:text-white">{course.title}</h1>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">{course.shortDescription || course.description?.substring(0, 200)}...</p>
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Course Info */}
+            <div className="lg:w-2/3">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                {course.category?.name && (
+                  <Link 
+                    to={`/courses/category/${course.category.slug || course.category._id}`}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                  >
+                    <FaTag className="mr-1.5 h-3 w-3" />
+                    {course.category.name}
+                  </Link>
+                )}
+                {course.isFeatured && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                    <FaStar className="mr-1.5 h-3 w-3" />
+                    Featured
+                  </span>
+                )}
+                {course.level && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                    {course.level}
+                  </span>
+                )}
+              </div>
+
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 dark:text-white">{course.title}</h1>
               
-              <div className="flex items-center space-x-4 mb-6">
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+                {course.shortDescription || course.description?.replace(/<[^>]*>?/gm, '').substring(0, 200)}...
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-4 mb-6">
                 <div className="flex items-center text-yellow-400">
                   <FaStar className="mr-1" />
-                  <span className="text-gray-700 dark:text-gray-300 ml-1">
-                    {course.rating?.toFixed(1) || 'New'}
+                  <span className="text-gray-700 dark:text-gray-300 ml-1 font-medium">
+                    {course.averageRating?.toFixed(1) || 'New'}
+                    <span className="text-gray-500 text-sm ml-1">({course.totalReviews || 0} reviews)</span>
                   </span>
                 </div>
                 <div className="flex items-center text-gray-600 dark:text-gray-400">
-                  <FaUsers className="mr-1" />
-                  <span>{course.enrolledStudents || 0} students</span>
+                  <FaUsers className="mr-1.5" />
+                  <span>{course.totalStudents?.toLocaleString() || '0'} students</span>
                 </div>
                 <div className="flex items-center text-gray-600 dark:text-gray-400">
-                  <FaClock className="mr-1" />
-                  <span>{course.duration || 'Self-paced'}</span>
+                  <FaClock className="mr-1.5" />
+                  <span>{formatDuration(course.duration) || 'Self-paced'}</span>
                 </div>
+                {course.language && (
+                  <div className="flex items-center text-gray-600 dark:text-gray-400">
+                    <FaGlobe className="mr-1.5" />
+                    <span>{course.language}</span>
+                  </div>
+                )}
               </div>
               
-              <div className="flex items-center space-x-4">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center">
+              <div className="flex flex-wrap gap-3">
+                <button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
+                  onClick={() => window.scrollTo({ top: document.getElementById('pricing-section').offsetTop - 100, behavior: 'smooth' })}
+                >
                   <FaPlay className="mr-2" /> Enroll Now
                 </button>
-                <button className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium flex items-center">
+                <button 
+                  className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium flex items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: course.title,
+                        text: `Check out this course: ${course.title}`,
+                        url: window.location.href,
+                      }).catch(console.error);
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success('Link copied to clipboard!');
+                    }
+                  }}
+                >
                   <FaShare className="mr-2" /> Share
                 </button>
+                {course.previewVideo && (
+                  <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center">
+                    <FaPlay className="mr-2" /> Preview this course
+                  </button>
+                )}
               </div>
             </div>
             
-            <div className="md:w-1/3">
-              <div className="bg-white dark:bg-slate-700 rounded-lg shadow-md p-6">
-                <div className="relative pb-9/16 mb-4 rounded-lg overflow-hidden">
+            {/* Course Card */}
+            <div className="lg:w-1/3">
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+                <div className="relative aspect-video bg-gray-100 dark:bg-slate-700">
                   <img 
-                    src={course.thumbnail} 
-                    alt={course.title} 
-                    className="w-full h-48 object-cover rounded-lg"
+                    src={getImageUrl(course.thumbnail)} 
+                    alt={course.title}
+                    className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = "/images/course-placeholder.jpg";
                     }}
                   />
-                  {course.isFeatured && (
-                    <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded">
-                      Featured
-                    </div>
+                  {course.previewVideo && (
+                    <button 
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-4xl hover:bg-opacity-60 transition-all"
+                      onClick={() => {
+                        // TODO: Implement video preview modal
+                        console.log('Open preview video');
+                      }}
+                    >
+                      <div className="w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center">
+                        <FaPlay className="ml-1" />
+                      </div>
+                    </button>
                   )}
                 </div>
                 
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {course.price > 0 ? `$${course.price}` : 'Free'}
-                    {course.originalPrice > course.price && (
-                      <span className="ml-2 text-sm text-gray-500 line-through">
-                        ${course.originalPrice}
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {course.price > 0 ? formatPrice(course.price) : 'Free'}
                       </span>
+                      {course.originalPrice > course.price && (
+                        <div className="flex items-center">
+                          <span className="ml-2 text-sm text-gray-500 line-through">
+                            {formatPrice(course.originalPrice)}
+                          </span>
+                          {discountPercentage > 0 && (
+                            <span className="ml-2 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-0.5 rounded-full">
+                              {discountPercentage}% OFF
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {course.certificateIncluded && (
+                      <div className="flex items-center text-green-600 dark:text-green-400 text-sm">
+                        <FaCertificate className="mr-1.5" />
+                        Certificate
+                      </div>
                     )}
-                  </span>
-                  {course.discount && (
-                    <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                      {course.discount}% OFF
-                    </span>
-                  )}
+                  </div>
+                  
+                  <button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium mb-4 transition-colors"
+                    onClick={() => {
+                      // TODO: Implement add to cart functionality
+                      toast.success('Added to cart!');
+                    }}
+                  >
+                    Add to Cart
+                  </button>
+                  
+                  <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+                    <div className="flex items-center">
+                      <FaBook className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
+                      <span>{course.curriculum?.reduce((total, section) => total + (section.lessons?.length || 0), 0) || 0} Lessons</span>
+                    </div>
+                    <div className="flex items-center">
+                      <FaClock className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
+                      <span>Full lifetime access</span>
+                    </div>
+                    {course.language && (
+                      <div className="flex items-center">
+                        <FaGlobe className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
+                        <span>Language: {course.language}</span>
+                      </div>
+                    )}
+                    {course.certificateIncluded && (
+                      <div className="flex items-center">
+                        <FaCertificate className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
+                        <span>Certificate of completion</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium mb-4">
-                  Add to Cart
-                </button>
-                
-                <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center">
-                    <FaBook className="mr-2" />
-                    <span>{course.lessons?.length || 0} Lessons</span>
-                  </div>
-                  <div className="flex items-center">
-                    <FaClock className="mr-2" />
-                    <span>Full lifetime access</span>
-                  </div>
-                  <div className="flex items-center">
-                    <FaGlobe className="mr-2" />
-                    <span>English</span>
-                  </div>
-                  <div className="flex items-center">
-                    <FaCertificate className="mr-2" />
-                    <span>Certificate of completion</span>
-                  </div>
-                </div>
+              </div>
+              
+              {/* Course Stats */}
+              <div className="mt-4 bg-white dark:bg-slate-800 rounded-lg shadow p-4 border border-gray-200 dark:border-slate-700">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">This course includes:</h3>
+                <ul className="space-y-2">
+                  {[
+                    { icon: <FaPlay className="text-green-500 mr-2" />, text: `${course.totalHours || 0} hours on-demand video` },
+                    { icon: <FaFileAlt className="text-blue-500 mr-2" />, text: 'Downloadable resources' },
+                    { icon: <FaUserTie className="text-purple-500 mr-2" />, text: 'Instructor support' },
+                    { icon: <FaGraduationCap className="text-yellow-500 mr-2" />, text: 'Certificate of completion' },
+                    { icon: <FaMobileAlt className="text-red-500 mr-2" />, text: 'Access on mobile and TV' },
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                      {item.icon}
+                      {item.text}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
@@ -467,42 +621,8 @@ const CourseDetail = () => {
         </div>
       </div>
       
-      {/* Related Courses */}
-      <div className="bg-gray-50 dark:bg-slate-800 py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8 dark:text-white">You May Also Like</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="bg-white dark:bg-slate-700 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <div className="h-40 bg-gray-200 dark:bg-slate-600"></div>
-                <div className="p-4">
-                  <h3 className="font-bold text-lg mb-2 line-clamp-2 h-14 dark:text-white">
-                    Related Course Title {item}
-                  </h3>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
-                    <span className="flex items-center mr-4">
-                      <FaStar className="text-yellow-400 mr-1" />
-                      {Math.round(Math.random() * 2 + 3).toFixed(1)}
-                    </span>
-                    <span className="flex items-center">
-                      <FaUsers className="mr-1" />
-                      {Math.floor(Math.random() * 1000)} students
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-gray-900 dark:text-white">
-                      ${(item * 20) + 29}.99
-                    </span>
-                    <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Course Tabs */}
+     
     </div>
   );
 };
