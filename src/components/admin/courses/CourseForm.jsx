@@ -509,25 +509,46 @@ const CourseForm = ({ isEdit = false }) => {
         title: formData.title?.toString().trim(),
         description: formData.description?.toString().trim(),
         instructor: formData.instructor?.toString().trim(),
+        shortDescription: formData.shortDescription?.toString().trim() || '',
+        
         // Convert string numbers to actual numbers
         price: Math.max(0, Number(formData.price) || 0),
         originalPrice: Math.max(0, Number(formData.originalPrice) || 0),
         totalHours: Math.max(0, Number(formData.totalHours) || 0),
+        
         // Ensure arrays are properly formatted
         benefits: Array.isArray(formData.benefits) 
           ? formData.benefits.filter(b => b && b.toString().trim() !== '')
           : ['No specific benefits listed'],
+          
         prerequisites: Array.isArray(formData.prerequisites)
-          ? formData.prerequisites.filter(p => p && p.toString().trim() !== '')
+          ? formData.prerequisites
+              .filter(p => p && p.toString().trim() !== '')
+              .map(p => p.toString().trim())
           : ['No prerequisites required'],
+          
+        skills: Array.isArray(formData.skills)
+          ? formData.skills
+              .filter(s => s && s.toString().trim() !== '')
+              .map(s => s.toString().trim())
+          : [],
+          
         whatYouWillLearn: Array.isArray(formData.whatYouWillLearn)
-          ? formData.whatYouWillLearn.filter(w => w && w.toString().trim() !== '')
+          ? formData.whatYouWillLearn
+              .filter(w => w && w.toString().trim() !== '')
+              .map(w => w.toString().trim())
           : ['Learn valuable skills'],
+          
         requirements: Array.isArray(formData.requirements)
-          ? formData.requirements.filter(r => r && r.toString().trim() !== '')
+          ? formData.requirements
+              .filter(r => r && r.toString().trim() !== '')
+              .map(r => r.toString().trim())
           : ['No special requirements'],
+          
         whoIsThisFor: Array.isArray(formData.whoIsThisFor)
-          ? formData.whoIsThisFor.filter(w => w && w.toString().trim() !== '')
+          ? formData.whoIsThisFor
+              .filter(w => w && w.toString().trim() !== '')
+              .map(w => w.toString().trim())
           : ['Anyone interested in learning'],
         // Ensure curriculum is properly formatted
         curriculum: Array.isArray(formData.curriculum)

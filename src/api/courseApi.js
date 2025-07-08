@@ -70,6 +70,8 @@ export const getCourseById = async (id) => {
 
 // Helper function to clean and format course data
 const prepareCourseData = (courseData) => {
+    console.log('Original course data in prepareCourseData:', JSON.stringify(courseData, null, 2));
+    
     // Create a deep copy to avoid mutating the original data
     const cleanData = JSON.parse(JSON.stringify(courseData));
     
@@ -80,18 +82,22 @@ const prepareCourseData = (courseData) => {
         'mentors', 'tags'
     ];
     
+    // Process array fields
     arrayFields.forEach(field => {
-        if (Array.isArray(cleanData[field])) {
+        if (courseData[field] === undefined || courseData[field] === null) {
+            cleanData[field] = [];
+            return;
+        }
+
+        if (Array.isArray(courseData[field])) {
             // Filter out empty strings, null, and undefined values from arrays
-            cleanData[field] = cleanData[field]
+            cleanData[field] = courseData[field]
                 .filter(item => item !== null && item !== undefined)
                 .map(item => item.toString().trim())
                 .filter(item => item !== '');
-        } else if (cleanData[field] === undefined) {
-            cleanData[field] = [];
-        } else if (typeof cleanData[field] === 'string') {
+        } else if (typeof courseData[field] === 'string') {
             // If it's a string, split by newlines and clean
-            cleanData[field] = cleanData[field]
+            cleanData[field] = courseData[field]
                 .split('\n')
                 .map(item => item.trim())
                 .filter(item => item !== '');
@@ -143,16 +149,49 @@ const prepareCourseData = (courseData) => {
     };
     
     Object.entries(defaults).forEach(([key, value]) => {
+        // Ensure numbers are properly formatted
+        const numberFields = ['price', 'originalPrice', 'totalHours'];
+        numberFields.forEach(field => {
+            cleanData[field] = Number(cleanData[field]) || 0;
+        });
+        
         if (cleanData[key] === undefined || cleanData[key] === null || cleanData[key] === '') {
             cleanData[key] = value;
         }
     });
     
-    // Ensure benefits is never empty
+    // Ensure required arrays are never empty
     if (!cleanData.benefits || cleanData.benefits.length === 0) {
         cleanData.benefits = ['No specific benefits listed'];
     }
+    if (!cleanData.prerequisites || cleanData.prerequisites.length === 0) {
+        cleanData.prerequisites = ['No prerequisites required'];
+    }
+    if (!cleanData.whatYouWillLearn || cleanData.whatYouWillLearn.length === 0) {
+        cleanData.whatYouWillLearn = ['Learn valuable skills'];
+    }
+    if (!cleanData.requirements || cleanData.requirements.length === 0) {
+        cleanData.requirements = ['No special requirements'];
+    }
+    if (!cleanData.whoIsThisFor || cleanData.whoIsThisFor.length === 0) {
+        cleanData.whoIsThisFor = ['Anyone interested in learning'];
+    }
+    if (!cleanData.skills || cleanData.skills.length === 0) {
+        cleanData.skills = ['No specific skills required'];
+    }
     
+    // Ensure curriculum has at least one week
+    if (!cleanData.curriculum || !Array.isArray(cleanData.curriculum) || cleanData.curriculum.length === 0) {
+        cleanData.curriculum = [{
+            week: 1,
+            title: 'Introduction',
+            description: '',
+            duration: '0 min',
+            topics: ['Course introduction']
+        }];
+    }
+    
+    console.log('Prepared course data:', JSON.stringify(cleanData, null, 2));
     return cleanData;
 };
 
