@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../../contexts/CartContext';
 import { X, Trash2, ShoppingCart, MessageSquare, CreditCard } from 'lucide-react';
+import { submitContactForm } from '../../api/contactApi';
 import { getImageUrl } from '../../utils/imageUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
@@ -62,8 +63,15 @@ const Cart = () => {
     setIsSubmitting(true);
     
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Prepare the data to send
+      const formDataToSubmit = {
+        ...formData,
+        courseInterests: items
+          .filter(item => formData.courseInterests.includes(item.id))
+          .map(item => item.id)
+      };
+      
+      await submitContactForm(formDataToSubmit);
       
       toast.success('Our team will contact you shortly!');
       setShowContactForm(false);
@@ -79,7 +87,8 @@ const Cart = () => {
         courseInterests: []
       });
     } catch (error) {
-      toast.error('Failed to submit your request. Please try again.');
+      const errorMessage = error.message || 'Failed to submit your request. Please try again.';
+      toast.error(errorMessage);
       console.error('Error submitting contact form:', error);
     } finally {
       setIsSubmitting(false);
@@ -164,8 +173,8 @@ const Cart = () => {
                   </div>
                 ) : (
                   <ul className="space-y-4">
-                    {items.map((item) => (
-                      <li key={item.id} className="flex gap-4 py-4 border-b">
+                    {items.map((item, index) => (
+                      <li key={`${item.id}-${index}`} className="flex gap-4 py-4 border-b">
                         <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex items-center justify-center">
                           <img
                             src={getImageUrl(item.image || item.thumbnail)}
