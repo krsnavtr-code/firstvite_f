@@ -22,6 +22,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import { CartProvider } from './contexts/CartContext';
 import Cart from './components/cart/Cart';
+import Profile from './pages/user/Profile';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -148,6 +149,17 @@ function App() {
             <PrivateRoute>
               <MainLayout>
                 <Courses />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <Profile />
               </MainLayout>
             </PrivateRoute>
           }

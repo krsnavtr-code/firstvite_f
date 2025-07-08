@@ -67,6 +67,36 @@ const userApi = {
       throw error;
     }
   },
+  
+  // Update user profile (phone, address)
+  updateProfile: async (profileData) => {
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      // Use the correct endpoint /api/users/profile
+      const response = await api.put('/users/profile', profileData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      if (error.response?.status === 401) {
+        // Clear invalid token and redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('Users');
+        window.location.href = '/login';
+      }
+      throw error;
+    }
+  },
 
   // Delete a user
   delete: async (userId) => {
@@ -81,13 +111,32 @@ const userApi = {
   // Change user password
   changePassword: async (userId, currentPassword, newPassword) => {
     try {
-      const response = await api.put(`${API_BASE}/${userId}/change-password`, {
-        currentPassword,
-        newPassword
-      });
+      // Get token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      const response = await api.put(
+        `${API_BASE}/${userId}/change-password`,
+        { currentPassword, newPassword },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
       return response.data;
     } catch (error) {
       console.error(`Error changing password for user ${userId}:`, error);
+      if (error.response?.status === 401) {
+        // Clear invalid token and redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('Users');
+        window.location.href = '/login';
+      }
       throw error;
     }
   },
