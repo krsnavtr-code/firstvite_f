@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../../contexts/CartContext';
-import { X, Trash2, ShoppingCart } from 'lucide-react';
+import { X, Trash2, ShoppingCart, MessageSquare, CreditCard } from 'lucide-react';
 import { getImageUrl } from '../../utils/imageUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Cart = () => {
+  const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const {
     items,
     totalItems,
@@ -16,7 +17,26 @@ const Cart = () => {
     toggleCart,
     removeFromCart,
     clearCart,
+    isInCart,
   } = useCart();
+
+  const handleProceedToCheckout = () => {
+    setShowCheckoutOptions(true);
+  };
+
+  const handleContactTeam = () => {
+    // TODO: Implement contact team functionality
+    toast.success('Our team will contact you shortly!');
+    setShowCheckoutOptions(false);
+    toggleCart();
+  };
+
+  const handleProceedToPayment = () => {
+    // TODO: Implement payment processing
+    toast.success('Redirecting to payment gateway...');
+    setShowCheckoutOptions(false);
+    toggleCart();
+  };
 
   // Prevent background scrolling when cart is open
   useEffect(() => {
@@ -45,124 +65,178 @@ const Cart = () => {
   if (!isCartOpen) return null;
 
   return (
-    <>
-      <motion.div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-        initial="hidden"
-        animate="visible"
-        exit="hidden"
-        variants={backdropVariants}
-        onClick={toggleCart}
-      />
-      <motion.div
-        className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto dark:bg-gray-800"
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        variants={cartVariants}
-      >
-        <div className="p-6 h-full flex flex-col dark:bg-gray-800">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Your Cart ({totalItems})</h2>
-            <button
-              onClick={toggleCart}
-              className="p-2 rounded-full hover:bg-gray-100"
-              aria-label="Close cart"
-            >
-              <X size={24} />
-            </button>
-          </div>
-
-          {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto dark:bg-gray-800">
-            {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <ShoppingCart size={48} className="mb-4" />
-                <p className="text-lg">Your cart is empty</p>
-                <p className="text-sm mt-2">Start adding some items to your cart</p>
-              </div>
-            ) : (
-              <ul className="space-y-4">
-                {items.map((item) => (
-                  <li key={item.id} className="flex gap-4 py-4 border-b">
-                    <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex items-center justify-center">
-                      <img
-                        src={getImageUrl(item.image || item.thumbnail)}
-                        alt={item.title}
-                        className="w-full h-full dark:bg-gray-700 object-cover"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/images/course-placeholder.jpg';
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between">
-                        <h3 className="font-medium">{item.title}</h3>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-gray-500 hover:text-red-500"
-                          aria-label="Remove item"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                      <p className="text-gray-600 text-sm">${item.price.toFixed(2)}</p>
-                      <p className="mt-1 font-medium">
-                      ${item.price.toFixed(2)}
-                    </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Summary */}
-          {items.length > 0 && (
-            <div className="mt-6 border-t pt-4 dark:bg-gray-800">
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${cartSummary.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax (10%)</span>
-                  <span>${cartSummary.tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                  <span>Total</span>
-                  <span>${cartSummary.total.toFixed(2)}</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
+    <AnimatePresence>
+      {isCartOpen && (
+        <>
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => {
+              setShowCheckoutOptions(false);
+              toggleCart();
+            }}
+          />
+          <motion.div
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto dark:bg-gray-800"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={cartVariants}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 h-full flex flex-col dark:bg-gray-800">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">Your Cart ({totalItems})</h2>
                 <button
-                  onClick={() => {
-                    // Handle checkout
-                    toast.success('Proceeding to checkout!');
-                  }}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  onClick={toggleCart}
+                  className="p-2 rounded-full hover:bg-gray-100"
+                  aria-label="Close cart"
                 >
-                  Proceed to Checkout
-                </button>
-                <button
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to clear your cart?')) {
-                      clearCart();
-                    }
-                  }}
-                  className="w-full py-2 text-red-600 hover:text-red-700 text-sm font-medium"
-                >
-                  Clear Cart
+                  <X size={24} />
                 </button>
               </div>
+
+              {/* Cart Items */}
+              <div className="flex-1 overflow-y-auto dark:bg-gray-800">
+                {items.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <ShoppingCart size={48} className="mb-4" />
+                    <p className="text-lg">Your cart is empty</p>
+                    <p className="text-sm mt-2">Start adding some items to your cart</p>
+                  </div>
+                ) : (
+                  <ul className="space-y-4">
+                    {items.map((item) => (
+                      <li key={item.id} className="flex gap-4 py-4 border-b">
+                        <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex items-center justify-center">
+                          <img
+                            src={getImageUrl(item.image || item.thumbnail)}
+                            alt={item.title}
+                            className="w-full h-full dark:bg-gray-700 object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = '/images/course-placeholder.jpg';
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between">
+                            <h3 className="font-medium">{item.title}</h3>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-gray-500 hover:text-red-500"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                          <p className="text-gray-600 text-sm">${item.price.toFixed(2)}</p>
+                          <p className="mt-1 font-medium">
+                            ${item.price.toFixed(2)}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Summary */}
+              {items.length > 0 && (
+                <div className="mt-6 border-t pt-4 dark:bg-gray-800">
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>${cartSummary.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Tax (10%)</span>
+                      <span>${cartSummary.tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg pt-2 border-t">
+                      <span>Total</span>
+                      <span>${cartSummary.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <button
+                      onClick={handleProceedToCheckout}
+                      className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Proceed to Checkout
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to clear your cart?')) {
+                          clearCart();
+                        }
+                      }}
+                      className="w-full py-2 text-red-600 hover:text-red-700 text-sm font-medium"
+                    >
+                      Clear Cart
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </motion.div>
-    </>
+          </motion.div>
+        </>
+      )}
+
+      {/* Checkout Options Modal */}
+      <AnimatePresence>
+        {showCheckoutOptions && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowCheckoutOptions(false)}
+          >
+            <motion.div
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold mb-6 text-center dark:text-white">
+                Choose Checkout Option
+              </h3>
+
+              <div className="space-y-4">
+                <button
+                  onClick={handleContactTeam}
+                  className="w-full flex items-center justify-center space-x-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-6 py-4 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  <span>Contact Our Team</span>
+                </button>
+
+                <button
+                  onClick={handleProceedToPayment}
+                  className="w-full flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg transition-colors"
+                >
+                  <CreditCard className="h-5 w-5" />
+                  <span>Proceed to Payment</span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => setShowCheckoutOptions(false)}
+                className="mt-6 w-full py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </AnimatePresence>
   );
 };
 
