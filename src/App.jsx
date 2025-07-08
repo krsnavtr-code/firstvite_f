@@ -18,6 +18,7 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import CourseDetail from './pages/user/CourseDetail';
+import About from './pages/About';
 import { CartProvider } from './contexts/CartContext';
 import Cart from './components/cart/Cart';
 import { ToastContainer } from 'react-toastify';
@@ -120,6 +121,12 @@ function App() {
         <Route path="/course/:id" element={
           <MainLayout>
             <CourseDetail />
+          </MainLayout>
+        } />
+        
+        <Route path="/about" element={
+          <MainLayout>
+            <About />
           </MainLayout>
         } />
 

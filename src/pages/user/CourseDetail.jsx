@@ -141,7 +141,7 @@ const CourseDetail = () => {
             </ol>
           </nav>
 
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-8 mt-14">
             {/* Course Info */}
             <div className="lg:w-2/3">
               <div className="flex flex-wrap items-center gap-2 mb-4">

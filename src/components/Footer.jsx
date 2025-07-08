@@ -1,10 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaGithub, FaTwitter, FaLinkedin, FaBook } from 'react-icons/fa';
+import React from "react";
+import { Link } from "react-router-dom";
+import { FaGithub, FaTwitter, FaLinkedin, FaBook } from "react-icons/fa";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
-  
+
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-12">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -15,16 +15,32 @@ function Footer() {
               About Us
             </h3>
             <p className="text-base text-gray-600 dark:text-gray-300">
-              Empowering learners with high-quality courses and resources to achieve their educational goals.
+              Empowering learners with high-quality courses and resources to
+              achieve their educational goals.
             </p>
             <div className="flex space-x-4">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
                 <FaGithub className="h-6 w-6" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500 dark:hover:text-blue-400">
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-blue-500 dark:hover:text-blue-400"
+              >
                 <FaTwitter className="h-6 w-6" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-700 dark:hover:text-blue-500">
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-blue-700 dark:hover:text-blue-500"
+              >
                 <FaLinkedin className="h-6 w-6" />
               </a>
             </div>
@@ -32,42 +48,133 @@ function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Quick Links</h3>
+            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+              Quick Links
+            </h3>
             <ul className="mt-4 space-y-2">
-              <li><Link to="/courses" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">Browse Courses</Link></li>
-              <li><Link to="/about" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">About Us</Link></li>
-              <li><Link to="/contact" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">Contact</Link></li>
-              <li><Link to="/blog" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">Blog</Link></li>
+              <li>
+                <Link
+                  to="/courses"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  Browse Courses
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/blog"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Resources */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Resources</h3>
+            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+              Resources
+            </h3>
             <ul className="mt-4 space-y-2">
-              <li><Link to="/help-center" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">Help Center</Link></li>
-              <li><Link to="/privacy" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">Terms of Service</Link></li>
-              <li><Link to="/faq" className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400">FAQs</Link></li>
+              <li>
+                <Link
+                  to="/help-center"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/terms"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/faq"
+                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                >
+                  FAQs
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Contact Us</h3>
+            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+              Contact Us
+            </h3>
             <ul className="mt-4 space-y-2">
               <li className="flex items-center">
-                <svg className="h-5 w-5 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="h-5 w-5 text-gray-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
-                <span className="text-gray-600 dark:text-gray-300">contact@bookstore.com</span>
+                <span className="text-gray-600 dark:text-gray-300">
+                  contact@FirstVite.com
+                </span>
               </li>
               <li className="flex items-center">
-                <svg className="h-5 w-5 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg
+                  className="h-5 w-5 text-gray-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
-                <span className="text-gray-600 dark:text-gray-300">123 Learning St, Education City</span>
+                <span className="text-gray-600 dark:text-gray-300">
+                  123 Learning St, Education City
+                </span>
               </li>
             </ul>
           </div>
@@ -77,7 +184,7 @@ function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-base text-gray-500 dark:text-gray-400">
-              &copy; {currentYear} BookStore. All rights reserved.
+              &copy; {currentYear} FirstVite. All rights reserved.
             </p>
             <div className="flex items-center mt-4 md:mt-0">
               <FaBook className="h-5 w-5 text-pink-500 mr-2" />
