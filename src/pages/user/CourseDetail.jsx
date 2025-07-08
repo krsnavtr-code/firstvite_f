@@ -90,9 +90,9 @@ const CourseDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Course Header */}
-      <div className="bg-white dark:bg-slate-800 shadow mt-16">
+      <div className="bg-white dark:bg-slate-900 shadow mt-16">
         <div className="container mx-auto px-4 py-6 md:py-8">
-          <nav className="flex mb-4 overflow-x-auto" aria-label="Breadcrumb">
+          <nav className="flex mb-4 overflow-x-auto mb-14" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3 whitespace-nowrap">
               <li>
                 <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">

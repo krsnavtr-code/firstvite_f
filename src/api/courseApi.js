@@ -53,7 +53,14 @@ export const getCourseById = async (id) => {
         console.log(`Fetching course with ID: ${id}`);
         const response = await axios.get(`/courses/${id}`, {
             params: {
-                fields: 'title,description,shortDescription,category,instructor,price,originalPrice,discount,thumbnail,rating,enrolledStudents,duration,whatYouWillLearn,requirements,whoIsThisFor,curriculum,reviews,isFeatured,slug,status,metaTitle,metaDescription,tags'
+                fields: [
+                    'title', 'description', 'shortDescription', 'category', 'instructor',
+                    'price', 'originalPrice', 'discount', 'totalHours', 'thumbnail', 'image',
+                    'rating', 'enrolledStudents', 'duration', 'whatYouWillLearn', 'requirements',
+                    'whoIsThisFor', 'curriculum', 'reviews', 'isFeatured', 'slug', 'status',
+                    'metaTitle', 'metaDescription', 'tags', 'prerequisites', 'skills',
+                    'certificateIncluded', 'isPublished', 'language', 'level', 'mentors', 'faqs'
+                ].join(',')
             }
         });
         console.log('Course fetched successfully:', response.data);
