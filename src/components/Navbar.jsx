@@ -52,12 +52,6 @@ function Navbar() {
       >
         Courses
       </Link>
-      <Link
-        to="/about"
-        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium dark:text-white"
-      >
-        About
-      </Link>
       {authUser && (
         <Link
           to="/my-courses"
@@ -66,18 +60,6 @@ function Navbar() {
           My Learning
         </Link>
       )}
-      <Link
-        to="/contact"
-        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer dark:text-white"
-      >
-        Contact
-      </Link>
-      <Link
-        to="/about"
-        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer dark:text-white"
-      >
-        About
-      </Link>
     </>
   );
   return (

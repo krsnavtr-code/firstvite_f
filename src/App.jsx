@@ -19,6 +19,7 @@ import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import CourseDetail from './pages/user/CourseDetail';
 import About from './pages/About';
+import Contact from './pages/Contact';
 import { CartProvider } from './contexts/CartContext';
 import Cart from './components/cart/Cart';
 import { ToastContainer } from 'react-toastify';
@@ -127,6 +128,12 @@ function App() {
         <Route path="/about" element={
           <MainLayout>
             <About />
+          </MainLayout>
+        } />
+        
+        <Route path="/contact" element={
+          <MainLayout>
+            <Contact />
           </MainLayout>
         } />
 
