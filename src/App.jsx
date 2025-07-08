@@ -86,7 +86,9 @@ function App() {
           <MainLayout>
             <Home />
           </MainLayout>
-        } />
+        }>
+          {/* Add any nested public routes here */}
+        </Route>
         
         <Route path="/login" element={
           <MainLayout>

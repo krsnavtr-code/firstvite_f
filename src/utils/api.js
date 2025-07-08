@@ -30,8 +30,12 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
-      // Only redirect if not already on the login page
-      if (!window.location.pathname.includes('login')) {
+      // Only handle if not already on the login page and not a public route
+      const isPublicRoute = ['/login', '/signup', '/', '/about', '/contact'].some(route => 
+        window.location.pathname.startsWith(route)
+      );
+      
+      if (!isPublicRoute) {
         // Clear auth data
         localStorage.removeItem('token');
         localStorage.removeItem('Users');
@@ -43,15 +47,17 @@ api.interceptors.response.use(
           toast.error('Your session has expired. Please log in again.');
         }
         
-        // Redirect to login with the current URL as the return path
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        // Only redirect if not already on a public route
+        if (!isPublicRoute) {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }
       }
     } else if (error.response?.data?.message) {
       // Show error message from server if available
       toast.error(error.response.data.message);
     } else if (error.message === 'Network Error') {
       toast.error('Unable to connect to the server. Please check your internet connection.');
-    } else {
+    } else if (error.response?.status !== 401) { // Don't show generic error for 401
       // Generic error message for other errors
       toast.error('An unexpected error occurred. Please try again.');
     }

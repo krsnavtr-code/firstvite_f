@@ -54,12 +54,19 @@ api.interceptors.response.use(
       // that falls out of the range of 2xx
       const { status, data } = error.response;
       
+      // Only handle 401 if not on a public route
+      const isPublicRoute = ['/login', '/signup', '/', '/about', '/contact'].some(route => 
+        window.location.pathname.startsWith(route)
+      );
+      
       if (status === 401) {
-        // Handle unauthorized access
-        toast.error('Session expired. Please log in again.');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+        // Only handle unauthorized for non-public routes
+        if (!isPublicRoute) {
+          toast.error('Session expired. Please log in again.');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }
       } else if (status === 403) {
         // Handle forbidden access
         toast.error('You do not have permission to perform this action.');
@@ -72,7 +79,7 @@ api.interceptors.response.use(
       } else if (data?.message) {
         // Show server error message if available
         toast.error(data.message);
-      } else {
+      } else if (status !== 401) { // Don't show generic error for 401
         // Generic error message
         toast.error('An error occurred. Please try again.');
       }
@@ -80,7 +87,7 @@ api.interceptors.response.use(
       // The request was made but no response was received
       console.error('No response received:', error.request);
       toast.error('Unable to connect to the server. Please check your internet connection.');
-    } else {
+    } else if (!error.response || error.response.status !== 401) { // Don't log 401 errors
       // Something happened in setting up the request that triggered an Error
       console.error('Request error:', error.message);
       toast.error('An error occurred. Please try again.');

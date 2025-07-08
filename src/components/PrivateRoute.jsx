@@ -27,8 +27,8 @@ export default function PrivateRoute({ children, roles = [] }) {
     );
   }
 
-  // Check if user is authenticated
-  if (!authUser) {
+  // Only check authentication once loading is complete
+  if (!loading && !authUser) {
     console.log('PrivateRoute - No authenticated user, redirecting to login');
     return (
       <Navigate 

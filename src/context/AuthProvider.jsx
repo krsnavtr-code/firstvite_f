@@ -34,8 +34,9 @@ export default function AuthProvider({ children }) {
 
   // Load user from localStorage on initial render
   useEffect(() => {
-    const loadUser = () => {
+    const loadUser = async () => {
       try {
+        setLoading(true);
         const userData = localStorage.getItem("Users");
         const token = localStorage.getItem("token");
         
@@ -49,6 +50,10 @@ export default function AuthProvider({ children }) {
             const parsedUser = JSON.parse(userData);
             console.log('Parsed user data:', parsedUser);
             
+            // Verify token with backend if needed
+            // const { data } = await api.get('/users/me');
+            // if (!data.success) throw new Error('Invalid token');
+            
             // Ensure user has required fields
             const userWithRole = {
               _id: parsedUser._id,
@@ -60,8 +65,9 @@ export default function AuthProvider({ children }) {
             
             console.log('Setting initial auth user:', userWithRole);
             setAuthUser(userWithRole);
-          } catch (parseError) {
-            console.error('Failed to parse user data:', parseError);
+          } catch (error) {
+            console.error('Error validating user session:', error);
+            // Clear invalid data
             localStorage.removeItem("Users");
             localStorage.removeItem("token");
             setAuthUser(null);
@@ -72,11 +78,13 @@ export default function AuthProvider({ children }) {
         }
       } catch (error) {
         console.error("Error loading user:", error);
+        // Clear any potentially corrupted data
         localStorage.removeItem("Users");
         localStorage.removeItem("token");
         setAuthUser(null);
       } finally {
-        setLoading(false);
+        // Add a small delay to prevent flash of unauthorized content
+        setTimeout(() => setLoading(false), 500);
       }
     };
 
