@@ -51,6 +51,7 @@ function Signup() {
       fullname: data.fullname,
       email: data.email,
       password: data.password,
+      department: data.department,
     };
 
     try {
@@ -146,6 +147,32 @@ function Signup() {
               {errors.password && (
                 <span className="text-sm text-red-500">
                   This field is required
+                </span>
+              )}
+            </div>
+            
+            {/* Department */}
+            <div className="mt-4 space-y-2">
+              <span>Department</span>
+              <br />
+              <select
+                className="w-80 px-3 py-1 border rounded-md outline-none dark:bg-slate-900 dark:text-white"
+                {...register("department", { required: true })}
+                defaultValue=""
+              >
+                <option value="" disabled>Select your department</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Civil">Civil</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Other">Other</option>
+              </select>
+              <br />
+              {errors.department && (
+                <span className="text-sm text-red-500">
+                  Please select a department
                 </span>
               )}
             </div>

@@ -119,7 +119,7 @@ export const logApiConfig = () => {
 export const testApiConnection = async () => {
   try {
     console.log('Testing API connection...');
-    const response = await api.get('/users');
+    const response = await api.get('/users/signup');
     console.log('API test response:', response.data);
     return true;
   } catch (error) {
