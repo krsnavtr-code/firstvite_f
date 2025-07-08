@@ -17,6 +17,10 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import CourseDetail from './pages/user/CourseDetail';
+import { CartProvider } from './contexts/CartContext';
+import Cart from './components/cart/Cart';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -38,7 +42,7 @@ function App() {
   const { authUser } = useAuth();
   
   return (
-    <>
+    <CartProvider>
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -61,6 +65,17 @@ function App() {
             },
           },
         }}
+      />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
       />
       <Routes>
         {/* Public routes */}
@@ -135,7 +150,8 @@ function App() {
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+      <Cart />
+    </CartProvider>
   );
 }
 
