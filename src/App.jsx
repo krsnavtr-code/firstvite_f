@@ -92,12 +92,14 @@ function App() {
         
         <Route path="/login" element={
           <MainLayout>
+            <Home />
             <Login />
           </MainLayout>
         } />
         
         <Route path="/signup" element={
           <MainLayout>
+            <Home />
             <Signup />
           </MainLayout>
         } />
@@ -164,6 +166,7 @@ function App() {
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/contacts" element={<ContactsPage />} />
         </Route>
+
 
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />

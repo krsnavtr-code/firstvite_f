@@ -1,21 +1,52 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../utils/api";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthProvider";
-import { useState } from "react";
 
 function Login() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const navigate = useNavigate();
+  
+  // Open modal when component mounts or location changes
+  useEffect(() => {
+    if (location.pathname === '/login') {
+      const modal = document.getElementById("my_modal_3");
+      if (modal) {
+        modal.showModal();
+      }
+    }
+  }, [location]);
 
   const { setAuthUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const modalRef = useRef(null);
+
+  // Handle click outside to close modal
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const modal = document.getElementById("my_modal_3");
+      // Only close if clicking directly on the overlay (not on any content)
+      if (event.target === modal) {
+        modal.close();
+      }
+    };
+
+    // Add event listener when component mounts
+    document.addEventListener('click', handleClickOutside);
+    
+    // Clean up event listener when component unmounts
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   // In Login.jsx, update the onSubmit function:
   const onSubmit = async (data) => {
@@ -106,17 +137,23 @@ function Login() {
   };
   return (
     <div>
-      <dialog id="my_modal_3" className="modal">
-        <div className="modal-box">
-          <form onSubmit={handleSubmit(onSubmit)} method="dialog">
-            {/* if there is a button in form, it will close the modal */}
-            <Link
-              to="/"
+      <dialog 
+        id="my_modal_3" 
+        className="modal"
+      >
+        <div 
+          ref={modalRef} 
+          className="modal-box dark:bg-slate-800 w-fit"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <form onSubmit={handleSubmit(onSubmit)} onClick={(e) => e.stopPropagation()}>
+            <button 
+              type="button"
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={() => document.getElementById("my_modal_3").close()}
             >
               ✕
-            </Link>
+            </button>
 
             <h3 className="font-bold text-lg">Login</h3>
             {/* Email */}
@@ -155,21 +192,29 @@ function Login() {
             </div>
 
             {/* Button */}
-            <div className="flex justify-around mt-6">
+            <div className="flex justify-around flex-col items-center gap-2 mt-6">
               <button
-                className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200 disabled:opacity-50"
+                className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200 disabled:opacity-50 w-24"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Logging in..." : "Login"}
               </button>
-              <p>
+              <p className="dark:text-white">
                 Not registered?{" "}
-                <Link
-                  to="/signup"
-                  className="underline text-blue-500 cursor-pointer"
+                <button
+                  type="button"
+                  className="underline text-blue-500 cursor-pointer w-24"
+                  onClick={() => {
+                    document.getElementById("my_modal_3").close();
+                    navigate('/signup');
+                    // Small timeout to ensure the route updates before showing the modal
+                    setTimeout(() => {
+                      document.getElementById("signup_modal").showModal();
+                    }, 0);
+                  }}
                 >
                   Signup
-                </Link>{" "}
+                </button>{" "}
               </p>
             </div>
           </form>

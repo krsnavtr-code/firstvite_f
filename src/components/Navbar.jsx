@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Login from "./Login";
+import Signup from "./Signup";
 import Logout from "./Logout";
 import { useAuth } from "../context/AuthProvider";
 import CartButton from "./cart/CartButton";
@@ -176,7 +177,7 @@ function Navbar() {
                       Profile
                     </Link>
                   </li>
-                  {authUser.role === "admin" (
+                  {authUser.role === "admin" && (
                     <li>
                       <Link to="/admin/dashboard">Admin Dashboard</Link>
                     </li>
@@ -191,7 +192,14 @@ function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
+                <button 
+                  className="btn btn-ghost"
+                  onClick={() => document.getElementById('my_modal_3').showModal()}
+                >
+                  Login
+                </button>
                 <Login />
+                <Signup />
               </div>
             )}
           </div>
