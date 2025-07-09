@@ -21,7 +21,7 @@ function Home() {
       <PopularCourses />
       
       {/* Featured Books */}
-      <FeaturedBooks />
+      {/* <FeaturedBooks /> */}
       
       {/* Stats Section */}
       <Stats />
