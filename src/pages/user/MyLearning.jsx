@@ -32,47 +32,89 @@ const MyLearning = () => {
         setLoading(true);
         const userId = auth?.authUser?._id;
         if (!userId) {
-          throw new Error('User ID not found');
+          console.error('User ID not found in auth context');
+          setError('Please log in to view your enrolled courses');
+          setLoading(false);
+          return;
         }
         
+        console.log('Fetching enrollments for user:', userId);
+        // Remove status filter to get all enrollments
         const response = await getUserEnrollments(userId);
-        const enrollments = response.enrollments || [];
+        
+        console.log('API Response:', response);
+        
+        if (!response || !response.success) {
+          const errorMessage = response?.message || 'Failed to fetch enrollments';
+          console.error('Error fetching enrollments:', errorMessage);
+          setError(errorMessage);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('Raw enrollments data:', response.data);
+        
+        // The response now has a 'data' array containing the enrollments
+        const enrollments = response.data || [];
+        console.log('Fetched enrollments:', enrollments);
+        
+        if (enrollments.length === 0) {
+          console.log('No active enrollments found');
+          setEnrolledCourses([]);
+          setStats({
+            totalEnrolled: 0,
+            inProgress: 0,
+            completed: 0,
+          });
+          setLoading(false);
+          return;
+        }
 
         // Transform the data to match our component's expected format
-        const courses = enrollments.map((enrollment) => ({
-          id: enrollment._id,
-          courseId: enrollment.course?._id,
-          title: enrollment.course?.title || "Course Title Not Available",
-          instructor: enrollment.course?.instructor?.name || "Instructor",
-          thumbnail:
-            enrollment.course?.thumbnail ||
-            "https://via.placeholder.com/300x150?text=Course+Image",
-          progress: enrollment.progress || 0,
-          lastAccessed: enrollment.lastAccessed
-            ? new Date(enrollment.lastAccessed).toLocaleDateString()
-            : "Never",
-          status: enrollment.status || "pending",
-          totalLessons:
-            enrollment.course?.modules?.reduce(
+        const courses = enrollments.map((enrollment) => {
+          console.log('Processing enrollment:', enrollment);
+          
+          // Extract course data from the enrollment
+          const course = enrollment.course || {};
+          const instructor = typeof course.instructor === 'object' 
+            ? course.instructor?.name || 'Instructor' 
+            : 'Instructor';
+            
+          return {
+            id: enrollment._id,
+            courseId: course._id || enrollment.courseId,
+            title: course.title || enrollment.courseTitle || 'Course Title Not Available',
+            instructor: instructor,
+            thumbnail: course.thumbnail || 'https://via.placeholder.com/300x150?text=Course+Image',
+            progress: enrollment.progress || 0,
+            lastAccessed: enrollment.lastAccessed
+              ? new Date(enrollment.lastAccessed).toLocaleDateString()
+              : 'Never',
+            status: enrollment.status || 'active',
+            totalLessons: course.modules?.reduce(
               (total, module) => total + (module.lessons?.length || 0),
               0
             ) || 0,
-          completedLessons: 0, // You might want to track this separately
-          duration: enrollment.course?.duration || "N/A",
-        }));
+            completedLessons: Math.floor((enrollment.progress || 0) / 100 * (course.modules?.reduce(
+              (total, module) => total + (module.lessons?.length || 0),
+              0
+            ) || 1)),
+            duration: course.duration || 'N/A'
+          };
+        });
 
+        console.log('Processed courses:', courses);
         setEnrolledCourses(courses);
 
         // Calculate stats
-        setStats({
-          totalEnrolled: enrollments.length,
-          inProgress: enrollments.filter(
-            (e) => e.status === "active" && e.progress < 100
-          ).length,
-          completed: enrollments.filter(
-            (e) => e.status === "active" && e.progress === 100
-          ).length,
-        });
+        const stats = {
+          totalEnrolled: courses.length,
+          inProgress: courses.filter(c => c.progress > 0 && c.progress < 100).length,
+          completed: courses.filter(c => c.progress === 100).length,
+        };
+        
+        console.log('Calculated stats:', stats);
+        setStats(stats);
       } catch (error) {
         console.error("Error fetching enrolled courses:", error);
         setError("Failed to load your courses. Please try again later.");

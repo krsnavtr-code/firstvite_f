@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
+import axios from 'axios';
 import { getCourseById } from '../../api/courseApi';
 import { submitContactForm } from '../../api/contactApi';
 import { enrollInCourse } from '../../api/enrollmentApi';
@@ -29,13 +30,13 @@ const CourseDetail = () => {
   const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     name: '',
     email: '',
     phone: '',
     message: '',
     courseInterests: []
-  });
+  }));
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
@@ -123,58 +124,177 @@ const CourseDetail = () => {
     navigate(`/checkout?courseId=${course._id}`);
   };
 
-  const handleContactSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
+  const handleEnroll = async () => {
     try {
-      // Include course information in the form data
-      const formDataWithCourse = {
-        ...formData,
-        courseId: course?._id,
-        courseTitle: course?.title,
-        subject: `Enquiry about ${course?.title || 'course'}`
-      };
-      
-      // Submit contact form
-      await submitContactForm(formDataWithCourse);
-      
-      // Enroll the user in the course with 'pending' status
-      try {
-        await enrollInCourse(course._id);
+      const enrollmentResponse = await enrollInCourse(course._id);
+      if (enrollmentResponse.success) {
         toast.success('You have been enrolled in this course with pending status. Our team will contact you shortly.', {
           style: {
             background: '#4caf50',
             color: 'white',
           },
+          duration: 5000
         });
-      } catch (enrollError) {
-        console.error('Error enrolling in course:', enrollError);
-        // Still show success for contact form submission even if enrollment fails
-        toast.success('Thank you for your inquiry! Our team will connect with you shortly.', {
+      } else {
+        console.warn('Enrollment warning:', enrollmentResponse.message);
+      }
+    } catch (enrollError) {
+      console.error('Error in enrollment process:', enrollError);
+    }
+  };
+
+  /**
+   * Handle contact form submission for course enrollment
+   * @param {Event} e - Form submit event
+   */
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.name?.trim()) {
+      toast.error('Please enter your name');
+      return;
+    }
+    
+    if (!formData.email?.trim()) {
+      toast.error('Please enter your email address');
+      return;
+    }
+    
+    if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
+    if (!formData.phone?.trim()) {
+      toast.error('Please enter your phone number');
+      return;
+    }
+    
+    if (!/^[\d\s\-+()]*$/.test(formData.phone)) {
+      toast.error('Please enter a valid phone number');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Prepare the enrollment data
+      const enrollmentData = {
+        courseId: course._id,
+        courseTitle: course.title,
+        status: 'pending',
+        contactInfo: {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          message: formData.message?.trim() || `I would like to enroll in ${course?.title}`
+        }
+      };
+      
+      console.log('Submitting enrollment with data:', enrollmentData);
+      
+      // Submit the enrollment with contact info
+      const response = await axios.post(
+        '/api/enrollments', 
+        enrollmentData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      
+      if (response.data.success) {
+        toast.success('Your enrollment request has been submitted successfully! Our team will contact you shortly.', {
+          duration: 5000,
           style: {
             background: '#4caf50',
             color: 'white',
           },
         });
+        
+        // Reset form and close modal
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          message: '',
+          courseInterests: []
+        });
+        
+        setShowContactForm(false);
+        
+        // Refresh the page to update the UI
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        throw new Error(response.data.message || 'Failed to submit enrollment');
       }
-      
-      // Close the contact form
-      setShowContactForm(false);
-      
-      // Reset the form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
-        courseInterests: []
-      });
-      
     } catch (error) {
-      console.error('Error submitting contact form:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to send your message. Please try again!';
-      toast.error(errorMessage);
+      console.error('Error submitting enrollment:', error);
+      
+      // Handle specific error cases
+      if (error.response?.status === 429) {
+        // Rate limiting error
+        toast.error('You have submitted too many requests. Please try again later.', {
+          duration: 8000,
+          icon: '⏱️',
+        });
+      } else if (!navigator.onLine) {
+        // Offline error
+        toast.error('You are offline. Please check your internet connection and try again.', {
+          duration: 8000,
+          icon: '🌐',
+        });
+      } else if (error.response?.data?.errors) {
+        // Handle validation errors from the server
+        const errorMessages = error.response.data.errors;
+        
+        // If it's an array of error messages
+        if (Array.isArray(errorMessages)) {
+          errorMessages.forEach(msg => {
+            toast.error(msg, { 
+              style: {
+                background: '#f44336',
+                color: 'white',
+              },
+              duration: 5000 
+            });
+          });
+        } 
+        // If it's an object with field-specific errors
+        else if (typeof errorMessages === 'object') {
+          Object.values(errorMessages).forEach(messages => {
+            if (Array.isArray(messages)) {
+              messages.forEach(msg => {
+                toast.error(msg, { 
+                  style: {
+                    background: '#f44336',
+                    color: 'white',
+                  },
+                  duration: 5000 
+                });
+              });
+            }
+          });
+        }
+      } else {
+        // Show generic error message
+        const errorMessage = error.response?.data?.message || 
+                           error.message || 
+                           'An unexpected error occurred. Please try again.';
+        
+        toast.error(errorMessage, { 
+          style: {
+            background: '#f44336',
+            color: 'white',
+          },
+          duration: 5000 
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -182,20 +302,16 @@ const CourseDetail = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    console.log('Input changed:', { name, value, type });
 
-    if (type === 'checkbox') {
-      setFormData(prev => ({
-        ...prev,
-        courseInterests: checked 
-          ? [...prev.courseInterests, value]
-          : prev.courseInterests.filter(courseId => courseId !== value)
-      }));
-    } else {
-      setFormData(prev => ({
+    setFormData(prev => {
+      const newData = {
         ...prev,
         [name]: value
-      }));
-    }
+      };
+      console.log('New form data:', newData);
+      return newData;
+    });
   };
 
   return (
@@ -927,9 +1043,9 @@ const CourseDetail = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold dark:text-white">
-                  Contact Our Team
-                </h3>
+                <p className="text-lg font-bold dark:text-white">
+                  Process Your Enrollment by Fill the Form
+                </p>
                 <button
                   onClick={() => setShowContactForm(false)}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
@@ -1037,7 +1153,7 @@ const CourseDetail = () => {
                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </button>
                 </div>
               </form>

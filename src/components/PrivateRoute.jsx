@@ -55,15 +55,17 @@ export default function PrivateRoute({ children, roles = [] }) {
     }
   }
 
-  // Special handling for admin routes
-  if (location.pathname.startsWith('/admin') && !isAdmin) {
-    console.log('PrivateRoute - Admin access required:', {
-      userRole: authUser.role,
-      isAdmin,
-      path: location.pathname
-    });
-    
-    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+  // Special handling for admin routes - only check if user is admin when accessing admin routes
+  if (location.pathname.startsWith('/admin')) {
+    if (authUser.role !== 'admin') {
+      console.log('PrivateRoute - Admin access required:', {
+        userRole: authUser.role,
+        isAdmin,
+        path: location.pathname
+      });
+      
+      return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+    }
   }
 
   console.log('PrivateRoute - Access granted to:', {

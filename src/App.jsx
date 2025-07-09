@@ -11,6 +11,7 @@ import Categories from "./components/admin/categories";
 import AdminCourses from "./components/admin/courses";
 import Users from "./components/admin/Users";
 import ContactsPage from "./pages/admin/ContactsPage";
+import AdminEnrollments from "./pages/admin/Enrollments";
 import PrivateRoute from './components/PrivateRoute';
 import Unauthorized from './pages/Unauthorized';
 import Navbar from './components/Navbar';
@@ -210,6 +211,7 @@ function App() {
           <Route path="/admin/courses/*" element={<AdminCourses />} />
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/contacts" element={<ContactsPage />} />
+          <Route path="/admin/enrollments" element={<AdminEnrollments />} />
         </Route>
 
 
