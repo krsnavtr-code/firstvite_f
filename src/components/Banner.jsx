@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaSearch, FaBookOpen, FaUsers, FaCertificate, FaPlay, FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import bannerImg from "../../public/Banner.png";
+import bannerImg from "../../public/banner-removebg.png";
 
 function Banner() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,16 +31,17 @@ function Banner() {
           {/* Left Content */}
           <div className="lg:w-1/2 space-y-8">
             <h1 className="text-2xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              Unlock Your <span className="text-blue-600 dark:text-blue-400">Potential</span> with
+              Learn
+              <span className="text-blue-600 dark:text-blue-400"> Anytime,</span>
               <br />
-              <span className="text-blue-600 dark:text-blue-400">Online Learning</span>
+              Grow
+              <span className="text-blue-600 dark:text-blue-400"> Every Day</span>
             </h1>
-            
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Discover the easiest way to learn new skills and advance your career with our comprehensive online courses. 
-              Join thousands of students already learning with us.
+              No schedule limits, no boundaries. Learn anytime you choose and
+              make progress every day with simple, effective online education
+              built for real growth.
             </p>
-            
             {/* Search Bar */}
             <div className="relative max-w-xl">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -53,8 +54,10 @@ function Banner() {
                 className="block w-full pl-10 pr-3 py-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 text-base transition-colors duration-200"
                 placeholder="What do you want to learn today?"
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter' && searchQuery.trim()) {
-                    window.location.href = `/courses?search=${encodeURIComponent(searchQuery)}`;
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    window.location.href = `/courses?search=${encodeURIComponent(
+                      searchQuery
+                    )}`;
                   }
                 }}
               />
@@ -67,25 +70,27 @@ function Banner() {
                 </Link>
               </div>
             </div>
-            
             {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
               {features.map((feature, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg hover:shadow-md dark:hover:shadow-gray-700 transition-all duration-300 border border-gray-100 dark:border-gray-700"
                 >
                   <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full">
                     {feature.icon}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">{feature.title}</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{feature.desc}</p>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">
+                      {feature.title}
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {feature.desc}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
-            
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-2">
               <Link
                 to="/courses"
@@ -102,7 +107,7 @@ function Banner() {
               </Link>
             </div>
           </div>
-          
+
           {/* Right Content */}
           <div className="lg:w-1/2 mt-8 lg:mt-0">
             <div className="relative">
@@ -110,7 +115,8 @@ function Banner() {
                 <img
                   src={bannerImg}
                   alt="Online Learning"
-                  className="w-full h-auto max-w-2xl mx-auto rounded-lg shadow-xl dark:shadow-gray-900/50 transition-transform duration-500 hover:scale-105"
+                  style={{ maxWidth: "80%" }}
+                  className="w-full h-auto mx-auto rounded-lg shadow-xl dark:shadow-gray-900/50 transition-transform duration-500 hover:scale-105"
                 />
               </div>
               {/* Floating elements */}
@@ -125,7 +131,7 @@ function Banner() {
                   </div>
                 </div>
               </div> */}
-              
+
               {/* Decorative elements */}
               <div className="absolute -top-6 -right-6 w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
               <div className="absolute -bottom-8 right-20 w-24 h-24 bg-purple-100 dark:bg-purple-900/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
