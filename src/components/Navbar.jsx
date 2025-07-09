@@ -61,8 +61,8 @@ function Navbar() {
       </Link>
       {authUser && (
         <Link
-          to="/my-courses"
-          className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium dark:text-white"
+          to="/my-learning"
+          className="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium dark:text-white"
         >
           My Learning
         </Link>
@@ -188,6 +188,15 @@ function Navbar() {
                       <Link to="/admin/dashboard">Admin Dashboard</Link>
                     </li>
                   )}
+                  <li>
+                    <Link
+                      to="/my-learning"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                      onClick={() => document.activeElement.blur()}
+                    >
+                      My Learning
+                    </Link>
+                  </li>
                   <li>
                     <Link to="/settings">Settings</Link>
                   </li>

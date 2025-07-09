@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
 import { getCourseById } from '../../api/courseApi';
 import { submitContactForm } from '../../api/contactApi';
+import { enrollInCourse } from '../../api/enrollmentApi';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../context/AuthProvider';
 import { 
@@ -135,15 +136,28 @@ const CourseDetail = () => {
         subject: `Enquiry about ${course?.title || 'course'}`
       };
       
+      // Submit contact form
       await submitContactForm(formDataWithCourse);
       
-      // Show success message
-      toast.success('Thank you for your inquiry! Our team will connect with you shortly.',{
-        style: {
-          background: '#4caf50',  // green background
-          color: 'white',
-        },
-      });
+      // Enroll the user in the course with 'pending' status
+      try {
+        await enrollInCourse(course._id);
+        toast.success('You have been enrolled in this course with pending status. Our team will contact you shortly.', {
+          style: {
+            background: '#4caf50',
+            color: 'white',
+          },
+        });
+      } catch (enrollError) {
+        console.error('Error enrolling in course:', enrollError);
+        // Still show success for contact form submission even if enrollment fails
+        toast.success('Thank you for your inquiry! Our team will connect with you shortly.', {
+          style: {
+            background: '#4caf50',
+            color: 'white',
+          },
+        });
+      }
       
       // Close the contact form
       setShowContactForm(false);

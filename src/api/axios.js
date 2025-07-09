@@ -24,9 +24,10 @@ api.interceptors.request.use(
     // console.log('Token from localStorage:', token ? 'Found' : 'Not found');
     
     if (token) {
-      // Ensure Authorization header is set correctly
+      // Set both Authorization and x-auth-token headers for backward compatibility
       config.headers.Authorization = `Bearer ${token}`;
-      // console.log('Authorization header set with token');
+      config.headers['x-auth-token'] = token;
+      // console.log('Auth headers set with token');
     } else {
       console.warn('No token found in localStorage');
       // If you want to redirect to login when no token is found, uncomment below

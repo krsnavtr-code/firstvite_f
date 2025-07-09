@@ -21,6 +21,7 @@ import CourseDetail from './pages/user/CourseDetail';
 import CorporateTraining from './pages/user/CorporateTraining';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import MyLearning from './pages/user/MyLearning';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import { CartProvider } from './contexts/CartContext';
@@ -164,6 +165,17 @@ function App() {
         } />
 
         {/* Protected routes */}
+        <Route
+          path="/my-learning"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MyLearning />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        
         <Route
           path="/my-courses"
           element={
