@@ -1006,8 +1006,9 @@ const CourseDetail = () => {
                 </button>
 
                 <button
-                  onClick={() => navigate(`/checkout?courseId=${id}`)}
-                  className="w-full flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg transition-colors"
+                  // onClick={() => navigate(`/checkout?courseId=${id}`)}
+                  disabled
+                  className="cursor-not-allowed w-full flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg transition-colors"
                 >
                   <CreditCard className="h-5 w-5" />
                   <span>Proceed with Payment</span>
