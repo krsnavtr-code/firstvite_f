@@ -6,7 +6,8 @@ function Home() {
   return (
     <>
       <Banner />
-      <Freebook />
+      
+      {/* <Freebook /> */}
     </>
   );
 }

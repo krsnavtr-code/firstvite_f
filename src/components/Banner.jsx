@@ -30,7 +30,7 @@ function Banner() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           {/* Left Content */}
           <div className="lg:w-1/2 space-y-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+            <h1 className="text-2xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
               Unlock Your <span className="text-blue-600 dark:text-blue-400">Potential</span> with
               <br />
               <span className="text-blue-600 dark:text-blue-400">Online Learning</span>
