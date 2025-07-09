@@ -18,6 +18,7 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import CourseDetail from './pages/user/CourseDetail';
+import CorporateTraining from './pages/user/CorporateTraining';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import { CartProvider } from './contexts/CartContext';
@@ -139,6 +140,12 @@ function App() {
         <Route path="/contact" element={
           <MainLayout>
             <Contact />
+          </MainLayout>
+        } />
+        
+        <Route path="/corporate-training" element={
+          <MainLayout>
+            <CorporateTraining />
           </MainLayout>
         } />
 

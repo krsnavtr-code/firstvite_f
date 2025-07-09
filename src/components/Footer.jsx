@@ -149,7 +149,7 @@ function Footer() {
                   />
                 </svg>
                 <span className="text-gray-600 dark:text-gray-300">
-                  contact@FirstVite.com
+                  info@FirstVite.com
                 </span>
               </li>
               <li className="flex items-center">
@@ -173,7 +173,8 @@ function Footer() {
                   />
                 </svg>
                 <span className="text-gray-600 dark:text-gray-300">
-                  123 Learning St, Education City
+                  H-161 BIS Sector-63 Noida Gautam Budh Nagar Uttar Pradesh
+                  201301
                 </span>
               </li>
             </ul>
