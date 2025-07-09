@@ -103,7 +103,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/privacy"
+                  to="/privacy-policy"
                   className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
                 >
                   Privacy Policy
@@ -111,7 +111,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/terms"
+                  to="/terms-of-service"
                   className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
                 >
                   Terms of Service

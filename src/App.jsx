@@ -19,6 +19,8 @@ import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import CourseDetail from './pages/user/CourseDetail';
 import CorporateTraining from './pages/user/CorporateTraining';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import { CartProvider } from './contexts/CartContext';
@@ -146,6 +148,18 @@ function App() {
         <Route path="/corporate-training" element={
           <MainLayout>
             <CorporateTraining />
+          </MainLayout>
+        } />
+        
+        <Route path="/privacy-policy" element={
+          <MainLayout>
+            <PrivacyPolicy />
+          </MainLayout>
+        } />
+        
+        <Route path="/terms-of-service" element={
+          <MainLayout>
+            <TermsOfService />
           </MainLayout>
         } />
 
