@@ -270,7 +270,7 @@ const Cart = () => {
       )}
 
       {/* Contact Form Modal */}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {showContactForm && (
           <motion.div
             className="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -423,10 +423,10 @@ const Cart = () => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       {/* Checkout Options Modal */}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {showCheckoutOptions && (
           <motion.div
             className="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -473,7 +473,7 @@ const Cart = () => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </AnimatePresence>
   );
 };
