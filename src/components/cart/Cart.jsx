@@ -1,21 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { useCart } from '../../contexts/CartContext';
-import { X, Trash2, ShoppingCart, MessageSquare, CreditCard } from 'lucide-react';
-import { submitContactForm } from '../../api/contactApi';
-import { getImageUrl } from '../../utils/imageUtils';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect } from "react";
+import { useCart } from "../../contexts/CartContext";
+import {
+  X,
+  Trash2,
+  ShoppingCart,
+  MessageSquare,
+  CreditCard,
+} from "lucide-react";
+import { submitContactForm } from "../../api/contactApi";
+import { getImageUrl } from "../../utils/imageUtils";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Cart = () => {
   const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-    courseInterests: []
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+    courseInterests: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
@@ -42,18 +48,18 @@ const Cart = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
-    if (type === 'checkbox') {
-      setFormData(prev => ({
+
+    if (type === "checkbox") {
+      setFormData((prev) => ({
         ...prev,
         courseInterests: checked
           ? [...prev.courseInterests, value]
-          : prev.courseInterests.filter(courseId => courseId !== value)
+          : prev.courseInterests.filter((courseId) => courseId !== value),
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -61,35 +67,36 @@ const Cart = () => {
   const handleContactSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Prepare the data to send
       const formDataToSubmit = {
         ...formData,
         courseInterests: items
-          .filter(item => formData.courseInterests.includes(item.id))
-          .map(item => item.id)
+          .filter((item) => formData.courseInterests.includes(item.id))
+          .map((item) => item.id),
       };
-      
+
       await submitContactForm(formDataToSubmit);
-      
-      toast.success('Our team will contact you shortly!');
+
+      toast.success("Our team will contact you shortly!");
       setShowContactForm(false);
       setShowCheckoutOptions(false);
       toggleCart();
-      
+
       // Reset form
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
-        courseInterests: []
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+        courseInterests: [],
       });
     } catch (error) {
-      const errorMessage = error.message || 'Failed to submit your request. Please try again.';
+      const errorMessage =
+        error.message || "Failed to submit your request. Please try again.";
       toast.error(errorMessage);
-      console.error('Error submitting contact form:', error);
+      console.error("Error submitting contact form:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -97,7 +104,7 @@ const Cart = () => {
 
   const handleProceedToPayment = () => {
     // TODO: Implement payment processing
-    toast.success('Redirecting to payment gateway...');
+    toast.success("Redirecting to payment gateway...");
     setShowCheckoutOptions(false);
     toggleCart();
   };
@@ -105,12 +112,12 @@ const Cart = () => {
   // Prevent background scrolling when cart is open
   useEffect(() => {
     if (isCartOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isCartOpen]);
 
@@ -121,9 +128,9 @@ const Cart = () => {
   };
 
   const cartVariants = {
-    hidden: { x: '100%' },
-    visible: { x: 0, transition: { type: 'tween', duration: 0.3 } },
-    exit: { x: '100%', transition: { type: 'tween', duration: 0.3 } },
+    hidden: { x: "100%" },
+    visible: { x: 0, transition: { type: "tween", duration: 0.3 } },
+    exit: { x: "100%", transition: { type: "tween", duration: 0.3 } },
   };
 
   if (!isCartOpen) return null;
@@ -169,12 +176,17 @@ const Cart = () => {
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">
                     <ShoppingCart size={48} className="mb-4" />
                     <p className="text-lg">Your cart is empty</p>
-                    <p className="text-sm mt-2">Start adding some items to your cart</p>
+                    <p className="text-sm mt-2">
+                      Start adding some items to your cart
+                    </p>
                   </div>
                 ) : (
                   <ul className="space-y-4">
                     {items.map((item, index) => (
-                      <li key={`${item.id}-${index}`} className="flex gap-4 py-4 border-b">
+                      <li
+                        key={`${item.id}-${index}`}
+                        className="flex gap-4 py-4 border-b"
+                      >
                         <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex items-center justify-center">
                           <img
                             src={getImageUrl(item.image || item.thumbnail)}
@@ -182,7 +194,7 @@ const Cart = () => {
                             className="w-full h-full dark:bg-gray-700 object-cover"
                             onError={(e) => {
                               e.target.onerror = null;
-                              e.target.src = '/images/course-placeholder.jpg';
+                              e.target.src = "/images/course-placeholder.jpg";
                             }}
                           />
                         </div>
@@ -197,7 +209,9 @@ const Cart = () => {
                               <Trash2 size={16} />
                             </button>
                           </div>
-                          <p className="text-gray-600 text-sm">${item.price.toFixed(2)}</p>
+                          <p className="text-gray-600 text-sm">
+                            ${item.price.toFixed(2)}
+                          </p>
                           <p className="mt-1 font-medium">
                             ${item.price.toFixed(2)}
                           </p>
@@ -235,7 +249,11 @@ const Cart = () => {
                     </button>
                     <button
                       onClick={() => {
-                        if (window.confirm('Are you sure you want to clear your cart?')) {
+                        if (
+                          window.confirm(
+                            "Are you sure you want to clear your cart?"
+                          )
+                        ) {
                           clearCart();
                         }
                       }}
@@ -269,7 +287,9 @@ const Cart = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold dark:text-white">Contact Our Team</h3>
+                <h3 className="text-xl font-bold dark:text-white">
+                  Contact Our Team
+                </h3>
                 <button
                   onClick={() => setShowContactForm(false)}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
@@ -281,7 +301,10 @@ const Cart = () => {
 
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Full Name *
                   </label>
                   <input
@@ -297,7 +320,10 @@ const Cart = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Email Address *
                   </label>
                   <input
@@ -313,7 +339,10 @@ const Cart = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Phone Number
                   </label>
                   <input
@@ -332,7 +361,7 @@ const Cart = () => {
                     Interested in:
                   </label>
                   <div className="space-y-2">
-                    {items.map(item => (
+                    {items.map((item) => (
                       <div key={item.id} className="flex items-center">
                         <input
                           type="checkbox"
@@ -343,7 +372,10 @@ const Cart = () => {
                           onChange={handleInputChange}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                         />
-                        <label htmlFor={`course-${item.id}`} className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        <label
+                          htmlFor={`course-${item.id}`}
+                          className="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                        >
                           {item.title}
                         </label>
                       </div>
@@ -352,7 +384,10 @@ const Cart = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Your Message *
                   </label>
                   <textarea
@@ -381,7 +416,7 @@ const Cart = () => {
                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </button>
                 </div>
               </form>

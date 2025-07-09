@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
 import { getCourseById } from '../../api/courseApi';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../../context/AuthProvider';
 import { 
   FaStar, FaUsers, FaClock, FaPlay, FaShare, FaBook, 
   FaCertificate, FaMoneyBillWave, FaGlobe, FaCheck, 
@@ -9,6 +10,8 @@ import {
   FaListOl, FaQuestionCircle, FaPen, FaBookOpen, FaBriefcase,
   FaTwitter, FaLinkedin, FaGithub
 } from 'react-icons/fa';
+import { FaMessage as MessageSquare, FaCreditCard as CreditCard } from 'react-icons/fa6';
+import { motion, AnimatePresence } from 'framer-motion';
 import { formatDuration, formatPrice } from '../../utils/format';
 import { getImageUrl } from '../../utils/imageUtils';
 import AddToCartButton from '../../components/cart/AddToCartButton';
@@ -16,10 +19,20 @@ import AddToCartButton from '../../components/cart/AddToCartButton';
 const CourseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { authUser, isAuthenticated } = useAuth();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [activeSection, setActiveSection] = useState(null);
+  const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    // Store the current URL in localStorage for 2FA flow
+    const returnUrl = window.location.pathname + window.location.search;
+    localStorage.setItem('returnUrl', returnUrl);
+    return <Navigate to="/login" state={{ from: returnUrl }} replace />;
+  }
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -87,6 +100,16 @@ const CourseDetail = () => {
   const discountPercentage = course.originalPrice > course.price 
     ? Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)
     : 0;
+
+  const handleContactTeam = () => {
+    // Implement contact team functionality
+    window.location.href = 'mailto:support@example.com?subject=Enrollment%20Inquiry';
+  };
+
+  const handleProceedToPayment = () => {
+    // Implement direct enrollment/payment flow
+    navigate(`/checkout?courseId=${course._id}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
@@ -212,14 +235,7 @@ const CourseDetail = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
-                  onClick={() =>
-                    window.scrollTo({
-                      top:
-                        document.getElementById("pricing-section").offsetTop -
-                        100,
-                      behavior: "smooth",
-                    })
-                  }
+                  onClick={() => setShowCheckoutOptions(true)}
                 >
                   <FaPlay className="mr-2" /> Enroll Now
                 </button>
@@ -305,7 +321,7 @@ const CourseDetail = () => {
                     )}
                   </div>
 
-                  <AddToCartButton
+                  {/* <AddToCartButton
                     product={{
                       id: course._id,
                       title: course.title,
@@ -314,7 +330,7 @@ const CourseDetail = () => {
                       description: course.shortDescription,
                     }}
                     className="w-full mb-4"
-                  />
+                  /> */}
 
                   <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
                     <div className="flex items-center">
@@ -756,7 +772,55 @@ const CourseDetail = () => {
         </div>
       </div>
 
-      {/* Course Tabs */}
+      {/* Checkout Options Modal */}
+      <AnimatePresence>
+        {showCheckoutOptions && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black bg-opacity-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowCheckoutOptions(false)}
+          >
+            <motion.div
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold mb-6 text-center dark:text-white">
+                Choose Enrollment Option
+              </h3>
+
+              <div className="space-y-4">
+                <button
+                  onClick={handleContactTeam}
+                  className="w-full flex items-center justify-center space-x-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-6 py-4 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  <span>Contact Our Team</span>
+                </button>
+
+                <button
+                  onClick={handleProceedToPayment}
+                  className="w-full flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg transition-colors"
+                >
+                  <CreditCard className="h-5 w-5" />
+                  <span>Proceed with Payment</span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => setShowCheckoutOptions(false)}
+                className="w-full mt-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm font-medium text-center"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
