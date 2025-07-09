@@ -43,7 +43,7 @@ function Banner() {
               built for real growth.
             </p>
             {/* Search Bar */}
-            <div className="relative max-w-xl">
+            {/* <div className="relative max-w-xl">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FaSearch className="h-5 w-5 text-gray-400" />
               </div>
@@ -69,7 +69,7 @@ function Banner() {
                   <FaSearch className="mr-2" /> Search
                 </Link>
               </div>
-            </div>
+            </div> */}
             {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
               {features.map((feature, index) => (
