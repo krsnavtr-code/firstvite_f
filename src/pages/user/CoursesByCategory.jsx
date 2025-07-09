@@ -185,20 +185,49 @@ const CourseCard = ({ course }) => {
     // Reset error state when course changes
     setImageError(false);
     
+    console.log('Course data:', course); // Debug: Log course data
+    
     if (!course.thumbnail) {
+      console.log('No thumbnail found for course:', course.title);
       setImageUrl('/images/course-placeholder.jpg');
       return;
     }
 
     let url = course.thumbnail;
+    console.log('Original thumbnail URL:', url); // Debug: Log original URL
     
     // If it's not already a full URL, construct it
     if (!url.startsWith('http') && !url.startsWith('https') && !url.startsWith('//')) {
       // Remove any leading slashes to avoid double slashes
       const cleanPath = url.replace(/^\/+/, '');
-      url = `${import.meta.env.VITE_API_URL}/${cleanPath}`;
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      url = `${baseUrl}/${cleanPath}`;
+      console.log('Constructed image URL:', url); // Debug: Log constructed URL
     }
-    setImageUrl(url);
+    
+    // Test if the image exists
+    const img = new Image();
+    img.onload = () => {
+      console.log('Image loaded successfully:', url);
+      setImageUrl(url);
+    };
+    img.onerror = () => {
+      console.error('Failed to load image:', url);
+      setImageError(true);
+      setImageUrl('/images/course-placeholder.jpg');
+    };
+    img.src = url;
+    
+    // Set a timeout to check if the image loads within 2 seconds
+    const timeoutId = setTimeout(() => {
+      if (!img.complete) {
+        console.warn('Image loading timed out:', url);
+        setImageError(true);
+        setImageUrl('/images/course-placeholder.jpg');
+      }
+    }, 2000);
+    
+    return () => clearTimeout(timeoutId);
   }, [course]);
   
   const handleImageError = () => {
