@@ -26,6 +26,8 @@ import TermsOfService from './pages/TermsOfService';
 import MyLearning from './pages/user/MyLearning';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import FAQPage from './pages/FAQPage';
+import ManageFAQs from './pages/admin/ManageFAQs';
 import { CartProvider } from './contexts/CartContext';
 import Cart from './components/cart/Cart';
 import Profile from './pages/user/Profile';
@@ -154,6 +156,12 @@ function App() {
           </MainLayout>
         } />
         
+        <Route path="/faq" element={
+          <MainLayout>
+            <FAQPage />
+          </MainLayout>
+        } />
+        
         <Route path="/corporate-training" element={
           <MainLayout>
             <CorporateTraining />
@@ -218,6 +226,7 @@ function App() {
           <Route path="/admin/courses/*" element={<AdminCourses />} />
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/contacts" element={<ContactsPage />} />
+          <Route path="/admin/faqs" element={<ManageFAQs />} />
           <Route path="/admin/enrollments" element={<AdminEnrollments />} />
         </Route>
 
