@@ -8,6 +8,7 @@ import { useAuth } from "./context/AuthProvider";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import Categories from "./components/admin/categories";
+import ScrollToTop from "./components/ScrollToTop";
 import AdminCourses from "./components/admin/courses";
 import Users from "./components/admin/Users";
 import ContactsPage from "./pages/admin/ContactsPage";
@@ -41,6 +42,7 @@ const MainLayout = ({ children }) => {
   
   return (
     <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
+      <ScrollToTop />
       {!isAdminRoute && <Navbar />}
       <main className="flex-grow bg-gray-50 dark:bg-gray-900">
         {children}
