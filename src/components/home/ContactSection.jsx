@@ -1,36 +1,42 @@
-import React, { useState } from 'react';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaPaperPlane, FaCheck } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
+import {
+  FaMapMarkerAlt,
+  FaPhone,
+  FaEnvelope,
+  FaPaperPlane,
+  FaCheck,
+} from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     setTimeout(() => {
-      console.log('Form submitted:', formData);
+      console.log("Form submitted:", formData);
       setIsSubmitting(false);
       setIsSubmitted(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      
+      setFormData({ name: "", email: "", subject: "", message: "" });
+
       // Reset submission status after 5 seconds
       setTimeout(() => setIsSubmitted(false), 5000);
     }, 1500);
@@ -39,25 +45,26 @@ const ContactSection = () => {
   const contactInfo = [
     {
       icon: <FaMapMarkerAlt className="text-2xl text-blue-500" />,
-      title: 'Our Location',
-      description: 'H-161 BIS Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301',
-      link: '#',
-      linkText: 'View on map'
+      title: "Our Location",
+      description:
+        "H-161 BIS Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301",
+      link: "#",
+      linkText: "View on map",
     },
     {
       icon: <FaPhone className="text-2xl text-green-500" />,
-      title: 'Phone Number',
-      description: '+91 9650222222',
-      link: 'tel:+919650222222',
-      linkText: 'Call us'
+      title: "Phone Number",
+      description: "+91 9990056799",
+      link: "tel:+919990056799",
+      linkText: "Call us",
     },
     {
       icon: <FaEnvelope className="text-2xl text-purple-500" />,
-      title: 'Email Address',
-      description: 'info@firstvite.com',
-      link: 'mailto:info@firstvite.com',
-      linkText: 'Send email'
-    }
+      title: "Email Address",
+      description: "info@firstvite.com",
+      link: "mailto:info@firstvite.com",
+      linkText: "Send email",
+    },
   ];
 
   return (
@@ -68,7 +75,8 @@ const ContactSection = () => {
             Get In Touch
           </h2>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
-            We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            We'd love to hear from you. Send us a message and we'll respond as
+            soon as possible.
           </p>
         </div>
 
@@ -76,7 +84,7 @@ const ContactSection = () => {
           {/* Contact Information */}
           <div className="space-y-6">
             {contactInfo.map((item, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
                 className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
                 whileHover={{ y: -5 }}
@@ -86,15 +94,28 @@ const ContactSection = () => {
                     {item.icon}
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">{item.title}</h3>
-                    <p className="mt-1 text-gray-600 dark:text-gray-300">{item.description}</p>
-                    <a 
-                      href={item.link} 
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 text-gray-600 dark:text-gray-300">
+                      {item.description}
+                    </p>
+                    <a
+                      href={item.link}
                       className="mt-2 inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       {item.linkText}
-                      <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 ml-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </a>
                   </div>
@@ -111,7 +132,9 @@ const ContactSection = () => {
                   <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900">
                     <FaCheck className="h-8 w-8 text-green-600 dark:text-green-400" />
                   </div>
-                  <h3 className="mt-4 text-xl font-medium text-gray-900 dark:text-white">Message Sent!</h3>
+                  <h3 className="mt-4 text-xl font-medium text-gray-900 dark:text-white">
+                    Message Sent!
+                  </h3>
                   <p className="mt-2 text-gray-600 dark:text-gray-300">
                     Thank you for contacting us. We'll get back to you soon!
                   </p>
@@ -126,7 +149,10 @@ const ContactSection = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
                         Full Name <span className="text-red-500">*</span>
                       </label>
                       <div className="mt-1">
@@ -144,7 +170,10 @@ const ContactSection = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
                         Email Address <span className="text-red-500">*</span>
                       </label>
                       <div className="mt-1">
@@ -163,7 +192,10 @@ const ContactSection = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="subject"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
                       Subject <span className="text-red-500">*</span>
                     </label>
                     <div className="mt-1">
@@ -181,7 +213,10 @@ const ContactSection = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
                       Your Message <span className="text-red-500">*</span>
                     </label>
                     <div className="mt-1">
@@ -194,7 +229,7 @@ const ContactSection = () => {
                         onChange={handleChange}
                         className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                         placeholder="Type your message here..."
-                        defaultValue={''}
+                        defaultValue={""}
                       />
                     </div>
                   </div>
@@ -208,7 +243,7 @@ const ContactSection = () => {
                       className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
-                        'Sending...'
+                        "Sending..."
                       ) : (
                         <>
                           <FaPaperPlane className="mr-2" />

@@ -116,7 +116,7 @@ function Banner() {
                   src={bannerImg}
                   alt="Online Learning"
                   style={{ maxWidth: "80%" }}
-                  className="w-full h-auto mx-auto rounded-lg shadow-xl dark:shadow-gray-900/50 transition-transform duration-500 hover:scale-105"
+                  className="hidden lg:block w-full h-auto mx-auto rounded-lg shadow-xl dark:shadow-gray-900/50 transition-transform duration-500 hover:scale-105"
                 />
               </div>
               {/* Floating elements */}

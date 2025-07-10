@@ -159,7 +159,8 @@ export default function Contact() {
                       Address
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-300">
-                      H-161 BIS Sector-63 Noida Gautam Budh Nagar <br /> Uttar Pradesh 201301
+                      H-161 BIS Sector-63 Noida Gautam Budh Nagar <br /> Uttar
+                      Pradesh 201301
                     </p>
                   </div>
                 </div>
@@ -173,7 +174,7 @@ export default function Contact() {
                       Phone
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-300">
-                      +91 9650262626
+                      +91 9990056799
                       <br />
                       Mon - Fri, 9:00 AM - 6:00 PM
                     </p>
