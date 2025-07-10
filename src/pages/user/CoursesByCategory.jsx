@@ -75,7 +75,7 @@ const CoursesByCategory = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 dark:text-white mt-16">
+    <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 dark:text-white mt-16">
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-2">
@@ -104,8 +104,8 @@ const CoursesByCategory = () => {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar with categories */}
         <div className="w-full md:w-1/4 lg:w-1/5 mt-14">
-          <div className="bg-white rounded-lg shadow-md dark:bg-slate-800 p-4 sticky top-4">
-            <h2 className="text-xl font-bold mb-4 dark:text-white">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sticky top-4 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
               Categories
             </h2>
             <ul className="space-y-2">
@@ -146,20 +146,20 @@ const CoursesByCategory = () => {
         {/* Main content */}
         <div className="w-full md:w-3/4 lg:w-4/5">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold dark:text-white">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
               {category ? `${category.name} Courses` : "All Courses"}
             </h1>
-            <p>Totel Courses: {courses.length}</p>
+            <p className="text-gray-600 dark:text-gray-300">Total Courses: {courses.length}</p>
           </div>
 
           {courses.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg dark:text-white">
+              <p className="text-gray-600 dark:text-gray-300 text-lg">
                 No courses found in this category.
               </p>
               <Link
                 to="/courses"
-                className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600"
+                className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
               >
                 Browse All Courses
               </Link>
@@ -236,10 +236,10 @@ const CourseCard = ({ course }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden dark:bg-slate-800 hover:shadow-lg transition-shadow duration-300">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500">
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
-          <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+          <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
             {imageError || !course.thumbnail ? (
               <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-700">
                 <span className="text-gray-500 dark:text-gray-400">No image available</span>
@@ -262,36 +262,36 @@ const CourseCard = ({ course }) => {
         </div>
 
         <div className="p-4">
-          <h3 className="font-bold text-lg mb-2 line-clamp-2 h-14">
+          <h3 className="font-bold text-lg mb-2 line-clamp-2 h-14 text-gray-800 dark:text-white">
             {course.title}
           </h3>
 
-          <div className="flex items-center text-sm text-gray-600 mb-2">
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
             <span className="flex items-center mr-4">
               <FaStar className="text-yellow-400 mr-1" />
               {course.rating?.toFixed(1) || "New"}
             </span>
             <span className="flex items-center">
-              <FaUsers className="mr-1" />
+              <FaUsers className="mr-1 text-gray-600 dark:text-gray-300" />
               {course.enrolledStudents || 0} students
             </span>
           </div>
 
-          <div className="flex items-center text-sm text-gray-600 mb-3">
-            <FaClock className="mr-1" />
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-3">
+            <FaClock className="mr-1 text-gray-600 dark:text-gray-300" />
             {course.duration || "Self-paced"}
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="font-bold text-lg">
+            <span className="font-bold text-lg text-gray-800 dark:text-white">
               {course.price > 0 ? `$${course.price}` : "Free"}
               {course.originalPrice > course.price && (
-                <span className="ml-2 text-sm text-gray-500 line-through">
+                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">
                   ${course.originalPrice}
                 </span>
               )}
             </span>
-            <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+            <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors duration-200">
               Enroll Now
             </button>
           </div>

@@ -19,9 +19,20 @@ export const getCategoriesForUser = async () => {
 };
 
 // Get all categories
-export const getCategories = async () => {
+export const getCategories = async (params = {}) => {
   try {
-    const response = await api.get('/categories');
+    // Default parameters
+    const defaultParams = {
+      status: 'active',
+      limit: 10,
+      sort: 'name',
+      fields: '_id,name,slug,description,image,courseCount'
+    };
+    
+    // Merge default params with provided params
+    const requestParams = { ...defaultParams, ...params };
+    
+    const response = await api.get('/categories', { params: requestParams });
     return response.data;
   } catch (error) {
     console.error('Error fetching categories:', error);

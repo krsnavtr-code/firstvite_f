@@ -18,6 +18,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
+import AllCategories from './pages/user/AllCategories';
 import CourseDetail from './pages/user/CourseDetail';
 import CorporateTraining from './pages/user/CorporateTraining';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -39,7 +40,7 @@ const MainLayout = ({ children }) => {
   return (
     <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
       {!isAdminRoute && <Navbar />}
-      <main className="flex-grow">
+      <main className="flex-grow bg-gray-50 dark:bg-gray-900">
         {children}
       </main>
       {!isAdminRoute && <Footer />}
@@ -126,6 +127,12 @@ function App() {
         <Route path="/courses/category/:categoryName" element={
           <MainLayout>
             <CoursesByCategory />
+          </MainLayout>
+        } />
+        
+        <Route path="/categories" element={
+          <MainLayout>
+            <AllCategories />
           </MainLayout>
         } />
         
