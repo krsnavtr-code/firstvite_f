@@ -33,10 +33,24 @@ export const getImageUrl = (path) => {
   // For debugging - log the environment variables
   console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
   
-  // If the path already contains the full URL, but with the wrong path, fix it
+  // If the path already contains the full URL with /uploads/, fix it
   if (path.includes('firstvite.com/uploads/')) {
-    path = path.replace('firstvite.com/uploads/', '');
-    console.log('Fixed path to remove /uploads/ prefix:', path);
+    // Extract just the filename part after /uploads/
+    const filename = path.split('/uploads/').pop();
+    path = filename;
+    console.log('Extracted filename from URL:', filename);
+  }
+  // If the path already contains /public/uploads/, remove it to avoid duplication
+  else if (path.includes('/public/uploads/')) {
+    const filename = path.split('/public/uploads/').pop();
+    path = filename;
+    console.log('Extracted filename from /public/uploads/ path:', filename);
+  }
+  // If the path already contains /uploads/, remove it to avoid duplication
+  else if (path.includes('/uploads/')) {
+    const filename = path.split('/uploads/').pop();
+    path = filename;
+    console.log('Extracted filename from /uploads/ path:', filename);
   }
 
   // If it's already a full URL with the correct path, return as is
@@ -51,8 +65,12 @@ export const getImageUrl = (path) => {
   // Use the environment variable or fall back to current origin
   const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
   
-  // Construct the final URL
-  const url = `${baseUrl}/public/uploads/${cleanPath}`;
+  // Construct the final URL - only add /public/uploads/ if it's not already in the path
+  const finalPath = cleanPath.startsWith('public/uploads/') 
+    ? cleanPath 
+    : `public/uploads/${cleanPath}`;
+    
+  const url = `${baseUrl}/${finalPath}`.replace(/([^:]\/)\/+/g, '$1'); // Remove duplicate slashes
   console.log('Final constructed URL:', url);
   
   return url;
