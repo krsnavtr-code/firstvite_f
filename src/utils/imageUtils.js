@@ -30,30 +30,31 @@ export const getImageUrl = (path) => {
     return '';
   }
 
-  // If it's already a full URL, return as is
+  // For debugging - log the environment variables
+  console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
+  
+  // If the path already contains the full URL, but with the wrong path, fix it
+  if (path.includes('firstvite.com/uploads/')) {
+    path = path.replace('firstvite.com/uploads/', '');
+    console.log('Fixed path to remove /uploads/ prefix:', path);
+  }
+
+  // If it's already a full URL with the correct path, return as is
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     console.log('Path is already a full URL, returning as is');
     return path;
   }
 
-  // Check if path is already a full URL but missing protocol
-  if (path.startsWith('//')) {
-    const url = window.location.protocol + path;
-    console.log('Path starts with //, adding protocol:', url);
-    return url;
-  }
-
-  // If it's a path starting with /, use the current origin as base
-  if (path.startsWith('/')) {
-    const url = window.location.origin + path;
-    console.log('Path starts with /, using origin:', url);
-    return url;
-  }
-
-  // For production, use the correct uploads directory path
+  // Remove any leading slashes from the path
+  const cleanPath = path.replace(/^\/+/, '');
+  
+  // Use the environment variable or fall back to current origin
   const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
-  const url = `${baseUrl}/public/uploads/${path}`;
-  console.log('Constructed URL:', url, 'from baseUrl:', baseUrl, 'and path:', path);
+  
+  // Construct the final URL
+  const url = `${baseUrl}/public/uploads/${cleanPath}`;
+  console.log('Final constructed URL:', url);
+  
   return url;
 };
 
