@@ -30,13 +30,13 @@ function Banner() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           {/* Left Content */}
           <div className="lg:w-1/2 space-y-8">
-            <h1 className="text-2xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+            <h2 className="text-2xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
               Learn
               <span className="text-blue-600 dark:text-blue-400"> Anytime,</span>
               <br />
               Grow
               <span className="text-blue-600 dark:text-blue-400"> Every Day</span>
-            </h1>
+            </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300">
               No schedule limits, no boundaries. Learn anytime you choose and
               make progress every day with simple, effective online education

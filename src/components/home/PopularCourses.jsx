@@ -273,9 +273,9 @@ const PopularCourses = () => {
     <div className="bg-white dark:bg-gray-900 py-12">
       <div className="container mx-auto px-4">
         <div className="mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center">
-            Popular Courses
-          </h2>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center">
+            Bast E-Learning Courses
+          </h1>
         </div>
 
         {loading ? (
