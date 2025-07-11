@@ -4,6 +4,7 @@ import { getCoursesByCategory } from "../../api/courseApi";
 import { getCategories } from "../../api/categoryApi";
 import { toast } from "react-hot-toast";
 import { FaStar, FaUsers, FaClock } from "react-icons/fa";
+import { getCardBgColor } from "../../utils/gradients";
 
 const CoursesByCategory = () => {
   const { categoryName } = useParams();
@@ -236,7 +237,7 @@ const CourseCard = ({ course }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500">
+    <div className={`${getCardBgColor(course)} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500`}>
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
           <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">

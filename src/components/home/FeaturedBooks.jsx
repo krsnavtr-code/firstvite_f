@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaStar, FaRegStar, FaHeart, FaBookOpen } from 'react-icons/fa';
+import { getCardGradient } from '../../utils/gradients';
 
 const FeaturedBooks = () => {
   const books = [
@@ -72,21 +73,21 @@ const FeaturedBooks = () => {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {books.map((book) => (
-            <div key={book.id} className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+            <div key={book.id} className={`rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${getCardGradient(book, book.id)}`}>
               <div className="relative">
                 <img 
                   src={book.image} 
                   alt={book.title}
                   className="w-full h-64 object-cover"
                 />
-                <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                <div className="absolute top-2 right-2 bg-white/80 dark:bg-black/80 text-gray-800 dark:text-white text-xs font-bold px-2 py-1 rounded backdrop-blur-sm">
                   {book.category}
                 </div>
-                <button className="absolute top-2 left-2 p-2 bg-white rounded-full text-red-500 hover:bg-red-100 transition-colors duration-300">
+                <button className="absolute top-2 left-2 p-2 bg-white/80 dark:bg-black/80 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors duration-300 backdrop-blur-sm">
                   <FaHeart />
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-6 bg-white/30 dark:bg-black/20 backdrop-blur-sm">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1">
                   {book.title}
                 </h3>

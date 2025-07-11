@@ -256,7 +256,7 @@ function Navbar() {
                 className="text-2xl font-bold text-blue-600 dark:text-blue-400"
               >
                 <span style={{ color: "#F47C26" }}>First</span>
-                <span style={{ color: "#1E90FF" }}>Vite</span>
+                <span style={{ color: "#1E90FF" }}>VITE</span>
               </Link>
             </div>
 

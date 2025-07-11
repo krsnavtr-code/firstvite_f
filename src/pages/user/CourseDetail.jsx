@@ -1,49 +1,86 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
-import axios from 'axios';
-import { getCourseById } from '../../api/courseApi';
-import { submitContactForm } from '../../api/contactApi';
-import { enrollInCourse } from '../../api/enrollmentApi';
-import { toast } from 'react-hot-toast';
-import { useAuth } from '../../context/AuthProvider';
-import { 
-  FaStar, FaUsers, FaClock, FaPlay, FaShare, FaBook, 
-  FaCertificate, FaMoneyBillWave, FaGlobe, FaCheck, 
-  FaFileAlt, FaUserTie, FaGraduationCap, FaTag, FaMobileAlt,
-  FaListOl, FaQuestionCircle, FaPen, FaBookOpen, FaBriefcase,
-  FaTwitter, FaLinkedin, FaGithub, FaTimes
-} from 'react-icons/fa';
-import { FaMessage as MessageSquare, FaCreditCard as CreditCard } from 'react-icons/fa6';
-import { motion, AnimatePresence } from 'framer-motion';
-import { formatDuration, formatPrice } from '../../utils/format';
-import { getImageUrl } from '../../utils/imageUtils';
-import AddToCartButton from '../../components/cart/AddToCartButton';
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate, Navigate } from "react-router-dom";
+import axios from "axios";
+import { getCourseById } from "../../api/courseApi";
+import { submitContactForm } from "../../api/contactApi";
+import { enrollInCourse } from "../../api/enrollmentApi";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../../context/AuthProvider";
+import {
+  FaStar,
+  FaUsers,
+  FaClock,
+  FaPlay,
+  FaShare,
+  FaBook,
+  FaCertificate,
+  FaMoneyBillWave,
+  FaGlobe,
+  FaCheck,
+  FaFileAlt,
+  FaUserTie,
+  FaGraduationCap,
+  FaTag,
+  FaMobileAlt,
+  FaListOl,
+  FaQuestionCircle,
+  FaPen,
+  FaBookOpen,
+  FaBriefcase,
+  FaTwitter,
+  FaLinkedin,
+  FaGithub,
+  FaTimes,
+  FaShoppingCart,
+  FaHeart,
+  FaBookmark,
+  FaInfinity,
+} from "react-icons/fa";
+import {
+  FaMessage as MessageSquare,
+  FaCreditCard as CreditCard,
+} from "react-icons/fa6";
+import { motion, AnimatePresence } from "framer-motion";
+import { formatDuration, formatPrice } from "../../utils/format";
+import { getImageUrl } from "../../utils/imageUtils";
+import { useCart } from "../../contexts/CartContext";
 
 const CourseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { authUser, isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
+
+  // State declarations - all hooks at the top
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [activeSection, setActiveSection] = useState(null);
   const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState(() => ({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-    courseInterests: []
-  }));
+  const [expandedSections, setExpandedSections] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+    courseInterests: [],
+  });
 
-  // Redirect to login if not authenticated
+  // Authentication effect
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const returnUrl = window.location.pathname + window.location.search;
+      localStorage.setItem("returnUrl", returnUrl);
+      navigate("/login", { state: { from: returnUrl }, replace: true });
+      return; // Exit early if not authenticated
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Don't render anything if not authenticated
   if (!isAuthenticated) {
-    // Store the current URL in localStorage for 2FA flow
-    const returnUrl = window.location.pathname + window.location.search;
-    localStorage.setItem('returnUrl', returnUrl);
-    return <Navigate to="/login" state={{ from: returnUrl }} replace />;
+    return null;
   }
 
   useEffect(() => {
@@ -54,12 +91,12 @@ const CourseDetail = () => {
         if (response.success && response.data) {
           setCourse(response.data);
         } else {
-          throw new Error(response.message || 'Failed to load course');
+          throw new Error(response.message || "Failed to load course");
         }
       } catch (error) {
-        console.error('Error fetching course:', error);
-        toast.error(error.message || 'Failed to load course details');
-        navigate('/courses');
+        console.error("Error fetching course:", error);
+        toast.error(error.message || "Failed to load course details");
+        navigate("/courses");
       } finally {
         setLoading(false);
       }
@@ -75,7 +112,9 @@ const CourseDetail = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading course details...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Loading course details...
+          </p>
         </div>
       </div>
     );
@@ -85,19 +124,22 @@ const CourseDetail = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
         <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Course Not Found</h2>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+            Course Not Found
+          </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            The course you're looking for doesn't exist or may have been removed.
+            The course you're looking for doesn't exist or may have been
+            removed.
           </p>
           <div className="space-y-3">
-            <Link 
-              to="/courses" 
+            <Link
+              to="/courses"
               className="inline-block w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Browse All Courses
             </Link>
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="inline-block w-full px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
             >
               Go to Homepage
@@ -109,9 +151,12 @@ const CourseDetail = () => {
   }
 
   // Calculate discount percentage if original price is available
-  const discountPercentage = course.originalPrice > course.price 
-    ? Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)
-    : 0;
+  const discountPercentage =
+    course.originalPrice > course.price
+      ? Math.round(
+          ((course.originalPrice - course.price) / course.originalPrice) * 100
+        )
+      : 0;
 
   const handleContactTeam = () => {
     setShowCheckoutOptions(false);
@@ -128,18 +173,21 @@ const CourseDetail = () => {
     try {
       const enrollmentResponse = await enrollInCourse(course._id);
       if (enrollmentResponse.success) {
-        toast.success('You have been enrolled in this course with pending status. Our team will contact you shortly.', {
-          style: {
-            background: '#4caf50',
-            color: 'white',
-          },
-          duration: 5000
-        });
+        toast.success(
+          "You have been enrolled in this course with pending status. Our team will contact you shortly.",
+          {
+            style: {
+              background: "#4caf50",
+              color: "white",
+            },
+            duration: 5000,
+          }
+        );
       } else {
-        console.warn('Enrollment warning:', enrollmentResponse.message);
+        console.warn("Enrollment warning:", enrollmentResponse.message);
       }
     } catch (enrollError) {
-      console.error('Error in enrollment process:', enrollError);
+      console.error("Error in enrollment process:", enrollError);
     }
   };
 
@@ -149,133 +197,140 @@ const CourseDetail = () => {
    */
   const handleContactSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!formData.name?.trim()) {
-      toast.error('Please enter your name');
+      toast.error("Please enter your name");
       return;
     }
-    
+
     if (!formData.email?.trim()) {
-      toast.error('Please enter your email address');
+      toast.error("Please enter your email address");
       return;
     }
-    
+
     if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
-      toast.error('Please enter a valid email address');
+      toast.error("Please enter a valid email address");
       return;
     }
-    
+
     if (!formData.phone?.trim()) {
-      toast.error('Please enter your phone number');
+      toast.error("Please enter your phone number");
       return;
     }
-    
+
     if (!/^[\d\s\-+()]*$/.test(formData.phone)) {
-      toast.error('Please enter a valid phone number');
+      toast.error("Please enter a valid phone number");
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Prepare the enrollment data
       const enrollmentData = {
         courseId: course._id,
         courseTitle: course.title,
-        status: 'pending',
+        status: "pending",
         contactInfo: {
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
-          message: formData.message?.trim() || `I would like to enroll in ${course?.title}`
-        }
+          message:
+            formData.message?.trim() ||
+            `I would like to enroll in ${course?.title}`,
+        },
       };
-      
-      console.log('Submitting enrollment with data:', enrollmentData);
-      
+
+      console.log("Submitting enrollment with data:", enrollmentData);
+
       // Submit the enrollment with contact info
-      const response = await axios.post(
-        '/api/enrollments', 
-        enrollmentData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        }
-      );
-      
+      const response = await axios.post("/api/enrollments", enrollmentData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
       if (response.data.success) {
-        toast.success('Your enrollment request has been submitted successfully! Our team will contact you shortly.', {
-          duration: 5000,
-          style: {
-            background: '#4caf50',
-            color: 'white',
-          },
-        });
-        
+        toast.success(
+          "Your enrollment request has been submitted successfully! Our team will contact you shortly.",
+          {
+            duration: 5000,
+            style: {
+              background: "#4caf50",
+              color: "white",
+            },
+          }
+        );
+
         // Reset form and close modal
         setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          message: '',
-          courseInterests: []
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+          courseInterests: [],
         });
-        
+
         setShowContactForm(false);
-        
+
         // Refresh the page to update the UI
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } else {
-        throw new Error(response.data.message || 'Failed to submit enrollment');
+        throw new Error(response.data.message || "Failed to submit enrollment");
       }
     } catch (error) {
-      console.error('Error submitting enrollment:', error);
-      
+      console.error("Error submitting enrollment:", error);
+
       // Handle specific error cases
       if (error.response?.status === 429) {
         // Rate limiting error
-        toast.error('You have submitted too many requests. Please try again later.', {
-          duration: 8000,
-          icon: '⏱️',
-        });
+        toast.error(
+          "You have submitted too many requests. Please try again later.",
+          {
+            duration: 8000,
+            icon: "⏱️",
+          }
+        );
       } else if (!navigator.onLine) {
         // Offline error
-        toast.error('You are offline. Please check your internet connection and try again.', {
-          duration: 8000,
-          icon: '🌐',
-        });
+        toast.error(
+          "You are offline. Please check your internet connection and try again.",
+          {
+            duration: 8000,
+            icon: "🌐",
+          }
+        );
       } else if (error.response?.data?.errors) {
         // Handle validation errors from the server
         const errorMessages = error.response.data.errors;
-        
+
         // If it's an array of error messages
         if (Array.isArray(errorMessages)) {
-          errorMessages.forEach(msg => {
-            toast.error(msg, { 
+          errorMessages.forEach((msg) => {
+            toast.error(msg, {
               style: {
-                background: '#f44336',
-                color: 'white',
+                background: "#f44336",
+                color: "white",
               },
-              duration: 5000 
+              duration: 5000,
             });
           });
-        } 
+        }
         // If it's an object with field-specific errors
-        else if (typeof errorMessages === 'object') {
-          Object.values(errorMessages).forEach(messages => {
+        else if (typeof errorMessages === "object") {
+          Object.values(errorMessages).forEach((messages) => {
             if (Array.isArray(messages)) {
-              messages.forEach(msg => {
-                toast.error(msg, { 
+              messages.forEach((msg) => {
+                toast.error(msg, {
                   style: {
-                    background: '#f44336',
-                    color: 'white',
+                    background: "#f44336",
+                    color: "white",
                   },
-                  duration: 5000 
+                  duration: 5000,
                 });
               });
             }
@@ -283,16 +338,17 @@ const CourseDetail = () => {
         }
       } else {
         // Show generic error message
-        const errorMessage = error.response?.data?.message || 
-                           error.message || 
-                           'An unexpected error occurred. Please try again.';
-        
-        toast.error(errorMessage, { 
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "An unexpected error occurred. Please try again.";
+
+        toast.error(errorMessage, {
           style: {
-            background: '#f44336',
-            color: 'white',
+            background: "#f44336",
+            color: "white",
           },
-          duration: 5000 
+          duration: 5000,
         });
       }
     } finally {
@@ -302,137 +358,287 @@ const CourseDetail = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    console.log('Input changed:', { name, value, type });
+    console.log("Input changed:", { name, value, type });
 
-    setFormData(prev => {
+    setFormData((prev) => {
       const newData = {
         ...prev,
-        [name]: value
+        [name]: value,
       };
-      console.log('New form data:', newData);
+      console.log("New form data:", newData);
       return newData;
     });
+  };
+
+  // Toggle section expansion
+  const toggleSection = (sectionId) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }));
+  };
+
+  // Expand all sections
+  const expandAllSections = () => {
+    const allExpanded = {};
+    course.curriculum?.forEach((section, index) => {
+      allExpanded[index] = true;
+    });
+    setExpandedSections(allExpanded);
+  };
+
+  // Collapse all sections
+  const collapseAllSections = () => {
+    setExpandedSections({});
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Course Header */}
-      <div className="bg-white dark:bg-slate-900 shadow mt-16">
-        <div className="container mx-auto px-4 py-6 md:py-8">
-          <nav
-            className="flex mb-4 overflow-x-auto mb-14"
-            aria-label="Breadcrumb"
-          >
-            <ol className="inline-flex items-center space-x-1 md:space-x-3 whitespace-nowrap">
-              <li>
+      <div className="bg-white dark:bg-slate-900 shadow">
+        <div className="container mx-auto px-4 py-4">
+          <nav className="flex overflow-x-auto py-2" aria-label="Breadcrumb">
+            <ol className="inline-flex items-center space-x-1 md:space-x-2 text-sm">
+              <li className="flex items-center">
                 <Link
                   to="/"
-                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
+                  className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
                 >
                   Home
                 </Link>
               </li>
-              <li>
-                <div className="flex items-center">
-                  <span className="mx-2 text-gray-500">/</span>
-                  <Link
-                    to="/courses"
-                    className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
-                  >
-                    Courses
-                  </Link>
-                </div>
+              <li className="flex items-center">
+                <span className="mx-2 text-gray-400">/</span>
+                <Link
+                  to="/courses"
+                  className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
+                >
+                  Courses
+                </Link>
               </li>
-              <li>
-                <div className="flex items-center">
-                  <span className="mx-2 text-gray-500">/</span>
-                  <Link
-                    to={`/courses/category/${
-                      course.category?.slug || course.category
-                    }`}
-                    className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
-                  >
-                    {course.category?.name || "Category"}
-                  </Link>
-                </div>
-              </li>
-              <li aria-current="page">
-                <div className="flex items-center">
-                  <span className="mx-2 text-gray-500">/</span>
-                  <span className="text-gray-500 font-medium truncate max-w-xs md:max-w-md">
-                    {course.title}
-                  </span>
-                </div>
+              <li className="flex items-center">
+                <span className="mx-2 text-gray-400">/</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[150px] md:max-w-md">
+                  {course.title}
+                </span>
               </li>
             </ol>
           </nav>
+        </div>
+      </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 mt-14">
-            {/* Course Info */}
-            <div className="lg:w-2/3">
+      <div className="container mx-auto px-4 py-6">
+        <div className="">
+          {/* Main Content */}
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Course Header */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 lg:w-2/3">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {course.category?.name && (
                   <Link
                     to={`/courses/category/${
                       course.category.slug || course.category._id
                     }`}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
                   >
                     <FaTag className="mr-1.5 h-3 w-3" />
                     {course.category.name}
                   </Link>
                 )}
                 {course.isFeatured && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
                     <FaStar className="mr-1.5 h-3 w-3" />
                     Featured
                   </span>
                 )}
                 {course.level && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
                     {course.level}
                   </span>
                 )}
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 dark:text-white">
-                {course.title}
-              </h1>
+              <div className="space-y-4">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+                  {course.title}
+                </h1>
 
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-                {course.shortDescription ||
-                  course.description
-                    ?.replace(/<[^>]*>?/gm, "")
-                    .substring(0, 200)}
-                ...
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className="flex items-center text-yellow-400">
-                  <FaStar className="mr-1" />
-                  <span className="text-gray-700 dark:text-gray-300 ml-1 font-medium">
-                    {course.averageRating?.toFixed(1) || "New"}
-                    <span className="text-gray-500 text-sm ml-1">
-                      ({course.totalReviews || 0} reviews)
+                <div className="flex items-center">
+                  <div className="flex items-center text-amber-400">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="w-5 h-5" />
+                    ))}
+                    <span className="ml-2 text-gray-700 dark:text-gray-300 font-medium">
+                      {course.rating?.toFixed(1) || "4"}
+                      <span className="text-gray-500 font-normal">
+                        {" "}
+                        ({course.reviews?.length || 18} ratings)
+                      </span>
                     </span>
-                  </span>
-                </div>
-                <div className="flex items-center text-gray-600 dark:text-gray-400">
-                  <FaUsers className="mr-1.5" />
-                  <span>
-                    {course.totalStudents?.toLocaleString() || "0"} students
-                  </span>
-                </div>
-                <div className="flex items-center text-gray-600 dark:text-gray-400">
-                  <FaClock className="mr-1.5" />
-                  <span>{formatDuration(course.duration) || "Self-paced"}</span>
-                </div>
-                {course.language && (
-                  <div className="flex items-center text-gray-600 dark:text-gray-400">
-                    <FaGlobe className="mr-1.5" />
-                    <span>{course.language}</span>
                   </div>
+                  <span className="mx-3 text-gray-300 dark:text-gray-600">
+                    •
+                  </span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {course.enrolledStudents?.toLocaleString() || "500+"}{" "}
+                    students
+                  </span>
+                </div>
+
+                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {course.shortDescription ||
+                    course.description
+                      ?.replace(/<[^>]*>?/gm, "")
+                      .substring(0, 200)}
+                  <button className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
+                    Read more
+                  </button>
+                </p>
+              </div>
+
+              {/* Course Meta */}
+              <div className="flex flex-wrap items-center gap-4 py-4 border-t border-b border-gray-100 dark:border-gray-700 my-6">
+                <div className="flex items-center text-sm">
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                      <FaClock className="w-4 h-4" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Duration
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {course.duration || "Lifetime"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+                <div className="flex items-center text-sm">
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                      <FaBookOpen className="w-4 h-4" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Lessons
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {course.lessonsCount || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+                <div className="flex items-center text-sm">
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                      <FaCertificate className="w-4 h-4" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Certificate
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        Included
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {course.language && (
+                  <>
+                    <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+                    <div className="flex items-center">
+                      <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                        <FaGlobe className="w-4 h-4" />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Language
+                        </p>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {course.language}
+                        </p>
+                      </div>
+                    </div>
+                  </>
                 )}
+              </div>
+
+              {/* Course Description */}
+              <div className="prose prose-gray max-w-none dark:prose-invert mb-6">
+                <p className="text-gray-700 dark:text-gray-300">
+                  {course.shortDescription || "No description available."}
+                </p>
+              </div>
+
+              {/* Course Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                      <FaClock className="h-4 w-4" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Duration
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {course.duration || "Lifetime"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                      <FaBookOpen className="h-4 w-4" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Lessons
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {course.lessonsCount || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+                      <FaCertificate className="h-4 w-4" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Certificate
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        Yes
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                      <FaMobileAlt className="h-4 w-4" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Access
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        Any device
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -470,142 +676,230 @@ const CourseDetail = () => {
             </div>
 
             {/* Course Card */}
-            <div className="lg:w-1/3">
-              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-slate-700">
-                <div className="relative bg-gray-100 dark:bg-slate-700">
-                  <img
-                    src={getImageUrl(course.thumbnail)}
-                    alt={course.title}
-                    className="w-full h-auto object-cover dark:object-contain dark:bg-slate-700 dark:border-slate-700 dark:border rounded"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/images/course-placeholder.jpg";
-                    }}
-                  />
-                  {course.previewVideo && (
-                    <button
-                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-4xl hover:bg-opacity-60 transition-all"
-                      onClick={() => {
-                        console.log("Open preview video");
+            <div className="lg:sticky lg:top-6 lg:w-1/3">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-slate-700 transition-all duration-300 hover:shadow-2xl">
+                <div className="relative group">
+                  <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                    <img
+                      src={getImageUrl(course.thumbnail)}
+                      alt={course.title}
+                      className="w-full h-48 md:h-56 object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/images/course-placeholder.jpg";
                       }}
-                    >
-                      <div className="w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center">
-                        <FaPlay className="ml-1" />
-                      </div>
-                    </button>
+                    />
+                  </div>
+
+                  {course.previewVideo && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pb-4 justify-center">
+                      <button
+                        className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-full font-medium transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300 hover:bg-blue-50"
+                        onClick={() => {
+                          console.log("Open preview video");
+                        }}
+                      >
+                        <FaPlay className="mr-2" />
+                        Watch Preview
+                      </button>
+                    </div>
+                  )}
+
+                  {discountPercentage > 0 && (
+                    <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                      {discountPercentage}% OFF
+                    </div>
                   )}
                 </div>
 
                 <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {course.price > 0 ? formatPrice(course.price) : "Free"}
-                      </span>
-                      {course.originalPrice > course.price && (
-                        <div className="flex items-center">
-                          <span className="ml-2 text-sm text-gray-500 line-through">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-col items-center">
+                        <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                          {course.price > 0
+                            ? formatPrice(course.price)
+                            : "Free"}
+                        </span>
+                        {course.originalPrice > course.price && (
+                          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">
                             {formatPrice(course.originalPrice)}
                           </span>
-                          {discountPercentage > 0 && (
-                            <span className="ml-2 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-0.5 rounded-full">
-                              {discountPercentage}% OFF
-                            </span>
-                          )}
+                        )}
+                      </div>
+
+                      {course.certificateIncluded && (
+                        <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                          <FaCertificate className="mr-1.5 w-4 h-4" />
+                          Certificate Included
                         </div>
                       )}
                     </div>
+                    <div className="space-y-4">
+                      <button
+                        onClick={() => {
+                          addToCart({
+                            id: course._id,
+                            title: course.title,
+                            price: course.price,
+                            thumbnail: course.thumbnail,
+                            instructor: course.instructor?.name,
+                            rating: course.rating,
+                            students: course.studentsCount,
+                          });
+                          setShowCheckoutOptions(true);
+                        }}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                      >
+                        <FaShoppingCart className="mr-2" />
+                        Enroll Now
+                      </button>
 
-                    {course.certificateIncluded && (
-                      <div className="flex items-center text-green-600 dark:text-green-400 text-sm">
-                        <FaCertificate className="mr-1.5" />
-                        Certificate
+                      <button className="w-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center">
+                        <FaHeart className="mr-2 text-red-500" />
+                        Add to Wishlist
+                      </button>
+
+                      <div className="flex items-center justify-center space-x-4 pt-2">
+                        <button
+                          onClick={() => {
+                            if (navigator.share) {
+                              navigator
+                                .share({
+                                  title: course.title,
+                                  text: `Check out this course: ${course.title}`,
+                                  url: window.location.href,
+                                })
+                                .catch(console.error);
+                            } else {
+                              navigator.clipboard.writeText(
+                                window.location.href
+                              );
+                              toast.success("Link copied to clipboard!");
+                            }
+                          }}
+                          className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
+                          aria-label="Share course"
+                        >
+                          <FaShare className="w-5 h-5" />
+                        </button>
+
+                        <button
+                          className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
+                          aria-label="Add to favorites"
+                        >
+                          <FaHeart className="w-5 h-5" />
+                        </button>
+
+                        <button
+                          className="text-gray-500 hover:text-green-500 dark:text-gray-400 dark:hover:text-green-400 transition-colors"
+                          aria-label="Save for later"
+                        >
+                          <FaBookmark className="w-5 h-5" />
+                        </button>
                       </div>
-                    )}
-                  </div>
-
-                  {/* <AddToCartButton
-                    product={{
-                      id: course._id,
-                      title: course.title,
-                      price: course.price,
-                      image: course.thumbnail,
-                      description: course.shortDescription,
-                    }}
-                    className="w-full mb-4"
-                  /> */}
-
-                  <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
-                    <div className="flex items-center">
-                      <FaBook className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
-                      <span>
-                        {course.curriculum?.reduce(
-                          (total, section) =>
-                            total + (section.lessons?.length || 0),
-                          0
-                        ) || 0}{" "}
-                        Lessons
-                      </span>
                     </div>
-                    <div className="flex items-center">
-                      <FaClock className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
-                      <span>Lifetime access</span>
+
+                    <div className="mt-6 space-y-4">
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        This course includes:
+                      </h3>
+                      <ul className="space-y-3">
+                        {[
+                          {
+                            icon: (
+                              <FaPlay className="text-blue-500 w-5 h-5 flex-shrink-0" />
+                            ),
+                            text: `${
+                              course.totalHours || 0
+                            } hours on-demand video`,
+                          },
+                          {
+                            icon: (
+                              <FaFileAlt className="text-purple-500 w-5 h-5 flex-shrink-0" />
+                            ),
+                            text: "Downloadable resources",
+                          },
+                          {
+                            icon: (
+                              <FaMobileAlt className="text-green-500 w-5 h-5 flex-shrink-0" />
+                            ),
+                            text: "Access on mobile and TV",
+                          },
+                          {
+                            icon: (
+                              <FaInfinity className="text-amber-500 w-5 h-5 flex-shrink-0" />
+                            ),
+                            text: "Full lifetime access",
+                          },
+                          {
+                            icon: (
+                              <FaCertificate className="text-red-500 w-5 h-5 flex-shrink-0" />
+                            ),
+                            text: "Certificate of completion",
+                          },
+                        ].map((item, index) => (
+                          <li key={index} className="flex items-start">
+                            <span className="mt-0.5">{item.icon}</span>
+                            <span className="ml-3 text-gray-600 dark:text-gray-300">
+                              {item.text}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                          30-Day Money-Back Guarantee
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Full Lifetime Access. Cancel anytime.
+                        </p>
+                      </div>
                     </div>
-                    {course.language && (
-                      <div className="flex items-center">
-                        <FaGlobe className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
-                        <span>Language: {course.language}</span>
-                      </div>
-                    )}
-                    {course.certificateIncluded && (
-                      <div className="flex items-center">
-                        <FaCertificate className="text-gray-500 dark:text-gray-400 mr-3 w-4 h-4 flex-shrink-0" />
-                        <span>Certificate of completion</span>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </div>
 
-              {/* Course Stats */}
-              <div className="mt-4 bg-white dark:bg-slate-800 rounded-lg shadow p-4 border border-gray-200 dark:border-slate-700">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-3">
-                  This course includes:
-                </h3>
-                <ul className="space-y-2">
-                  {[
-                    {
-                      icon: <FaPlay className="text-green-500 mr-2" />,
-                      text: `${course.totalHours || 0} hours on-demand video`,
-                    },
-                    {
-                      icon: <FaFileAlt className="text-blue-500 mr-2" />,
-                      text: "Downloadable resources",
-                    },
-                    {
-                      icon: <FaUserTie className="text-purple-500 mr-2" />,
-                      text: "Instructor support",
-                    },
-                    {
-                      icon: (
-                        <FaGraduationCap className="text-yellow-500 mr-2" />
-                      ),
-                      text: "Certificate of completion",
-                    },
-                    {
-                      icon: <FaMobileAlt className="text-red-500 mr-2" />,
-                      text: "Access on mobile and TV",
-                    },
-                  ].map((item, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center text-sm text-gray-600 dark:text-gray-300"
-                    >
-                      {item.icon}
-                      {item.text}
-                    </li>
-                  ))}
-                </ul>
+                {/* Course Stats */}
+                <div className="mt-4 bg-white dark:bg-slate-800 rounded-lg shadow p-4 border border-gray-200 dark:border-slate-700">
+                  <h3 className="font-medium text-gray-900 dark:text-white mb-3">
+                    This course includes:
+                  </h3>
+                  <ul className="space-y-2">
+                    {[
+                      {
+                        icon: <FaPlay className="text-green-500 mr-2" />,
+                        text: `${course.totalHours || 0} hours on-demand video`,
+                      },
+                      {
+                        icon: <FaFileAlt className="text-blue-500 mr-2" />,
+                        text: "Downloadable resources",
+                      },
+                      {
+                        icon: <FaUserTie className="text-purple-500 mr-2" />,
+                        text: "Instructor support",
+                      },
+                      {
+                        icon: (
+                          <FaGraduationCap className="text-yellow-500 mr-2" />
+                        ),
+                        text: "Certificate of completion",
+                      },
+                      {
+                        icon: <FaMobileAlt className="text-red-500 mr-2" />,
+                        text: "Access on mobile and TV",
+                      },
+                    ].map((item, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center text-sm text-gray-600 dark:text-gray-300"
+                      >
+                        {item.icon}
+                        {item.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -614,8 +908,8 @@ const CourseDetail = () => {
 
       {/* Course Tabs */}
       <div className="container mx-auto px-4 py-8">
-        <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
-          <nav className="flex -mb-px">
+        <div className="border-b border-gray-200 dark:border-gray-700 mb-8 overflow-x-auto">
+          <nav className="flex -mb-px whitespace-nowrap space-x-1">
             <button
               onClick={() => setActiveTab("overview")}
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
@@ -664,7 +958,11 @@ const CourseDetail = () => {
           {activeTab === "overview" && (
             <div className="prose max-w-none dark:prose-invert">
               <h2 className="text-2xl font-bold mb-4">About This Course</h2>
-              <p className="mb-6">{course.description}</p>
+              <p className="mb-6">
+                {course.description
+                  ?.replace(/^<p>/i, "")
+                  .replace(/<\/p>$/i, "")}
+              </p>
 
               <h3 className="text-xl font-semibold mb-4">What You'll Learn</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -708,58 +1006,122 @@ const CourseDetail = () => {
 
           {activeTab === "curriculum" && (
             <div>
-              <h2 className="text-2xl font-bold mb-6">Course Content</h2>
-              {course.curriculum?.length > 0 ? (
-                <div className="space-y-4">
-                  {course.curriculum.map((section, sectionIndex) => (
-                    <div
-                      key={sectionIndex}
-                      className="border rounded-lg overflow-hidden"
-                    >
-                      <div className="bg-gray-50 dark:bg-slate-700 px-4 py-3 font-medium flex justify-between items-center cursor-pointer">
-                        <div className="flex items-center">
-                          <span className="mr-2">{section.title}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {section.lessons?.length || 0} lessons •{" "}
-                            {section.duration || "0 min"}
-                          </span>
-                        </div>
-                        <svg
-                          className="h-5 w-5 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Course Content</h2>
+                <div className="flex space-x-2 mt-3 sm:mt-0">
+                  <button
+                    onClick={expandAllSections}
+                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 px-3 py-1.5 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                  >
+                    Expand All
+                  </button>
+                  <button
+                    onClick={collapseAllSections}
+                    className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    Collapse All
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {course.curriculum?.length > 0 ? (
+                  <div className="space-y-3">
+                    {course.curriculum.map((section, sectionIndex) => (
+                      <div
+                        key={sectionIndex}
+                        className="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden transition-all duration-200"
+                      >
+                        <div
+                          className={`px-5 py-4 font-medium flex justify-between items-center cursor-pointer transition-colors ${
+                            expandedSections[sectionIndex]
+                              ? "bg-blue-50 dark:bg-slate-800/50"
+                              : "bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                          }`}
+                          onClick={() => toggleSection(sectionIndex)}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                      <div className="bg-white dark:bg-slate-800">
-                        {section.lessons?.map((lesson, lessonIndex) => (
-                          <div
-                            key={lessonIndex}
-                            className="border-t border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center justify-between"
-                          >
-                            <div className="flex items-center">
-                              <FaPlay className="h-4 w-4 text-gray-400 mr-3" />
-                              <span>{lesson.title}</span>
-                            </div>
-                            <span className="text-sm text-gray-500">
-                              {lesson.duration || "5:00"}
+                          <div className="flex items-center">
+                            <div
+                              className={`w-2 h-2 rounded-full mr-3 ${
+                                expandedSections[sectionIndex]
+                                  ? "bg-blue-500"
+                                  : "bg-gray-400"
+                              }`}
+                            ></div>
+                            <h3 className="text-gray-900 dark:text-white font-semibold">
+                              {section.title}
+                            </h3>
+                            <span className="ml-3 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                              {section.lessons?.length || 0} lessons •{" "}
+                              {section.duration || "0 min"}
                             </span>
                           </div>
-                        ))}
+                          <svg
+                            className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
+                              expandedSections[sectionIndex]
+                                ? "transform rotate-180"
+                                : ""
+                            }`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
+                        <AnimatePresence>
+                          {expandedSections[sectionIndex] && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="bg-white dark:bg-slate-800 overflow-hidden"
+                            >
+                              <div className="divide-y divide-gray-100 dark:divide-slate-700">
+                                {section.lessons?.map((lesson, lessonIndex) => (
+                                  <div
+                                    key={lessonIndex}
+                                    className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+                                  >
+                                    <div className="flex items-center">
+                                      <FaPlay className="h-4 w-4 text-gray-400 mr-3" />
+                                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                                        {lesson.title}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                      <span className="mr-4">
+                                        {lesson.duration || "5 min"}
+                                      </span>
+                                      <FaLock className="h-4 w-4 text-gray-400" />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p>No curriculum available for this course yet.</p>
-              )}
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <FaBookOpen className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
+                      No curriculum available
+                    </h3>
+                    <p className="mt-1 text-gray-500 dark:text-gray-400">
+                      The course curriculum will be available soon.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -886,10 +1248,10 @@ const CourseDetail = () => {
 
           {activeTab === "reviews" && (
             <div>
-              <div className="flex justify-between items-center mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold">Student Feedback</h2>
-                  <div className="flex items-center mt-2">
+                  <p className="text-lg font-bold">Student Feedback</p>
+                  <div className="flex flex-wrap items-center mt-2">
                     <div className="flex items-center">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg
@@ -906,13 +1268,13 @@ const CourseDetail = () => {
                         </svg>
                       ))}
                     </div>
-                    <span className="ml-2 text-gray-600 dark:text-gray-300">
+                    <span className="ml-2 text-gray-600 dark:text-gray-300 text-sm">
                       {course.rating?.toFixed(1) || "No"} rating •{" "}
                       {course.reviews?.length || 0} reviews
                     </span>
                   </div>
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium self-start sm:self-auto">
                   Write a Review
                 </button>
               </div>
@@ -1054,6 +1416,166 @@ const CourseDetail = () => {
                 >
                   <FaTimes size={20} />
                 </button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <div className="relative flex-1">
+                  <button
+                    onClick={handleEnrollClick}
+                    disabled={isEnrolling}
+                    className={`w-full flex items-center justify-center px-6 py-3.5 rounded-lg font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ${
+                      isEnrolling
+                        ? "opacity-80 cursor-not-allowed"
+                        : "shadow-md hover:shadow-lg"
+                    }`}
+                  >
+                    {isEnrolling ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <FaShoppingCart className="mr-2" />
+                        Enroll Now -{" "}
+                        {course.price ? `$${course.price.toFixed(2)}` : "Free"}
+                      </>
+                    )}
+                  </button>
+                  {course.hasDiscount && course.originalPrice && (
+                    <div className="absolute -bottom-5 left-0 right-0 text-center">
+                      <span className="inline-block px-2 py-0.5 text-xs font-medium text-white bg-amber-500 rounded-full">
+                        {Math.round(
+                          (1 - course.price / course.originalPrice) * 100
+                        )}
+                        % OFF
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleAddToWishlist}
+                    disabled={isWishlistLoading}
+                    className={`flex items-center justify-center px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm ${
+                      isWishlistLoading ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                    aria-label={
+                      isInWishlist ? "Remove from wishlist" : "Add to wishlist"
+                    }
+                  >
+                    {isWishlistLoading ? (
+                      <>
+                        <svg
+                          className="animate-spin h-5 w-5 text-gray-500"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      </>
+                    ) : isInWishlist ? (
+                      <FaHeart className="h-5 w-5 text-red-500" />
+                    ) : (
+                      <FaRegHeart className="h-5 w-5" />
+                    )}
+                  </button>
+
+                  <div className="relative">
+                    <button
+                      onClick={toggleShareMenu}
+                      className="flex items-center justify-center w-12 h-12 border border-gray-200 dark:border-gray-700 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
+                      aria-label="Share course"
+                      aria-expanded={showShareMenu}
+                      aria-haspopup="true"
+                    >
+                      <FaShareAlt className="h-5 w-5" />
+                    </button>
+
+                    <AnimatePresence>
+                      {showShareMenu && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-white dark:bg-slate-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="share-menu"
+                        >
+                          <div className="py-1">
+                            <button
+                              onClick={handleShare("facebook")}
+                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                              role="menuitem"
+                            >
+                              <FaFacebook className="mr-3 h-5 w-5 text-blue-600" />
+                              Facebook
+                            </button>
+                            <button
+                              onClick={handleShare("twitter")}
+                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                              role="menuitem"
+                            >
+                              <FaTwitter className="mr-3 h-5 w-5 text-blue-400" />
+                              Twitter
+                            </button>
+                            <button
+                              onClick={handleShare("linkedin")}
+                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                              role="menuitem"
+                            >
+                              <FaLinkedin className="mr-3 h-5 w-5 text-blue-700" />
+                              LinkedIn
+                            </button>
+                            <button
+                              onClick={handleCopyLink}
+                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                              role="menuitem"
+                            >
+                              <FaLink className="mr-3 h-5 w-5 text-gray-500" />
+                              Copy Link
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
               </div>
 
               <form onSubmit={handleContactSubmit} className="space-y-4">

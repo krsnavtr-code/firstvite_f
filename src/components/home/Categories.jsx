@@ -3,6 +3,7 @@ import { getCategories as getCategoriesFromApi } from '../../api/categoryApi';
 import { getCoursesByCategory } from '../../api/courseApi';
 import { FaBook, FaLaptopCode, FaChartLine, FaPalette, FaLanguage, FaMusic, FaArrowRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { getCardBgColor } from '../../utils/gradients';
 
 const categoryIcons = {
   'Computer Science': <FaLaptopCode className="text-3xl text-blue-500" />,
@@ -86,10 +87,10 @@ const Categories = () => {
               <Link
                 key={category._id}
                 to={`/courses/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`}
-                className="block bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                className={`block p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${getCardBgColor(category)}`}
               >
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-blue-50 dark:bg-gray-700 rounded-lg">
+                  <div className="p-3 bg-white/30 dark:bg-black/30 backdrop-blur-sm rounded-lg">
                     {getCategoryIcon(category.name)}
                   </div>
                   <div>

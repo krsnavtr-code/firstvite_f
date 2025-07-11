@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaBook, FaUsers, FaBookOpen, FaStar } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { getCardBgColor } from '../../utils/gradients';
 
 const stats = [
   { id: 1, name: 'Books Available', value: '10,000+', icon: FaBook },
@@ -17,7 +18,7 @@ const Stats = () => {
           {stats.map((stat) => (
             <motion.div
               key={stat.id}
-              className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl text-center"
+              className={`p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 ${getCardBgColor(stat, stat.id)}`}
               whileHover={{ 
                 y: -5,
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
@@ -25,7 +26,7 @@ const Stats = () => {
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <div className="flex justify-center">
-                <div className="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                <div className="flex items-center justify-center h-16 w-16 rounded-full bg-white/80 dark:bg-black/50 text-blue-600 dark:text-blue-300 backdrop-blur-sm">
                   <stat.icon className="h-8 w-8" aria-hidden="true" />
                 </div>
               </div>

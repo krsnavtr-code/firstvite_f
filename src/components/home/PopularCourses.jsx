@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaRegStar, FaRegClock, FaUserGraduate } from 'react-icons/fa';
 import axios from '../../api/axios';
+import { getCardBgColor } from '../../utils/gradients';
 
 // Base URL for API requests
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -83,8 +84,11 @@ const CourseCard = ({ course }) => {
     return stars;
   };
 
+  // Get background color class
+  const bgColor = getCardBgColor(course);
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <div className={`${bgColor} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02]`}>
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
           <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
@@ -126,7 +130,7 @@ const CourseCard = ({ course }) => {
         </div>
 
         <div className="p-4">
-          <h3 className="font-bold text-lg mb-2 line-clamp-2 h-14">
+          <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2 h-14">
             {course.title}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2 h-10">
@@ -261,16 +265,10 @@ const PopularCourses = () => {
   return (
     <div className="bg-white dark:bg-gray-900 py-12">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center">
             Popular Courses
           </h2>
-          <Link
-            to="/courses"
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            View All Courses
-          </Link>
         </div>
 
         {loading ? (
@@ -303,6 +301,14 @@ const PopularCourses = () => {
             ))}
           </div>
         )}
+        <div className="mt-8 text-center">
+          <Link
+            to="/courses"
+            className="inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
+          >
+            View All Courses
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -87,22 +87,40 @@ export default function About() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
-                  name: "John Doe",
-                  role: "Founder & CEO",
-                  bio: "Education enthusiast with 10+ years of experience in the publishing industry.",
-                  image: "https://randomuser.me/api/portraits/men/1.jpg",
+                  name: "Sachin Sharma",
+                  role: "SEO Expert",
+                  bio: "Experienced SEO strategist helping educational platforms rank higher and reach the right audience.",
+                  image: "../../public/images/team-1.jpg",
                 },
                 {
-                  name: "Jane Smith",
-                  role: "Head of Curriculum",
-                  bio: "Former professor with a passion for creating engaging learning experiences.",
-                  image: "https://randomuser.me/api/portraits/women/1.jpg",
+                  name: "Krishna Avtar",
+                  role: "Developer",
+                  bio: "Full-stack developer with a strong focus on building scalable and secure learning platforms.",
+                  image: "../../public/images/team-5.jpg",
                 },
                 {
-                  name: "Alex Johnson",
-                  role: "Tech Lead",
-                  bio: "Expert in educational technology and digital learning platforms.",
-                  image: "https://randomuser.me/api/portraits/men/2.jpg",
+                  name: "Ritik Kumar",
+                  role: "Content Writer",
+                  bio: "Crafts compelling educational content that simplifies complex concepts for learners of all ages.",
+                  image: "../../public/images/team-3.jpg",
+                },
+                {
+                  name: "Sudev Mohan",
+                  role: "Designer",
+                  bio: "Passionate UI/UX designer focused on creating intuitive and visually appealing e-learning interfaces.",
+                  image: "../../public/images/team-4.jpg",
+                },
+                {
+                  name: "Kiran Rawat",
+                  role: "SEO Team",
+                  bio: "Optimizes website visibility through data-driven SEO practices tailored for the education sector.",
+                  image: "../../public/images/team-2.jpg",
+                },
+                {
+                  name: "Mohit Rajput",
+                  role: "Content Writer",
+                  bio: "Specializes in writing impactful content that enhances user engagement in digital education platforms.",
+                  image: "/images/team-6.jpg",
                 },
               ].map((member, index) => (
                 <div
