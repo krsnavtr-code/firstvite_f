@@ -33,45 +33,35 @@ export const getImageUrl = (path) => {
   // For debugging - log the environment variables
   console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
   
-  // If the path already contains the full URL with /uploads/, fix it
-  if (path.includes('firstvite.com/uploads/')) {
-    // Extract just the filename part after /uploads/
-    const filename = path.split('/uploads/').pop();
-    path = filename;
-    console.log('Extracted filename from URL:', filename);
-  }
-  // If the path already contains /public/uploads/, remove it to avoid duplication
-  else if (path.includes('/public/uploads/')) {
-    const filename = path.split('/public/uploads/').pop();
-    path = filename;
-    console.log('Extracted filename from /public/uploads/ path:', filename);
-  }
-  // If the path already contains /uploads/, remove it to avoid duplication
-  else if (path.includes('/uploads/')) {
-    const filename = path.split('/uploads/').pop();
-    path = filename;
-    console.log('Extracted filename from /uploads/ path:', filename);
-  }
-
   // If it's already a full URL with the correct path, return as is
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     console.log('Path is already a full URL, returning as is');
     return path;
   }
 
-  // Remove any leading slashes from the path
-  const cleanPath = path.replace(/^\/+/, '');
+  // Extract just the filename part, removing any path components
+  const filename = path.split('/').pop();
+  console.log('Extracted filename:', filename);
   
   // Use the environment variable or fall back to current origin
   const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
   
-  // Construct the final URL - only add /public/uploads/ if it's not already in the path
-  const finalPath = cleanPath.startsWith('public/uploads/') 
-    ? cleanPath 
-    : `public/uploads/${cleanPath}`;
-    
-  const url = `${baseUrl}/${finalPath}`.replace(/([^:]\/)\/+/g, '$1'); // Remove duplicate slashes
-  console.log('Final constructed URL:', url);
+  // Try different URL patterns - the server might be expecting different paths
+  const possiblePaths = [
+    `${baseUrl}/uploads/${filename}`,                    // Pattern 1: /uploads/filename
+    `${baseUrl}/public/uploads/${filename}`,            // Pattern 2: /public/uploads/filename
+    `${baseUrl}/storage/${filename}`,                   // Pattern 3: /storage/filename
+    `${baseUrl}/images/${filename}`,                    // Pattern 4: /images/filename
+    `${baseUrl}/assets/uploads/${filename}`,            // Pattern 5: /assets/uploads/filename
+    `https://firstvite.com/uploads/${filename}`,        // Hardcoded domain
+    `https://firstvite.com/public/uploads/${filename}`, // Hardcoded with public
+  ];
+  
+  console.log('Trying possible image paths:', possiblePaths);
+  
+  // For now, return the first pattern - we'll test which one works
+  const url = possiblePaths[1]; // Try /public/uploads/ first
+  console.log('Using URL:', url);
   
   return url;
 };
