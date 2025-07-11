@@ -70,7 +70,7 @@ const Categories = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            Explore Categories
+            Best E-Learning Categories
           </h2>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Discover books in your favorite categories

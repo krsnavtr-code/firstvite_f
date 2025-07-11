@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaGithub, FaTwitter, FaLinkedin, FaBook } from "react-icons/fa";
+import { FaGithub, FaTwitter, FaLinkedin, FaBook, FaWhatsapp, FaFacebook } from "react-icons/fa";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
@@ -20,12 +20,12 @@ function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://github.com"
+                href="https://wa.me/919990056799"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               >
-                <FaGithub className="h-6 w-6" />
+                <FaWhatsapp className="h-6 w-6" />
               </a>
               <a
                 href="https://twitter.com"
@@ -42,6 +42,14 @@ function Footer() {
                 className="text-gray-500 hover:text-blue-700 dark:hover:text-blue-500"
               >
                 <FaLinkedin className="h-6 w-6" />
+              </a>
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <FaFacebook className="h-6 w-6" />
               </a>
             </div>
           </div>
@@ -95,7 +103,7 @@ function Footer() {
             <ul className="mt-4 space-y-2">
               <li>
                 <Link
-                  to="/help-center"
+                  to="/faq"
                   className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
                 >
                   Help Center

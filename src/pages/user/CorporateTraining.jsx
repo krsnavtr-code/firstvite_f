@@ -67,7 +67,7 @@ const CorporateTraining = () => {
 
       {/* Why Choose Us */}
       <div className="py-16 bg-white dark:bg-slate-800">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Choose Our Corporate Training?</h2>
             <div className="w-24 h-1 bg-blue-600 mx-auto mb-8"></div>
