@@ -11,6 +11,7 @@ import { debounce } from "lodash";
 function Navbar() {
   const { authUser } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
@@ -18,6 +19,50 @@ function Navbar() {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const toggleProfileMenu = () => {
+    setIsProfileMenuOpen(!isProfileMenuOpen);
+  };
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Close profile menu if click is outside
+      const profileMenu = document.getElementById('user-menu');
+      const profileButton = document.querySelector('[aria-label="User menu"]');
+      
+      if (profileMenu && profileButton && !profileMenu.contains(event.target) && !profileButton.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+
+      // Close mobile menu if click is outside
+      const mobileMenu = document.querySelector('.mobile-menu-container');
+      const menuButton = document.querySelector('[aria-label="Toggle menu"]');
+      
+      if (mobileMenu && menuButton && isMobileMenuOpen && 
+          !mobileMenu.contains(event.target) && !menuButton.contains(event.target)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    // Close modals when clicking outside
+    const handleModalClick = (event) => {
+      const modals = document.querySelectorAll('dialog[open]');
+      modals.forEach(modal => {
+        if (!modal.contains(event.target) && event.target !== modal) {
+          modal.close();
+        }
+      });
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleModalClick);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('click', handleModalClick);
+    };
+  }, [isMobileMenuOpen]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState({
     courses: [],
@@ -215,17 +260,17 @@ function Navbar() {
   ];
 
   const renderNavItems = (className = "") => (
-    <>
+    <div className="flex items-center space-x-0.5">
       {navItems.map((item) => (
         <Link
           key={item.to}
           to={item.to}
-          className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 ${className}`}
+          className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 whitespace-nowrap ${className}`}
         >
           {item.label}
         </Link>
       ))}
-    </>
+    </div>
   );
   return (
     <div
@@ -261,8 +306,18 @@ function Navbar() {
             </div>
 
             {/* Desktop menu */}
-            <div className="hidden md:ml-6 md:flex md:items-center md:space-x-1">
-              {renderNavItems()}
+            <div className="hidden md:flex md:items-center xl:ml-8 lg:ml-6">
+              <div className="flex-shrink-0">
+                {renderNavItems()}
+              </div>
+              <a 
+                href="https://genlead.in/agent/register" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="ml-1 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 whitespace-nowrap"
+              >
+                Agent Register
+              </a>
             </div>
           </div>
 
@@ -402,11 +457,9 @@ function Navbar() {
               <div className="relative ml-2">
                 <button
                   className="p-0 m-0 rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
-                  onClick={() =>
-                    document
-                      .getElementById("user-menu")
-                      .classList.toggle("hidden")
-                  }
+                  onClick={toggleProfileMenu}
+                  aria-expanded={isProfileMenuOpen}
+                  aria-label="User menu"
                 >
                   {authUser?.fullname?.charAt(0)?.toUpperCase() || (
                     <FaUser className="w-5 h-5 p-0 m-0" />
@@ -416,7 +469,7 @@ function Navbar() {
                 {/* Dropdown menu */}
                 <div
                   id="user-menu"
-                  className="hidden absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                  className={`${isProfileMenuOpen ? 'block' : 'hidden'} absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-10`}
                 >
                   <div className="py-1" role="none">
                     <Link
@@ -455,9 +508,11 @@ function Navbar() {
             ) : (
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() =>
-                    document.getElementById("my_modal_3").showModal()
-                  }
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    document.getElementById("my_modal_3").showModal();
+                  }}
                   className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                 >
                   SignIn
@@ -473,23 +528,35 @@ function Navbar() {
       {/* Mobile menu */}
       <div 
         style={{ maxWidth: '250px' }}
-        className={`md:hidden transition-all duration-300 ease-in-out transform ${
+        className={`mobile-menu-container md:hidden transition-all duration-300 ease-in-out transform ${
           isMobileMenuOpen 
             ? 'translate-y-0 opacity-100 visible' 
             : '-translate-y-full opacity-0 invisible'
         } absolute left-0 right-0 top-16 bg-white dark:bg-gray-900 shadow-lg z-40 overflow-x-auto`}
       >
-        <div className="flex flex-col px-2 py-3 space-x-2 sm:px-3 whitespace-nowrap" style={{ height: 'auto', width: '50%' }}>
+        <div className="flex flex-col px-2 py-3 space-y-2 sm:px-3">
           {navItems.map((item) => (
-            <div key={item.to} className="flex-shrink-0">
+            <div key={item.to} className="w-full">
               <Link
                 to={item.to}
-                className="inline-block px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="block w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                onClick={toggleMobileMenu}
               >
                 {item.label}
               </Link>
             </div>
           ))}
+          <div className="w-full px-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <a 
+              href="https://genlead.in/agent/register" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block w-full px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+              onClick={toggleMobileMenu}
+            >
+              Agent Register
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -30,13 +30,21 @@ function Banner() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           {/* Left Content */}
           <div className="lg:w-1/2 space-y-8">
-            <h2 className="text-2xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              Learn
-              <span className="text-blue-600 dark:text-blue-400"> Anytime,</span>
-              <br />
-              Grow
-              <span className="text-blue-600 dark:text-blue-400"> Every Day</span>
-            </h2>
+            <div className="space-y-2 w-full">
+              <div className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+                <span className="whitespace-nowrap">Learn</span>
+                <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap"> Anytime,</span>
+              </div>
+              <div className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+                <div className="flex items-start">
+                  <div className="w-12 xs:w-16 sm:w-20 md:w-24 flex-shrink-0"></div>
+                  <div>
+                    <span className="whitespace-nowrap">Grow</span>
+                    <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap"> Every Day</span>
+                  </div>
+                </div>
+              </div>
+            </div>
             <p className="text-lg text-gray-600 dark:text-gray-300">
               No schedule limits, no boundaries. Learn anytime you choose and
               make progress every day with simple, effective online education
