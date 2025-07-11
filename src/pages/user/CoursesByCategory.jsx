@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { getCoursesByCategory } from "../../api/courseApi";
 import { getCategories } from "../../api/categoryApi";
 import { toast } from "react-hot-toast";
+import { getImageUrl } from "../../utils/imageUtils";
 import { FaStar, FaUsers, FaClock } from "react-icons/fa";
 import { getCardBgColor } from "../../utils/gradients";
 
@@ -189,22 +190,12 @@ const CourseCard = ({ course }) => {
     console.log('Course data:', course); // Debug: Log course data
     
     if (!course.thumbnail) {
-      console.log('No thumbnail found for course:', course.title);
       setImageUrl('/images/course-placeholder.jpg');
       return;
     }
 
-    let url = course.thumbnail;
-    console.log('Original thumbnail URL:', url); // Debug: Log original URL
-    
-    // If it's not already a full URL, construct it
-    if (!url.startsWith('http') && !url.startsWith('https') && !url.startsWith('//')) {
-      // Remove any leading slashes to avoid double slashes
-      const cleanPath = url.replace(/^\/+/, '');
-      const baseUrl = import.meta.env.VITE_API_URL || '';
-      url = `${baseUrl}/${cleanPath}`;
-      console.log('Constructed image URL:', url); // Debug: Log constructed URL
-    }
+    const url = getImageUrl(course.thumbnail);
+    console.log('Image URL:', url); // Debug log
     
     // Test if the image exists
     const img = new Image();
