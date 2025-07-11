@@ -1,4 +1,4 @@
-import { useState } from 'react';
+ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { FaUpload, FaTimes } from 'react-icons/fa';
 
@@ -46,24 +46,35 @@ const ImageUploader = ({ onUploadSuccess, label = 'Upload Image', className = ''
       const token = localStorage.getItem('token');
       const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4002/api';
       
-      const response = await fetch(`${API_URL}/upload/`, {
+      // Add cache-busting parameter
+      const url = new URL(`${API_URL}/upload/`);
+      url.searchParams.append('_t', Date.now());
+      
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      // Don't set Content-Type header - let the browser set it with the correct boundary
+      const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: headers,
         credentials: 'include',
         body: formData,
       });
 
-      // Check if the response is JSON before parsing
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text();
-        console.error('Non-JSON response:', text);
-        throw new Error('Server returned an invalid response');
+      // Log response details for debugging
+      console.log('Upload response status:', response.status);
+      const responseText = await response.text();
+      console.log('Upload response text:', responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse JSON response:', e);
+        throw new Error('Invalid server response');
       }
-
-      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || `Upload failed with status ${response.status}`);
@@ -72,12 +83,16 @@ const ImageUploader = ({ onUploadSuccess, label = 'Upload Image', className = ''
       console.log('Upload successful, response:', data);
       toast.success('Image uploaded successfully');
       
-      if (onUploadSuccess && data.data) {
-        onUploadSuccess({
-          url: data.data.url,
-          path: data.data.path,
-          name: data.data.name
-        });
+      if (onUploadSuccess) {
+        // Handle both response formats for backward compatibility
+        const result = data.data || data;
+        if (result) {
+          onUploadSuccess({
+            url: result.url || result.path,
+            path: result.path,
+            name: result.name || file.name
+          });
+        }
       }
     } catch (error) {
       console.error('Upload error:', error);
