@@ -6,21 +6,43 @@ const VITE_API_URL= import.meta.env.VITE_API_URL;
  * @param {string} path - Image path (can be relative or absolute)
  * @returns {string} Full image URL
  */
+// export const getImageUrl = (path) => {
+//   if (!path) return '';
+  
+//   // If it's already a full URL, return as is
+//   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+//     return path;
+//   }
+  
+//   // If it's a path starting with /, use the API URL as base
+//   if (path.startsWith('/')) {
+//     return `${VITE_API_URL}${path}`;
+//   }
+  
+//   // Otherwise, assume it's a relative path from the uploads directory
+//   return `${VITE_API_URL}/public/uploads/${path}`;
+// };
 export const getImageUrl = (path) => {
   if (!path) return '';
-  
+
   // If it's already a full URL, return as is
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  
-  // If it's a path starting with /, use the API URL as base
-  if (path.startsWith('/')) {
-    return `${VITE_API_URL}${path}`;
+
+  // Check if path is already a full URL but missing protocol
+  if (path.startsWith('//')) {
+    return window.location.protocol + path;
   }
-  
-  // Otherwise, assume it's a relative path from the uploads directory
-  return `${VITE_API_URL}/public/uploads/${path}`;
+
+  // If it's a path starting with /, use the current origin as base
+  if (path.startsWith('/')) {
+    return window.location.origin + path;
+  }
+
+  // For production, use the correct uploads directory path
+  const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
+  return `${baseUrl}/public/uploads/${path}`;
 };
 
 /**
