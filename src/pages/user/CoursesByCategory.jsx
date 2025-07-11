@@ -187,15 +187,18 @@ const CourseCard = ({ course }) => {
     // Reset error state when course changes
     setImageError(false);
     
-    console.log('Course data:', course); // Debug: Log course data
+    console.log('Course data:', course);
+    console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
     
     if (!course.thumbnail) {
+      console.log('No thumbnail found, using placeholder');
       setImageUrl('/images/course-placeholder.jpg');
       return;
     }
 
+    console.log('Raw thumbnail path from API:', course.thumbnail);
     const url = getImageUrl(course.thumbnail);
-    console.log('Image URL:', url); // Debug log
+    console.log('Constructed image URL:', url);
     
     // Test if the image exists
     const img = new Image();
@@ -205,9 +208,17 @@ const CourseCard = ({ course }) => {
     };
     img.onerror = () => {
       console.error('Failed to load image:', url);
+      console.log('Image element error details:', {
+        naturalWidth: img.naturalWidth,
+        naturalHeight: img.naturalHeight,
+        complete: img.complete,
+        src: img.src
+      });
       setImageError(true);
       setImageUrl('/images/course-placeholder.jpg');
     };
+    
+    console.log('Setting image source to:', url);
     img.src = url;
     
     // Set a timeout to check if the image loads within 2 seconds

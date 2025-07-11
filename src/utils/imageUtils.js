@@ -23,26 +23,38 @@ const VITE_API_URL= import.meta.env.VITE_API_URL;
 //   return `${VITE_API_URL}/public/uploads/${path}`;
 // };
 export const getImageUrl = (path) => {
-  if (!path) return '';
+  console.log('getImageUrl called with path:', path);
+  
+  if (!path) {
+    console.log('No path provided, returning empty string');
+    return '';
+  }
 
   // If it's already a full URL, return as is
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    console.log('Path is already a full URL, returning as is');
     return path;
   }
 
   // Check if path is already a full URL but missing protocol
   if (path.startsWith('//')) {
-    return window.location.protocol + path;
+    const url = window.location.protocol + path;
+    console.log('Path starts with //, adding protocol:', url);
+    return url;
   }
 
   // If it's a path starting with /, use the current origin as base
   if (path.startsWith('/')) {
-    return window.location.origin + path;
+    const url = window.location.origin + path;
+    console.log('Path starts with /, using origin:', url);
+    return url;
   }
 
   // For production, use the correct uploads directory path
   const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
-  return `${baseUrl}/public/uploads/${path}`;
+  const url = `${baseUrl}/public/uploads/${path}`;
+  console.log('Constructed URL:', url, 'from baseUrl:', baseUrl, 'and path:', path);
+  return url;
 };
 
 /**
