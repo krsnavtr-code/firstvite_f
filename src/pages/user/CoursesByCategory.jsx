@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { getImageUrl } from "../../utils/imageUtils";
 import { FaStar, FaUsers, FaClock } from "react-icons/fa";
 import { getCardBgColor } from "../../utils/gradients";
+import { formatPrice } from "../../utils/format";
 
 const CoursesByCategory = () => {
   const { categoryName } = useParams();
@@ -239,18 +240,24 @@ const CourseCard = ({ course }) => {
   };
 
   return (
-    <div className={`${getCardBgColor(course)} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500`}>
+    <div
+      className={`${getCardBgColor(
+        course
+      )} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500`}
+    >
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
           <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
             {imageError || !course.thumbnail ? (
               <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-700">
-                <span className="text-gray-500 dark:text-gray-400">No image available</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  No image available
+                </span>
               </div>
             ) : (
               <img
                 src={imageUrl}
-                alt={course.title || 'Course image'}
+                alt={course.title || "Course image"}
                 className="w-full h-full object-cover"
                 onError={handleImageError}
                 loading="lazy"
@@ -287,10 +294,10 @@ const CourseCard = ({ course }) => {
 
           <div className="flex justify-between items-center">
             <span className="font-bold text-lg text-gray-800 dark:text-white">
-              {course.price > 0 ? `$${course.price}` : "Free"}
+              {course.price > 0 ? `${formatPrice(course.price)}` : "Free"}
               {course.originalPrice > course.price && (
                 <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">
-                  ${course.originalPrice}
+                  {formatPrice(course.originalPrice)}
                 </span>
               )}
             </span>
