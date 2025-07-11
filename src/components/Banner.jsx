@@ -79,20 +79,20 @@ function Banner() {
               </div>
             </div> */}
             {/* Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
               {features.map((feature, index) => (
                 <div
                   key={index}
-                  className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg hover:shadow-md dark:hover:shadow-gray-700 transition-all duration-300 border border-gray-100 dark:border-gray-700"
+                  className="flex flex-nowrap items-start p-2.5 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg hover:shadow-md dark:hover:shadow-gray-700 transition-all duration-300 border border-gray-100 dark:border-gray-700"
                 >
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full">
+                  <div className="flex-shrink-0 p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full mr-3">
                     {feature.icon}
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-[13px] sm:text-[15px] leading-tight">
                       {feature.title}
                     </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-[11px] sm:text-[13px] text-gray-500 dark:text-gray-400 leading-tight mt-0.5">
                       {feature.desc}
                     </p>
                   </div>

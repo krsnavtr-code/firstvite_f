@@ -54,7 +54,7 @@ const CategoriesList = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Categories</h2>
+        <h2 className="text-2xl text-black font-bold">Categories</h2>
         <button
           onClick={() => navigate('/admin/categories/new')}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
@@ -64,7 +64,8 @@ const CategoriesList = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -90,7 +91,9 @@ const CategoriesList = () => {
                     )}
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">{category.name}</div>
-                      <div className="text-sm text-gray-500">{category.description}</div>
+                      <div className="text-sm text-gray-500 truncate max-w-[200px]" title={category.description}>
+                        {category.description?.length > 20 ? `${category.description.substring(0, 20)}...` : category.description}
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -117,6 +120,7 @@ const CategoriesList = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -112,9 +112,16 @@ const CategoryForm = () => {
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">
-        {isEditing ? 'Edit Category' : 'Add New Category'}
-      </h2>
+      <div className="mb-6">
+        <h2 className="text-2xl text-black font-bold">
+          {isEditing ? `Edit Category: ${formData.name}` : 'Add New Category'}
+        </h2>
+        {isEditing && (
+          <p className="text-sm text-gray-500 mt-1">
+            Update the details for this category
+          </p>
+        )}
+      </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -127,7 +134,7 @@ const CategoryForm = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+            className={`mt-1 block p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
               errors.name ? 'border-red-500' : ''
             }`}
             disabled={loading}
@@ -147,7 +154,7 @@ const CategoryForm = () => {
             rows={3}
             value={formData.description}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+            className={`mt-1 block p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
               errors.description ? 'border-red-500' : ''
             }`}
             disabled={loading}
@@ -167,7 +174,7 @@ const CategoryForm = () => {
             name="image"
             value={formData.image}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+            className={`mt-1 block p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
               errors.image ? 'border-red-500' : ''
             }`}
             placeholder="https://example.com/image.jpg"
