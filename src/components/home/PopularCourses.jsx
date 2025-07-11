@@ -88,14 +88,18 @@ const CourseCard = ({ course }) => {
   const bgColor = getCardBgColor(course);
 
   return (
-    <div className={`${bgColor} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02]`}>
+    <div
+      className={`${bgColor} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02]`}
+    >
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
           <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
             {imageError || !course.thumbnail ? (
               <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-700">
                 <div className="text-center">
-                  <div className="text-gray-500 dark:text-gray-400">No image available</div>
+                  <div className="text-gray-500 dark:text-gray-400">
+                    No image available
+                  </div>
                   {course.thumbnail && (
                     <div className="text-xs mt-2 text-gray-400 break-all max-w-xs">
                       Tried to load: {course.thumbnail}
@@ -107,10 +111,12 @@ const CourseCard = ({ course }) => {
               <>
                 <img
                   src={imageUrl}
-                  alt={course.title || 'Course image'}
+                  alt={course.title || "Course image"}
                   className="w-full h-full object-cover"
                   onError={handleImageError}
-                  onLoad={() => console.log('Image loaded successfully:', imageUrl)}
+                  onLoad={() =>
+                    console.log("Image loaded successfully:", imageUrl)
+                  }
                   loading="lazy"
                 />
                 {/* Hidden debug info */}
@@ -134,23 +140,24 @@ const CourseCard = ({ course }) => {
             {course.title}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2 h-10">
-            {course.description}
+            {course.description?.replace(/^<p>/i, "").replace(/<\/p>$/i, "")}
           </p>
           <div className="flex items-center mb-2">
             <div className="flex text-yellow-400">
               {renderStars(course.rating || 0)}
             </div>
             <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-              ({course.enrollmentCount || course.enrolledStudents || 0} students)
+              ({course.enrollmentCount || course.enrolledStudents || 0}{" "}
+              students)
             </span>
           </div>
           <div className="flex justify-between items-center">
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
               <FaRegClock className="mr-1" />
-              {course.duration || 'Self-paced'}
+              {course.duration || "Self-paced"}
             </div>
             <span className="text-sm px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded">
-              {course.level || 'All Levels'}
+              {course.level || "All Levels"}
             </span>
           </div>
         </div>
