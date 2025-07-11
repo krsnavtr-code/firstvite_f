@@ -46,22 +46,9 @@ export const getImageUrl = (path) => {
   // Use the environment variable or fall back to current origin
   const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
   
-  // Try different URL patterns - the server might be expecting different paths
-  const possiblePaths = [
-    `${baseUrl}/uploads/${filename}`,                    // Pattern 1: /uploads/filename
-    `${baseUrl}/public/uploads/${filename}`,            // Pattern 2: /public/uploads/filename
-    `${baseUrl}/storage/${filename}`,                   // Pattern 3: /storage/filename
-    `${baseUrl}/images/${filename}`,                    // Pattern 4: /images/filename
-    `${baseUrl}/assets/uploads/${filename}`,            // Pattern 5: /assets/uploads/filename
-    `https://firstvite.com/uploads/${filename}`,        // Hardcoded domain
-    `https://firstvite.com/public/uploads/${filename}`, // Hardcoded with public
-  ];
-  
-  console.log('Trying possible image paths:', possiblePaths);
-  
-  // For now, return the first pattern - we'll test which one works
-  const url = possiblePaths[1]; // Try /public/uploads/ first
-  console.log('Using URL:', url);
+  // Since the server is configured to serve from /uploads (without /public)
+  const url = `${baseUrl}/uploads/${filename}`;
+  console.log('Constructed image URL:', url);
   
   return url;
 };
