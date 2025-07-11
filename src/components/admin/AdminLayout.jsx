@@ -136,6 +136,26 @@ const AdminLayout = () => {
                 </svg>
                 FAQs
               </Link>
+
+              <Link 
+                to="/admin/image-upload" 
+                className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
+              >
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Image Upload
+              </Link>
+
+              <Link 
+                to="/admin/image-gallery" 
+                className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
+              >
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+                Image Gallery
+              </Link>
               
               <button
                 onClick={handleLogout}
