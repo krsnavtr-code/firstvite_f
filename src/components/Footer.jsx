@@ -181,8 +181,7 @@ function Footer() {
                   />
                 </svg>
                 <span className="text-gray-600 dark:text-gray-300">
-                  H-161 BIS Sector-63 Noida Gautam Budh Nagar Uttar Pradesh
-                  201301
+                  H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301
                 </span>
               </li>
             </ul>

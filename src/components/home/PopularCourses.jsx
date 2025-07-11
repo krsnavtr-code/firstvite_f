@@ -175,92 +175,44 @@ const PopularCourses = () => {
     const fetchPopularCourses = async () => {
       try {
         setLoading(true);
-        // First, get all categories
-        const categoriesResponse = await axios.get('/categories');
-        const categories = Array.isArray(categoriesResponse.data) 
-          ? categoriesResponse.data 
-          : categoriesResponse.data?.data || [];
         
-        // Then get courses for each category
-        const categoryPromises = categories.map(category => 
-          axios.get('/courses', {
-            params: {
-              category: category._id,
-              limit: 2, // Get 2 courses per category
-              sort: '-enrollments',
-            },
-          })
-        );
-
-        const categoryResponses = await Promise.all(categoryPromises);
-        
-        // Process courses from all categories
-        let allCourses = [];
-        const usedCategories = new Set();
-        
-        // First pass: take one course from each category
-        categoryResponses.forEach((response, index) => {
-          const categoryCourses = Array.isArray(response.data) 
-            ? response.data 
-            : response.data?.data || [];
-            
-          if (categoryCourses.length > 0) {
-            allCourses.push({
-              ...categoryCourses[0],
-              category: categories[index] // Ensure category info is included
-            });
-            usedCategories.add(categories[index]._id);
-          }
+        // Only fetch courses that are marked to show on home page
+        console.log('Fetching featured courses with showOnHome=true');
+        const response = await axios.get('/courses', {
+          params: {
+            showOnHome: 'true',
+            limit: 6, // Limit to 6 featured courses
+            sort: '-createdAt', // Show most recently added first
+            isPublished: 'true' // Only get published courses
+          },
         });
         
-        // If we need more courses, take second course from each category
-        if (allCourses.length < 6) {
-          categoryResponses.forEach((response, index) => {
-            if (allCourses.length >= 6) return;
-            
-            const categoryCourses = Array.isArray(response.data) 
-              ? response.data 
-              : response.data?.data || [];
-              
-            if (categoryCourses.length > 1) {
-              allCourses.push({
-                ...categoryCourses[1],
-                category: categories[index] // Ensure category info is included
-              });
-            }
-          });
+        console.log('Featured courses response:', response);
+        
+        let courses = [];
+        
+        // Handle different response formats
+        if (Array.isArray(response.data)) {
+          courses = response.data;
+        } else if (response.data && Array.isArray(response.data.data)) {
+          courses = response.data.data;
+        } else if (response.data && response.data.courses) {
+          courses = response.data.courses;
         }
         
-        // If still not enough, fetch more popular courses
-        if (allCourses.length < 6) {
-          const remaining = 6 - allCourses.length;
-          const usedCourseIds = new Set(allCourses.map(c => c._id));
-          
-          const popularResponse = await axios.get('/courses', {
-            params: {
-              limit: Math.max(10, remaining * 2), // Get more to ensure we have enough unique courses
-              sort: '-enrollments',
-            },
-          });
-          
-          const popularCourses = Array.isArray(popularResponse.data) 
-            ? popularResponse.data 
-            : popularResponse.data?.data || [];
-            
-          for (const course of popularCourses) {
-            if (allCourses.length >= 6) break;
-            if (!usedCourseIds.has(course._id)) {
-              allCourses.push(course);
-              usedCourseIds.add(course._id);
-            }
-          }
-        }
+        console.log('Parsed featured courses:', courses);
         
-        // Ensure we have exactly 6 courses
-        setCourses(allCourses.slice(0, 6));
+        // Only show courses that are explicitly marked to show on home page
+        const featuredCourses = courses.filter(course => course.showOnHome === true);
+        
+        console.log('Filtered featured courses (showOnHome=true):', featuredCourses);
+        
+        // Only set the courses that are marked to show on home page
+        // We don't need a fallback to popular courses anymore
+        setCourses(featuredCourses.slice(0, 6)); // Limit to 6 courses
       } catch (err) {
-        console.error('Error fetching popular courses:', err);
-        setError('Failed to load popular courses');
+        console.error('Error fetching featured courses:', err);
+        setError('Failed to load featured courses');
       } finally {
         setLoading(false);
       }

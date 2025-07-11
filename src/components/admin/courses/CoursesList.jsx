@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { FaSearch } from 'react-icons/fa';
 import { getCourses, deleteCourse, getCategoriesForForm } from '../../../api/courseApi';
 
 const CoursesList = () => {
@@ -8,25 +9,32 @@ const CoursesList = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showHomeFilter, setShowHomeFilter] = useState('all'); // 'all', 'yes', 'no'
 
   // Fetch courses and categories
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        // Pass true for isAdmin to get all courses including unpublished ones
-        const data = await getCourses('', true);
-        setCourses(data);
-
+        
         // Fetch categories for filter
         console.log('Fetching categories...');
         const categoriesData = await getCategoriesForForm();
         console.log('Categories fetched:', categoriesData);
         setCategories(categoriesData);
         
-        // Fetch courses with category filter and admin flag
-        console.log('Fetching courses with category:', selectedCategory);
-        const coursesData = await getCourses(selectedCategory, true); // true for isAdmin
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (selectedCategory) params.append('category', selectedCategory);
+        if (searchTerm) params.append('search', searchTerm);
+        if (showHomeFilter !== 'all') {
+          params.append('showOnHome', showHomeFilter === 'yes' ? 'true' : 'false');
+        }
+        
+        // Fetch courses with filters and admin flag
+        console.log('Fetching courses with params:', params.toString());
+        const coursesData = await getCourses(params.toString(), true); // true for isAdmin
         console.log('Courses fetched:', coursesData);
         setCourses(coursesData);
       } catch (error) {
@@ -38,7 +46,7 @@ const CoursesList = () => {
     };
 
     fetchCourses();
-  }, [selectedCategory]);
+  }, [selectedCategory, searchTerm, showHomeFilter]);
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this course?')) {
@@ -80,24 +88,66 @@ const CoursesList = () => {
         </div>
       </div>
 
-      {/* Category Filter */}
-      <div className="mt-4">
-        <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700">
-          Filter by Category
-        </label>
-        <select
-          id="category-filter"
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option key="all" value="">All Categories</option>
-          {categories.map((category) => (
-            <option key={category.value} value={category.value}>
-              {category.label}
-            </option>
-          ))}
-        </select>
+      {/* Search and Filters */}
+      <div className="mt-4 bg-white p-4 rounded-lg shadow">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search Input */}
+          <div>
+            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+              Search
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-400" />
+              </div>
+              <input
+                type="text"
+                id="search"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Search courses..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Category Filter */}
+          <div>
+            <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
+              Category
+            </label>
+            <select
+              id="category-filter"
+              className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">All Categories</option>
+              {categories.map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Show on Home Filter */}
+          <div>
+            <label htmlFor="show-home-filter" className="block text-sm font-medium text-gray-700 mb-1">
+              Show on Home
+            </label>
+            <select
+              id="show-home-filter"
+              className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              value={showHomeFilter}
+              onChange={(e) => setShowHomeFilter(e.target.value)}
+            >
+              <option value="all">All Courses</option>
+              <option value="yes">Show on Home</option>
+              <option value="no">Not on Home</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 flex flex-col">
@@ -118,6 +168,9 @@ const CoursesList = () => {
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Price
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Show on Home
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Status
@@ -158,6 +211,15 @@ const CoursesList = () => {
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           ${course.price.toFixed(2)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm">
+                          <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                            course.showOnHome 
+                              ? 'bg-blue-100 text-blue-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {course.showOnHome ? 'Yes' : 'No'}
+                          </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
                           <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${

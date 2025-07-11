@@ -26,11 +26,19 @@ export const getCategories = async (params = {}) => {
       status: 'active',
       limit: 10,
       sort: 'name',
-      fields: '_id,name,slug,description,image,courseCount'
+      fields: '_id,name,slug,description,image,courseCount,showOnHome',
+      showOnHome: params.showOnHome ? 'true' : undefined
     };
     
     // Merge default params with provided params
     const requestParams = { ...defaultParams, ...params };
+    
+    // Remove undefined values
+    Object.keys(requestParams).forEach(key => {
+      if (requestParams[key] === undefined) {
+        delete requestParams[key];
+      }
+    });
     
     const response = await api.get('/categories', { params: requestParams });
     return response.data;
@@ -52,23 +60,45 @@ export const getCategoryById = async (id) => {
 };
 
 // Create a new category
-export const createCategory = async (categoryData) => {
+export const createCategory = async (formData) => {
   try {
-    const response = await api.post('/categories', categoryData);
+    const response = await api.post('/categories', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error creating category:', error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Error message:', error.message);
+    }
     throw error;
   }
 };
 
 // Update an existing category
-export const updateCategory = async (id, categoryData) => {
+export const updateCategory = async (id, formData) => {
   try {
-    const response = await api.put(`/categories/${id}`, categoryData);
+    const response = await api.put(`/categories/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error(`Error updating category with ID ${id}:`, error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    }
     throw error;
   }
 };

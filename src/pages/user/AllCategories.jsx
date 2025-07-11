@@ -116,7 +116,12 @@ const AllCategories = () => {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                     {category.name}
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {category.description && (
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                      {category.description}
+                    </p>
+                  )}
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     {category.courseCount || 0} courses
                   </p>
                 </div>
