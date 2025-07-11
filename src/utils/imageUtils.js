@@ -20,7 +20,7 @@ export const getImageUrl = (path) => {
   }
   
   // Otherwise, assume it's a relative path from the uploads directory
-  return `${VITE_API_URL}/uploads/${path}`;
+  return `${VITE_API_URL}/public/uploads/${path}`;
 };
 
 /**
