@@ -70,10 +70,24 @@ const VideoUploader = ({ onUploadSuccess, label = 'Upload Video', className = ''
 
         let data;
         try {
-          data = await response.json();
+          const responseText = await response.text();
+          try {
+            data = responseText ? JSON.parse(responseText) : {};
+          } catch (e) {
+            console.error('Failed to parse JSON response:', e, 'Response:', responseText);
+            if (response.status === 413) {
+              throw new Error('File is too large. Maximum size is 1GB.');
+            } else if (responseText.includes('Request Entity Too Large')) {
+              throw new Error('File is too large. Maximum size is 1GB.');
+            } else {
+              throw new Error('Server returned an invalid response. Please try again.');
+            }
+          }
         } catch (e) {
-          console.error('Failed to parse JSON response:', e);
-          throw new Error('Invalid server response');
+          if (e.message.includes('Failed to fetch')) {
+            throw new Error('Network error. Please check your connection and try again.');
+          }
+          throw e; // Re-throw other errors
         }
 
         if (!response.ok) {
