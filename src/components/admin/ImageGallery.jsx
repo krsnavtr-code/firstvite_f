@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getUploadedImages, getImageUrl } from '../../api/imageApi';
+import { getUploadedImages, getImageUrl, deleteMediaFile } from '../../api/imageApi';
 import { toast } from 'react-toastify';
 import { FiCopy, FiRefreshCw, FiVideo, FiImage, FiUpload } from 'react-icons/fi';
 import { FaImage, FaVideo, FaTimes } from 'react-icons/fa';
@@ -42,6 +42,24 @@ const ImageGallery = () => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard!');
+  };
+
+  const handleDelete = async (filename, e) => {
+    e.stopPropagation();
+    
+    if (!window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await deleteMediaFile(filename);
+      toast.success('File deleted successfully');
+      // Refresh the media list
+      fetchMedia();
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete file');
+    }
   };
 
   const filteredMedia = media.filter(item => {
@@ -165,16 +183,25 @@ const ImageGallery = () => {
                 />
               )}
             </div>
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   copyToClipboard(item.url);
                 }}
-                className="p-2 bg-white bg-opacity-90 rounded-full text-gray-800 hover:bg-opacity-100 transition-all"
+                className="p-2 bg-white bg-opacity-90 rounded-full text-gray-800 hover:bg-opacity-100 transition-all hover:bg-blue-100"
                 title="Copy URL"
               >
                 <FiCopy className="w-5 h-5" />
+              </button>
+              <button
+                onClick={(e) => handleDelete(item.name || item.filename, e)}
+                className="p-2 bg-white bg-opacity-90 rounded-full text-gray-800 hover:bg-opacity-100 transition-all hover:bg-red-100"
+                title="Delete file"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
               </button>
             </div>
             <div className="p-2 text-xs text-gray-600 dark:text-gray-300 truncate flex items-center justify-between">

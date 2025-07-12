@@ -104,6 +104,23 @@ export const uploadImage = async (file) => {
   }
 };
 
+// Delete a media file
+export const deleteMediaFile = async (filename) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.delete(`${API_URL}/upload/file/${encodeURIComponent(filename)}`, {
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : undefined,
+      },
+      withCredentials: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw error;
+  }
+};
+
 // Upload a video
 export const uploadVideo = async (file) => {
   try {
