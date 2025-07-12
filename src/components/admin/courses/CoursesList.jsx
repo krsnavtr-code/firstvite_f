@@ -18,28 +18,43 @@ const CoursesList = () => {
       try {
         setLoading(true);
         
-        // Fetch categories for filter
         console.log('Fetching categories...');
         const categoriesData = await getCategoriesForForm();
         console.log('Categories fetched:', categoriesData);
         setCategories(categoriesData);
         
         // Build query parameters
-        const params = new URLSearchParams();
-        if (selectedCategory) params.append('category', selectedCategory);
-        if (searchTerm) params.append('search', searchTerm);
-        if (showHomeFilter !== 'all') {
-          params.append('showOnHome', showHomeFilter === 'yes' ? 'true' : 'false');
+        const params = {
+          category: selectedCategory || undefined,
+          search: searchTerm || undefined,
+          showOnHome: showHomeFilter !== 'all' ? (showHomeFilter === 'yes' ? 'true' : 'false') : undefined,
+          all: 'true' // Make sure to include all courses including unpublished ones for admin
+        };
+        
+        // Remove undefined values
+        Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
+        
+        console.log('Fetching courses with params:', params);
+        const response = await getCourses(new URLSearchParams(params).toString(), true);
+        console.log('API Response:', response);
+        
+        // Handle different response formats
+        let coursesData = [];
+        if (Array.isArray(response)) {
+          coursesData = response;
+        } else if (response && Array.isArray(response.data)) {
+          coursesData = response.data;
+        } else if (response && response.data && typeof response.data === 'object') {
+          // If data is an object, convert it to array
+          coursesData = Object.values(response.data);
         }
         
-        // Fetch courses with filters and admin flag
-        console.log('Fetching courses with params:', params.toString());
-        const coursesData = await getCourses(params.toString(), true); // true for isAdmin
-        console.log('Courses fetched:', coursesData);
+        console.log('Processed courses data:', coursesData);
         setCourses(coursesData);
       } catch (error) {
         console.error('Error fetching data:', error);
-        toast.error('Failed to load data');
+        toast.error(`Failed to load data: ${error.response?.data?.message || error.message || 'Unknown error'}`);
+        setCourses([]); // Set empty array to prevent render issues
       } finally {
         setLoading(false);
       }

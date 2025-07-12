@@ -29,18 +29,45 @@ export const uploadCourseImage = async (formData) => {
 // If isAdmin is true, will include unpublished courses
 export const getCourses = async (queryParams = '', isAdmin = false) => {
     try {
-        // If queryParams is already a string (URLSearchParams.toString() result), use it directly
-        // Otherwise, treat it as a category string for backward compatibility
-        const params = new URLSearchParams(queryParams);
+        // Parse queryParams if it's a string
+        const params = typeof queryParams === 'string' 
+            ? new URLSearchParams(queryParams)
+            : new URLSearchParams();
         
+        // Add admin flag if needed
         if (isAdmin) {
             params.set('admin', 'true');
         }
         
+        // Ensure we're including all necessary fields
+        params.set('fields', 'title,description,image,category,instructor,price,showOnHome,isPublished,level');
+        
+        console.log('Making API request to /courses with params:', Object.fromEntries(params));
         const response = await axios.get(`/courses?${params.toString()}`);
-        return response.data;
+        
+        console.log('API Response data structure:', {
+            isArray: Array.isArray(response.data),
+            hasDataProperty: response.data && typeof response.data === 'object' && 'data' in response.data,
+            responseKeys: response.data ? Object.keys(response.data) : 'no data'
+        });
+        
+        // Handle different response formats
+        if (Array.isArray(response.data)) {
+            return response.data; // Direct array response
+        } else if (response.data && Array.isArray(response.data.data)) {
+            return response.data.data; // { data: [...] } format
+        } else if (response.data && typeof response.data === 'object') {
+            // Handle case where data is an object with course IDs as keys
+            return Object.values(response.data);
+        }
+        
+        return [];
     } catch (error) {
-        console.error('Error fetching courses:', error);
+        console.error('Error in getCourses:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
         throw error;
     }
 };
