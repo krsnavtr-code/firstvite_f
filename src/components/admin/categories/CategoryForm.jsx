@@ -12,7 +12,6 @@ const CategoryForm = () => {
     name: '',
     description: '',
     image: '',
-    imageFile: null,
     master: false,
     isActive: true,
     showOnHome: false
@@ -60,10 +59,18 @@ const CategoryForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    const newValue = type === 'checkbox' ? checked : value;
+    
+    console.log(`Field changed - Name: ${name}, Value:`, newValue);
+    
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: newValue
+      };
+      console.log('Updated form data:', newData);
+      return newData;
+    });
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -87,9 +94,11 @@ const CategoryForm = () => {
       newErrors.description = 'Description must be less than 500 characters';
     }
     
-    // Only validate image on create or if a new file is being uploaded
-    if (!isEditing && !formData.imageFile) {
-      newErrors.image = 'Image is required';
+    // Validate image URL
+    if (!formData.image) {
+      newErrors.image = 'Image URL is required';
+    } else if (!/^https?:\/\//i.test(formData.image)) {
+      newErrors.image = 'Please enter a valid URL (must start with http:// or https://)';
     }
     
     setErrors(newErrors);
@@ -99,37 +108,69 @@ const CategoryForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    // Log current form data and environment before validation
+    console.log('=== Form Submission Started ===');
+    console.log('Form data before validation:', JSON.parse(JSON.stringify(formData)));
+    console.log('Environment VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
+    
+    // Client-side validation
+    if (!formData.name || !formData.name.trim()) {
+      console.error('Validation failed: Name is required');
+      toast.error('Name is required');
+      setErrors(prev => ({ ...prev, name: 'Name is required' }));
+      return;
+    }
+    
+    const trimmedName = formData.name.trim();
+    if (trimmedName.length < 3 || trimmedName.length > 50) {
+      console.error('Validation failed: Name must be between 3 and 50 characters');
+      toast.error('Name must be between 3 and 50 characters');
+      setErrors(prev => ({ ...prev, name: 'Name must be between 3 and 50 characters' }));
       return;
     }
     
     try {
       setLoading(true);
       
-      // Create FormData for the request
-      const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name.trim());
-      formDataToSend.append('description', formData.description?.trim() || '');
-      formDataToSend.append('isActive', formData.isActive);
-      formDataToSend.append('showOnHome', formData.showOnHome || false);
-      formDataToSend.append('master', formData.master || false);
+      // Prepare the category data as a plain object
+      const categoryData = {
+        name: trimmedName,
+        description: formData.description?.trim() || '',
+        isActive: formData.isActive,
+        showOnHome: formData.showOnHome,
+        master: formData.master
+      };
       
-      // If we have a new image file, append it
-      if (formData.imageFile) {
-        formDataToSend.append('image', formData.imageFile);
+      // Only include image if it's a new file or changed
+      if (formData.image) {
+        let imageValue = formData.image.trim();
+        // Remove base URL if present
+        if (import.meta.env.VITE_API_BASE_URL && imageValue.includes(import.meta.env.VITE_API_BASE_URL)) {
+          imageValue = imageValue.replace(import.meta.env.VITE_API_BASE_URL, '');
+        }
+        categoryData.image = imageValue;
       }
       
-      console.log('Sending form data with keys:');
-      for (let pair of formDataToSend.entries()) {
-        console.log(pair[0], pair[1]);
+      console.log('=== Prepared Category Data ===');
+      console.log(JSON.stringify(categoryData, null, 2));
+      
+      // If there's a file to upload, use FormData
+      let requestData = categoryData;
+      if (formData.imageFile && formData.imageFile instanceof File) {
+        const formDataToSend = new FormData();
+        Object.entries(categoryData).forEach(([key, value]) => {
+          formDataToSend.append(key, value);
+        });
+        formDataToSend.append('image', formData.imageFile);
+        requestData = formDataToSend;
       }
       
       if (isEditing) {
-        const response = await updateCategory(id, formDataToSend);
+        const response = await updateCategory(id, categoryData);
         console.log('Update response:', response);
         toast.success('Category updated successfully');
       } else {
-        const response = await createCategory(formDataToSend);
+        const response = await createCategory(categoryData);
         console.log('Create response:', response);
         toast.success('Category created successfully');
       }
@@ -204,53 +245,36 @@ const CategoryForm = () => {
         
         <div>
           <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-            Category Image
+            Image URL <span className="text-red-500">*</span>
           </label>
-          <div className="mt-1 flex items-center">
-            <input
-              type="file"
-              id="image"
-              name="image"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    setFormData(prev => ({
-                      ...prev,
-                      image: reader.result,
-                      imageFile: file
-                    }));
-                  };
-                  reader.readAsDataURL(file);
-                }
-              }}
-              className="hidden"
-              disabled={loading}
-            />
-            <label
-              htmlFor="image"
-              className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Choose File
-            </label>
-            <span className="ml-2 text-sm text-gray-500">
-              {formData.imageFile ? formData.imageFile.name : 'No file chosen'}
-            </span>
-          </div>
+          <input
+            type="url"
+            id="image"
+            name="image"
+            value={formData.image}
+            onChange={handleChange}
+            placeholder="https://example.com/image.jpg"
+            className={`mt-1 block p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+              errors.image ? 'border-red-500' : ''
+            }`}
+            disabled={loading}
+          />
           {errors.image && (
             <p className="mt-1 text-sm text-red-600">{errors.image}</p>
           )}
-          {(formData.image || formData.imageUrl) && (
+          {formData.image && (
             <div className="mt-2">
               <p className="text-sm text-gray-500">Image Preview:</p>
               <img 
-                src={formData.image || formData.imageUrl} 
+                src={formData.image} 
                 alt="Preview" 
                 className="mt-1 h-32 w-32 object-cover rounded"
                 onError={(e) => {
                   e.target.style.display = 'none';
+                  setErrors(prev => ({
+                    ...prev,
+                    image: 'Could not load image from URL. Please check the URL and try again.'
+                  }));
                 }}
               />
             </div>

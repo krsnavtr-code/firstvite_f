@@ -90,13 +90,28 @@ export const createCategory = async (formData) => {
 // Update an existing category
 export const updateCategory = async (id, formData) => {
   try {
+    console.log('Sending update request to /categories/' + id);
+    console.log('Request data:', formData);
+    
+    // Convert FormData to plain object for logging
+    if (formData instanceof FormData) {
+      const formDataObj = {};
+      formData.forEach((value, key) => {
+        formDataObj[key] = value;
+      });
+      console.log('FormData contents:', formDataObj);
+    }
+    
     const response = await api.put(`/categories/${id}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json', // Changed from multipart/form-data
       },
     });
+    
+    console.log('Update successful:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Update failed:', error);
     console.error(`Error updating category with ID ${id}:`, error);
     if (error.response) {
       console.error('Response data:', error.response.data);
