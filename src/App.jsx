@@ -31,6 +31,7 @@ import FAQPage from './pages/FAQPage';
 import ManageFAQs from './pages/admin/ManageFAQs';
 import ImageUploadDemo from './pages/admin/ImageUploadDemo';
 import ImageGallery from './components/admin/ImageGallery';
+import MediaGallery from './pages/admin/MediaGallery';
 import { CartProvider } from './contexts/CartContext';
 import Cart from './components/cart/Cart';
 import Profile from './pages/user/Profile';
@@ -231,9 +232,11 @@ function App() {
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/contacts" element={<ContactsPage />} />
           <Route path="/admin/faqs" element={<ManageFAQs />} />
+          <Route path="/admin/media" element={<MediaGallery />} />
           <Route path="/admin/image-upload" element={<ImageUploadDemo />} />
           <Route path="/admin/image-gallery" element={<ImageGallery />} />
           <Route path="/admin/enrollments" element={<AdminEnrollments />} />
+          <Route path="/admin/*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
 
