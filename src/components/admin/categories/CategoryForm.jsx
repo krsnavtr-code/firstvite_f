@@ -41,7 +41,7 @@ const CategoryForm = () => {
       setFormData({
         name: category.name || '',
         description: category.description || '',
-        image: category.image ? `${import.meta.env.VITE_API_BASE_URL}${category.image}` : '',
+        image: category.image || '',
         imageFile: null,
         master: category.master || false,
         isActive: category.isActive !== false,
@@ -97,7 +97,7 @@ const CategoryForm = () => {
     // Validate image URL
     if (!formData.image) {
       newErrors.image = 'Image URL is required';
-    } else if (!/^https?:\/\//i.test(formData.image)) {
+    } else if (!/^(https?:\/\/|\/)/i.test(formData.image)) {
       newErrors.image = 'Please enter a valid URL (must start with http:// or https://)';
     }
     
@@ -141,14 +141,9 @@ const CategoryForm = () => {
         master: formData.master
       };
       
-      // Only include image if it's a new file or changed
+      // Include image URL as is
       if (formData.image) {
-        let imageValue = formData.image.trim();
-        // Remove base URL if present
-        if (import.meta.env.VITE_API_BASE_URL && imageValue.includes(import.meta.env.VITE_API_BASE_URL)) {
-          imageValue = imageValue.replace(import.meta.env.VITE_API_BASE_URL, '');
-        }
-        categoryData.image = imageValue;
+        categoryData.image = formData.image.trim();
       }
       
       console.log('=== Prepared Category Data ===');
