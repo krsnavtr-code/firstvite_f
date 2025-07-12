@@ -12,7 +12,8 @@ const CategoryForm = () => {
     name: '',
     description: '',
     image: '',
-    isActive: true
+    isActive: true,
+    showOnHome: false
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -21,21 +22,32 @@ const CategoryForm = () => {
     if (isEditing) {
       fetchCategory();
     }
-  }, [id]);
+  }, [id, isEditing]); // Add isEditing to dependency array
 
   const fetchCategory = async () => {
+    if (!id) return;
+    
     try {
       setLoading(true);
+      console.log(`Fetching category with ID: ${id}`);
       const category = await getCategoryById(id);
+      console.log('Fetched category data:', category);
+      
+      if (!category) {
+        throw new Error('Category not found');
+      }
+      
       setFormData({
-        name: category.name,
+        name: category.name || '',
         description: category.description || '',
         image: category.image || '',
-        isActive: category.isActive !== false
+        isActive: category.isActive !== false,
+        showOnHome: category.showOnHome || false
       });
+      
     } catch (err) {
       console.error('Error fetching category:', err);
-      // Error toast will be shown by the API interceptor
+      toast.error(err.message || 'Failed to load category');
       navigate('/admin/categories');
     } finally {
       setLoading(false);
@@ -89,18 +101,30 @@ const CategoryForm = () => {
     try {
       setLoading(true);
       
+      // Prepare the data to be sent
+      const categoryData = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        image: formData.image.trim(),
+        isActive: formData.isActive,
+        showOnHome: formData.showOnHome || false
+      };
+      
+      console.log('Submitting category data:', categoryData);
+      
       if (isEditing) {
-        await updateCategory(id, formData);
+        await updateCategory(id, categoryData);
         toast.success('Category updated successfully');
       } else {
-        await createCategory(formData);
+        await createCategory(categoryData);
         toast.success('Category created successfully');
       }
       
       navigate('/admin/categories');
     } catch (err) {
       console.error('Error saving category:', err);
-      // Error toast will be shown by the API interceptor
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to save category';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

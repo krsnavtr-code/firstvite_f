@@ -44,7 +44,11 @@ export const getCategories = async (params = {}) => {
 export const getCategoryById = async (id) => {
   try {
     const response = await api.get(`/categories/${id}`);
-    return response.data;
+    // The backend returns { success: true, data: { ...category } }
+    if (response.data && response.data.success && response.data.data) {
+      return response.data.data; // Return just the category data
+    }
+    throw new Error('Invalid response format from server');
   } catch (error) {
     console.error(`Error fetching category with ID ${id}:`, error);
     throw error;
