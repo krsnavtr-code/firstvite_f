@@ -1,8 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { Editor } from "@tinymce/tinymce-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { Editor } from '@tinymce/tinymce-react';
+
+// Load TinyMCE from CDN
+const loadTinyMCE = () => {
+  return new Promise((resolve) => {
+    if (window.tinymce) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.tiny.cloud/1/000nwap7tgu75ovbp0gu5js87gbqjnsayryehvmack7qizyt/tinymce/6/tinymce.min.js';
+    script.referrerPolicy = 'origin';
+    script.onload = () => resolve();
+    script.onerror = (error) => {
+      console.error('Failed to load TinyMCE:', error);
+      resolve();
+    };
+    document.head.appendChild(script);
+  });
+};
 import { 
   createCourse, 
   updateCourse, 
@@ -750,28 +770,72 @@ const CourseForm = ({ isEdit = false }) => {
               name="description"
               control={control}
               rules={{ required: "Description is required" }}
-              render={({ field }) => (
-                <Editor
-                  // apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-                  apiKey="pqt3p849mrd0644ple5h621x04w9j3t6npvqkj7322xm4m0j"
-                  value={field.value}
-                  onEditorChange={field.onChange}
-                  init={{
-                    height: 300,
-                    menubar: true,
-                    plugins: [
-                      "advlist autolink lists link image charmap print preview anchor",
-                      "searchreplace visualblocks code fullscreen",
-                      "insertdatetime media table paste code help wordcount",
-                    ],
-                    toolbar:
-                      "undo redo | formatselect | bold italic backcolor | \
-                      alignleft aligncenter alignright alignjustify | \
-                      bullist numlist outdent indent | removeformat | help",
-                    images_upload_handler: handleImageUpload,
-                  }}
-                />
-              )}
+              render={({ field }) => {
+                const [editorLoaded, setEditorLoaded] = useState(false);
+                const editorRef = useRef(null);
+
+                useEffect(() => {
+                  loadTinyMCE().then(() => {
+                    setEditorLoaded(true);
+                  });
+                }, []);
+
+                if (!editorLoaded) {
+                  return <div>Loading editor...</div>;
+                }
+
+                return (
+                  <div className="prose max-w-none">
+                    {window.tinymce && (
+                      <Editor
+                        tinymceScriptSrc="https://cdn.tiny.cloud/1/000nwap7tgu75ovbp0gu5js87gbqjnsayryehvmack7qizyt/tinymce/6/tinymce.min.js"
+                        onInit={(evt, editor) => (editorRef.current = editor)}
+                        value={field.value || ''}
+                        onEditorChange={field.onChange}
+                        init={{
+                          height: 400,
+                          menubar: true,
+                          plugins: 'lists link image table code help wordcount',
+                          toolbar: 'undo redo | formatselect | bold italic | \
+                            alignleft aligncenter alignright | \
+                            bullist numlist outdent indent | link image | \
+                            removeformat | help',
+                          images_upload_url: '/api/upload',
+                          automatic_uploads: true,
+                          file_picker_types: 'image',
+                          file_picker_callback: (cb, value, meta) => {
+                            const input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/*');
+
+                            input.onchange = async () => {
+                              const file = input.files[0];
+                              const formData = new FormData();
+                              formData.append('file', file);
+
+                              try {
+                                // Replace with your actual upload function
+                                const response = await uploadCourseImage(formData);
+                                const url = response.url; // Adjust based on your API response
+                                cb(url, { title: file.name });
+                              } catch (error) {
+                                console.error('Error uploading image:', error);
+                                toast.error('Failed to upload image');
+                              }
+                            };
+
+                            input.click();
+                          },
+                          content_style: 'body { font-family:Inter,Arial,sans-serif; font-size:16px }',
+                          skin: 'oxide',
+                          content_css: 'default',
+                          branding: false
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              }}
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">
