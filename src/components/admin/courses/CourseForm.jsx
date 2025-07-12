@@ -798,33 +798,26 @@ const CourseForm = ({ isEdit = false }) => {
                           plugins: 'lists link image table code help wordcount',
                           toolbar: 'undo redo | formatselect | bold italic | \
                             alignleft aligncenter alignright | \
-                            bullist numlist outdent indent | link image | \
+                            bullist numlist outdent indent | link | image | \
                             removeformat | help',
-                          images_upload_url: '/api/upload',
-                          automatic_uploads: true,
+                          // Disable automatic uploads and use direct URL insertion
+                          automatic_uploads: false,
+                          // Configure the image dialog
+                          image_title: true,
+                          // Enable file_browser_callback for image dialog
                           file_picker_types: 'image',
-                          file_picker_callback: (cb, value, meta) => {
-                            const input = document.createElement('input');
-                            input.setAttribute('type', 'file');
-                            input.setAttribute('accept', 'image/*');
-
-                            input.onchange = async () => {
-                              const file = input.files[0];
-                              const formData = new FormData();
-                              formData.append('file', file);
-
-                              try {
-                                // Replace with your actual upload function
-                                const response = await uploadCourseImage(formData);
-                                const url = response.url; // Adjust based on your API response
-                                cb(url, { title: file.name });
-                              } catch (error) {
-                                console.error('Error uploading image:', error);
-                                toast.error('Failed to upload image');
-                              }
-                            };
-
-                            input.click();
+                          // Custom image dialog for URL insertion
+                          image_advtab: true,
+                          // Disable upload tab in image dialog
+                          image_dimensions: true,
+                          image_description: false,
+                          // Custom image insert handler
+                          images_upload_handler: (blobInfo, progress) => {
+                            // This will be called if someone tries to drag & drop an image
+                            return new Promise((resolve, reject) => {
+                              // We'll reject with a message to use the image URL dialog instead
+                              reject('Please use the image URL dialog to insert images');
+                            });
                           },
                           content_style: 'body { font-family:Inter,Arial,sans-serif; font-size:16px }',
                           skin: 'oxide',
@@ -1248,22 +1241,41 @@ const CourseForm = ({ isEdit = false }) => {
         </div>
         
 
-        {/* Thumbnail Upload */}
+        {/* Thumbnail URL */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
           <h3 className="text-lg font-semibold mb-4">Course Thumbnail</h3>
-          <ErrorBoundary>
-            <FileUploadInput
-              thumbnail={watch('thumbnail')}
-              onFileSelect={(path) => {
-                console.log('Setting thumbnail path:', path);
-                setValue('thumbnail', path, { shouldValidate: true });
-              }}
-              onRemove={() => {
-                console.log('Removing thumbnail');
-                setValue('thumbnail', '', { shouldValidate: true });
-              }}
-            />
-          </ErrorBoundary>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Thumbnail URL
+              </label>
+              <input
+                type="url"
+                {...register('thumbnail')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="https://example.com/image.jpg"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Enter the URL of the course thumbnail image
+              </p>
+            </div>
+            {watch('thumbnail') && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                <div className="w-64 h-36 border border-gray-300 rounded-md overflow-hidden">
+                  <img 
+                    src={watch('thumbnail')} 
+                    alt="Thumbnail preview" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/400x225?text=Thumbnail+Not+Found';
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Form Actions */}
