@@ -2,27 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Editor } from '@tinymce/tinymce-react';
-
-// Load TinyMCE from CDN
-const loadTinyMCE = () => {
-  return new Promise((resolve) => {
-    if (window.tinymce) {
-      resolve();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://cdn.tiny.cloud/1/000nwap7tgu75ovbp0gu5js87gbqjnsayryehvmack7qizyt/tinymce/6/tinymce.min.js';
-    script.referrerPolicy = 'origin';
-    script.onload = () => resolve();
-    script.onerror = (error) => {
-      console.error('Failed to load TinyMCE:', error);
-      resolve();
-    };
-    document.head.appendChild(script);
-  });
-};
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { 
   createCourse, 
   updateCourse, 
@@ -328,6 +309,7 @@ const CourseForm = ({ isEdit = false }) => {
     reset,
     getValues,
     trigger,
+    formState: { isSubmitting },
   } = useForm({
     defaultValues: {
       title: "",
@@ -766,70 +748,41 @@ const CourseForm = ({ isEdit = false }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Detailed Description *
             </label>
-            <Controller
-              name="description"
-              control={control}
-              rules={{ required: "Description is required" }}
-              render={({ field }) => {
-                const [editorLoaded, setEditorLoaded] = useState(false);
-                const editorRef = useRef(null);
-
-                useEffect(() => {
-                  loadTinyMCE().then(() => {
-                    setEditorLoaded(true);
-                  });
-                }, []);
-
-                if (!editorLoaded) {
-                  return <div>Loading editor...</div>;
-                }
-
-                return (
-                  <div className="prose max-w-none">
-                    {window.tinymce && (
-                      <Editor
-                        tinymceScriptSrc="https://cdn.tiny.cloud/1/000nwap7tgu75ovbp0gu5js87gbqjnsayryehvmack7qizyt/tinymce/6/tinymce.min.js"
-                        onInit={(evt, editor) => (editorRef.current = editor)}
-                        value={field.value || ''}
-                        onEditorChange={field.onChange}
-                        init={{
-                          height: 400,
-                          menubar: true,
-                          plugins: 'lists link image table code help wordcount',
-                          toolbar: 'undo redo | formatselect | bold italic | \
-                            alignleft aligncenter alignright | \
-                            bullist numlist outdent indent | link | image | \
-                            removeformat | help',
-                          // Disable automatic uploads and use direct URL insertion
-                          automatic_uploads: false,
-                          // Configure the image dialog
-                          image_title: true,
-                          // Enable file_browser_callback for image dialog
-                          file_picker_types: 'image',
-                          // Custom image dialog for URL insertion
-                          image_advtab: true,
-                          // Disable upload tab in image dialog
-                          image_dimensions: true,
-                          image_description: false,
-                          // Custom image insert handler
-                          images_upload_handler: (blobInfo, progress) => {
-                            // This will be called if someone tries to drag & drop an image
-                            return new Promise((resolve, reject) => {
-                              // We'll reject with a message to use the image URL dialog instead
-                              reject('Please use the image URL dialog to insert images');
-                            });
-                          },
-                          content_style: 'body { font-family:Inter,Arial,sans-serif; font-size:16px }',
-                          skin: 'oxide',
-                          content_css: 'default',
-                          branding: false
-                        }}
-                      />
-                    )}
-                  </div>
-                );
-              }}
-            />
+            <div className="prose max-w-none">
+              <Controller
+                name="description"
+                control={control}
+                rules={{ required: 'Description is required' }}
+                render={({ field: { onChange, value } }) => (
+                  <ReactQuill
+                    theme="snow"
+                    value={value || ''}
+                    onChange={(content) => {
+                      onChange(content);
+                      // Trigger validation when content changes
+                      trigger('description');
+                    }}
+                    modules={{
+                      toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{'list': 'ordered'}, {'list': 'bullet'}],
+                        ['link', 'image'],
+                        ['clean']
+                      ],
+                    }}
+                    formats={[
+                      'header',
+                      'bold', 'italic', 'underline', 'strike',
+                      'list', 'bullet',
+                      'link', 'image'
+                    ]}
+                    placeholder="Enter course description..."
+                    className="h-64 bg-white"
+                  />
+                )}
+              />
+            </div>
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">
                 {errors.description.message}
