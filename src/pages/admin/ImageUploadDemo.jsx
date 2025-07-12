@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ImageUploader from "../../components/common/ImageUploader";
+import { Link } from 'react-router-dom';
 
 const ImageUploadDemo = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
@@ -10,7 +11,8 @@ const ImageUploadDemo = () => {
 
   return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Image Upload Demo</h1>
+      <h1 className="text-2xl font-bold mb-6">Image Upload Demo</h1>
+      <Link to="/admin/media">Media Upload</Link>
         
         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Upload an Image</h2>
