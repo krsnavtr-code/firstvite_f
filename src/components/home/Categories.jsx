@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { getCategories as getCategoriesFromApi } from '../../api/categoryApi';
 import { getCoursesByCategory } from '../../api/courseApi';
-import { FaBook, FaLaptopCode, FaChartLine, FaPalette, FaLanguage, FaMusic, FaArrowRight } from 'react-icons/fa';
+import { FaImage, FaArrowRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { getCardBgColor } from '../../utils/gradients';
 
-const categoryIcons = {
-  'Computer Science': <FaLaptopCode className="text-3xl text-blue-500" />,
-  'Business': <FaChartLine className="text-3xl text-green-500" />,
-  'Arts & Design': <FaPalette className="text-3xl text-purple-500" />,
-  'Language': <FaLanguage className="text-3xl text-red-500" />,
-  'Music': <FaMusic className="text-3xl text-pink-500" />,
-  'default': <FaBook className="text-3xl text-yellow-500" />
+// Helper function to get the full image URL
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http')) return imagePath;
+  // Otherwise, prepend the API base URL
+  return `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${imagePath}`;
 };
 
 const Categories = () => {
@@ -23,21 +23,29 @@ const Categories = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        // Fetch categories that are marked to show on home page
+        
+        // Fetch only categories marked to show on home page
         const categoriesData = await getCategoriesFromApi({
           showOnHome: true,
           limit: 6,
-          sort: '-courseCount', // Sort by course count in descending order
+          sort: '-courseCount',
           fields: '_id,name,slug,courseCount,image,description,showOnHome'
         });
 
-        // Filter categories that are marked to show on home page
-        const filteredCategories = categoriesData.filter(cat => cat.showOnHome);
+        // Create a map to remove duplicates by ID
+        const uniqueCategoriesMap = new Map();
+        categoriesData.forEach(cat => {
+          if (!uniqueCategoriesMap.has(cat._id)) {
+            uniqueCategoriesMap.set(cat._id, cat);
+          }
+        });
+        
+        const uniqueCategories = Array.from(uniqueCategoriesMap.values());
 
-        // If courseCount is not populated from the backend, we'll fetch it manually
+        // Fetch course counts for categories that don't have it
         const categoriesWithCount = await Promise.all(
-          filteredCategories.map(async (category) => {
-            if (category.courseCount === undefined) {
+          uniqueCategories.map(async (category) => {
+            if (category.courseCount === undefined || category.courseCount === null) {
               try {
                 const courses = await getCoursesByCategory(category._id);
                 return {
@@ -53,7 +61,7 @@ const Categories = () => {
           })
         );
 
-        // Sort by course count in descending order and limit to 6 categories
+        // Sort by course count and limit to 6 categories
         const sortedCategories = categoriesWithCount
           .sort((a, b) => (b.courseCount || 0) - (a.courseCount || 0))
           .slice(0, 6);
@@ -70,11 +78,27 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
-  const getCategoryIcon = (categoryName) => {
-    const iconKey = Object.keys(categoryIcons).find(key => 
-      categoryName.toLowerCase().includes(key.toLowerCase())
+  const CategoryImage = ({ category }) => {
+    const [imageError, setImageError] = useState(false);
+    const imageUrl = category.image ? getImageUrl(category.image) : null;
+    const showFallback = !imageUrl || imageError;
+    
+    return (
+      <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-white/30 dark:bg-black/30 backdrop-blur-sm flex items-center justify-center">
+        {!showFallback ? (
+          <img 
+            src={imageUrl} 
+            alt={category.name}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full text-gray-400">
+            <FaImage className="text-2xl" />
+          </div>
+        )}
+      </div>
     );
-    return iconKey ? categoryIcons[iconKey] : categoryIcons.default;
   };
 
   if (loading) {
@@ -141,10 +165,8 @@ const Categories = () => {
                 className={`block p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${getCardBgColor(category)}`}
               >
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-white/30 dark:bg-black/30 backdrop-blur-sm rounded-lg">
-                    {getCategoryIcon(category.name)}
-                  </div>
-                  <div>
+                  <CategoryImage category={category} />
+                  <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                       {category.name}
                     </h3>

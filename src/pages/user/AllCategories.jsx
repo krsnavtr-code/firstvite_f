@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getCategories as getCategoriesFromApi } from "../../api/categoryApi";
 import { getCoursesByCategory } from "../../api/courseApi";
-import { FaBook, FaLaptopCode, FaChartLine, FaPalette, FaLanguage, FaMusic, FaArrowRight } from 'react-icons/fa';
+import { FaImage, FaArrowRight } from 'react-icons/fa';
 
-export const categoryIcons = {
-  'Computer Science': <FaLaptopCode className="text-blue-500 text-2xl" />,
-  'Business': <FaChartLine className="text-green-500 text-2xl" />,
-  'Arts & Design': <FaPalette className="text-purple-500 text-2xl" />,
-  'Language': <FaLanguage className="text-red-500 text-2xl" />,
-  'Music': <FaMusic className="text-yellow-500 text-2xl" />,
-  'default': <FaBook className="text-gray-500 text-2xl" />
+// Helper function to get the full image URL
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http')) return imagePath;
+  // Otherwise, prepend the API base URL
+  return `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${imagePath}`;
 };
 
 const AllCategories = () => {
@@ -55,11 +55,29 @@ const AllCategories = () => {
     fetchCategoriesWithCount();
   }, []);
 
-  const getCategoryIcon = (categoryName) => {
-    const iconKey = Object.keys(categoryIcons).find(key => 
-      categoryName.toLowerCase().includes(key.toLowerCase())
+  const renderCategoryImage = (category) => {
+    const imageUrl = category.image ? getImageUrl(category.image) : null;
+    
+    return (
+      <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={category.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // If image fails to load, show the default icon
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+              e.target.nextElementSibling.style.display = 'block';
+            }}
+          />
+        ) : null}
+        {!imageUrl && (
+          <FaImage className="text-gray-400 text-2xl" />
+        )}
+      </div>
     );
-    return iconKey ? categoryIcons[iconKey] : categoryIcons.default;
   };
 
   if (loading) {
@@ -106,10 +124,8 @@ const AllCategories = () => {
               className="group block bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1"
             >
               <div className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="p-3 bg-blue-50 dark:bg-gray-700 rounded-lg">
-                    {getCategoryIcon(category.name)}
-                  </div>
+                <div className="flex items-center justify-between mb-4">
+                  {renderCategoryImage(category)}
                   <FaArrowRight className="text-gray-400 group-hover:text-blue-500 transition-colors duration-300" />
                 </div>
                 <div className="mt-4">
