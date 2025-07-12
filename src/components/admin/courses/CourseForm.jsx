@@ -192,25 +192,25 @@ const WeekItem = ({ week, weekIndex, removeWeek, register, control, errors }) =>
   return (
     <div className="mb-6 border border-gray-200 rounded-lg p-4">
       <div className="flex justify-between items-center mb-4">
-        <h4 className="text-md font-medium">Week {weekIndex + 1}</h4>
+        <h4 className="text-md font-medium">Module {weekIndex + 1}</h4>
         <button
           type="button"
           onClick={() => removeWeek(weekIndex)}
           className="text-sm text-red-600 hover:text-red-800"
         >
-          Remove Week
+          Remove Module
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Week Title *
+            Module Title *
           </label>
           <input
             type="text"
             {...register(`curriculum.${weekIndex}.title`, {
-              required: "Week title is required",
+              required: "Module title is required",
             })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., Introduction to React"
