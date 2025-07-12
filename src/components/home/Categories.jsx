@@ -17,20 +17,26 @@ const categoryIcons = {
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        // Fetch top 6 categories
+        setLoading(true);
+        // Fetch categories that are marked to show on home page
         const categoriesData = await getCategoriesFromApi({
+          showOnHome: true,
           limit: 6,
           sort: '-courseCount', // Sort by course count in descending order
-          fields: '_id,name,slug,courseCount'
+          fields: '_id,name,slug,courseCount,image,description,showOnHome'
         });
+
+        // Filter categories that are marked to show on home page
+        const filteredCategories = categoriesData.filter(cat => cat.showOnHome);
 
         // If courseCount is not populated from the backend, we'll fetch it manually
         const categoriesWithCount = await Promise.all(
-          categoriesData.map(async (category) => {
+          filteredCategories.map(async (category) => {
             if (category.courseCount === undefined) {
               try {
                 const courses = await getCoursesByCategory(category._id);
@@ -47,9 +53,15 @@ const Categories = () => {
           })
         );
 
-        setCategories(categoriesWithCount);
+        // Sort by course count in descending order and limit to 6 categories
+        const sortedCategories = categoriesWithCount
+          .sort((a, b) => (b.courseCount || 0) - (a.courseCount || 0))
+          .slice(0, 6);
+
+        setCategories(sortedCategories);
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setError('Failed to load categories. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -65,23 +77,62 @@ const Categories = () => {
     return iconKey ? categoryIcons[iconKey] : categoryIcons.default;
   };
 
+  if (loading) {
+    return (
+      <section className="py-16 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              Featured Categories
+            </h2>
+            <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
+              Discover books in your favorite categories
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden animate-pulse">
+                <div className="p-6">
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="text-red-500 mb-4">{error}</div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Try Again
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            Best E-Learning Categories
+            Featured Categories
           </h2>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Discover books in your favorite categories
           </p>
         </div>
         
-        {loading ? (
-          <div className="flex justify-center items-center min-h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : categories.length > 0 ? (
+        {categories.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category) => (
               <Link

@@ -929,6 +929,21 @@ const CourseForm = ({ isEdit = false }) => {
                   Publish Now
                 </label>
               </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showOnHome"
+                  {...register("showOnHome")}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="showOnHome"
+                  className="ml-2 block text-sm text-gray-700"
+                >
+                  Show on Home
+                </label>
+              </div>
             </div>
           </div>
         </div>

@@ -12,6 +12,9 @@ const CategoryForm = () => {
     name: '',
     description: '',
     image: '',
+    clean-image-upload-commit
+    imageFile: null,
+    master
     isActive: true,
     showOnHome: false
   });
@@ -40,7 +43,12 @@ const CategoryForm = () => {
       setFormData({
         name: category.name || '',
         description: category.description || '',
+        clean-image-upload-commit
         image: category.image || '',
+
+        image: category.image ? `${import.meta.env.VITE_API_BASE_URL}${category.image}` : '',
+        imageFile: null,
+        master
         isActive: category.isActive !== false,
         showOnHome: category.showOnHome || false
       });
@@ -83,8 +91,9 @@ const CategoryForm = () => {
       newErrors.description = 'Description must be less than 500 characters';
     }
     
-    if (formData.image && !/^https?:\/\//.test(formData.image)) {
-      newErrors.image = 'Please enter a valid URL';
+    // Only validate image on create or if a new file is being uploaded
+    if (!isEditing && !formData.imageFile) {
+      newErrors.image = 'Image is required';
     }
     
     setErrors(newErrors);
@@ -101,6 +110,7 @@ const CategoryForm = () => {
     try {
       setLoading(true);
       
+ clean-image-upload-commit
       // Prepare the data to be sent
       const categoryData = {
         name: formData.name.trim(),
@@ -117,6 +127,32 @@ const CategoryForm = () => {
         toast.success('Category updated successfully');
       } else {
         await createCategory(categoryData);
+
+      // Create FormData for the request
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description || ''); // Ensure description is not null
+      formDataToSend.append('isActive', formData.isActive);
+      formDataToSend.append('showOnHome', formData.showOnHome || false); // Add showOnHome field
+      
+      // If we have a new image file, append it
+      if (formData.imageFile) {
+        formDataToSend.append('image', formData.imageFile);
+      }
+      
+      console.log('Sending form data with keys:');
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+      
+      if (isEditing) {
+        const response = await updateCategory(id, formDataToSend);
+        console.log('Update response:', response);
+        toast.success('Category updated successfully');
+      } else {
+        const response = await createCategory(formDataToSend);
+        console.log('Create response:', response);
+ master
         toast.success('Category created successfully');
       }
       
@@ -190,28 +226,49 @@ const CategoryForm = () => {
         
         <div>
           <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-            Image URL
+            Category Image
           </label>
-          <input
-            type="url"
-            id="image"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            className={`mt-1 block p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-              errors.image ? 'border-red-500' : ''
-            }`}
-            placeholder="https://example.com/image.jpg"
-            disabled={loading}
-          />
+          <div className="mt-1 flex items-center">
+            <input
+              type="file"
+              id="image"
+              name="image"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setFormData(prev => ({
+                      ...prev,
+                      image: reader.result,
+                      imageFile: file
+                    }));
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="hidden"
+              disabled={loading}
+            />
+            <label
+              htmlFor="image"
+              className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Choose File
+            </label>
+            <span className="ml-2 text-sm text-gray-500">
+              {formData.imageFile ? formData.imageFile.name : 'No file chosen'}
+            </span>
+          </div>
           {errors.image && (
             <p className="mt-1 text-sm text-red-600">{errors.image}</p>
           )}
-          {formData.image && (
+          {(formData.image || formData.imageUrl) && (
             <div className="mt-2">
               <p className="text-sm text-gray-500">Image Preview:</p>
               <img 
-                src={formData.image} 
+                src={formData.image || formData.imageUrl} 
                 alt="Preview" 
                 className="mt-1 h-32 w-32 object-cover rounded"
                 onError={(e) => {
@@ -222,19 +279,35 @@ const CategoryForm = () => {
           )}
         </div>
         
-        <div className="flex items-center">
-          <input
-            id="isActive"
-            name="isActive"
-            type="checkbox"
-            checked={formData.isActive}
-            onChange={handleChange}
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-            disabled={loading}
-          />
-          <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
-            Active
-          </label>
+        <div className="space-y-3">
+          <div className="flex items-center">
+            <input
+              id="isActive"
+              name="isActive"
+              type="checkbox"
+              checked={formData.isActive}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              disabled={loading}
+            />
+            <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+              Active
+            </label>
+          </div>
+          <div className="flex items-center">
+            <input
+              id="showOnHome"
+              name="showOnHome"
+              type="checkbox"
+              checked={formData.showOnHome}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              disabled={loading}
+            />
+            <label htmlFor="showOnHome" className="ml-2 block text-sm text-gray-900">
+              Show on Home Page
+            </label>
+          </div>
         </div>
         
         <div className="flex justify-end space-x-3">

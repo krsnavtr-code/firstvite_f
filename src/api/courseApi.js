@@ -25,24 +25,22 @@ export const uploadCourseImage = async (formData) => {
     }
 };
 
-// Get all courses with optional category filter
+// Get all courses with optional filters
 // If isAdmin is true, will include unpublished courses
-export const getCourses = async (category = '', isAdmin = false) => {
+export const getCourses = async (queryParams = '', isAdmin = false) => {
     try {
-        const params = {};
-        if (category) params.category = category;
-        if (isAdmin) params.all = 'true'; // This will tell the backend to return all courses
+        // If queryParams is already a string (URLSearchParams.toString() result), use it directly
+        // Otherwise, treat it as a category string for backward compatibility
+        const params = new URLSearchParams(queryParams);
         
-        // console.log('Fetching courses with params:', params);
-        const response = await axios.get('/courses', { params });
-        console.log('Courses fetched successfully');
+        if (isAdmin) {
+            params.set('admin', 'true');
+        }
+        
+        const response = await axios.get(`/courses?${params.toString()}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching courses:', error);
-        if (error.response) {
-            console.error('Response status:', error.response.status);
-            console.error('Response data:', error.response.data);
-        }
         throw error;
     }
 };
