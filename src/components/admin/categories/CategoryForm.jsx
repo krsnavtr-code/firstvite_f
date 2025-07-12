@@ -12,9 +12,8 @@ const CategoryForm = () => {
     name: '',
     description: '',
     image: '',
-    clean-image-upload-commit
     imageFile: null,
-    master
+    master: false,
     isActive: true,
     showOnHome: false
   });
@@ -43,12 +42,9 @@ const CategoryForm = () => {
       setFormData({
         name: category.name || '',
         description: category.description || '',
-        clean-image-upload-commit
-        image: category.image || '',
-
         image: category.image ? `${import.meta.env.VITE_API_BASE_URL}${category.image}` : '',
         imageFile: null,
-        master
+        master: category.master || false,
         isActive: category.isActive !== false,
         showOnHome: category.showOnHome || false
       });
@@ -110,30 +106,13 @@ const CategoryForm = () => {
     try {
       setLoading(true);
       
- clean-image-upload-commit
-      // Prepare the data to be sent
-      const categoryData = {
-        name: formData.name.trim(),
-        description: formData.description.trim(),
-        image: formData.image.trim(),
-        isActive: formData.isActive,
-        showOnHome: formData.showOnHome || false
-      };
-      
-      console.log('Submitting category data:', categoryData);
-      
-      if (isEditing) {
-        await updateCategory(id, categoryData);
-        toast.success('Category updated successfully');
-      } else {
-        await createCategory(categoryData);
-
       // Create FormData for the request
       const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('description', formData.description || ''); // Ensure description is not null
+      formDataToSend.append('name', formData.name.trim());
+      formDataToSend.append('description', formData.description?.trim() || '');
       formDataToSend.append('isActive', formData.isActive);
-      formDataToSend.append('showOnHome', formData.showOnHome || false); // Add showOnHome field
+      formDataToSend.append('showOnHome', formData.showOnHome || false);
+      formDataToSend.append('master', formData.master || false);
       
       // If we have a new image file, append it
       if (formData.imageFile) {
@@ -152,7 +131,6 @@ const CategoryForm = () => {
       } else {
         const response = await createCategory(formDataToSend);
         console.log('Create response:', response);
- master
         toast.success('Category created successfully');
       }
       
