@@ -136,11 +136,13 @@ const CourseCard = ({ course }) => {
         </div>
 
         <div className="p-4">
-          <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2 h-14">
+          <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2 mb-0 h-14">
             {course.title}
           </h3>
-          <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2 h-10">
-            {course.description?.replace(/^<p>/i, "").replace(/<\/p>$/i, "")}
+          <p className="text-gray-600 dark:text-gray-300 mt-0 text-sm mb-3 line-clamp-2 h-10">
+            {course.shortDescription
+              ?.replace(/^<p>/i, "")
+              .replace(/<\/p>$/i, "")}
           </p>
           <div className="flex items-center mb-2">
             <div className="flex text-yellow-400">

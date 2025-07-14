@@ -32,7 +32,8 @@ export const getCardBgColor = (item, index = 0) => {
 
   const bgColors = [
     // 'bg-[#F47C26]/30 dark:bg-[#2563EB]/30',
-    'bg-[#ffbf91] dark:bg-[#2563EB]/30',
+    // 'bg-[#ffbf91] dark:bg-[#2563EB]/30',
+    'bg-[#2563EB]/30 dark:bg-[#2563EB]/30',
   ];
 
   return bgColors[Math.abs(hash) % bgColors.length];
