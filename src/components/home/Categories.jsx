@@ -25,17 +25,21 @@ const Categories = () => {
         setLoading(true);
         
         // Fetch only categories marked to show on home page
-        const categoriesData = await getCategoriesFromApi({
+        const response = await getCategoriesFromApi({
           showOnHome: true,
           limit: 6,
           sort: '-courseCount',
           fields: '_id,name,slug,courseCount,image,description,showOnHome'
         });
 
+        // Extract the categories array from the response
+        // The API might return either an array directly or a paginated response with a 'data' property
+        const categoriesData = Array.isArray(response) ? response : (response.data || []);
+
         // Create a map to remove duplicates by ID
         const uniqueCategoriesMap = new Map();
         categoriesData.forEach(cat => {
-          if (!uniqueCategoriesMap.has(cat._id)) {
+          if (cat && cat._id && !uniqueCategoriesMap.has(cat._id)) {
             uniqueCategoriesMap.set(cat._id, cat);
           }
         });
