@@ -1,20 +1,26 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Login from "./Login";
-import Signup from "./Signup";
-import Logout from "./Logout";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-import { FaSun, FaMoon, FaSearch, FaUser, FaTimes, FaBars } from "react-icons/fa";
-import axios from "../api/axios";
+import { FaSun, FaMoon, FaSearch, FaUser, FaTimes, FaBars, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
 
 function Navbar() {
-  const { authUser } = useAuth();
+  const { authUser, isAuthenticated, isAdmin, isApproved, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Clean up event listeners on unmount
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
   
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -73,7 +79,6 @@ function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchInputRef = useRef(null);
   const searchRef = useRef(null);
-  const navigate = useNavigate();
   const element = document.documentElement;
   useEffect(() => {
     if (theme === "dark") {
@@ -238,25 +243,45 @@ function Navbar() {
     }
   }, [isSearchOpen]);
 
-  const [sticky, setSticky] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setSticky(true);
-      } else {
-        setSticky(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+  // Handle scroll effect
+  const handleScroll = useCallback(() => {
+    const navbar = document.getElementById('main-navbar');
+    if (!navbar) return;
+    
+    if (window.scrollY > 10) {
+      navbar.classList.add('shadow-lg', 'bg-white/80', 'dark:bg-gray-800/80', 'backdrop-blur-sm');
+      navbar.classList.remove('bg-white', 'dark:bg-gray-900');
+    } else {
+      navbar.classList.remove('shadow-lg', 'bg-white/80', 'dark:bg-gray-800/80', 'backdrop-blur-sm');
+      navbar.classList.add('bg-white', 'dark:bg-gray-900');
+    }
   }, []);
+
+  // Add scroll event listener
+  useEffect(() => {
+    const navbar = document.getElementById('main-navbar');
+    if (!navbar) return;
+
+    // Initial check
+    handleScroll();
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
+
+  // Navigation items
   const navItems = [
     { to: "/", label: "Home" },
     { to: "/courses", label: "Courses" },
-    { to: "/corporate-training", label: "Corporate Training" },
-    ...(authUser ? [{ to: "/my-learning", label: "My Learning" }] : [])
+    { to: "/about", label: "About" },
+    { to: "/contact", label: "Contact" },
+    ...(isAuthenticated && isApproved ? [
+      { to: "/my-learning", label: "My Learning" },
+      ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : [])
+    ] : [])
   ];
 
   const renderNavItems = (className = "") => (
@@ -272,13 +297,11 @@ function Navbar() {
       ))}
     </div>
   );
+
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        sticky
-          ? "bg-white/80 dark:bg-gray-800/90 backdrop-blur-sm shadow-md"
-          : "bg-white dark:bg-gray-900"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white dark:bg-gray-900"
+      id="main-navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -319,6 +342,7 @@ function Navbar() {
                 Agent Register
               </a>
             </div>
+            
           </div>
 
           <div className="flex items-center space-x-4">
@@ -453,72 +477,76 @@ function Navbar() {
             </button>
 
             {/* User menu */}
-            {authUser ? (
-              <div className="relative ml-2">
+            {isAuthenticated ? (
+              <div className="relative">
                 <button
-                  className="p-0 m-0 rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+                  type="button"
+                  className="flex items-center space-x-2 focus:outline-none"
                   onClick={toggleProfileMenu}
-                  aria-expanded={isProfileMenuOpen}
                   aria-label="User menu"
+                  aria-haspopup="true"
                 >
-                  {authUser?.fullname?.charAt(0)?.toUpperCase() || (
-                    <FaUser className="w-5 h-5 p-0 m-0" />
-                  )}
+                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                    <FaUser className="text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {authUser?.fullname || authUser?.name || 'Profile'}
+                  </span>
                 </button>
 
-                {/* Dropdown menu */}
-                <div
-                  id="user-menu"
-                  className={`${isProfileMenuOpen ? 'block' : 'hidden'} absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-10`}
-                >
-                  <div className="py-1" role="none">
+                {isProfileMenuOpen && (
+                  <div
+                    id="user-menu"
+                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="user-menu"
+                  >
                     <Link
                       to="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      role="menuitem"
+                      onClick={() => setIsProfileMenuOpen(false)}
                     >
                       Your Profile
                     </Link>
-                    {authUser.role === "admin" && (
-                      <Link
-                        to="/admin/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                      >
-                        Admin Dashboard
-                      </Link>
+                    {!isApproved && (
+                      <div className="px-4 py-2 text-sm text-yellow-600 dark:text-yellow-400">
+                        Pending Approval
+                      </div>
                     )}
-                    <Link
-                      to="/my-learning"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                    >
-                      My Learning
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                    >
-                      Settings
-                    </Link>
                     <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                    <div className="px-4 py-2">
-                      <Logout />
-                    </div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsProfileMenuOpen(false);
+                        toast.success('Logged out successfully');
+                        navigate('/');
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"
+                      role="menuitem"
+                    >
+                      Sign out
+                    </button>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document.getElementById("my_modal_3").showModal();
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/login"
+                  state={{ from: location }}
+                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                 >
-                  SignIn
-                </button>
-                <Login id="my_modal_3" />
-                <Signup id="signup_modal" />
+                  <FaSignInAlt className="mr-1" /> Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  state={{ from: location }}
+                  className="flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200"
+                >
+                  <FaUserPlus className="mr-1" /> Sign Up
+                </Link>
               </div>
             )}
           </div>

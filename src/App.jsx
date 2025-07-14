@@ -3,6 +3,7 @@ import Home from "./home/Home";
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Courses from "./components/Courses";
 import Signup from "./components/Signup";
+import LoginPage from "./pages/auth/LoginPage";
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "./context/AuthProvider";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -17,7 +18,6 @@ import PrivateRoute from './components/PrivateRoute';
 import Unauthorized from './pages/Unauthorized';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Login from './components/Login';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import AllCategories from './pages/user/AllCategories';
 import CourseDetail from './pages/user/CourseDetail';
@@ -37,6 +37,10 @@ import Cart from './components/cart/Cart';
 import Profile from './pages/user/Profile';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// LMS Components
+import RegisterPage from './pages/auth/RegisterPage';
+import UsersPage from './pages/admin/UsersPage';
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -106,8 +110,7 @@ function App() {
         
         <Route path="/login" element={
           <MainLayout>
-            <Home />
-            <Login />
+            <LoginPage />
           </MainLayout>
         } />
         
@@ -221,7 +224,7 @@ function App() {
 
         {/* Admin routes - No Navbar/Footer */}
         <Route element={
-          <PrivateRoute roles={['admin']}>
+          <PrivateRoute allowedRoles={['admin']}>
             <AdminLayout />
           </PrivateRoute>
         }>
@@ -229,7 +232,7 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/categories/*" element={<Categories />} />
           <Route path="/admin/courses/*" element={<AdminCourses />} />
-          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/contacts" element={<ContactsPage />} />
           <Route path="/admin/faqs" element={<ManageFAQs />} />
           <Route path="/admin/media" element={<MediaGallery />} />
@@ -239,6 +242,12 @@ function App() {
           <Route path="/admin/*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
+        {/* LMS Routes */}
+        <Route path="/register" element={
+          <MainLayout>
+            <RegisterPage />
+          </MainLayout>
+        } />
 
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />

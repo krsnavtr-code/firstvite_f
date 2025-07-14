@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthProvider';
 export default function PrivateRoute({ children, roles = [] }) {
   const { authUser, isAdmin, loading } = useAuth();
   const location = useLocation();
+  const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
 
   // Debug logging
   useEffect(() => {
@@ -18,8 +19,17 @@ export default function PrivateRoute({ children, roles = [] }) {
     });
   }, [authUser, isAdmin, loading, roles, location.pathname]);
 
+  // Add a small delay before showing loading state to prevent flickering
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsCheckingAuth(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   // Show loading state while checking auth
-  if (loading) {
+  if (loading || isCheckingAuth) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
@@ -28,7 +38,7 @@ export default function PrivateRoute({ children, roles = [] }) {
   }
 
   // Only check authentication once loading is complete
-  if (!loading && !authUser) {
+  if (!loading && !isCheckingAuth && !authUser) {
     console.log('PrivateRoute - No authenticated user, redirecting to login');
     return (
       <Navigate 

@@ -20,7 +20,10 @@ const CoursesByCategory = () => {
       try {
         setLoading(true);
         console.log('Fetching categories...');
-        const categoriesData = await getCategories();
+        const response = await getCategories({ limit: 100 }); // Get all categories with a higher limit
+        
+        // Handle paginated response
+        const categoriesData = response.data || [];
         console.log('Categories fetched:', categoriesData);
         setAllCategories(categoriesData);
 
@@ -35,7 +38,7 @@ const CoursesByCategory = () => {
           
           // Find the category by name (case insensitive and trim whitespace)
           const categoryData = categoriesData.find(
-            (cat) => cat.name.trim().toLowerCase() === decodedCategoryName.trim().toLowerCase()
+            (cat) => cat?.name?.trim().toLowerCase() === decodedCategoryName.trim().toLowerCase()
           );
           
           console.log('Found category data:', categoryData);
@@ -43,7 +46,9 @@ const CoursesByCategory = () => {
           if (categoryData) {
             setCategory(categoryData);
             console.log('Fetching courses for category ID:', categoryData._id);
-            const coursesData = await getCoursesByCategory(categoryData._id);
+            const coursesResponse = await getCoursesByCategory(categoryData._id);
+            // Handle both array and paginated response
+            const coursesData = Array.isArray(coursesResponse) ? coursesResponse : (coursesResponse.data || []);
             console.log('Fetched courses:', coursesData);
             setCourses(coursesData);
             return; // Exit early after handling category courses
@@ -54,8 +59,9 @@ const CoursesByCategory = () => {
         
         // If no category or category not found, show all courses
         console.log('Fetching all courses');
-        const allCourses = await getCoursesByCategory();
-        // console.log('Fetched all courses:', allCourses);
+        const allCoursesResponse = await getCoursesByCategory();
+        // Handle both array and paginated response
+        const allCourses = Array.isArray(allCoursesResponse) ? allCoursesResponse : (allCoursesResponse.data || []);
         setCourses(allCourses);
         setCategory(null); // Ensure category is cleared when showing all courses
       } catch (error) {

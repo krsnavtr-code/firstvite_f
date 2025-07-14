@@ -1,10 +1,108 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 export const AuthContext = createContext();
+
+// Create axios instance with base URL and default headers
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4002/api',
+  withCredentials: true
+});
+
+// Add a request interceptor to include the auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default function AuthProvider({ children }) {
   const [authUser, setAuthUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
+
+  // Login function
+  const login = async (email, password) => {
+    try {
+      // Clear any existing auth state
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Call the login API
+      const response = await api.post('/auth/login', { email, password });
+      console.log('Login response:', response.data);
+      
+      if (response.data.success && response.data.token) {
+        const { token, user } = response.data;
+        
+        if (!token) {
+          throw new Error('No token received from server');
+        }
+        
+        // Store the token
+        localStorage.setItem('token', token);
+        setToken(token);
+        
+        // Set default auth header
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        // Update auth user
+        if (user) {
+          updateAuthUser(user);
+        } else {
+          // If no user data in response, fetch it
+          await loadUser();
+        }
+        
+        return true;
+      } else {
+        // Handle case where success is false or no token
+        const errorMessage = response.data.message || 'Login failed. Please try again.';
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      
+      // Clear any partial auth state on error
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setToken(null);
+      setAuthUser(null);
+      delete api.defaults.headers.common['Authorization'];
+      
+      if (error.response) {
+        // Handle specific error responses
+        if (error.response.status === 401) {
+          throw new Error('Invalid email or password');
+        } else if (error.response.status === 403) {
+          throw new Error('Account not approved. Please wait for admin approval.');
+        } else if (error.response.data && error.response.data.message) {
+          throw new Error(error.response.data.message);
+        }
+      }
+      
+      // Re-throw the error with a user-friendly message
+      throw new Error(error.message || 'Login failed. Please try again.');
+    }
+  };
+
+  // Logout function
+  const logout = () => {
+    // Clear all auth data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setToken(null);
+    setAuthUser(null);
+    delete api.defaults.headers.common['Authorization'];
+  };
 
   // Update both auth state and localStorage
   const updateAuthUser = useCallback((userData) => {
@@ -17,85 +115,89 @@ export default function AuthProvider({ children }) {
         fullname: userData.fullname || userData.name || 'User',
         email: userData.email,
         role: userData.role || 'user',
+        isApproved: userData.isApproved || false,
         ...userData
       };
       
       console.log('Setting auth user with data:', userWithRole);
-      localStorage.setItem("Users", JSON.stringify(userWithRole));
+      localStorage.setItem('user', JSON.stringify(userWithRole));
       setAuthUser(userWithRole);
+      
+      // Update axios headers if we have a token
+      const currentToken = localStorage.getItem('token');
+      if (currentToken) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${currentToken}`;
+      }
     } else {
       // Logout
       console.log('Logging out user');
-      localStorage.removeItem("Users");
-      localStorage.removeItem("token");
-      setAuthUser(null);
+      logout();
     }
   }, []);
 
-  // Load user from localStorage on initial render
-  useEffect(() => {
-    const loadUser = async () => {
+  // Load user from token on initial render
+  const loadUser = useCallback(async () => {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    // If no token, set loading to false immediately
+    if (!storedToken) {
+      console.log('No token found in localStorage');
+      setLoading(false);
+      return;
+    }
+    
+    // Set the auth header immediately
+    api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+    
+    // Set initial user from localStorage while we verify the token
+    if (storedUser) {
       try {
-        setLoading(true);
-        const userData = localStorage.getItem("Users");
-        const token = localStorage.getItem("token");
-        
-        console.log('Loading user from localStorage:', { 
-          hasUserData: !!userData, 
-          hasToken: !!token 
-        });
-        
-        if (userData && token) {
-          try {
-            const parsedUser = JSON.parse(userData);
-            console.log('Parsed user data:', parsedUser);
-            
-            // Verify token with backend if needed
-            // const { data } = await api.get('/users/me');
-            // if (!data.success) throw new Error('Invalid token');
-            
-            // Ensure user has required fields
-            const userWithRole = {
-              _id: parsedUser._id,
-              fullname: parsedUser.fullname || parsedUser.name || 'User',
-              email: parsedUser.email,
-              role: parsedUser.role || 'user',
-              ...parsedUser
-            };
-            
-            console.log('Setting initial auth user:', userWithRole);
-            setAuthUser(userWithRole);
-          } catch (error) {
-            console.error('Error validating user session:', error);
-            // Clear invalid data
-            localStorage.removeItem("Users");
-            localStorage.removeItem("token");
-            setAuthUser(null);
-          }
-        } else {
-          console.log('No valid user data or token found in localStorage');
-          setAuthUser(null);
-        }
-      } catch (error) {
-        console.error("Error loading user:", error);
-        // Clear any potentially corrupted data
-        localStorage.removeItem("Users");
-        localStorage.removeItem("token");
-        setAuthUser(null);
-      } finally {
-        // Add a small delay to prevent flash of unauthorized content
-        setTimeout(() => setLoading(false), 500);
+        const parsedUser = JSON.parse(storedUser);
+        setAuthUser(parsedUser);
+      } catch (e) {
+        console.error('Error parsing stored user:', e);
+        localStorage.removeItem('user');
       }
-    };
+    }
+    
+    try {
+      // Verify token and get fresh user data
+      const response = await api.get('/auth/me');
+      console.log('Auth me response:', response.data);
+      
+      if (response.data.success && response.data.user) {
+        // Update auth user with fresh data from the server
+        updateAuthUser(response.data.user);
+      } else {
+        console.log('No valid user data in response, logging out');
+        // If no valid user data, clear the token
+        logout();
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+      // If token is invalid or other error, clear it
+      if (!error.response || error.response.status === 401) {
+        console.log('Token invalid or expired, logging out');
+        logout();
+      }
+    } finally {
+      // Ensure we always set loading to false, even if there was an error
+      setLoading(false);
+    }
+  }, [updateAuthUser]);
 
+  // Load user on mount and when token changes
+  useEffect(() => {
     loadUser();
-  }, []);
+  }, [loadUser]);
 
   // Debug auth state changes
   useEffect(() => {
     console.log('Auth state updated:', { 
       isAuthenticated: !!authUser,
       userRole: authUser?.role,
+      isApproved: authUser?.isApproved,
       loading 
     });
   }, [authUser, loading]);
@@ -111,11 +213,21 @@ export default function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ 
+      // State
       authUser, 
-      setAuthUser: updateAuthUser,
+      token,
+      loading,
+      
+      // Computed
       isAuthenticated: !!authUser,
       isAdmin: authUser?.role === 'admin',
-      loading
+      isApproved: authUser?.isApproved === true,
+      
+      // Actions
+      login,
+      logout,
+      setAuthUser: updateAuthUser,
+      api // Expose the configured axios instance
     }}>
       {children}
     </AuthContext.Provider>
@@ -129,3 +241,6 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Export the configured axios instance for direct use if needed
+export { api };

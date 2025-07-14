@@ -8,10 +8,14 @@ const CategoriesList = () => {
   const [categories, setCategories] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   const [showHomeFilter, setShowHomeFilter] = useState('all'); // 'all', 'yes', 'no'
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
   const [searchTerm, setSearchTerm] = useState('');
   const [selectAll, setSelectAll] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,14 +26,24 @@ const CategoriesList = () => {
     console.log('Fetching categories...');
     try {
       setLoading(true);
-      console.log('Calling getCategories()...');
-      const data = await getCategories();
+      
+      // Build query params
+      const params = {
+        limit: itemsPerPage,
+        page: currentPage,
+        status: statusFilter === 'all' ? undefined : statusFilter
+      };
+      
+      console.log('Calling getCategories with params:', params);
+      const { data, total } = await getCategories(params);
+      
       console.log('Categories data received:', data);
       setCategories(data);
+      setTotalCount(total);
     } catch (err) {
       console.error('Error in fetchCategories:', err);
       setError('Failed to fetch categories');
-      // Error toast will be shown by the API interceptor
+      toast.error(err.message || 'Failed to fetch categories');
     } finally {
       setLoading(false);
     }
@@ -61,7 +75,11 @@ const CategoriesList = () => {
       (showHomeFilter === 'yes' && category.showOnHome) || 
       (showHomeFilter === 'no' && !category.showOnHome);
     
-    return matchesSearch && matchesHomeFilter;
+    const matchesStatusFilter = statusFilter === 'all' || 
+      (statusFilter === 'active' && category.isActive) || 
+      (statusFilter === 'inactive' && !category.isActive);
+    
+    return matchesSearch && matchesHomeFilter && matchesStatusFilter;
   });
 
   if (loading) {
@@ -88,17 +106,42 @@ const CategoriesList = () => {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-4 border-b">
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaSearch className="text-gray-400" />
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Search categories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Search categories..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+              
+              <div className="flex gap-2">
+                <select
+                  className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+                
+                <select
+                  className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                >
+                  <option value={10}>10 per page</option>
+                  <option value={25}>25 per page</option>
+                  <option value={50}>50 per page</option>
+                  <option value={100}>100 per page</option>
+                </select>
+              </div>
             </div>
             <div className="w-full sm:w-48">
               <select
@@ -191,6 +234,58 @@ const CategoriesList = () => {
           </table>
         </div>
       </div>
+      
+      {/* Pagination */}
+      {totalCount > itemsPerPage && (
+        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={currentPage * itemsPerPage >= totalCount}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-500">
+                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalCount)}</span> of <span className="font-medium">{totalCount}</span> categories
+              </p>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span className="sr-only">Previous</span>
+                  &larr; Previous
+                </button>
+                <div className="flex items-center px-4 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700">
+                  Page {currentPage} of {Math.ceil(totalCount / itemsPerPage)}
+                </div>
+                <button
+                  onClick={() => setCurrentPage(p => p + 1)}
+                  disabled={currentPage * itemsPerPage >= totalCount}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span className="sr-only">Next</span>
+                  Next &rarr;
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

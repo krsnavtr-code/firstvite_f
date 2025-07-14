@@ -138,34 +138,35 @@ const CategoryForm = () => {
         description: formData.description?.trim() || '',
         isActive: formData.isActive,
         showOnHome: formData.showOnHome,
-        master: formData.master
+        master: formData.master,
+        image: formData.image?.trim() || ''
       };
-      
-      // Include image URL as is
-      if (formData.image) {
-        categoryData.image = formData.image.trim();
-      }
       
       console.log('=== Prepared Category Data ===');
       console.log(JSON.stringify(categoryData, null, 2));
       
       // If there's a file to upload, use FormData
-      let requestData = categoryData;
+      let requestData = { ...categoryData }; // Create a copy to avoid modifying the original
+      
       if (formData.imageFile && formData.imageFile instanceof File) {
         const formDataToSend = new FormData();
         Object.entries(categoryData).forEach(([key, value]) => {
-          formDataToSend.append(key, value);
+          // Convert boolean values to strings for FormData
+          const formValue = typeof value === 'boolean' ? String(value) : value;
+          formDataToSend.append(key, formValue);
         });
         formDataToSend.append('image', formData.imageFile);
         requestData = formDataToSend;
       }
       
+      console.log('Sending request with data:', requestData);
+      
       if (isEditing) {
-        const response = await updateCategory(id, categoryData);
+        const response = await updateCategory(id, requestData);
         console.log('Update response:', response);
         toast.success('Category updated successfully');
       } else {
-        const response = await createCategory(categoryData);
+        const response = await createCategory(requestData);
         console.log('Create response:', response);
         toast.success('Category created successfully');
       }
