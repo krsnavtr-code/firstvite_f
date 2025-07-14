@@ -21,12 +21,24 @@ const AllCategories = () => {
   useEffect(() => {
     const fetchCategoriesWithCount = async () => {
       try {
-        // First, fetch all categories
-        const categoriesData = await getCategoriesFromApi();
+        // First, fetch all categories with pagination
+        const response = await getCategoriesFromApi({ limit: 100 });
+        
+        // Extract categories from the response (handling both direct array and paginated response)
+        const categoriesData = Array.isArray(response) ? response : 
+                             (response?.data || []);
+        
+        if (!categoriesData.length) {
+          setError('No categories found.');
+          setLoading(false);
+          return;
+        }
         
         // Then, fetch course count for each category
         const categoriesWithCount = await Promise.all(
           categoriesData.map(async (category) => {
+            if (!category || !category._id) return null;
+            
             try {
               const courses = await getCoursesByCategory(category._id);
               return {
@@ -34,7 +46,7 @@ const AllCategories = () => {
                 courseCount: Array.isArray(courses) ? courses.length : 0
               };
             } catch (err) {
-              console.error(`Error fetching courses for category ${category.name}:`, err);
+              console.error(`Error fetching courses for category ${category.name || 'unknown'}:`, err);
               return {
                 ...category,
                 courseCount: 0
@@ -43,7 +55,9 @@ const AllCategories = () => {
           })
         );
         
-        setCategories(categoriesWithCount);
+        // Filter out any null categories that might have been returned
+        const validCategories = categoriesWithCount.filter(Boolean);
+        setCategories(validCategories);
       } catch (err) {
         console.error('Error fetching categories:', err);
         setError('Failed to load categories. Please try again later.');

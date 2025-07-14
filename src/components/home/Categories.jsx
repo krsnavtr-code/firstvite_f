@@ -82,19 +82,42 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
-  const CategoryImage = ({ category }) => {
+  // Memoized CategoryImage component to prevent unnecessary re-renders
+  const CategoryImage = React.memo(({ category }) => {
     const [imageError, setImageError] = useState(false);
-    const imageUrl = category.image ? getImageUrl(category.image) : null;
-    const showFallback = !imageUrl || imageError;
+    const [imageUrl, setImageUrl] = useState(null);
+    
+    useEffect(() => {
+      // Reset error state when category changes
+      setImageError(false);
+      // Only process if we have an image and no error
+      if (category?.image) {
+        const url = getImageUrl(category.image);
+        // Create a new Image object to check if it loads successfully
+        const img = new Image();
+        img.onload = () => setImageUrl(url);
+        img.onerror = () => setImageError(true);
+        img.src = url;
+        
+        // Cleanup function
+        return () => {
+          img.onload = null;
+          img.onerror = null;
+        };
+      } else {
+        setImageError(true);
+      }
+    }, [category?.image]);
     
     return (
       <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-white/30 dark:bg-black/30 backdrop-blur-sm flex items-center justify-center">
-        {!showFallback ? (
+        {!imageError && imageUrl ? (
           <img 
-            src={imageUrl} 
-            alt={category.name}
+            src={imageUrl}
+            alt={category?.name || 'Category'}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}
+            loading="lazy"
           />
         ) : (
           <div className="flex items-center justify-center w-full h-full text-gray-400">
@@ -103,7 +126,7 @@ const Categories = () => {
         )}
       </div>
     );
-  };
+  });
 
   if (loading) {
     return (
