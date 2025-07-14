@@ -34,6 +34,9 @@ import {
   FaShoppingCart,
   FaHeart,
   FaBookmark,
+  FaDollarSign,
+  FaRegStar,
+  FaArrowRight,
   FaInfinity,
 } from "react-icons/fa";
 import {
@@ -59,7 +62,16 @@ const CourseDetail = () => {
   const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({});
+  const [expandedSections, setExpandedSections] = useState(() => {
+    // Initialize all sections as expanded by default
+    if (course?.curriculum?.length > 0) {
+      return course.curriculum.reduce((acc, _, index) => ({
+        ...acc,
+        [index]: true
+      }), {});
+    }
+    return {};
+  });
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -392,11 +404,13 @@ const CourseDetail = () => {
     setExpandedSections({});
   };
 
+  const rating = course.rating || 4;
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 mt-20">
       {/* Course Header */}
-      <div className="bg-white dark:bg-slate-900 shadow">
-        <div className="container mx-auto px-4 py-4">
+      <div className="">
+        <div className="container mx-auto px-4">
           <nav className="flex overflow-x-auto py-2" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-2 text-sm">
               <li className="flex items-center">
@@ -427,23 +441,20 @@ const CourseDetail = () => {
         </div>
       </div>
 
+      {/* Course Detail */}
       <div className="container mx-auto px-4 py-6">
         <div className="">
           {/* Main Content */}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Course Header */}
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 lg:w-2/3">
+              {/* Course Meta */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {course.category?.name && (
-                  <Link
-                    to={`/courses/category/${
-                      course.category.slug || course.category._id
-                    }`}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
-                  >
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
                     <FaTag className="mr-1.5 h-3 w-3" />
                     {course.category.name}
-                  </Link>
+                  </span>
                 )}
                 {course.isFeatured && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
@@ -456,23 +467,57 @@ const CourseDetail = () => {
                     {course.level}
                   </span>
                 )}
+                {course.price && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800 transition-colors">
+                    {/* <FaDollarSign className="mr-1.5 h-3 w-3" /> */}
+                    {formatPrice(course.price)}
+                  </span>
+                )}
+                <button
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator
+                        .share({
+                          title: course.title,
+                          text: `Check out this course: ${course.title}`,
+                          url: window.location.href,
+                        })
+                        .catch(console.error);
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success("Link copied to clipboard!");
+                    }
+                  }}
+                  className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
+                  aria-label="Share course"
+                >
+                  <FaShare className="w-5 h-5" />
+                </button>
               </div>
 
+              {/* Course Title */}
               <div className="space-y-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
                   {course.title}
                 </h1>
 
+                {/* Course Rating */}
                 <div className="flex items-center">
                   <div className="flex items-center text-amber-400">
-                    {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className="w-5 h-5" />
-                    ))}
+                    {[...Array(5)].map((_, i) =>
+                      i < rating ? (
+                        <FaStar key={i} className="text-yellow-500 w-5 h-5" />
+                      ) : (
+                        <FaRegStar
+                          key={i}
+                          className="text-yellow-500 w-5 h-5"
+                        />
+                      )
+                    )}
                     <span className="ml-2 text-gray-700 dark:text-gray-300 font-medium">
                       {course.rating?.toFixed(1) || "4"}
                       <span className="text-gray-500 font-normal">
-                        {" "}
-                        ({course.reviews?.length || 18} ratings)
+                        ({course.reviews?.length || 18} Ratings)
                       </span>
                     </span>
                   </div>
@@ -481,11 +526,12 @@ const CourseDetail = () => {
                   </span>
                   <span className="text-gray-600 dark:text-gray-400">
                     {course.enrolledStudents?.toLocaleString() || "500+"}{" "}
-                    students
+                    Students
                   </span>
                 </div>
 
-                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                {/* Course Description */}
+                {/* <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                   {course.shortDescription ||
                     course.description
                       ?.replace(/<[^>]*>?/gm, "")
@@ -493,7 +539,7 @@ const CourseDetail = () => {
                   <button className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
                     Read more
                   </button>
-                </p>
+                </p> */}
               </div>
 
               {/* Course Meta */}
@@ -507,8 +553,8 @@ const CourseDetail = () => {
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         Duration
                       </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {course.duration || "Lifetime"}
+                      <p className="font-medium text-xs text-gray-900 dark:text-white">
+                        {course.duration || "Lifetime"} Weeks
                       </p>
                     </div>
                   </div>
@@ -525,7 +571,7 @@ const CourseDetail = () => {
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         Lessons
                       </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-xs text-gray-900 dark:text-white">
                         {course.lessonsCount || 0}
                       </p>
                     </div>
@@ -543,7 +589,7 @@ const CourseDetail = () => {
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         Certificate
                       </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-xs text-gray-900 dark:text-white">
                         Included
                       </p>
                     </div>
@@ -561,7 +607,7 @@ const CourseDetail = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           Language
                         </p>
-                        <p className="font-medium text-gray-900 dark:text-white">
+                        <p className="font-medium text-xs text-gray-900 dark:text-white">
                           {course.language}
                         </p>
                       </div>
@@ -577,95 +623,20 @@ const CourseDetail = () => {
                 </p>
               </div>
 
-              {/* Course Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="p-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                      <FaClock className="h-4 w-4" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Duration
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {course.duration || "Lifetime"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="p-2 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
-                      <FaBookOpen className="h-4 w-4" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Lessons
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {course.lessonsCount || 0}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="p-2 rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-                      <FaCertificate className="h-4 w-4" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Certificate
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        Yes
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="p-2 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
-                      <FaMobileAlt className="h-4 w-4" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Access
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        Any device
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Course Includes */}
+              {/* <div className="prose prose-gray max-w-none dark:prose-invert mb-6">
+                <p className="text-gray-700 dark:text-gray-300">
+                  {course.includes || "No includes available."}
+                </p>
+              </div> */}
 
+              {/* Course Action Buttons */}
               <div className="flex flex-wrap gap-3">
                 <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
                   onClick={() => setShowCheckoutOptions(true)}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
                 >
-                  <FaPlay className="mr-2" /> Enroll Now
-                </button>
-                <button
-                  className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium flex items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator
-                        .share({
-                          title: course.title,
-                          text: `Check out this course: ${course.title}`,
-                          url: window.location.href,
-                        })
-                        .catch(console.error);
-                    } else {
-                      navigator.clipboard.writeText(window.location.href);
-                      toast.success("Link copied to clipboard!");
-                    }
-                  }}
-                >
-                  <FaShare className="mr-2" /> Share
+                  Enroll Now <FaArrowRight className="ml-2" />
                 </button>
                 {course.previewVideo && (
                   <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center">
@@ -675,21 +646,25 @@ const CourseDetail = () => {
               </div>
             </div>
 
+            {/* Course Sidebar On Right */}
             {/* Course Card */}
             <div className="lg:sticky lg:top-6 lg:w-1/3">
               <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-slate-700 transition-all duration-300 hover:shadow-2xl">
+                {/* Course Media */}
                 <div className="relative group">
-                  <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                  <div className="overflow-hidden rounded p-4">
                     <img
                       src={getImageUrl(course.thumbnail)}
                       alt={course.title}
-                      className="w-full h-48 md:h-56 object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full rounded h-48 md:h-56 object-cover transition-transform group-hover:scale-105"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = "/images/course-placeholder.jpg";
                       }}
                     />
                   </div>
+
+                  <hr />
 
                   {course.previewVideo && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pb-4 justify-center">
@@ -712,11 +687,13 @@ const CourseDetail = () => {
                   )}
                 </div>
 
-                <div className="p-6">
+                {/* Course Price */}
+                <div className="px-6 py-2">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="flex flex-col items-center">
-                        <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {/* Course Price */}
+                      <div className="flex items-center">
+                        <span className="text-xl font-bold text-gray-900 dark:text-white">
                           {course.price > 0
                             ? formatPrice(course.price)
                             : "Free"}
@@ -726,85 +703,20 @@ const CourseDetail = () => {
                             {formatPrice(course.originalPrice)}
                           </span>
                         )}
-                      </div>
-
-                      {course.certificateIncluded && (
-                        <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                          <FaCertificate className="mr-1.5 w-4 h-4" />
-                          Certificate Included
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-4">
-                      <button
-                        onClick={() => {
-                          addToCart({
-                            id: course._id,
-                            title: course.title,
-                            price: course.price,
-                            thumbnail: course.thumbnail,
-                            instructor: course.instructor?.name,
-                            rating: course.rating,
-                            students: course.studentsCount,
-                          });
-                          setShowCheckoutOptions(true);
-                        }}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
-                      >
-                        <FaShoppingCart className="mr-2" />
-                        Enroll Now
-                      </button>
-
-                      <button className="w-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center">
-                        <FaHeart className="mr-2 text-red-500" />
-                        Add to Wishlist
-                      </button>
-
-                      <div className="flex items-center justify-center space-x-4 pt-2">
-                        <button
-                          onClick={() => {
-                            if (navigator.share) {
-                              navigator
-                                .share({
-                                  title: course.title,
-                                  text: `Check out this course: ${course.title}`,
-                                  url: window.location.href,
-                                })
-                                .catch(console.error);
-                            } else {
-                              navigator.clipboard.writeText(
-                                window.location.href
-                              );
-                              toast.success("Link copied to clipboard!");
-                            }
-                          }}
-                          className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
-                          aria-label="Share course"
-                        >
-                          <FaShare className="w-5 h-5" />
-                        </button>
-
-                        <button
-                          className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
-                          aria-label="Add to favorites"
-                        >
-                          <FaHeart className="w-5 h-5" />
-                        </button>
-
-                        <button
-                          className="text-gray-500 hover:text-green-500 dark:text-gray-400 dark:hover:text-green-400 transition-colors"
-                          aria-label="Save for later"
-                        >
-                          <FaBookmark className="w-5 h-5" />
-                        </button>
+                        {discountPercentage > 0 && (
+                          <span className="ml-2 text-sm text-red-500 dark:text-red-400">
+                            {discountPercentage}% OFF
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    <div className="mt-6 space-y-4">
-                      <h3 className="font-medium text-gray-900 dark:text-white">
+                    {/* Course Includes */}
+                    <div className="mt-2">
+                      <p className="text-gray-900 dark:text-white">
                         This course includes:
-                      </h3>
-                      <ul className="space-y-3">
+                      </p>
+                      <ul className="space-y-2">
                         {[
                           {
                             icon: (
@@ -840,65 +752,24 @@ const CourseDetail = () => {
                           },
                         ].map((item, index) => (
                           <li key={index} className="flex items-start">
-                            <span className="mt-0.5">{item.icon}</span>
-                            <span className="ml-3 text-gray-600 dark:text-gray-300">
+                            <span className="mt-0.5 text-sm">{item.icon}</span>
+                            <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
                               {item.text}
                             </span>
                           </li>
                         ))}
                       </ul>
 
-                      <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                      <div className="mt-2 border-t border-gray-100 dark:border-gray-700">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                           30-Day Money-Back Guarantee
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           Full Lifetime Access. Cancel anytime.
                         </p>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Course Stats */}
-                <div className="mt-4 bg-white dark:bg-slate-800 rounded-lg shadow p-4 border border-gray-200 dark:border-slate-700">
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-3">
-                    This course includes:
-                  </h3>
-                  <ul className="space-y-2">
-                    {[
-                      {
-                        icon: <FaPlay className="text-green-500 mr-2" />,
-                        text: `${course.totalHours || 0} hours on-demand video`,
-                      },
-                      {
-                        icon: <FaFileAlt className="text-blue-500 mr-2" />,
-                        text: "Downloadable resources",
-                      },
-                      {
-                        icon: <FaUserTie className="text-purple-500 mr-2" />,
-                        text: "Instructor support",
-                      },
-                      {
-                        icon: (
-                          <FaGraduationCap className="text-yellow-500 mr-2" />
-                        ),
-                        text: "Certificate of completion",
-                      },
-                      {
-                        icon: <FaMobileAlt className="text-red-500 mr-2" />,
-                        text: "Access on mobile and TV",
-                      },
-                    ].map((item, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center text-sm text-gray-600 dark:text-gray-300"
-                      >
-                        {item.icon}
-                        {item.text}
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </div>
             </div>
@@ -956,13 +827,14 @@ const CourseDetail = () => {
         {/* Tab Content */}
         <div className="mb-12">
           {activeTab === "overview" && (
-            <div className="prose max-w-none dark:prose-invert">
+            <div className="text-gray-700 dark:text-gray-300 prose max-w-none dark:prose-invert">
               <h2 className="text-2xl font-bold mb-4">About This Course</h2>
-              <p className="mb-6">
-                {course.description
-                  ?.replace(/^<p>/i, "")
-                  .replace(/<\/p>$/i, "")}
-              </p>
+              <div
+                className="mb-6"
+                dangerouslySetInnerHTML={{
+                  __html: course.description || "No description available",
+                }}
+              />
 
               <h3 className="text-xl font-semibold mb-4">What You'll Learn</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -988,7 +860,7 @@ const CourseDetail = () => {
 
               <h3 className="text-xl font-semibold mb-4">Requirements</h3>
               <ul className="list-disc pl-5 space-y-2 mb-8">
-                {course.requirements?.map((req, index) => (
+                {course.prerequisites?.map((req, index) => (
                   <li key={index}>{req}</li>
                 )) || <li>No specific requirements</li>}
               </ul>
@@ -996,18 +868,19 @@ const CourseDetail = () => {
               <h3 className="text-xl font-semibold mb-4">
                 Who is this course for?
               </h3>
-              <ul className="list-disc pl-5 space-y-2">
+              {/* <ul className="list-disc pl-5 space-y-2">
                 {course.whoIsThisFor?.map((item, index) => (
                   <li key={index}>{item}</li>
                 )) || <li>Anyone interested in learning about this topic</li>}
-              </ul>
+              </ul> */}
+              <li>Anyone interested in learning about this topic.</li>
             </div>
           )}
 
           {activeTab === "curriculum" && (
             <div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Course Content</h2>
+                <h2 className="text-2xl font-bold">Full Curriculum</h2>
                 <div className="flex space-x-2 mt-3 sm:mt-0">
                   <button
                     onClick={expandAllSections}

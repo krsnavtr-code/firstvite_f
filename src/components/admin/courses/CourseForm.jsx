@@ -336,17 +336,19 @@ const CourseForm = ({ isEdit = false }) => {
       whatYouWillLearn: ["Learn valuable skills"],
       requirements: ["No special requirements"],
       whoIsThisFor: ["Anyone interested in learning"],
-      prerequisites: ["No prerequisites required"],
+      prerequisites: ["No Requirements required"],
       tags: [],
       faqs: [],
-      curriculum: [{
-        week: 1,
-        title: "Introduction",
-        description: "",
-        duration: "0 min",
-        topics: ["Course introduction"]
-      }]
-    }
+      curriculum: [
+        {
+          week: 1,
+          title: "Introduction",
+          description: "",
+          duration: "0 min",
+          topics: ["Course introduction"],
+        },
+      ],
+    },
   });
   
   // FAQ form array methods
@@ -511,79 +513,81 @@ const CourseForm = ({ isEdit = false }) => {
         title: formData.title?.toString().trim(),
         description: formData.description?.toString().trim(),
         instructor: formData.instructor?.toString().trim(),
-        shortDescription: formData.shortDescription?.toString().trim() || '',
-        
+        shortDescription: formData.shortDescription?.toString().trim() || "",
+
         // Convert string numbers to actual numbers
         price: Math.max(0, Number(formData.price) || 0),
         originalPrice: Math.max(0, Number(formData.originalPrice) || 0),
         totalHours: Math.max(0, Number(formData.totalHours) || 0),
-        
+
         // Ensure arrays are properly formatted
-        benefits: Array.isArray(formData.benefits) 
-          ? formData.benefits.filter(b => b && b.toString().trim() !== '')
-          : ['No specific benefits listed'],
-          
+        benefits: Array.isArray(formData.benefits)
+          ? formData.benefits.filter((b) => b && b.toString().trim() !== "")
+          : ["No specific benefits listed"],
+
         prerequisites: Array.isArray(formData.prerequisites)
           ? formData.prerequisites
-              .filter(p => p && p.toString().trim() !== '')
-              .map(p => p.toString().trim())
-          : ['No prerequisites required'],
-          
+              .filter((p) => p && p.toString().trim() !== "")
+              .map((p) => p.toString().trim())
+          : ["No Requirements required"],
+
         skills: Array.isArray(formData.skills)
           ? formData.skills
-              .filter(s => s && s.toString().trim() !== '')
-              .map(s => s.toString().trim())
+              .filter((s) => s && s.toString().trim() !== "")
+              .map((s) => s.toString().trim())
           : [],
-          
+
         whatYouWillLearn: Array.isArray(formData.whatYouWillLearn)
           ? formData.whatYouWillLearn
-              .filter(w => w && w.toString().trim() !== '')
-              .map(w => w.toString().trim())
-          : ['Learn valuable skills'],
-          
+              .filter((w) => w && w.toString().trim() !== "")
+              .map((w) => w.toString().trim())
+          : ["Learn valuable skills"],
+
         requirements: Array.isArray(formData.requirements)
           ? formData.requirements
-              .filter(r => r && r.toString().trim() !== '')
-              .map(r => r.toString().trim())
-          : ['No special requirements'],
-          
+              .filter((r) => r && r.toString().trim() !== "")
+              .map((r) => r.toString().trim())
+          : ["No special requirements"],
+
         whoIsThisFor: Array.isArray(formData.whoIsThisFor)
           ? formData.whoIsThisFor
-              .filter(w => w && w.toString().trim() !== '')
-              .map(w => w.toString().trim())
-          : ['Anyone interested in learning'],
+              .filter((w) => w && w.toString().trim() !== "")
+              .map((w) => w.toString().trim())
+          : ["Anyone interested in learning"],
         // Ensure curriculum is properly formatted
         curriculum: Array.isArray(formData.curriculum)
           ? formData.curriculum
-              .filter(week => week && (week.title || week.week))
+              .filter((week) => week && (week.title || week.week))
               .map((week, index) => ({
                 week: Number(week.week) || index + 1,
                 title: week.title?.toString().trim() || `Week ${index + 1}`,
-                description: week.description?.toString().trim() || '',
-                duration: week.duration?.toString().trim() || '0 min',
+                description: week.description?.toString().trim() || "",
+                duration: week.duration?.toString().trim() || "0 min",
                 topics: Array.isArray(week.topics)
                   ? week.topics
-                      .map(topic => topic?.toString().trim())
-                      .filter(topic => topic && topic !== '')
-                  : []
+                      .map((topic) => topic?.toString().trim())
+                      .filter((topic) => topic && topic !== "")
+                  : [],
               }))
-          : [{
-              week: 1,
-              title: 'Introduction',
-              description: '',
-              duration: '0 min',
-              topics: ['Course introduction']
-            }],
+          : [
+              {
+                week: 1,
+                title: "Introduction",
+                description: "",
+                duration: "0 min",
+                topics: ["Course introduction"],
+              },
+            ],
         // Ensure boolean fields are properly set
         certificateIncluded: formData.certificateIncluded !== false,
         isFeatured: Boolean(formData.isFeatured),
         isPublished: Boolean(formData.isPublished),
         // Ensure required fields have values
-        level: ['Beginner', 'Intermediate', 'Advanced'].includes(formData.level) 
-          ? formData.level 
-          : 'Beginner',
-        language: formData.language?.toString().trim() || 'English',
-        duration: formData.duration?.toString().trim() || '0 min'
+        level: ["Beginner", "Intermediate", "Advanced"].includes(formData.level)
+          ? formData.level
+          : "Beginner",
+        language: formData.language?.toString().trim() || "English",
+        duration: formData.duration?.toString().trim() || "0 min",
       };
       
       console.log('Submitting course data:', dataToSend);
@@ -752,30 +756,35 @@ const CourseForm = ({ isEdit = false }) => {
               <Controller
                 name="description"
                 control={control}
-                rules={{ required: 'Description is required' }}
+                rules={{ required: "Description is required" }}
                 render={({ field: { onChange, value } }) => (
                   <ReactQuill
                     theme="snow"
-                    value={value || ''}
+                    value={value || ""}
                     onChange={(content) => {
                       onChange(content);
                       // Trigger validation when content changes
-                      trigger('description');
+                      trigger("description");
                     }}
                     modules={{
                       toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{'list': 'ordered'}, {'list': 'bullet'}],
-                        ['link', 'image'],
-                        ['clean']
+                        [{ header: [1, 2, 3, false] }],
+                        ["bold", "italic", "underline", "strike"],
+                        [{ list: "ordered" }, { list: "bullet" }],
+                        ["link", "image"],
+                        ["clean"],
                       ],
                     }}
                     formats={[
-                      'header',
-                      'bold', 'italic', 'underline', 'strike',
-                      'list', 'bullet',
-                      'link', 'image'
+                      "header",
+                      "bold",
+                      "italic",
+                      "underline",
+                      "strike",
+                      "list",
+                      "bullet",
+                      "link",
+                      "image",
                     ]}
                     placeholder="Enter course description..."
                     className="h-64 bg-white"
@@ -993,9 +1002,9 @@ const CourseForm = ({ isEdit = false }) => {
           </button>
         </div>
 
-        {/* Prerequisites */}
+        {/* Requirements */}
         <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Prerequisites</h3>
+          <h3 className="text-lg font-semibold mb-4">Requirements</h3>
 
           {prerequisiteFields.map((field, index) => (
             <div key={field.id} className="flex items-start space-x-2 mb-2">
@@ -1116,19 +1125,24 @@ const CourseForm = ({ isEdit = false }) => {
         {/* FAQ Section */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Frequently Asked Questions</h3>
+            <h3 className="text-lg font-semibold">
+              Frequently Asked Questions
+            </h3>
             <button
               type="button"
-              onClick={() => appendFaq({ question: '', answer: '' })}
+              onClick={() => appendFaq({ question: "", answer: "" })}
               className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Add FAQ
             </button>
           </div>
-          
+
           <div className="space-y-4">
             {faqFields.map((faq, index) => (
-              <div key={faq.id} className="border border-gray-200 rounded-lg p-4">
+              <div
+                key={faq.id}
+                className="border border-gray-200 rounded-lg p-4"
+              >
                 <div className="flex justify-between items-start mb-3">
                   <h4 className="font-medium">FAQ {index + 1}</h4>
                   <button
@@ -1139,7 +1153,7 @@ const CourseForm = ({ isEdit = false }) => {
                     Remove
                   </button>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1147,7 +1161,9 @@ const CourseForm = ({ isEdit = false }) => {
                     </label>
                     <input
                       type="text"
-                      {...register(`faqs.${index}.question`, { required: 'Question is required' })}
+                      {...register(`faqs.${index}.question`, {
+                        required: "Question is required",
+                      })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter question"
                     />
@@ -1157,13 +1173,15 @@ const CourseForm = ({ isEdit = false }) => {
                       </p>
                     )}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Answer <span className="text-red-500">*</span>
                     </label>
                     <textarea
-                      {...register(`faqs.${index}.answer`, { required: 'Answer is required' })}
+                      {...register(`faqs.${index}.answer`, {
+                        required: "Answer is required",
+                      })}
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter answer"
@@ -1177,13 +1195,13 @@ const CourseForm = ({ isEdit = false }) => {
                 </div>
               </div>
             ))}
-            
+
             {faqFields.length === 0 && (
               <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
                 <p className="text-gray-500">No FAQs added yet.</p>
                 <button
                   type="button"
-                  onClick={() => appendFaq({ question: '', answer: '' })}
+                  onClick={() => appendFaq({ question: "", answer: "" })}
                   className="mt-2 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Add your first FAQ
@@ -1192,7 +1210,6 @@ const CourseForm = ({ isEdit = false }) => {
             )}
           </div>
         </div>
-        
 
         {/* Thumbnail URL */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
@@ -1204,7 +1221,7 @@ const CourseForm = ({ isEdit = false }) => {
               </label>
               <input
                 type="url"
-                {...register('thumbnail')}
+                {...register("thumbnail")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="https://example.com/image.jpg"
               />
@@ -1212,17 +1229,20 @@ const CourseForm = ({ isEdit = false }) => {
                 Enter the URL of the course thumbnail image
               </p>
             </div>
-            {watch('thumbnail') && (
+            {watch("thumbnail") && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  Preview:
+                </p>
                 <div className="w-64 h-36 border border-gray-300 rounded-md overflow-hidden">
-                  <img 
-                    src={watch('thumbnail')} 
-                    alt="Thumbnail preview" 
+                  <img
+                    src={watch("thumbnail")}
+                    alt="Thumbnail preview"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/400x225?text=Thumbnail+Not+Found';
+                      e.target.src =
+                        "https://via.placeholder.com/400x225?text=Thumbnail+Not+Found";
                     }}
                   />
                 </div>
