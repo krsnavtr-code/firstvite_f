@@ -483,9 +483,28 @@ export const getCoursesByCategory = async (categoryId = '') => {
 export const getCategoriesForForm = async () => {
     try {
         console.log('Fetching categories for form');
-        const response = await axios.get('/categories');
-        // console.log('Categories fetched successfully:', response.data);
-        return response.data.map(cat => ({
+        // Add pagination parameters to get all categories
+        const response = await axios.get('/categories', {
+            params: {
+                limit: 100, // Get a large number of categories
+                fields: '_id,name', // Only get the fields we need
+                status: 'active' // Only get active categories
+            }
+        });
+        
+        // Handle both paginated and non-paginated responses
+        const categories = Array.isArray(response.data) 
+            ? response.data 
+            : (response.data?.data || response.data?.results || []);
+            
+        if (!Array.isArray(categories)) {
+            console.error('Unexpected categories format:', response.data);
+            return [];
+        }
+        
+        console.log(`Fetched ${categories.length} categories`);
+        
+        return categories.map(cat => ({
             value: cat._id,
             label: cat.name
         }));
@@ -495,6 +514,7 @@ export const getCategoriesForForm = async () => {
             console.error('Response status:', error.response.status);
             console.error('Response data:', error.response.data);
         }
-        throw error;
+        // Return empty array instead of throwing to prevent UI crashes
+        return [];
     }
 };
