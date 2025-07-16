@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
 import { getCourses, deleteCourse, getCategoriesForForm } from '../../../api/courseApi';
 
 const CoursesList = () => {
@@ -95,7 +95,7 @@ const CoursesList = () => {
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <Link
-            to="/admin/courses/new"
+            to="new"
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
           >
             Add Course
@@ -178,14 +178,14 @@ const CoursesList = () => {
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Category
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    {/* <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Instructor
-                    </th>
+                    </th> */}
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Price
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Show on Home
+                       Home
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Status
@@ -221,9 +221,9 @@ const CoursesList = () => {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {course.category?.name || 'Uncategorized'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {/* <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {course.instructor}
-                        </td>
+                        </td> */}
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           ${course.price.toFixed(2)}
                         </td>
@@ -245,18 +245,18 @@ const CoursesList = () => {
                             {course.isPublished ? 'Published' : 'Draft'}
                           </span>
                         </td>
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <Link
-                            to={`/admin/courses/edit/${course._id}`}
-                            className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        <td className="flex justify-center items-center relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                           <Link
+                             to={`/admin/courses/${course._id}/edit`}
+                            className="text-indigo-600 cursor-pointer hover:text-indigo-900 p-2"
                           >
-                            Edit
+                            <FaEdit />
                           </Link>
                           <button
                             onClick={() => handleDelete(course._id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 cursor-pointer hover:text-red-900 ml-2 p-2"
                           >
-                            Delete
+                            <FaTrash />
                           </button>
                         </td>
                       </tr>

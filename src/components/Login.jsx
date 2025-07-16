@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../utils/api";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../contexts/AuthContext";
 
 function Login() {
   const location = useLocation();

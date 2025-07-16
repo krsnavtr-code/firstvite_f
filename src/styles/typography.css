@@ -1,0 +1,77 @@
+/* Thinner text classes */
+.text-thin {
+  font-weight: 300;
+}
+
+.text-thin-bold {
+  font-weight: 400;
+}
+
+/* Mobile-specific text sizes */
+@media (max-width: 640px) {
+  .text-xs-mobile {
+    font-size: 0.75rem;
+  }
+  
+  .text-sm-mobile {
+    font-size: 0.875rem;
+  }
+  
+  .text-base-mobile {
+    font-size: 1rem;
+  }
+  
+  .text-lg-mobile {
+    font-size: 1.125rem;
+  }
+  
+  .text-xl-mobile {
+    font-size: 1.25rem;
+  }
+}
+
+/* Tablet-specific text sizes */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .text-xs-tablet {
+    font-size: 0.875rem;
+  }
+  
+  .text-sm-tablet {
+    font-size: 1rem;
+  }
+  
+  .text-base-tablet {
+    font-size: 1.125rem;
+  }
+  
+  .text-lg-tablet {
+    font-size: 1.25rem;
+  }
+  
+  .text-xl-tablet {
+    font-size: 1.5rem;
+  }
+}
+
+/* Desktop-specific text sizes */
+@media (min-width: 1025px) {
+  .text-xs-desktop {
+    font-size: 1rem;
+  }
+  
+  .text-sm-desktop {
+    font-size: 1.125rem;
+  }
+  
+  .text-base-desktop {
+    font-size: 1.25rem;
+  }
+  
+  .text-lg-desktop {
+    font-size: 1.5rem;
+  }
+  
+  .text-xl-desktop {
+    font-size: 1.75rem;
+  }
+}

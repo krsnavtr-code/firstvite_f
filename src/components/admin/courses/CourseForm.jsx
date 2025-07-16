@@ -292,7 +292,7 @@ const WeekItem = ({ week, weekIndex, removeWeek, register, control, errors }) =>
   );
 };
 
-const CourseForm = ({ isEdit = false }) => {
+export const CourseForm = ({ isEdit = false }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);

@@ -5,14 +5,14 @@ import Courses from "./components/Courses";
 import Signup from "./components/Signup";
 import LoginPage from "./pages/auth/LoginPage";
 import { Toaster } from "react-hot-toast";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./contexts/AuthContext";
 import AdminLayout from "./components/admin/AdminLayout";
-import AdminDashboard from "./components/admin/AdminDashboard";
-import Categories from "./components/admin/categories";
-import ScrollToTop from "./components/ScrollToTop";
-import AdminCourses from "./components/admin/courses";
-import Users from "./components/admin/Users";
-import ContactsPage from "./pages/admin/ContactsPage";
+import AdminDashboard from './components/admin/AdminDashboard';
+import CategoriesList from './components/admin/categories/CategoriesList';
+import ScrollToTop from './components/ScrollToTop';
+import CoursesList from "./components/admin/courses/CoursesList";
+import Users from './components/admin/Users';
+import ContactsList from "./components/admin/ContactsList";
 import AdminEnrollments from "./pages/admin/Enrollments";
 import PrivateRoute from './components/PrivateRoute';
 import Unauthorized from './pages/Unauthorized';
@@ -21,6 +21,7 @@ import Footer from './components/Footer';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import AllCategories from './pages/user/AllCategories';
 import CourseDetail from './pages/user/CourseDetail';
+import CategoryForm from './components/admin/categories/CategoryForm';
 import CorporateTraining from './pages/user/CorporateTraining';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
@@ -31,6 +32,7 @@ import FAQPage from './pages/FAQPage';
 import ManageFAQs from './pages/admin/ManageFAQs';
 import ImageUploadDemo from './pages/admin/ImageUploadDemo';
 import ImageGallery from './components/admin/ImageGallery';
+import CourseForm from './components/admin/courses/CourseForm';
 import MediaGallery from './pages/admin/MediaGallery';
 import { CartProvider } from './contexts/CartContext';
 import Cart from './components/cart/Cart';
@@ -41,6 +43,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // LMS Components
 import RegisterPage from './pages/auth/RegisterPage';
 import UsersPage from './pages/admin/UsersPage';
+import LMS from './pages/lms';
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -223,23 +226,36 @@ function App() {
         />
 
         {/* Admin routes - No Navbar/Footer */}
-        <Route element={
-          <PrivateRoute allowedRoles={['admin']}>
-            <AdminLayout />
+        <Route path="/mylearning" element={
+          <PrivateRoute allowedRoles={['user', 'admin']}>
+            <Navigate to="/lms" replace />
           </PrivateRoute>
-        }>
+        } />
+        
+        <Route path="/lms/*" element={
+          <PrivateRoute allowedRoles={['user', 'admin']}>
+            <LMS />
+          </PrivateRoute>
+        } />
+        
+        <Route element={<PrivateRoute allowedRoles={['admin']}><AdminLayout /></PrivateRoute>}>
           <Route path="/admin" element={<Navigate to="dashboard" replace />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/categories/*" element={<Categories />} />
-          <Route path="/admin/courses/*" element={<AdminCourses />} />
-          <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/admin/contacts" element={<ContactsPage />} />
+          <Route path="/admin/categories" element={<CategoriesList />} />
+          <Route path="/admin/categories/new" element={<CategoryForm />} />
+          <Route path="/admin/categories/:id/edit" element={<CategoryForm />} />
+          <Route path="/admin/courses" element={<CoursesList />} />
+          <Route path="/admin/courses/new" element={<CourseForm isEdit={false} />} />
+          <Route path="/admin/courses/:id/edit" element={<CourseForm isEdit={true} />} />
+          <Route path="/admin/course/:id" element={<CourseDetail />} />
+          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/contacts" element={<ContactsList />} />
           <Route path="/admin/faqs" element={<ManageFAQs />} />
           <Route path="/admin/media" element={<MediaGallery />} />
           <Route path="/admin/image-upload" element={<ImageUploadDemo />} />
           <Route path="/admin/image-gallery" element={<ImageGallery />} />
           <Route path="/admin/enrollments" element={<AdminEnrollments />} />
-          <Route path="/admin/*" element={<Navigate to="dashboard" replace />} />
+          <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
         {/* LMS Routes */}

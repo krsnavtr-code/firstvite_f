@@ -7,7 +7,7 @@ import {
   FaSpinner,
   FaBook,
 } from "react-icons/fa";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-hot-toast";
 import { getUserEnrollments } from "../../api/enrollmentApi";
 

@@ -295,10 +295,10 @@ const CourseCard = ({ course }) => {
 
           <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-3">
             <FaClock className="mr-1 text-gray-600 dark:text-gray-300" />
-            {course.duration || "Self-paced"}
+            {course.duration || "Self-paced"} Weeks
           </div>
 
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col justify-between">
             <span className="font-bold text-lg text-gray-800 dark:text-white">
               {course.price > 0 ? `${formatPrice(course.price)}` : "Free"}
               {course.originalPrice > course.price && (
@@ -307,7 +307,7 @@ const CourseCard = ({ course }) => {
                 </span>
               )}
             </span>
-            <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors duration-200">
+            <button className="w-1/2 self-end px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors duration-200">
               Enroll Now
             </button>
           </div>

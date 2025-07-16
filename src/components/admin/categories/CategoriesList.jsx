@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
 import { getCategories, deleteCategory } from '../../../api/categoryApi';
@@ -17,6 +17,7 @@ const CategoriesList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const navigate = useNavigate();
+const location = useLocation();
 
   useEffect(() => {
     fetchCategories();
@@ -35,14 +36,18 @@ const CategoriesList = () => {
       };
       
       console.log('Calling getCategories with params:', params);
-      const { data, total } = await getCategories(params);
+      const response = await getCategories(params);
       
-      console.log('Categories data received:', data);
-      setCategories(data);
-      setTotalCount(total);
+      console.log('Categories response received:', response);
+      if (response?.success && response?.data) {
+        setCategories(response.data);
+        setTotalCount(response.pagination?.total || response.data.length);
+      } else {
+        throw new Error('Invalid response format from server');
+      }
     } catch (err) {
       console.error('Error in fetchCategories:', err);
-      setError('Failed to fetch categories');
+      setError(err.message || 'Failed to fetch categories');
       toast.error(err.message || 'Failed to fetch categories');
     } finally {
       setLoading(false);
@@ -67,20 +72,20 @@ const CategoriesList = () => {
   };
 
   // Filter categories based on search term and showOnHome filter
-  const filteredCategories = categories.filter(category => {
-    const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredCategories = Array.isArray(categories) ? categories.filter(category => {
+    const matchesSearch = category?.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      (category?.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesHomeFilter = showHomeFilter === 'all' || 
-      (showHomeFilter === 'yes' && category.showOnHome) || 
-      (showHomeFilter === 'no' && !category.showOnHome);
+      (showHomeFilter === 'yes' && category?.showOnHome) || 
+      (showHomeFilter === 'no' && !category?.showOnHome);
     
     const matchesStatusFilter = statusFilter === 'all' || 
-      (statusFilter === 'active' && category.isActive) || 
-      (statusFilter === 'inactive' && !category.isActive);
+      (statusFilter === 'active' && category?.isActive) || 
+      (statusFilter === 'inactive' && !category?.isActive);
     
     return matchesSearch && matchesHomeFilter && matchesStatusFilter;
-  });
+  }) : [];
 
   if (loading) {
     return <div className="flex justify-center p-8">Loading categories...</div>;
@@ -95,7 +100,7 @@ const CategoriesList = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl text-black font-bold">Categories</h2>
         <button
-          onClick={() => navigate('/admin/categories/new')}
+          onClick={() => navigate('new')}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <FaEdit className="text-sm" />
@@ -213,7 +218,10 @@ const CategoriesList = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-3">
                       <button
-                        onClick={() => navigate(`/admin/categories/edit/${category._id}`)}
+                        onClick={() => {
+                          // Use the correct absolute path for edit
+                          navigate(`/admin/categories/${category._id}/edit`);
+                        }}
                         className="text-indigo-600 hover:text-indigo-900"
                         title="Edit"
                       >

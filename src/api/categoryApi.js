@@ -47,25 +47,8 @@ export const getCategories = async (params = {}) => {
     console.log('Fetching categories with params:', requestParams);
     const response = await api.get('/categories', { params: requestParams });
     
-    // If the API returns paginated data, return it as is
-    if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-      return {
-        data: response.data.data,
-        total: response.data.total || response.data.data.length,
-        page: response.data.page || 1,
-        limit: response.data.limit || 25,
-        totalPages: response.data.totalPages || Math.ceil((response.data.total || response.data.data.length) / (response.data.limit || 25))
-      };
-    }
-    
-    // For backward compatibility with non-paginated responses
-    return {
-      data: response.data,
-      total: response.data.length,
-      page: 1,
-      limit: response.data.length,
-      totalPages: 1
-    };
+    // Return the backend response directly
+    return response.data;
   } catch (error) {
     console.error('Error fetching categories:', error);
     throw error;
@@ -92,19 +75,37 @@ export const createCategory = async (formData) => {
   try {
     console.log('createCategory called with data:', formData);
     
+    // Get the current token
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    // Prepare headers
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+    
     // Check if we're sending FormData (for file upload) or regular JSON
     const isFormData = formData instanceof FormData;
     
-    const config = {};
-    
-    // Only set Content-Type for FormData, let axios handle JSON content type
-    if (isFormData) {
-      config.headers = {
-        'Content-Type': 'multipart/form-data',
-      };
+    // Don't set Content-Type for FormData, let the browser set it with the correct boundary
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
     }
     
+    // Log FormData contents for debugging
+    if (isFormData) {
+      const formDataObj = {};
+      formData.forEach((value, key) => {
+        formDataObj[key] = value;
+      });
+      console.log('FormData contents:', formDataObj);
+    }
+    
+    const config = { headers };
     console.log('Sending request with config:', config);
+    
     const response = await api.post('/categories', formData, config);
     console.log('Category created successfully:', response.data);
     return response.data;
@@ -133,7 +134,23 @@ export const createCategory = async (formData) => {
 export const updateCategory = async (id, formData) => {
   try {
     console.log('Sending update request to /categories/' + id);
-    console.log('Request data:', formData);
+    
+    // Get the current token
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    // Prepare config
+    const config = {};
+    
+    // If we have FormData, let the browser set the Content-Type with boundary
+    // Otherwise, explicitly set it to application/json
+    if (!(formData instanceof FormData)) {
+      config.headers = {
+        'Content-Type': 'application/json'
+      };
+    }
     
     // Convert FormData to plain object for logging
     if (formData instanceof FormData) {
@@ -142,13 +159,12 @@ export const updateCategory = async (id, formData) => {
         formDataObj[key] = value;
       });
       console.log('FormData contents:', formDataObj);
+    } else {
+      console.log('Request data:', formData);
     }
     
-    const response = await api.put(`/categories/${id}`, formData, {
-      headers: {
-        'Content-Type': 'application/json', // Changed from multipart/form-data
-      },
-    });
+    // The Authorization header will be added by the axios interceptor
+    const response = await api.put(`/categories/${id}`, formData, config);
     
     console.log('Update successful:', response.data);
     return response.data;
@@ -167,10 +183,30 @@ export const updateCategory = async (id, formData) => {
 // Delete a category
 export const deleteCategory = async (id) => {
   try {
-    const response = await api.delete(`/categories/${id}`);
+    // Get the current token
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    // Prepare headers with authorization
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+    
+    console.log(`Deleting category with ID: ${id}`);
+    const response = await api.delete(`/categories/${id}`, config);
+    console.log('Delete successful:', response.data);
     return response.data;
   } catch (error) {
     console.error(`Error deleting category with ID ${id}:`, error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    }
     throw error;
   }
 };

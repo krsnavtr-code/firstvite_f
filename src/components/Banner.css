@@ -1,0 +1,8 @@
+.mask-inset-corners {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><path d='M10,0 H90 Q100,0 100,10 V90 Q100,100 90,100 H10 Q0,100 0,90 V10 Q0,0 10,0 Z M20,20 Q20,10 30,10 H70 Q80,10 80,20 V80 Q80,90 70,90 H30 Q20,90 20,80 Z' fill='white'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><path d='M10,0 H90 Q100,0 100,10 V90 Q100,100 90,100 H10 Q0,100 0,90 V10 Q0,0 10,0 Z M20,20 Q20,10 30,10 H70 Q80,10 80,20 V80 Q80,90 70,90 H30 Q20,90 20,80 Z' fill='white'/></svg>");
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}

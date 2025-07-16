@@ -5,7 +5,7 @@ import { getCourseById } from "../../api/courseApi";
 import { submitContactForm } from "../../api/contactApi";
 import { enrollInCourse } from "../../api/enrollmentApi";
 import { toast } from "react-hot-toast";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   FaStar,
   FaUsers,
@@ -51,7 +51,7 @@ import { useCart } from "../../contexts/CartContext";
 const CourseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { authUser, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
 
   // State declarations - all hooks at the top
@@ -80,20 +80,7 @@ const CourseDetail = () => {
     courseInterests: [],
   });
 
-  // Authentication effect
-  useEffect(() => {
-    if (!isAuthenticated) {
-      const returnUrl = window.location.pathname + window.location.search;
-      localStorage.setItem("returnUrl", returnUrl);
-      navigate("/login", { state: { from: returnUrl }, replace: true });
-      return; // Exit early if not authenticated
-    }
-  }, [isAuthenticated, navigate]);
-
-  // Don't render anything if not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
+// No authentication required for course details page - allowing public access
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -182,11 +169,19 @@ const CourseDetail = () => {
   };
 
   const handleEnroll = async () => {
+    if (!isAuthenticated) {
+      // If user is not authenticated, redirect to login
+      navigate('/login', { state: { from: `/courses/${course._id}` } });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const enrollmentResponse = await enrollInCourse(course._id);
+      
       if (enrollmentResponse.success) {
         toast.success(
-          "You have been enrolled in this course with pending status. Our team will contact you shortly.",
+          "Your enrollment request has been received. Our team will contact you shortly.",
           {
             style: {
               background: "#4caf50",
@@ -195,11 +190,24 @@ const CourseDetail = () => {
             duration: 5000,
           }
         );
+        // Close the form after successful submission
+        setShowContactForm(false);
       } else {
-        console.warn("Enrollment warning:", enrollmentResponse.message);
+        // Handle specific error cases
+        if (enrollmentResponse.shouldLogout) {
+          // If token is invalid, redirect to login
+          toast.error("Your session has expired. Please log in again.");
+          // The AuthContext will handle the logout
+        } else {
+          // Show error message to user
+          toast.error(enrollmentResponse.message || "Failed to process enrollment. Please try again.");
+        }
       }
     } catch (enrollError) {
       console.error("Error in enrollment process:", enrollError);
+      toast.error("An error occurred while processing your request. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -633,7 +641,15 @@ const CourseDetail = () => {
               {/* Course Action Buttons */}
               <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={() => setShowCheckoutOptions(true)}
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      // Redirect to login page with a return URL
+                      navigate('/login', { state: { from: `/courses/${id}` } });
+                      toast.info('Please log in to enroll in this course');
+                      return;
+                    }
+                    setShowCheckoutOptions(true);
+                  }}
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
                 >
                   Enroll Now <FaArrowRight className="ml-2" />
@@ -1294,15 +1310,15 @@ const CourseDetail = () => {
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
                 <div className="relative flex-1">
                   <button
-                    onClick={handleEnrollClick}
-                    disabled={isEnrolling}
+                    onClick={handleEnroll}
+                    disabled={isSubmitting}
                     className={`w-full flex items-center justify-center px-6 py-3.5 rounded-lg font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ${
-                      isEnrolling
+                      isSubmitting
                         ? "opacity-80 cursor-not-allowed"
                         : "shadow-md hover:shadow-lg"
                     }`}
                   >
-                    {isEnrolling ? (
+                    {isSubmitting ? (
                       <>
                         <svg
                           className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
@@ -1346,7 +1362,7 @@ const CourseDetail = () => {
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2">
                   <button
                     onClick={handleAddToWishlist}
                     disabled={isWishlistLoading}
@@ -1448,7 +1464,7 @@ const CourseDetail = () => {
                       )}
                     </AnimatePresence>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <form onSubmit={handleContactSubmit} className="space-y-4">

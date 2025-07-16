@@ -1,9 +1,19 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthProvider";
-import { FaSun, FaMoon, FaSearch, FaUser, FaTimes, FaBars, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  FaSun,
+  FaMoon,
+  FaSearch,
+  FaUser,
+  FaTimes,
+  FaBars,
+  FaSignInAlt,
+  FaUserPlus,
+} from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
+import api from "../api/axios";
 
 function Navbar() {
   const { authUser, isAuthenticated, isAdmin, isApproved, logout } = useAuth();
@@ -14,14 +24,14 @@ function Navbar() {
   );
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Clean up event listeners on unmount
   useEffect(() => {
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -34,45 +44,55 @@ function Navbar() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Close profile menu if click is outside
-      const profileMenu = document.getElementById('user-menu');
+      const profileMenu = document.getElementById("user-menu");
       const profileButton = document.querySelector('[aria-label="User menu"]');
-      
-      if (profileMenu && profileButton && !profileMenu.contains(event.target) && !profileButton.contains(event.target)) {
+
+      if (
+        profileMenu &&
+        profileButton &&
+        !profileMenu.contains(event.target) &&
+        !profileButton.contains(event.target)
+      ) {
         setIsProfileMenuOpen(false);
       }
 
       // Close mobile menu if click is outside
-      const mobileMenu = document.querySelector('.mobile-menu-container');
+      const mobileMenu = document.querySelector(".mobile-menu-container");
       const menuButton = document.querySelector('[aria-label="Toggle menu"]');
-      
-      if (mobileMenu && menuButton && isMobileMenuOpen && 
-          !mobileMenu.contains(event.target) && !menuButton.contains(event.target)) {
+
+      if (
+        mobileMenu &&
+        menuButton &&
+        isMobileMenuOpen &&
+        !mobileMenu.contains(event.target) &&
+        !menuButton.contains(event.target)
+      ) {
         setIsMobileMenuOpen(false);
       }
     };
 
     // Close modals when clicking outside
     const handleModalClick = (event) => {
-      const modals = document.querySelectorAll('dialog[open]');
-      modals.forEach(modal => {
+      const modals = document.querySelectorAll("dialog[open]");
+      modals.forEach((modal) => {
         if (!modal.contains(event.target) && event.target !== modal) {
           modal.close();
         }
       });
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('click', handleModalClick);
-    
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("click", handleModalClick);
+
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('click', handleModalClick);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("click", handleModalClick);
     };
   }, [isMobileMenuOpen]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState({
     courses: [],
-    categories: []
+    categories: [],
   });
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -102,62 +122,75 @@ function Navbar() {
 
     try {
       setIsSearching(true);
-      // Search courses with the query using the existing /courses endpoint with search parameter
-      const response = await axios.get('/courses', {
+      // Search courses using the API endpoint
+      const response = await api.get("/courses", {
         params: {
           search: trimmedQuery,
-          limit: 10 // Limit the number of results for better performance
-        }
+          limit: 10, // Limit the number of results for better performance
+        },
       });
-      
+
       // The backend returns courses directly or in a data property
-      const courses = response.data?.data || response.data || [];
-      
+      const courses = response?.data?.data || response?.data || [];
+
       setSearchResults({
         courses: Array.isArray(courses) ? courses : [],
-        categories: []
+        categories: [],
       });
-      
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
+      // Only show error if it's not a 404 or 500
+      if (error.response?.status !== 404 && error.response?.status !== 500) {
+        toast.error(
+          "Error fetching search results. Using local search instead."
+        );
+      }
       // Fall back to client-side search if the API call fails
       handleClientSideSearch(trimmedQuery);
     } finally {
       setIsSearching(false);
     }
   }, 500); // Debounce to reduce API calls
-  
+
   // Fallback client-side search if the API endpoint is not available
   const handleClientSideSearch = async (query) => {
     try {
       // Get all courses with a limit to avoid loading too much data
-      const response = await axios.get('/courses', { params: { limit: 50 } });
-      const allCourses = Array.isArray(response.data) ? response.data : 
-                       (response.data?.data || []);
-      
-      if (!allCourses.length) {
+      const response = await api.get("/courses", { params: { limit: 50 } });
+      const allCourses = Array.isArray(response?.data)
+        ? response?.data
+        : response?.data?.data || [];
+
+      if (!allCourses?.length) {
         setSearchResults({ courses: [], categories: [] });
         return;
       }
-      
+
       // Simple case-insensitive search on multiple fields
       const searchLower = query.toLowerCase();
-      const filtered = allCourses.filter(course => {
+      const filtered = allCourses.filter((course) => {
         if (!course) return false;
         return (
-          (course.title && course.title.toLowerCase().includes(searchLower)) ||
-          (course.description && course.description.toLowerCase().includes(searchLower)) ||
-          (course.instructor && course.instructor.toLowerCase().includes(searchLower)) ||
-          (course.category?.name && course.category.name.toLowerCase().includes(searchLower))
+          (course?.title && course.title.toLowerCase().includes(searchLower)) ||
+          (course?.description &&
+            course.description.toLowerCase().includes(searchLower)) ||
+          (course?.instructor &&
+            course.instructor.toLowerCase().includes(searchLower)) ||
+          (course?.category?.name &&
+            course.category.name.toLowerCase().includes(searchLower))
         );
       });
-      
+
       setSearchResults({
         courses: filtered,
-        categories: []
+        categories: [],
       });
     } catch (error) {
-      console.error('Client-side search error:', error);
+      console.error("Client-side search error:", error);
+      // Only show error if it's not a 404
+      if (error.response?.status !== 404) {
+        toast.error("Error fetching courses. Please try again later.");
+      }
       setSearchResults({ courses: [], categories: [] });
     }
   };
@@ -176,28 +209,28 @@ function Navbar() {
   // Handle search result click
   const handleResultClick = (type, item) => {
     if (!item) return;
-    
-    if (type === 'course') {
+
+    if (type === "course") {
       // Check if the course has a slug, otherwise use _id
       const courseId = item.slug || item._id;
-      console.log('Navigating to course:', { courseId, item });
+      console.log("Navigating to course:", { courseId, item });
       if (courseId) {
         // Try both /course/:id and /courses/:id to see which one works
         const path = `/course/${courseId}`;
-        console.log('Navigating to path:', path);
+        console.log("Navigating to path:", path);
         navigate(path);
         resetSearch();
       }
-    } else if (type === 'category' && item._id) {
-      console.log('Navigating to category:', item._id);
+    } else if (type === "category" && item._id) {
+      console.log("Navigating to category:", item._id);
       navigate(`/courses/category/${item._id}`);
       resetSearch();
     }
   };
-  
+
   // Reset search state
   const resetSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
     setSearchResults({ courses: [], categories: [] });
     setShowResults(false);
   };
@@ -209,7 +242,7 @@ function Navbar() {
     if (query) {
       // If there are search results, navigate to the first one
       if (searchResults.courses.length > 0) {
-        handleResultClick('course', searchResults.courses[0]);
+        handleResultClick("course", searchResults.courses[0]);
       } else {
         // Otherwise, navigate to search results page
         navigate(`/search?q=${encodeURIComponent(query)}`);
@@ -224,15 +257,15 @@ function Navbar() {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
         // Don't close search if clicking on the search icon
-        if (!event.target.closest('.search-icon-container')) {
+        if (!event.target.closest(".search-icon-container")) {
           setIsSearchOpen(false);
         }
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -245,30 +278,40 @@ function Navbar() {
 
   // Handle scroll effect
   const handleScroll = useCallback(() => {
-    const navbar = document.getElementById('main-navbar');
+    const navbar = document.getElementById("main-navbar");
     if (!navbar) return;
-    
+
     if (window.scrollY > 10) {
-      navbar.classList.add('shadow-lg', 'bg-white/80', 'dark:bg-gray-800/80', 'backdrop-blur-sm');
-      navbar.classList.remove('bg-white', 'dark:bg-gray-900');
+      navbar.classList.add(
+        "shadow-lg",
+        "bg-white/80",
+        "dark:bg-gray-800/80",
+        "backdrop-blur-sm"
+      );
+      navbar.classList.remove("bg-white", "dark:bg-gray-900");
     } else {
-      navbar.classList.remove('shadow-lg', 'bg-white/80', 'dark:bg-gray-800/80', 'backdrop-blur-sm');
-      navbar.classList.add('bg-white', 'dark:bg-gray-900');
+      navbar.classList.remove(
+        "shadow-lg",
+        "bg-white/80",
+        "dark:bg-gray-800/80",
+        "backdrop-blur-sm"
+      );
+      navbar.classList.add("bg-white", "dark:bg-gray-900");
     }
   }, []);
 
   // Add scroll event listener
   useEffect(() => {
-    const navbar = document.getElementById('main-navbar');
+    const navbar = document.getElementById("main-navbar");
     if (!navbar) return;
 
     // Initial check
     handleScroll();
 
     // Add scroll event listener
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [handleScroll]);
 
@@ -276,12 +319,14 @@ function Navbar() {
   const navItems = [
     { to: "/", label: "Home" },
     { to: "/courses", label: "Courses" },
-    { to: "/about", label: "About" },
+    // { to: "/about", label: "About" },
     { to: "/contact", label: "Contact" },
-    ...(isAuthenticated && isApproved ? [
-      { to: "/my-learning", label: "My Learning" },
-      ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : [])
-    ] : [])
+    ...(isAuthenticated && isApproved
+      ? [
+          { to: "/my-learning", label: "My Learning" },
+          ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
+        ]
+      : []),
   ];
 
   const renderNavItems = (className = "") => (
@@ -315,8 +360,16 @@ function Navbar() {
               aria-label="Toggle menu"
             >
               <span className="sr-only">Open main menu</span>
-              <FaBars className={`block h-6 w-6 ${isMobileMenuOpen ? 'hidden' : 'block'}`} aria-hidden="true" />
-              <FaTimes className={`h-6 w-6 ${isMobileMenuOpen ? 'block' : 'hidden'}`} aria-hidden="true" />
+              <FaBars
+                className={`block h-6 w-6 ${
+                  isMobileMenuOpen ? "hidden" : "block"
+                }`}
+                aria-hidden="true"
+              />
+              <FaTimes
+                className={`h-6 w-6 ${isMobileMenuOpen ? "block" : "hidden"}`}
+                aria-hidden="true"
+              />
             </button>
             <div className="flex-shrink-0">
               <Link
@@ -330,19 +383,22 @@ function Navbar() {
 
             {/* Desktop menu */}
             <div className="hidden md:flex md:items-center xl:ml-8 lg:ml-6">
-              <div className="flex-shrink-0">
-                {renderNavItems()}
-              </div>
-              <a 
-                href="https://genlead.in/agent/register" 
-                target="_blank" 
+              <div className="flex-shrink-0">{renderNavItems()}</div>
+              <Link
+                to="/lms"
+                className="ml-2 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 whitespace-nowrap"
+              >
+                LMS
+              </Link>
+              <a
+                href="https://genlead.in/agent/register"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="ml-1 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 whitespace-nowrap"
+                className="ml-2 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 whitespace-nowrap"
               >
                 Agent Register
               </a>
             </div>
-            
           </div>
 
           <div className="flex items-center space-x-4">
@@ -367,8 +423,12 @@ function Navbar() {
               </div>
 
               {/* Search Dropdown */}
-              <div 
-                className={`absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 ease-in-out transform ${isSearchOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+              <div
+                className={`absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 ease-in-out transform ${
+                  isSearchOpen
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-2 pointer-events-none"
+                }`}
                 style={{ zIndex: 50 }}
               >
                 <form onSubmit={handleSearchSubmit} className="relative">
@@ -436,7 +496,8 @@ function Navbar() {
                                 >
                                   <div className="flex-shrink-0 w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden flex items-center justify-center">
                                     <div className="text-gray-400 text-xs text-center p-1">
-                                      {course.title?.charAt(0)?.toUpperCase() || "C"}
+                                      {course.title?.charAt(0)?.toUpperCase() ||
+                                        "C"}
                                     </div>
                                   </div>
                                   <div className="ml-3">
@@ -489,9 +550,9 @@ function Navbar() {
                   <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
                     <FaUser className="text-gray-600 dark:text-gray-300" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {authUser?.fullname || authUser?.name || 'Profile'}
-                  </span>
+                  {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {authUser?.fullname || authUser?.name || "Profile"}
+                  </span> */}
                 </button>
 
                 {isProfileMenuOpen && (
@@ -520,8 +581,8 @@ function Navbar() {
                       onClick={() => {
                         logout();
                         setIsProfileMenuOpen(false);
-                        toast.success('Logged out successfully');
-                        navigate('/');
+                        toast.success("Logged out successfully");
+                        navigate("/");
                       }}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"
                       role="menuitem"
@@ -554,12 +615,12 @@ function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      <div 
-        style={{ maxWidth: '250px' }}
+      <div
+        style={{ maxWidth: "250px" }}
         className={`mobile-menu-container md:hidden transition-all duration-300 ease-in-out transform ${
-          isMobileMenuOpen 
-            ? 'translate-y-0 opacity-100 visible' 
-            : '-translate-y-full opacity-0 invisible'
+          isMobileMenuOpen
+            ? "translate-y-0 opacity-100 visible"
+            : "-translate-y-full opacity-0 invisible"
         } absolute left-0 right-0 top-16 bg-white dark:bg-gray-900 shadow-lg z-40 overflow-x-auto`}
       >
         <div className="flex flex-col px-2 py-3 space-y-2 sm:px-3">
@@ -575,15 +636,26 @@ function Navbar() {
             </div>
           ))}
           <div className="w-full px-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-            <a 
-              href="https://genlead.in/agent/register" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block w-full px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-              onClick={toggleMobileMenu}
-            >
-              Agent Register
-            </a>
+            <div className="w-full">
+              <Link
+                to="/lms"
+                className="block text-center w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                onClick={toggleMobileMenu}
+              >
+                LMS
+              </Link>
+            </div>
+            <div className="w-full mt-2">
+              <a
+                href="https://genlead.in/agent/register"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+                onClick={toggleMobileMenu}
+              >
+                Agent Register
+              </a>
+            </div>
           </div>
         </div>
       </div>

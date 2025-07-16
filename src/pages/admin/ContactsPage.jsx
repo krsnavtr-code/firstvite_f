@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../contexts/AuthContext";
 import ContactsList from "../../components/admin/ContactsList";
 
 const ContactsPage = () => {

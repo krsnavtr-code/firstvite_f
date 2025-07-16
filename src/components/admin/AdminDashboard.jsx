@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getCategories } from "../../api/categoryApi";
 import { getCourses, deleteCourse } from "../../api/courseApi";
@@ -8,8 +8,8 @@ import userApi from "../../api/userApi";
 import { toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
-  console.log('AdminDashboard - Rendering...');
-  const { authUser } = useAuth();
+  console.log("AdminDashboard - Rendering...");
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -17,63 +17,75 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(false);
 
   const handleDeleteCourse = async (id) => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
+    if (window.confirm("Are you sure you want to delete this course?")) {
       try {
         await deleteCourse(id);
         // Refresh the courses list after deletion
         const response = await getCourses();
         setCourses(response.data || []);
-        toast.success('Course deleted successfully');
+        toast.success("Course deleted successfully");
       } catch (error) {
-        console.error('Error deleting course:', error);
-        toast.error('Failed to delete course');
+        console.error("Error deleting course:", error);
+        toast.error("Failed to delete course");
       }
     }
   };
-  
+
   useEffect(() => {
-    console.log('AdminDashboard - useEffect running');
+    console.log("AdminDashboard - useEffect running");
     const fetchData = async () => {
-      console.log('Fetching dashboard data...');
+      console.log("Fetching dashboard data...");
       try {
         setLoading(true);
-        
-        // Fetch categories
-        const categoriesRes = await getCategories();
-        console.log('Categories response:', categoriesRes);
-        // Handle both array and object with data property
-        const categoriesData = Array.isArray(categoriesRes) ? categoriesRes : (categoriesRes.data || []);
-        setCategories(categoriesData);
-        console.log('Processed categories:', categoriesData);
-        
-        // Fetch courses
-        const coursesRes = await getCourses();
-        console.log('Courses response:', coursesRes);
-        // Handle both array and object with data property
-        const coursesData = Array.isArray(coursesRes) ? coursesRes : (coursesRes.data || []);
-        setCourses(coursesData);
 
-        // Fetch users (students only)
-        const usersRes = await userApi.getUsers({ role: 'student' });
-        console.log('Users response:', usersRes);
-        // Handle both array and object with data property
-        const usersData = Array.isArray(usersRes) ? usersRes : (usersRes.data || []);
-        setUsers(usersData);
-        console.log('Processed students:', usersData);
-        
+        // Fetch categories
+        try {
+          const categoriesRes = await getCategories();
+          console.log("Categories response:", categoriesRes);
+          const categoriesData = categoriesRes.data || categoriesRes || [];
+          setCategories(categoriesData);
+          console.log("Processed categories:", categoriesData);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+          toast.error("Failed to load categories");
+        }
+
+        // Fetch courses
+        try {
+          const coursesRes = await getCourses();
+          console.log("Courses response:", coursesRes);
+          const coursesData = coursesRes.data || coursesRes || [];
+          setCourses(coursesData);
+          console.log("Processed courses:", coursesData);
+        } catch (error) {
+          console.error("Error fetching courses:", error);
+          toast.error("Failed to load courses");
+        }
+
+        // Fetch users
+        try {
+          const usersRes = await userApi.getUsers();
+          console.log("Users response:", usersRes);
+          const usersData = usersRes.data || usersRes || [];
+          setUsers(usersData);
+          console.log("Processed users:", usersData);
+        } catch (error) {
+          console.error("Error fetching users:", error);
+          toast.error("Failed to load users");
+        }
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        toast.error('Failed to load dashboard data');
+        console.error("Error fetching dashboard data:", error);
+        toast.error("Failed to load dashboard data");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, []);
-  
-  console.log('AdminDashboard - Render with state:', { loading, categories });
-  
+
+  console.log("AdminDashboard - Render with state:", { loading, categories });
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -81,7 +93,7 @@ const AdminDashboard = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">
@@ -121,7 +133,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Total Students Card */}
-        <div 
+        <div
           className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
           onClick={() => navigate("/admin/students")}
         >
@@ -143,7 +155,9 @@ const AdminDashboard = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-gray-500 text-sm font-medium">Total Students</h3>
+              <h3 className="text-gray-500 text-sm font-medium">
+                Total Students
+              </h3>
               <p className="text-2xl font-semibold text-gray-800">
                 {Array.isArray(users) ? users.length : 0}
               </p>

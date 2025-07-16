@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { api } from '../../context/AuthProvider';
+import api from '../../api/axios';
 
 const RegisterForm = ({ onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,7 +20,7 @@ const RegisterForm = ({ onSuccess }) => {
       
       // Prepare user data
       const userData = {
-        name: data.fullname,
+        fullname: data.fullname,  // Changed from name to fullname to match backend
         email: data.email,
         password: data.password,
         role: data.role || 'student', // Default to student if not specified

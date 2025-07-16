@@ -480,34 +480,46 @@ export const getCoursesByCategory = async (categoryId = '') => {
 };
 
 // Get all categories for course form
-export const getCategoriesForForm = async () => {
+export const getCategoriesForForm = async () => {   
     try {
         console.log('Fetching categories for form');
-        // Add pagination parameters to get all categories
-        const response = await axios.get('/categories', {
-            params: {
-                limit: 100, // Get a large number of categories
-                fields: '_id,name', // Only get the fields we need
-                status: 'active' // Only get active categories
-            }
-        });
         
-        // Handle both paginated and non-paginated responses
-        const categories = Array.isArray(response.data) 
-            ? response.data 
-            : (response.data?.data || response.data?.results || []);
-            
-        if (!Array.isArray(categories)) {
-            console.error('Unexpected categories format:', response.data);
-            return [];
+        // First, try with a simple query to get all categories
+        console.log('Making API call to /categories');
+        const response = await axios.get('/categories');
+        
+        console.log('Raw categories API response:', response);
+        console.log('Response data:', response.data);
+        
+        // Check if we have a data property with an array
+        if (response.data && Array.isArray(response.data)) {
+            console.log('Found categories directly in response.data');
+            return response.data.map(cat => ({
+                value: cat._id,
+                label: cat.title || cat.name || 'Unnamed Category'
+            }));
         }
         
-        console.log(`Fetched ${categories.length} categories`);
+        // Check for nested data property
+        if (response.data?.data && Array.isArray(response.data.data)) {
+            console.log('Found categories in response.data.data');
+            return response.data.data.map(cat => ({
+                value: cat._id,
+                label: cat.title || cat.name || 'Unnamed Category'
+            }));
+        }
         
-        return categories.map(cat => ({
-            value: cat._id,
-            label: cat.name
-        }));
+        // Check for results property (some APIs use this)
+        if (response.data?.results && Array.isArray(response.data.results)) {
+            console.log('Found categories in response.data.results');
+            return response.data.results.map(cat => ({
+                value: cat._id,
+                label: cat.title || cat.name || 'Unnamed Category'
+            }));
+        }
+        
+        console.warn('No categories found in the expected format');
+        return [];
     } catch (error) {
         console.error('Error fetching categories:', error);
         if (error.response) {

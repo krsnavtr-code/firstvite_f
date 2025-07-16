@@ -1,11 +1,4 @@
-import api from '../utils/api';
-
-// Base API path for user endpoints
-const API_BASE = '/users';
-
-// Debug: Log the base URL being used
-console.log('API Base URL:', api.defaults.baseURL);
-console.log('Full Users URL:', `${api.defaults.baseURL}${API_BASE}`);
+import api from './axios';
 
 /**
  * User API Service
@@ -15,8 +8,8 @@ const userApi = {
   // Get all users with optional filters
   getUsers: async (filters = {}) => {
     try {
-      console.log('Sending request to:', API_BASE);
-      const response = await api.get(API_BASE, { params: filters });
+      console.log('Fetching users with filters:', filters);
+      const response = await api.get('/users', { params: filters });
       console.log('Users response:', response);
       return response.data;
     } catch (error) {
@@ -38,7 +31,7 @@ const userApi = {
   // Get single user by ID
   getById: async (userId) => {
     try {
-      const response = await api.get(`${API_BASE}/${userId}`);
+      const response = await api.get(`/users/${userId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching user ${userId}:`, error);
@@ -168,7 +161,8 @@ export const logApiConfig = () => {
 export const testApiConnection = async () => {
   try {
     console.log('Testing API connection...');
-    const response = await api.get('/users/signup');
+    // Test with a more appropriate endpoint
+    const response = await api.get('/courses');
     console.log('API test response:', response.data);
     return true;
   } catch (error) {
@@ -186,6 +180,5 @@ export const testApiConnection = async () => {
   }
 };
 
-// Log the configuration and test connection when this module is imported
+// Log the configuration when this module is imported
 logApiConfig();
-testApiConnection();

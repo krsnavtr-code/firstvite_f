@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CategoriesList from './CategoriesList';
 import CategoryForm from './CategoryForm';
-import { useAuth } from '../../../context/AuthProvider';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Categories = () => {
   const { isAdmin } = useAuth();

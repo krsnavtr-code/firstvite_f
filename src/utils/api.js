@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost:4002'}/api`,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4002/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -28,6 +28,43 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      message: error.message,
+      data: error.response?.data,
+      config: error.config
+    });
+
+    if (error.response) {
+      // Server responded with error status
+      const { status, data } = error.response;
+      if (status === 401) {
+        // Handle unauthorized access
+        toast.error('Unauthorized. Please login again.');
+        window.location.href = '/login';
+      } else if (status === 403) {
+        // Handle forbidden access
+        toast.error('Access denied.');
+      } else if (status === 404) {
+        // Handle not found
+        toast.error('Resource not found.');
+      } else if (status >= 500) {
+        // Handle server errors
+        toast.error('Server error. Please try again later.');
+      } else {
+        // Handle other errors
+        toast.error(data?.message || 'An error occurred.');
+      }
+    } else if (error.request) {
+      // Request made but no response
+      toast.error('No response from server. Please check your connection.');
+    } else {
+      // Something happened in setting up the request
+      toast.error('Error setting up request. Please try again.');
+    }
+
+    return Promise.reject(error);
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
       // Only handle if not already on the login page and not a public route

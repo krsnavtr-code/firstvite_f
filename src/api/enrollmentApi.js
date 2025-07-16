@@ -31,7 +31,7 @@ export const enrollInCourse = async (courseId) => {
     
     const response = await axios.post('/api/enrollments', { 
       courseId: courseId,
-      status: 'active' // Set to active directly for now
+      status: 'pending' // Changed to pending to require admin approval
     }, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -39,7 +39,8 @@ export const enrollInCourse = async (courseId) => {
         'x-client-ip': localStorage.getItem('clientIp') || '',
         'x-user-agent': navigator.userAgent
       },
-      timeout: 15000 // 15 seconds timeout
+      timeout: 15000, // 15 seconds timeout
+      validateStatus: (status) => status < 500 // Don't throw for 4xx errors
     });
     
     // Log successful enrollment

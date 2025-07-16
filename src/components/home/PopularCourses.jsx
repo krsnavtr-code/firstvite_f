@@ -1,70 +1,117 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaStar, FaRegStar, FaRegClock, FaUserGraduate } from 'react-icons/fa';
-import axios from '../../api/axios';
-import { getCardBgColor } from '../../utils/gradients';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaStar, FaRegStar, FaRegClock, FaUserGraduate } from "react-icons/fa";
+import axios from "../../api/axios";
+import { getCardBgColor } from "../../utils/gradients";
 
 // Base URL for API requests
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 // CourseCard component for displaying individual course
 const CourseCard = ({ course }) => {
-  const [imageError, setImageError] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageState, setImageState] = useState({
+    url: "",
+    error: false,
+    loading: true,
+  });
 
   useEffect(() => {
-    // Reset error state when course changes
-    setImageError(false);
-    
-    console.log('Course data:', course); // Debug: Log course data
-    
-    if (!course.thumbnail) {
-      console.log('No thumbnail found for course:', course.title);
-      setImageUrl('/images/course-placeholder.jpg');
-      return;
-    }
+    let isMounted = true;
 
-    let url = course.thumbnail;
-    console.log('Original thumbnail URL:', url); // Debug: Log original URL
-    
-    // If it's not already a full URL, construct it
-    if (!url.startsWith('http') && !url.startsWith('https') && !url.startsWith('//')) {
-      // Remove any leading slashes to avoid double slashes
-      const cleanPath = url.replace(/^\/+/, '');
-      const baseUrl = API_BASE_URL || '';
-      url = `${baseUrl}/${cleanPath}`;
-      console.log('Constructed image URL:', url); // Debug: Log constructed URL
-    }
-    
-    // Test if the image exists
-    const img = new Image();
-    img.onload = () => {
-      console.log('Image loaded successfully:', url);
-      setImageUrl(url);
-    };
-    img.onerror = () => {
-      console.error('Failed to load image:', url);
-      setImageError(true);
-      setImageUrl('/images/course-placeholder.jpg');
-    };
-    img.src = url;
-    
-    // Set a timeout to check if the image loads within 2 seconds
-    const timeoutId = setTimeout(() => {
-      if (!img.complete) {
-        console.warn('Image loading timed out:', url);
-        setImageError(true);
-        setImageUrl('/images/course-placeholder.jpg');
+    const loadImage = async () => {
+      if (!course?.thumbnail) {
+        if (isMounted) {
+          setImageState({
+            url: "/images/course-placeholder.jpg",
+            error: false,
+            loading: false,
+          });
+        }
+        return;
       }
-    }, 2000);
-    
-    return () => clearTimeout(timeoutId);
-  }, [course]);
-  
-  const handleImageError = () => {
-    setImageError(true);
-    setImageUrl('/images/course-placeholder.jpg');
-  };
+
+      let url = course.thumbnail;
+
+      // If it's not already a full URL, construct it
+      if (
+        !url.startsWith("http") &&
+        !url.startsWith("https") &&
+        !url.startsWith("//")
+      ) {
+        const cleanPath = url.replace(/^\/+/, "");
+        const baseUrl = API_BASE_URL || "";
+        url = `${baseUrl}/${cleanPath}`.replace(/([^:]\/)\/+/g, "$1"); // Remove duplicate slashes
+      }
+
+      // Set loading state
+      if (isMounted) {
+        setImageState({
+          url: url,
+          error: false,
+          loading: true,
+        });
+      }
+
+      // Create a new image to test loading
+      const img = new Image();
+
+      const handleLoad = () => {
+        if (isMounted) {
+          setImageState({
+            url: url,
+            error: false,
+            loading: false,
+          });
+        }
+      };
+
+      const handleError = () => {
+        if (isMounted) {
+          setImageState({
+            url: "/images/course-placeholder.jpg",
+            error: true,
+            loading: false,
+          });
+        }
+      };
+
+      img.onload = handleLoad;
+      img.onerror = handleError;
+      img.src = url;
+
+      // Set a longer timeout for slow connections
+      const timeoutId = setTimeout(() => {
+        if (isMounted) {
+          // Only show error if the image hasn't loaded yet
+          const imgElement = new Image();
+          imgElement.onload = () => {};
+          imgElement.onerror = () => {
+            if (isMounted) {
+              setImageState({
+                url: "/images/course-placeholder.jpg",
+                error: true,
+                loading: false,
+              });
+            }
+          };
+          imgElement.src = url;
+        }
+      }, 5000); // Increased to 5 seconds
+
+      return () => {
+        isMounted = false;
+        img.onload = null;
+        img.onerror = null;
+        clearTimeout(timeoutId);
+      };
+    };
+
+    loadImage();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [course?._id, course?.thumbnail]); // Only re-run if course ID or thumbnail changes
 
   // Render star ratings
   const renderStars = (rating) => {
@@ -94,38 +141,49 @@ const CourseCard = ({ course }) => {
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
           <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-            {imageError || !course.thumbnail ? (
-              <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-700">
-                <div className="text-center">
+            {imageState.loading ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                <div className="animate-pulse rounded-full h-12 w-12 border-4 border-t-blue-500 border-gray-300 dark:border-gray-600"></div>
+              </div>
+            ) : imageState.error || !course.thumbnail ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                <div className="text-center p-4">
                   <div className="text-gray-500 dark:text-gray-400">
                     No image available
                   </div>
-                  {course.thumbnail && (
-                    <div className="text-xs mt-2 text-gray-400 break-all max-w-xs">
-                      Tried to load: {course.thumbnail}
-                    </div>
-                  )}
+                  {process.env.NODE_ENV === "development" &&
+                    course.thumbnail && (
+                      <div className="text-xs mt-2 text-gray-400 break-all max-w-xs">
+                        {course.thumbnail}
+                      </div>
+                    )}
                 </div>
               </div>
             ) : (
-              <>
-                <img
-                  src={imageUrl}
-                  alt={course.title || "Course image"}
-                  className="w-full h-full object-cover"
-                  onError={handleImageError}
-                  onLoad={() =>
-                    console.log("Image loaded successfully:", imageUrl)
-                  }
-                  loading="lazy"
-                />
-                {/* Hidden debug info */}
-                <div className="hidden">
-                  <div>Image URL: {imageUrl}</div>
-                  <div>Course ID: {course._id}</div>
-                  <div>Course Title: {course.title}</div>
-                </div>
-              </>
+              <img
+                src={imageState.url}
+                alt={course.title || "Course image"}
+                className="w-full h-full object-cover transition-opacity duration-300"
+                style={{ opacity: imageState.loading ? 0 : 1 }}
+                loading="lazy"
+                onError={() => {
+                  setImageState({
+                    url: "/images/course-placeholder.jpg",
+                    error: true,
+                    loading: false,
+                  });
+                }}
+              />
+            )}
+            {/* Hidden debug info - only shown in development */}
+            {process.env.NODE_ENV === "development" && (
+              <div className="hidden">
+                <div>Image URL: {course.thumbnail}</div>
+                <div>Processed URL: {imageState.url}</div>
+                <div>Course ID: {course._id}</div>
+                <div>Loading: {imageState.loading ? "true" : "false"}</div>
+                <div>Error: {imageState.error ? "true" : "false"}</div>
+              </div>
             )}
           </div>
           {course.isFeatured && (
@@ -177,44 +235,55 @@ const PopularCourses = () => {
     const fetchPopularCourses = async () => {
       try {
         setLoading(true);
-        
-        // Only fetch courses that are marked to show on home page
-        console.log('Fetching featured courses with showOnHome=true');
-        const response = await axios.get('/courses', {
+        setError(null);
+
+        // Set a timeout for the request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        console.log("Fetching featured courses with showOnHome=true");
+        const response = await axios.get("/courses", {
           params: {
-            showOnHome: 'true',
+            showOnHome: "true",
             limit: 6, // Limit to 6 featured courses
-            sort: '-createdAt', // Show most recently added first
-            isPublished: 'true' // Only get published courses
+            sort: "-createdAt", // Show most recently added first
+            isPublished: "true", // Only get published courses
           },
+          signal: controller.signal
         });
-        
-        console.log('Featured courses response:', response);
-        
-        let courses = [];
-        
+
+        // Clear the timeout if the request completes
+        clearTimeout(timeoutId);
+
+        console.log("Featured courses response:", response);
+
         // Handle different response formats
+        let courses = [];
         if (Array.isArray(response.data)) {
           courses = response.data;
         } else if (response.data && Array.isArray(response.data.data)) {
           courses = response.data.data;
         } else if (response.data && response.data.courses) {
           courses = response.data.courses;
+        } else {
+          throw new Error('Invalid response format from server');
         }
+
+        console.log("Parsed featured courses:", courses);
+
+        // Filter courses that are marked to show on home page
+        // If no courses are marked, show the most recent published courses
+        const featuredCourses = courses.filter(course => 
+          course.showOnHome !== false // Include if true or undefined
+        );
+
+        console.log("Filtered featured courses:", featuredCourses);
         
-        console.log('Parsed featured courses:', courses);
-        
-        // Only show courses that are explicitly marked to show on home page
-        const featuredCourses = courses.filter(course => course.showOnHome === true);
-        
-        console.log('Filtered featured courses (showOnHome=true):', featuredCourses);
-        
-        // Only set the courses that are marked to show on home page
-        // We don't need a fallback to popular courses anymore
-        setCourses(featuredCourses.slice(0, 6)); // Limit to 6 courses
+        // Set the courses, or an empty array if none found
+        setCourses(featuredCourses);
       } catch (err) {
-        console.error('Error fetching featured courses:', err);
-        setError('Failed to load featured courses');
+        console.error("Error fetching featured courses:", err);
+        setError("Failed to load featured courses");
       } finally {
         setLoading(false);
       }
@@ -231,7 +300,9 @@ const PopularCourses = () => {
             Best E-Learning Courses
           </h1>
           <p className="mt-4 text-xl text-center text-gray-600 dark:text-gray-300">
-            Discover the best courses for your learning journey
+            Practical, skill-based online courses in areas like IT, business,
+            design, and marketing. Learn at your own pace with real-world
+            projects and expert-led content
           </p>
         </div>
 

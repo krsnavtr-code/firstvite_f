@@ -1,24 +1,16 @@
 import React, { useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthProvider';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AdminLayout = () => {
-  const { authUser, setAuthUser, isAdmin, loading } = useAuth();
+  const { currentUser, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Debug log
-  useEffect(() => {
-    console.log('AdminLayout - Auth State:', { 
-      authUser,
-      isAdmin,
-      loading,
-      hasToken: !!localStorage.getItem('token')
-    });
-  }, [authUser, isAdmin, loading]);
+
 
   const handleLogout = () => {
     console.log('AdminLayout - Logging out');
-    setAuthUser(null);
+    // The logout function should be provided by the AuthContext
     navigate('/login');
   };
 
@@ -31,24 +23,20 @@ const AdminLayout = () => {
     );
   }
 
-  // Check for admin access
-  if (!authUser || !isAdmin) {
-    console.log('AdminLayout - Access Denied:', { 
-      hasUser: !!authUser, 
-      userRole: authUser?.role,
-      isAdmin,
-      loading 
-    });
+  // Since we're already wrapped in PrivateRoute with allowedRoles=['admin'],
+  // we can assume the user is an admin at this point
+  if (!currentUser || !isAuthenticated) {
+    console.log('AdminLayout - No user or not authenticated');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
           <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
-          <p className="mb-4">You don't have permission to access this page.</p>
+          <p className="mb-4">You must be logged in to access this page.</p>
           <Link 
-            to="/" 
+            to="/login" 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Go to Home
+            Login
           </Link>
         </div>
       </div>
@@ -63,7 +51,7 @@ const AdminLayout = () => {
           <div className="p-4">
             <h1 className="text-2xl font-bold">Admin Panel</h1>
             <p className="text-indigo-200 text-sm">
-              Welcome, {authUser?.fullname || "Admin"}
+              Welcome, {currentUser?.fullname || "Admin"}
             </p>
           </div>
 
@@ -262,43 +250,8 @@ const AdminLayout = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto">
-          <div className="bg-white shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  {window.location.pathname
-                    .split("/")
-                    .pop()
-                    .charAt(0)
-                    .toUpperCase() +
-                    window.location.pathname.split("/").pop().slice(1) ||
-                    "Dashboard"}
-                </h1>
-                <div className="flex items-center">
-                  <span className="text-gray-600 mr-4">
-                    {new Date().toLocaleDateString("en-US", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </span>
-                  <div className="relative">
-                    <div className="h-8 w-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-800 font-semibold">
-                      {authUser?.fullname
-                        ? authUser.fullname.charAt(0).toUpperCase()
-                        : "A"}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <Outlet />
-          </main>
+        <div className="flex-1 overflow-auto p-6">
+          <Outlet />
         </div>
       </div>
     </div>

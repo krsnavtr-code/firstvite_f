@@ -1,27 +1,41 @@
 import React, { useState } from "react";
-import { FaSearch, FaBookOpen, FaUsers, FaCertificate, FaPlay, FaArrowRight } from "react-icons/fa";
+import {
+  FaSearch,
+  FaBookOpen,
+  FaUsers,
+  FaCertificate,
+  FaPlay,
+  FaArrowRight,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
-import bannerImg from "../../public/banner-removebg.png";
+const bannerImg =
+  "http://firstvite.com/api/upload/file/img-1752554019521-300496356.png";
+import "./Banner.css";
+import "../styles/typography.css";
 
 function Banner() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const features = [
     {
-      icon: <FaBookOpen className="text-2xl text-blue-500 dark:text-blue-400" />,
+      icon: (
+        <FaBookOpen className="text-2xl text-blue-500 dark:text-blue-400" />
+      ),
       title: "1000+ Courses",
-      desc: "Wide range of topics"
+      desc: "Wide range of topics",
     },
     {
       icon: <FaUsers className="text-2xl text-green-500 dark:text-green-400" />,
       title: "Expert Instructors",
-      desc: "Learn from the best"
+      desc: "Learn from the best",
     },
     {
-      icon: <FaCertificate className="text-2xl text-yellow-500 dark:text-yellow-400" />,
+      icon: (
+        <FaCertificate className="text-2xl text-yellow-500 dark:text-yellow-400" />
+      ),
       title: "Certification",
-      desc: "Get certified"
-    }
+      desc: "Get certified",
+    },
   ];
 
   return (
@@ -31,21 +45,27 @@ function Banner() {
           {/* Left Content */}
           <div className="lg:w-1/2 space-y-8">
             <div className="space-y-2 w-full">
-              <div className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+              <div className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
                 <span className="whitespace-nowrap">Learn</span>
-                <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap"> Anytime,</span>
+                <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                  {" "}
+                  Anytime,
+                </span>
               </div>
-              <div className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+              <div className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
                 <div className="flex items-start">
                   <div className="w-12 xs:w-16 sm:w-20 md:w-24 flex-shrink-0"></div>
                   <div>
                     <span className="whitespace-nowrap">Grow</span>
-                    <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap"> Every Day</span>
+                    <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                      {" "}
+                      Every Day
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <p className="text-sm-mobile text-base-tablet text-base-desktop text-thin text-gray-600 dark:text-gray-300">
               No schedule limits, no boundaries. Learn anytime you choose and
               make progress every day with simple, effective online education
               built for real growth.
@@ -119,14 +139,14 @@ function Banner() {
           {/* Right Content */}
           <div className="lg:w-1/2 mt-8 lg:mt-0">
             <div className="relative">
-              <div className="relative z-10">
+              <div className="w-[90%] hidden lg:block mx-auto mask-inset-corners hover:scale-105 transition-transform duration-500 shadow-xl dark:shadow-gray-900/50">
                 <img
                   src={bannerImg}
                   alt="Online Learning"
-                  style={{ maxWidth: "80%" }}
-                  className="hidden lg:block w-full h-auto mx-auto rounded-lg shadow-xl dark:shadow-gray-900/50 transition-transform duration-500 hover:scale-105"
+                  className="w-full h-auto rounded-none"
                 />
               </div>
+
               {/* Floating elements */}
               {/* <div className="absolute -bottom-6 -left-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-20">
                 <div className="flex items-center space-x-3">
