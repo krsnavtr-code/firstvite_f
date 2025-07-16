@@ -601,13 +601,13 @@ function Navbar() {
                 >
                   <FaSignInAlt className="mr-1" /> Sign In
                 </Link>
-                <Link
+                {/* <Link
                   to="/register"
                   state={{ from: location }}
-                  className="flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200"
+                  className="flex hidden lg:block items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200"
                 >
                   <FaUserPlus className="mr-1" /> Sign Up
-                </Link>
+                </Link> */}
               </div>
             )}
           </div>
