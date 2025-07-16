@@ -42,7 +42,7 @@ const LoginPage = () => {
     } catch (error) {
       console.error('Login error:', error);
       
-      if (error.message === 'Account not approved. Please wait for admin approval.') {
+      if (error.message.includes('account is pending approval')) {
         // If account is not approved, show message
         navigate('/login', { 
           state: { 
@@ -50,6 +50,9 @@ const LoginPage = () => {
           },
           replace: true
         });
+      } else if (error.message.includes('account has been deactivated')) {
+        // If account is inactive, redirect to inactive account page
+        navigate('/inactive-account', { replace: true });
       } else {
         // Show error message to user
         toast.error(error.message || 'Login failed. Please try again.');

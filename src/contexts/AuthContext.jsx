@@ -57,7 +57,8 @@ export function AuthProvider({ children }) {
               fullname: response.data.fullname,
               email: response.data.email,
               role: response.data.role,
-              isApproved: response.data.isApproved
+              isApproved: response.data.isApproved,
+              isActive: response.data.isActive !== false // Default to true if not specified
             };
             
             localStorage.setItem('user', JSON.stringify(userData));
@@ -98,6 +99,7 @@ export function AuthProvider({ children }) {
                   fullname: user.fullname,
                   email: user.email,
                   role: user.role,
+                  isActive: user.isActive !== false, // Default to true if not specified
                   isApproved: user.isApproved
                 };
                 

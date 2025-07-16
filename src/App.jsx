@@ -44,6 +44,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import RegisterPage from './pages/auth/RegisterPage';
 import UsersPage from './pages/admin/UsersPage';
 import LMS from './pages/lms';
+import InactiveAccount from './pages/auth/InactiveAccount';
+import PendingApproval from './pages/auth/PendingApproval';
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -117,12 +119,12 @@ function App() {
           </MainLayout>
         } />
         
-        <Route path="/signup" element={
+        {/* <Route path="/signup" element={
           <MainLayout>
             <Home />
             <Signup />
           </MainLayout>
-        } />
+        } /> */}
         
         <Route path="/unauthorized" element={
           <MainLayout>
@@ -191,29 +193,7 @@ function App() {
           </MainLayout>
         } />
 
-        {/* Protected routes */}
-        <Route
-          path="/my-learning"
-          element={
-            <PrivateRoute>
-              <MainLayout>
-                <MyLearning />
-              </MainLayout>
-            </PrivateRoute>
-          }
-        />
-        
-        <Route
-          path="/my-courses"
-          element={
-            <PrivateRoute>
-              <MainLayout>
-                <Courses />
-              </MainLayout>
-            </PrivateRoute>
-          }
-        />
-        
+        {/* Protected routes - Basic website access (only requires active account) */}
         <Route
           path="/profile"
           element={
@@ -225,17 +205,53 @@ function App() {
           }
         />
 
+        {/* Protected routes - Requires active and approved account (LMS access) */}
+        <Route
+          path="/my-learning"
+          element={
+            <PrivateRoute requireLMSAccess={true}>
+              <MainLayout>
+                <MyLearning />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        
+        <Route
+          path="/my-courses"
+          element={
+            <PrivateRoute requireLMSAccess={true}>
+              <MainLayout>
+                <Courses />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
         {/* Admin routes - No Navbar/Footer */}
         <Route path="/mylearning" element={
-          <PrivateRoute allowedRoles={['user', 'admin']}>
+          <PrivateRoute allowedRoles={['user', 'admin']} requireLMSAccess={true}>
             <Navigate to="/lms" replace />
           </PrivateRoute>
         } />
         
         <Route path="/lms/*" element={
-          <PrivateRoute allowedRoles={['user', 'admin']}>
+          <PrivateRoute allowedRoles={['user', 'admin']} requireLMSAccess={true}>
             <LMS />
           </PrivateRoute>
+        } />
+
+        {/* Status pages */}
+        <Route path="/inactive-account" element={
+          <MainLayout>
+            <InactiveAccount />
+          </MainLayout>
+        } />
+        
+        <Route path="/pending-approval" element={
+          <MainLayout>
+            <PendingApproval />
+          </MainLayout>
         } />
         
         <Route element={<PrivateRoute allowedRoles={['admin']}><AdminLayout /></PrivateRoute>}>
