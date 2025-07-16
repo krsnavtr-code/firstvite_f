@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /wp-admin/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /my-account/
+Disallow: /?s=
+
+Allow: /
+
+Sitemap: https://firstvite.com/sitemap.xml
