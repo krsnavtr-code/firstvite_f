@@ -135,21 +135,28 @@ export const updateCategory = async (id, formData) => {
   try {
     console.log('Sending update request to /categories/' + id);
     
-    // Get the current token
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-    
     // Prepare config
-    const config = {};
+    const config = {
+      headers: {}
+    };
     
     // If we have FormData, let the browser set the Content-Type with boundary
     // Otherwise, explicitly set it to application/json
     if (!(formData instanceof FormData)) {
-      config.headers = {
-        'Content-Type': 'application/json'
-      };
+      config.headers['Content-Type'] = 'application/json';
+    }
+    
+    // Get the current token
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Clean the token
+      const cleanedToken = token.trim();
+      if (cleanedToken) {
+        // Ensure the token has the Bearer prefix
+        config.headers.Authorization = cleanedToken.startsWith('Bearer ') 
+          ? cleanedToken 
+          : `Bearer ${cleanedToken}`;
+      }
     }
     
     // Convert FormData to plain object for logging
@@ -163,7 +170,10 @@ export const updateCategory = async (id, formData) => {
       console.log('Request data:', formData);
     }
     
-    // The Authorization header will be added by the axios interceptor
+    // Log the final headers being sent
+    console.log('Request headers:', config.headers);
+    
+    // Make the request
     const response = await api.put(`/categories/${id}`, formData, config);
     
     console.log('Update successful:', response.data);

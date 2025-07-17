@@ -46,34 +46,35 @@ api.interceptors.request.use(
       return config;
     }
     
-    // Get the token from localStorage
-    const token = localStorage.getItem('token');
-    
-    // If no token is found, reject the request
-    if (!token) {
-      console.warn('No authentication token found');
-      return config; // Continue without token, let the server handle it
-    }
-    
-    // Ensure headers exist
-    config.headers = config.headers || {};
-    
-    // Remove any existing Authorization header to prevent duplicates
-    if (config.headers.Authorization) {
-      delete config.headers.Authorization;
-    }
-    
     try {
-      // Trim and validate the token
-      const trimmedToken = token.trim();
-      if (!trimmedToken) {
-        console.error('Empty token found in localStorage');
-        localStorage.removeItem('token');
-        return Promise.reject(new Error('Invalid token'));
-      }
+      // Ensure headers exist
+      config.headers = config.headers || {};
       
-      // Add the token with Bearer prefix
-      config.headers.Authorization = `Bearer ${trimmedToken}`;
+      // Only add auth token for non-public endpoints
+      const token = localStorage.getItem('token');
+      
+      if (token) {
+        // Clean and validate the token
+        const cleanedToken = token.trim();
+        
+        if (!cleanedToken) {
+          console.error('Empty token found in localStorage');
+          localStorage.removeItem('token');
+          return Promise.reject(new Error('Invalid token'));
+        }
+        
+        // Ensure the token starts with 'Bearer ' if it doesn't already
+        if (!cleanedToken.startsWith('Bearer ')) {
+          config.headers.Authorization = `Bearer ${cleanedToken}`;
+        } else {
+          config.headers.Authorization = cleanedToken;
+        }
+        
+        console.log('Added Authorization header to request');
+      } else {
+        console.warn('No authentication token found for protected endpoint:', config.url);
+        // Don't reject here, let the server handle the missing token
+      }
     } catch (error) {
       console.error('Error processing token:', error);
       localStorage.removeItem('token');
