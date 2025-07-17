@@ -814,7 +814,7 @@ const CourseDetail = () => {
       {/* Course Tabs */}
       <div className="container mx-auto px-4 py-8">
         <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
-          <nav className="flex -mb-px whitespace-nowrap space-x-1">
+          <nav className="flex flex-wrap -mb-px whitespace-nowrap space-x-1">
             <button
               onClick={() => setActiveTab("overview")}
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
@@ -955,14 +955,24 @@ const CourseDetail = () => {
                                   : "bg-gray-400"
                               }`}
                             ></div>
-                            <h3 className="text-gray-900 dark:text-white font-semibold">
-                              {section.title}
-                            </h3>
-                            <span className="ml-3 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
-                              Week {section.week} •{" "}
-                              {section.topics?.length || 0} topics •{" "}
-                              {section.duration || "0"} hours
-                            </span>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                              <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">
+                                {section.title}
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
+                                <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                  Week {section.week}
+                                </span>
+                                <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                  {section.topics?.length || 0} topics
+                                </span>
+                                {section.duration && (
+                                  <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                    {section.duration} hours
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
                           <svg
                             className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
