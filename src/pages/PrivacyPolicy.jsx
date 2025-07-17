@@ -14,19 +14,7 @@ const PrivacyPolicy = () => {
             This Privacy Policy outlines how we collect, use, and safeguard your information when you use our platform.
           </p>
 
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">1. Information We Collect</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            We may collect the following types of information:
-          </p>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 mb-6 space-y-2">
-            <li>Personal information (name, email, contact details)</li>
-            <li>Account credentials</li>
-            <li>Payment information (processed securely through our payment processor)</li>
-            <li>Course progress and completion data</li>
-            <li>Device and usage information</li>
-          </ul>
-
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">2. How We Use Your Information</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">1. How We Use Your Information</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">
             We use the information we collect to:
           </p>
@@ -39,14 +27,14 @@ const PrivacyPolicy = () => {
             <li>Comply with legal obligations</li>
           </ul>
 
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">3. Data Security</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">2. Data Security</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             We implement appropriate security measures to protect your personal information from unauthorized access, 
             alteration, disclosure, or destruction. However, no internet transmission or electronic storage is 100% secure, 
             so we cannot guarantee absolute security.
           </p>
 
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">4. Your Rights</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">3. Your Rights</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">
             You have the right to:
           </p>
@@ -58,19 +46,19 @@ const PrivacyPolicy = () => {
             <li>Withdraw consent where applicable</li>
           </ul>
 
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">5. Third-Party Services</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">4. Third-Party Services</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             We may use third-party services (e.g., payment processors, analytics) that have their own privacy policies. 
             We encourage you to review these policies when accessing their services.
           </p>
 
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">6. Changes to This Policy</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">5. Changes to This Policy</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new 
             Privacy Policy on this page and updating the "Last updated" date.
           </p>
 
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">7. Contact Us</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">6. Contact Us</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             If you have any questions about this Privacy Policy, please contact us at:
           </p>
