@@ -23,34 +23,36 @@ const VITE_API_URL= import.meta.env.VITE_API_URL;
 //   return `${VITE_API_URL}/public/uploads/${path}`;
 // };
 export const getImageUrl = (path) => {
-  console.log('getImageUrl called with path:', path);
-  
   if (!path) {
     console.log('No path provided, returning empty string');
     return '';
   }
 
-  // For debugging - log the environment variables
-  console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
-  
-  // If it's already a full URL with the correct path, return as is
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    console.log('Path is already a full URL, returning as is');
+  // If it's a data URL, return as is
+  if (path.startsWith('data:')) {
     return path;
   }
 
-  // Extract just the filename part, removing any path components
-  const filename = path.split('/').pop();
-  console.log('Extracted filename:', filename);
-  
-  // Use the environment variable or fall back to current origin
   const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
   
-  // Since the server is configured to serve from /uploads (without /public)
-  const url = `${baseUrl}/uploads/${filename}`;
-  console.log('Constructed image URL:', url);
+  // If it's already a full URL
+  if (path.startsWith('http')) {
+    // If it's from our own domain or firstvite.com, return as is
+    if (path.includes(window.location.hostname) || path.includes('firstvite.com')) {
+      return path;
+    }
+    // For other external URLs, proxy through our backend
+    return `${baseUrl}/api/proxy-image?url=${encodeURIComponent(path)}`;
+  }
+
+  // Remove any leading slashes or uploads/ from the path
+  let cleanPath = path.replace(/^\/+|^uploads\/+/, '');
   
-  return url;
+  // Make sure we don't have any double slashes
+  cleanPath = cleanPath.replace(/\/+/g, '/');
+  
+  // Construct the final URL
+  return `${baseUrl}/uploads/${cleanPath}`;
 };
 
 /**

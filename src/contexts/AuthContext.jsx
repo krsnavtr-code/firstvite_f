@@ -18,13 +18,9 @@ export function AuthProvider({ children }) {
       try {
         const token = localStorage.getItem('token');
         const refreshToken = localStorage.getItem('refreshToken');
-        const storedUser = localStorage.getItem('user');
-        
-        console.log('Initial auth check - Token exists:', !!token, 'Refresh token exists:', !!refreshToken);
         
         // If no tokens, clear everything and return
         if (!token || !refreshToken) {
-          console.log('No valid authentication tokens found');
           if (isMounted) {
             setCurrentUser(null);
             setLoading(false);
@@ -40,17 +36,10 @@ export function AuthProvider({ children }) {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         
         try {
-          console.log('Verifying authentication token...');
-          
-          // Set the auth header
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
           // Get fresh user data
           const response = await api.get('/auth/profile');
           
           if (response.data && isMounted) {
-            console.log('User authenticated:', response.data.email);
-            
             // Store the updated user data
             const userData = {
               _id: response.data._id,
@@ -63,6 +52,16 @@ export function AuthProvider({ children }) {
             
             localStorage.setItem('user', JSON.stringify(userData));
             setCurrentUser(userData);
+            
+            // Handle redirects based on user status
+            if (!userData.isActive) {
+              if (window.location.pathname !== '/suspended') {
+                window.location.href = '/suspended';
+              }
+            } else if (window.location.pathname === '/suspended') {
+              window.location.href = '/';
+            }
+            
             setLoading(false);
             return;
           }

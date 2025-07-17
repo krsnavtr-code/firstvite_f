@@ -14,24 +14,45 @@ const api = axios.create({
   timeout: 10000, // 10 seconds timeout
 });
 
+// Track if a token refresh is in progress
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+// Queue for requests that need to wait for token refresh
+const onTokenRefreshed = (token) => {
+  refreshSubscribers.forEach(callback => callback(token));
+  refreshSubscribers = [];
+};
+
+const addRefreshSubscriber = (callback) => {
+  refreshSubscribers.push(callback);
+};
+
 // Request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
     // Skip adding auth header for public endpoints
-    const publicEndpoints = ['/auth/login', '/auth/register', '/auth/refresh-token'];
+    const publicEndpoints = [
+      '/auth/login', 
+      '/auth/register', 
+      '/auth/refresh-token',
+      '/auth/forgot-password',
+      '/auth/reset-password',
+      '/categories' // Add public endpoints that don't require auth
+    ];
     
     // Don't modify the config for public endpoints
     if (publicEndpoints.some(endpoint => config.url.endsWith(endpoint))) {
-      console.log('Skipping auth for public endpoint:', config.url);
       return config;
     }
     
     // Get the token from localStorage
     const token = localStorage.getItem('token');
     
+    // If no token is found, reject the request
     if (!token) {
-      console.warn('No token found for request:', config.url);
-      return config;
+      console.warn('No authentication token found');
+      return config; // Continue without token, let the server handle it
     }
     
     // Ensure headers exist
@@ -39,39 +60,25 @@ api.interceptors.request.use(
     
     // Remove any existing Authorization header to prevent duplicates
     if (config.headers.Authorization) {
-      console.log('Removing existing Authorization header');
       delete config.headers.Authorization;
     }
     
-    // Trim and validate the token
-    const trimmedToken = token.trim();
-    if (!trimmedToken) {
-      console.error('Empty token found in localStorage');
-      return config;
-    }
-    
-    // Try to decode the token to check its format
     try {
-      const tokenParts = trimmedToken.split('.');
-      if (tokenParts.length !== 3) {
-        console.error('Invalid token format: expected 3 parts, got', tokenParts.length);
-      } else {
-        const header = JSON.parse(atob(tokenParts[0]));
-        const payload = JSON.parse(atob(tokenParts[1]));
-        console.log('Token header:', header);
-        console.log('Token payload:', {
-          ...payload,
-          iat: payload.iat ? new Date(payload.iat * 1000).toISOString() : null,
-          exp: payload.exp ? new Date(payload.exp * 1000).toISOString() : null
-        });
+      // Trim and validate the token
+      const trimmedToken = token.trim();
+      if (!trimmedToken) {
+        console.error('Empty token found in localStorage');
+        localStorage.removeItem('token');
+        return Promise.reject(new Error('Invalid token'));
       }
-    } catch (e) {
-      console.error('Error decoding token:', e);
+      
+      // Add the token with Bearer prefix
+      config.headers.Authorization = `Bearer ${trimmedToken}`;
+    } catch (error) {
+      console.error('Error processing token:', error);
+      localStorage.removeItem('token');
+      return Promise.reject(new Error('Invalid token format'));
     }
-    
-    // Add the token with Bearer prefix
-    config.headers.Authorization = `Bearer ${trimmedToken}`;
-    console.log('Added Authorization header to request:', config.url);
     
     return config;
   },
@@ -84,23 +91,25 @@ api.interceptors.request.use(
 // Response interceptor to handle errors and token refresh
 api.interceptors.response.use(
   (response) => {
-    // Handle successful responses
+    // You can modify successful responses here if needed
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
     
-    // Log the error for debugging
-    if (error.response) {
-      console.error('Response error:', {
-        url: originalRequest?.url,
-        status: error.response.status,
-        statusText: error.response.statusText,
-        data: error.response.data,
-        headers: error.response.headers
+    // If the error is not a 401 or it's a retry request, reject
+    if (error.response?.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error);
+    }
+    
+    // If we're already refreshing the token, add the request to the queue
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        addRefreshSubscriber((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve(api(originalRequest));
+        });
       });
-    } else {
-      console.error('Request error:', error);
     }
     
     // If the error is 401 and we haven't tried to refresh the token yet

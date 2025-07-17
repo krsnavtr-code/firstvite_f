@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getCoursesByCategory } from "../../api/courseApi";
 import { getCategories } from "../../api/categoryApi";
@@ -187,62 +187,126 @@ const CoursesByCategory = () => {
 };
 
 const CourseCard = ({ course }) => {
-  const [imageError, setImageError] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageState, setImageState] = useState({
+    url: '',
+    isLoading: true,
+    hasError: false
+  });
 
   useEffect(() => {
-    // Reset error state when course changes
-    setImageError(false);
+    let isMounted = true;
+    let img = null;
+    let timeoutId = null;
     
-    console.log('Course data:', course);
-    console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
-    
-    if (!course.thumbnail) {
-      console.log('No thumbnail found, using placeholder');
-      setImageUrl('/images/course-placeholder.jpg');
-      return;
-    }
-
-    console.log('Raw thumbnail path from API:', course.thumbnail);
-    const url = getImageUrl(course.thumbnail);
-    console.log('Constructed image URL:', url);
-    
-    // Test if the image exists
-    const img = new Image();
-    img.onload = () => {
-      console.log('Image loaded successfully:', url);
-      setImageUrl(url);
-    };
-    img.onerror = () => {
-      console.error('Failed to load image:', url);
-      console.log('Image element error details:', {
-        naturalWidth: img.naturalWidth,
-        naturalHeight: img.naturalHeight,
-        complete: img.complete,
-        src: img.src
-      });
-      setImageError(true);
-      setImageUrl('/images/course-placeholder.jpg');
-    };
-    
-    console.log('Setting image source to:', url);
-    img.src = url;
-    
-    // Set a timeout to check if the image loads within 2 seconds
-    const timeoutId = setTimeout(() => {
-      if (!img.complete) {
-        console.warn('Image loading timed out:', url);
-        setImageError(true);
-        setImageUrl('/images/course-placeholder.jpg');
+    const loadImage = async () => {
+      if (!course.thumbnail) {
+        if (isMounted) {
+          setImageState({
+            url: '/images/course-placeholder.jpg',
+            isLoading: false,
+            hasError: true
+          });
+        }
+        return;
       }
-    }, 2000);
+
+      try {
+        const url = getImageUrl(course.thumbnail);
+        console.log('Loading image:', url);
+        
+        if (isMounted) {
+          setImageState({
+            url: url,
+            isLoading: true,
+            hasError: false
+          });
+        }
+
+        // Create image element to test loading
+        img = new Image();
+        
+        // Set up load/error handlers
+        const onLoad = () => {
+          if (isMounted) {
+            console.log('Image loaded successfully');
+            setImageState({
+              url: url,
+              isLoading: false,
+              hasError: false
+            });
+          }
+        };
+        
+        const onError = (e) => {
+          console.warn('Failed to load image:', url, e);
+          if (isMounted) {
+            setImageState({
+              url: '/images/course-placeholder.jpg',
+              isLoading: false,
+              hasError: true
+            });
+          }
+        };
+        
+        // Set up event listeners
+        img.onload = onLoad;
+        img.onerror = onError;
+        
+        // Start loading the image
+        img.src = url;
+        
+        // Set a timeout to handle slow loading
+        timeoutId = setTimeout(() => {
+          if (isMounted && img && !img.complete) {
+            console.warn('Image load timed out:', url);
+            // Only set error state if the image hasn't loaded yet
+            if (isMounted) {
+              setImageState({
+                url: '/images/course-placeholder.jpg',
+                isLoading: false,
+                hasError: true
+              });
+            }
+          }
+        }, 5000);
+        
+      } catch (error) {
+        console.error('Error loading image:', error);
+        if (isMounted) {
+          setImageState({
+            url: '/images/course-placeholder.jpg',
+            isLoading: false,
+            hasError: true
+          });
+        }
+      }
+    };
     
-    return () => clearTimeout(timeoutId);
-  }, [course]);
+    // Start loading the image
+    loadImage();
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      if (img) {
+        img.onload = null;
+        img.onerror = null;
+        img = null;
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [course.thumbnail]);
   
-  const handleImageError = () => {
-    setImageError(true);
-    setImageUrl('/images/course-placeholder.jpg');
+  const handleImageError = (e) => {
+    console.error('Image error:', e);
+    setImageState(prev => ({
+      ...prev,
+      url: '/images/course-placeholder.jpg',
+      isLoading: false,
+      hasError: true
+    }));
   };
 
   return (
@@ -254,15 +318,19 @@ const CourseCard = ({ course }) => {
       <Link to={`/course/${course.slug || course._id}`}>
         <div className="relative pb-9/16">
           <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-            {imageError || !course.thumbnail ? (
-              <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-700">
+            {imageState.isLoading ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                <div className="animate-pulse w-full h-full bg-gray-300 dark:bg-gray-600"></div>
+              </div>
+            ) : imageState.hasError || !course.thumbnail ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
                 <span className="text-gray-500 dark:text-gray-400">
                   No image available
                 </span>
               </div>
             ) : (
               <img
-                src={imageUrl}
+                src={imageState.url}
                 alt={course.title || "Course image"}
                 className="w-full h-full object-cover"
                 onError={handleImageError}

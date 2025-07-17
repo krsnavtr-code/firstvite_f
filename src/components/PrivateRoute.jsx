@@ -1,106 +1,78 @@
-import React, { useEffect } from 'react';
-import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { message } from 'antd';
 
-export default function PrivateRoute({ children, allowedRoles = [] }) {
-  const { currentUser, isAuthenticated, loading } = useAuth();
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+  </div>
+);
+
+export default function PrivateRoute({ 
+  children, 
+  allowedRoles = [],
+  requireLMS = false
+}) {
+  const { currentUser, isAuthenticated, loading, logout } = useAuth();
   const location = useLocation();
-  const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
-
-  // Debug logging
-  useEffect(() => {
-    console.log('PrivateRoute - Auth State:', { 
-      hasAuthUser: isAuthenticated,
-      currentUser,
-      isAdmin: currentUser?.role === 'admin',
-      loading,
-      allowedRoles,
-      currentPath: location.pathname
-    });
-  }, [currentUser, isAuthenticated, loading, allowedRoles, location.pathname]);
-
-  // Add a small delay before showing loading state to prevent flickering
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsCheckingAuth(false);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Get user role and check if they're an admin
   const userRole = currentUser?.role?.toLowerCase();
-  const isAdmin = userRole === 'admin'; // Check if user role is 'admin'
+  const isAdmin = userRole === 'admin';
 
-  // If we have a token, show content immediately
-  if (localStorage.getItem('token')) {
-    // If we don't have currentUser yet but have a token, show loading
-    if (!currentUser) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-        </div>
-      );
-    }
-    return (
-      <>
-        {children ? React.cloneElement(children, { currentUser }) : <Outlet />}
-      </>
-    );
+  if (loading) {
+    return <LoadingSpinner />;
   }
 
-  // If we're loading but don't have a token, show loading
-  if (loading || isCheckingAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-      </div>
-    );
-  }
-
-  // If we're not loading but not authenticated, redirect to login
+  // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    console.log('PrivateRoute - Not authenticated, redirecting to login');
-    return (
-      <Navigate 
-        to={`/login?redirect=${encodeURIComponent(location.pathname)}`} 
-        state={{ from: location }} 
-        replace 
-      />
-    );
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check admin access first
-  if (location.pathname.startsWith('/admin')) {
-    if (!isAdmin) {
-      console.log('PrivateRoute - Admin access denied');
-      return <Navigate to="/" replace />;
-    }
-    return (
-      <>
-        {children ? React.cloneElement(children, { currentUser }) : <Outlet />}
-      </>
-    );
+  // Check if user is active
+  if (currentUser?.isActive === false) {
+    logout();
+    return <Navigate to="/login?error=account_suspended" replace />;
+  }
+
+  // Check LMS access requirements
+  if (requireLMS && currentUser?.isApproved === false) {
+    logout();
+    return <Navigate to="/login?error=not_approved" replace />;
+  }
+
+  // Check admin access
+  if (location.pathname.startsWith('/admin') && !isAdmin) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   // Check allowed roles for non-admin routes
   if (allowedRoles.length > 0) {
-    const hasAllowedRole = allowedRoles.some(role => 
-      role.toLowerCase() === userRole
-    );
+    const normalizedUserRole = userRole?.toLowerCase();
+    const normalizedAllowedRoles = allowedRoles.map(role => role?.toLowerCase());
+    
+    const hasAllowedRole = normalizedAllowedRoles.includes(normalizedUserRole);
 
     if (!hasAllowedRole) {
       console.log('PrivateRoute - Role-based access denied', {
         currentRole: userRole,
+        normalizedUserRole,
         allowedRoles,
+        normalizedAllowedRoles,
         hasToken: !!localStorage.getItem('token')
       });
-      return <Navigate to="/" replace />;
+      return <Navigate to="/unauthorized" replace />;
     }
   }
 
-  // If we've passed all checks, show the content
+  // If we get here, user is authenticated and has the required role/status
+  console.log('PrivateRoute - Access granted', {
+    path: location.pathname,
+    userRole,
+    isAuthenticated,
+    requireLMS,
+    isApproved: currentUser?.isApproved,
+    isActive: currentUser?.isActive
+  });
+  
   return (
     <>
       {children ? React.cloneElement(children, { currentUser }) : <Outlet />}

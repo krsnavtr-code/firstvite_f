@@ -39,13 +39,15 @@ import Cart from './components/cart/Cart';
 import Profile from './pages/user/Profile';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SuspendedAccount from './pages/SuspendedAccount';
+import PendingApproval from './pages/PendingApproval';
+import LMSLayout from './components/LMSLayout';
 
 // LMS Components
 import RegisterPage from './pages/auth/RegisterPage';
 import UsersPage from './pages/admin/UsersPage';
 import LMS from './pages/lms';
 import InactiveAccount from './pages/auth/InactiveAccount';
-import PendingApproval from './pages/auth/PendingApproval';
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -104,6 +106,11 @@ function App() {
         pauseOnHover
       />
       <Routes>
+        {/* Account Status Pages */}
+        <Route path="/suspended" element={<SuspendedAccount />} />
+        <Route path="/pending-approval" element={<PendingApproval />} />
+        <Route path="/inactive-account" element={<InactiveAccount />} />
+
         {/* Public routes */}
         <Route path="/" element={
           <MainLayout>
@@ -197,7 +204,7 @@ function App() {
         <Route
           path="/profile"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin', 'user', 'student']}>
               <MainLayout>
                 <Profile />
               </MainLayout>
@@ -209,7 +216,7 @@ function App() {
         <Route
           path="/my-learning"
           element={
-            <PrivateRoute requireLMSAccess={true}>
+            <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
               <MainLayout>
                 <MyLearning />
               </MainLayout>
@@ -220,7 +227,7 @@ function App() {
         <Route
           path="/my-courses"
           element={
-            <PrivateRoute requireLMSAccess={true}>
+            <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
               <MainLayout>
                 <Courses />
               </MainLayout>
@@ -228,16 +235,18 @@ function App() {
           }
         />
 
-        {/* Admin routes - No Navbar/Footer */}
+        {/* LMS Routes - Requires active and approved account */}
         <Route path="/mylearning" element={
-          <PrivateRoute allowedRoles={['user', 'admin']} requireLMSAccess={true}>
+          <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
             <Navigate to="/lms" replace />
           </PrivateRoute>
         } />
         
         <Route path="/lms/*" element={
-          <PrivateRoute allowedRoles={['user', 'admin']} requireLMSAccess={true}>
-            <LMS />
+          <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
+            <LMSLayout>
+              <LMS />
+            </LMSLayout>
           </PrivateRoute>
         } />
 

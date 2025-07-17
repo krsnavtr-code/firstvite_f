@@ -569,7 +569,7 @@ function Navbar() {
                       role="menuitem"
                       onClick={() => setIsProfileMenuOpen(false)}
                     >
-                      Your Profile
+                      My Profile
                     </Link>
                     {!isApproved && (
                       <div className="px-4 py-2 text-sm text-yellow-600 dark:text-yellow-400">

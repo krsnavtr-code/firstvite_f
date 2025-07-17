@@ -54,6 +54,9 @@ const CourseDetail = () => {
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
 
+  // Get current user from auth context
+  const { currentUser } = useAuth();
+
   // State declarations - all hooks at the top
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,25 +65,38 @@ const CourseDetail = () => {
   const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [expandedSections, setExpandedSections] = useState(() => {
-    // Initialize all sections as expanded by default
+  const [expandedSections, setExpandedSections] = useState({});
+
+  // Initialize expanded sections when course data is loaded
+  useEffect(() => {
     if (course?.curriculum?.length > 0) {
-      return course.curriculum.reduce((acc, _, index) => ({
+      const initialExpandedState = course.curriculum.reduce((acc, _, index) => ({
         ...acc,
         [index]: true
       }), {});
+      setExpandedSections(initialExpandedState);
     }
-    return {};
-  });
+  }, [course]);
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: currentUser?.name || "",
+    email: currentUser?.email || "",
+    phone: currentUser?.phone || "",
     message: "",
     courseInterests: [],
   });
 
-// No authentication required for course details page - allowing public access
+  // Auto-fill user data when component mounts or user changes
+  useEffect(() => {
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        name: currentUser.name || prev.name,
+        email: currentUser.email || prev.email,
+        phone: currentUser.phone || prev.phone
+      }));
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -580,7 +596,9 @@ const CourseDetail = () => {
                         Lessons
                       </p>
                       <p className="font-medium text-xs text-gray-900 dark:text-white">
-                        {course.lessonsCount || 0}
+                        {course.curriculum?.length
+                          ? course.curriculum.length * 2
+                          : 0}
                       </p>
                     </div>
                   </div>
@@ -644,8 +662,8 @@ const CourseDetail = () => {
                   onClick={() => {
                     if (!isAuthenticated) {
                       // Redirect to login page with a return URL
-                      navigate('/login', { state: { from: `/courses/${id}` } });
-                      toast.info('Please log in to enroll in this course');
+                      navigate("/login", { state: { from: `/courses/${id}` } });
+                      toast.info("Please log in to enroll in this course");
                       return;
                     }
                     setShowCheckoutOptions(true);
@@ -659,6 +677,14 @@ const CourseDetail = () => {
                     <FaPlay className="mr-2" /> Preview this course
                   </button>
                 )}
+              </div>
+              <div className="mt-5 border-t border-gray-100 dark:border-gray-700">
+                {/* <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                          30-Day Money-Back Guarantee
+                        </p> */}
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Full Lifetime Access.
+                </p>
               </div>
             </div>
 
@@ -775,15 +801,6 @@ const CourseDetail = () => {
                           </li>
                         ))}
                       </ul>
-
-                      <div className="mt-2 border-t border-gray-100 dark:border-gray-700">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                          30-Day Money-Back Guarantee
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Full Lifetime Access. Cancel anytime.
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -795,7 +812,7 @@ const CourseDetail = () => {
 
       {/* Course Tabs */}
       <div className="container mx-auto px-4 py-8">
-        <div className="border-b border-gray-200 dark:border-gray-700 mb-8 overflow-x-auto">
+        <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
           <nav className="flex -mb-px whitespace-nowrap space-x-1">
             <button
               onClick={() => setActiveTab("overview")}
@@ -817,7 +834,7 @@ const CourseDetail = () => {
             >
               Curriculum
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab("instructor")}
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "instructor"
@@ -826,8 +843,8 @@ const CourseDetail = () => {
               }`}
             >
               Instructor
-            </button>
-            <button
+            </button> */}
+            {/* <button
               onClick={() => setActiveTab("reviews")}
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "reviews"
@@ -836,7 +853,7 @@ const CourseDetail = () => {
               }`}
             >
               Reviews
-            </button>
+            </button> */}
           </nav>
         </div>
 
@@ -941,8 +958,9 @@ const CourseDetail = () => {
                               {section.title}
                             </h3>
                             <span className="ml-3 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
-                              {section.lessons?.length || 0} lessons •{" "}
-                              {section.duration || "0 min"}
+                              Week {section.week} •{" "}
+                              {section.topics?.length || 0} topics •{" "}
+                              {section.duration || "0"} hours
                             </span>
                           </div>
                           <svg
@@ -973,25 +991,26 @@ const CourseDetail = () => {
                               className="bg-white dark:bg-slate-800 overflow-hidden"
                             >
                               <div className="divide-y divide-gray-100 dark:divide-slate-700">
-                                {section.lessons?.map((lesson, lessonIndex) => (
-                                  <div
-                                    key={lessonIndex}
-                                    className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
-                                  >
-                                    <div className="flex items-center">
-                                      <FaPlay className="h-4 w-4 text-gray-400 mr-3" />
-                                      <span className="text-sm text-gray-600 dark:text-gray-300">
-                                        {lesson.title}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                      <span className="mr-4">
-                                        {lesson.duration || "5 min"}
-                                      </span>
-                                      <FaLock className="h-4 w-4 text-gray-400" />
-                                    </div>
-                                  </div>
-                                ))}
+                                <div className="p-4">
+                                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                    {section.description}
+                                  </p>
+                                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                                    Topics Covered:
+                                  </h4>
+                                  <ul className="list-disc list-inside space-y-1">
+                                    {section.topics?.map(
+                                      (topic, topicIndex) => (
+                                        <li
+                                          key={topicIndex}
+                                          className="text-sm text-gray-600 dark:text-gray-300"
+                                        >
+                                          {topic}
+                                        </li>
+                                      )
+                                    )}
+                                  </ul>
+                                </div>
                               </div>
                             </motion.div>
                           )}
@@ -1361,110 +1380,6 @@ const CourseDetail = () => {
                     </div>
                   )}
                 </div>
-
-                {/* <div className="flex gap-2">
-                  <button
-                    onClick={handleAddToWishlist}
-                    disabled={isWishlistLoading}
-                    className={`flex items-center justify-center px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm ${
-                      isWishlistLoading ? "opacity-70 cursor-not-allowed" : ""
-                    }`}
-                    aria-label={
-                      isInWishlist ? "Remove from wishlist" : "Add to wishlist"
-                    }
-                  >
-                    {isWishlistLoading ? (
-                      <>
-                        <svg
-                          className="animate-spin h-5 w-5 text-gray-500"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                      </>
-                    ) : isInWishlist ? (
-                      <FaHeart className="h-5 w-5 text-red-500" />
-                    ) : (
-                      <FaRegHeart className="h-5 w-5" />
-                    )}
-                  </button>
-
-                  <div className="relative">
-                    <button
-                      onClick={toggleShareMenu}
-                      className="flex items-center justify-center w-12 h-12 border border-gray-200 dark:border-gray-700 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
-                      aria-label="Share course"
-                      aria-expanded={showShareMenu}
-                      aria-haspopup="true"
-                    >
-                      <FaShareAlt className="h-5 w-5" />
-                    </button>
-
-                    <AnimatePresence>
-                      {showShareMenu && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-white dark:bg-slate-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-                          role="menu"
-                          aria-orientation="vertical"
-                          aria-labelledby="share-menu"
-                        >
-                          <div className="py-1">
-                            <button
-                              onClick={handleShare("facebook")}
-                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-                              role="menuitem"
-                            >
-                              <FaFacebook className="mr-3 h-5 w-5 text-blue-600" />
-                              Facebook
-                            </button>
-                            <button
-                              onClick={handleShare("twitter")}
-                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-                              role="menuitem"
-                            >
-                              <FaTwitter className="mr-3 h-5 w-5 text-blue-400" />
-                              Twitter
-                            </button>
-                            <button
-                              onClick={handleShare("linkedin")}
-                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-                              role="menuitem"
-                            >
-                              <FaLinkedin className="mr-3 h-5 w-5 text-blue-700" />
-                              LinkedIn
-                            </button>
-                            <button
-                              onClick={handleCopyLink}
-                              className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-                              role="menuitem"
-                            >
-                              <FaLink className="mr-3 h-5 w-5 text-gray-500" />
-                              Copy Link
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div> */}
               </div>
 
               <form onSubmit={handleContactSubmit} className="space-y-4">
@@ -1498,10 +1413,11 @@ const CourseDetail = () => {
                     type="email"
                     id="email"
                     name="email"
+                    disabled
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full cursor-not-allowed px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="your@email.com"
                   />
                 </div>
