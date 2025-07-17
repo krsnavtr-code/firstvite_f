@@ -76,7 +76,7 @@ const PrivacyPolicy = () => {
           </p>
           <address className="not-italic text-gray-700 dark:text-gray-300 mb-8">
             FirstVite<br />
-            H-161 BIS Sector-63<br />
+            H-161 BSI Sector-63<br />
             Noida, Gautam Budh Nagar<br />
             Uttar Pradesh 201301<br />
             Email: info@firstvite.com

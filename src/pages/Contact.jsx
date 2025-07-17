@@ -159,7 +159,7 @@ export default function Contact() {
                       Address
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-300">
-                      H-161 BIS Sector-63 Noida Gautam Budh Nagar <br /> Uttar
+                      H-161 BSI Sector-63 Noida Gautam Budh Nagar <br /> Uttar
                       Pradesh 201301
                     </p>
                   </div>

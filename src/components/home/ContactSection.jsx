@@ -47,7 +47,7 @@ const ContactSection = () => {
       icon: <FaMapMarkerAlt className="text-2xl text-blue-500" />,
       title: "Our Location",
       description:
-        "H-161 BIS Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301",
+        "H-161 BSI Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301",
       link: "#",
       linkText: "View on map",
     },
