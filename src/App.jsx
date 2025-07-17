@@ -39,6 +39,7 @@ import Cart from './components/cart/Cart';
 import Profile from './pages/user/Profile';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import useContactFormPopup from './hooks/useContactFormPopup.jsx';
 import SuspendedAccount from './pages/SuspendedAccount';
 import PendingApproval from './pages/PendingApproval';
 import LMSLayout from './components/LMSLayout';
@@ -68,6 +69,7 @@ const MainLayout = ({ children }) => {
 
 function App() {
   const { authUser } = useAuth();
+  const { ContactFormPopup } = useContactFormPopup();
   
   return (
     <CartProvider>
@@ -94,6 +96,7 @@ function App() {
           },
         }}
       />
+      <ContactFormPopup />
       <ToastContainer
         position="bottom-right"
         autoClose={3000}

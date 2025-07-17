@@ -20,7 +20,9 @@ export default function Contact() {
     email: '',
     phone: '',
     message: '',
-    courseInterests: []
+    courseInterest: '', // Changed from array to single value
+    courseInterests: [], // Keeping for backward compatibility
+    agreedToTerms: false
   });
   
   const [courses, setCourses] = useState([]);
@@ -83,21 +85,26 @@ export default function Contact() {
     }));
   };
 
+  // Keeping handleCheckboxChange for backward compatibility
   const handleCheckboxChange = (courseId) => {
-    setFormData(prev => {
-      const updatedInterests = prev.courseInterests.includes(courseId)
-        ? prev.courseInterests.filter(id => id !== courseId)
-        : [...prev.courseInterests, courseId];
-      
-      return {
-        ...prev,
-        courseInterests: updatedInterests
-      };
-    });
+    setFormData(prev => ({
+      ...prev,
+      courseInterest: courseId,
+      courseInterests: [courseId] // Maintain compatibility with existing code
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.agreedToTerms) {
+      toast.error('Please accept the terms & conditions and privacy policy', {
+        position: 'top-center',
+        autoClose: 5000,
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -108,7 +115,8 @@ export default function Contact() {
         email: '',
         phone: '',
         message: '',
-        courseInterests: []
+        courseInterests: [],
+        agreedToTerms: false
       });
       
       toast.success('Your message has been sent successfully!', {
@@ -318,49 +326,58 @@ export default function Contact() {
                       value={formData.phone}
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+91 8080808080"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="courseInterest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     I'm interested in: (Optional)
                   </label>
                   {isLoadingCourses ? (
-                    <div className="flex items-center justify-center py-4">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                        Loading courses...
-                      </span>
+                    <div className="relative">
+                      <select
+                        id="courseInterest"
+                        name="courseInterest"
+                        disabled
+                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                      >
+                        <option>Loading courses...</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      </div>
                     </div>
                   ) : courses.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {courses.map((course) => (
-                        <div key={course.id} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id={`course-${course.id}`}
-                            checked={formData.courseInterests.includes(
-                              course.id
-                            )}
-                            onChange={() => handleCheckboxChange(course.id)}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-                          />
-                          <label
-                            htmlFor={`course-${course.id}`}
-                            className="ml-2 text-sm text-gray-700 dark:text-gray-300 truncate"
-                            title={course.name}
-                          >
+                    <div className="mt-1">
+                      <select
+                        id="courseInterest"
+                        name="courseInterest"
+                        value={formData.courseInterest}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          courseInterest: e.target.value
+                        }))}
+                        className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="">Select a course (optional)</option>
+                        {courses.map((course) => (
+                          <option key={course.id} value={course.id}>
                             {course.name}
-                          </label>
-                        </div>
-                      ))}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      No courses available at the moment.
-                    </p>
+                    <select
+                      id="courseInterest"
+                      name="courseInterest"
+                      disabled
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                    >
+                      <option>No courses available</option>
+                    </select>
                   )}
                 </div>
 
@@ -374,7 +391,7 @@ export default function Contact() {
                   <textarea
                     id="message"
                     name="message"
-                    rows={5}
+                    rows={2}
                     value={formData.message}
                     onChange={handleChange}
                     required
@@ -384,10 +401,57 @@ export default function Contact() {
                 </div>
 
                 <div className="pt-2">
+                  <div className="flex items-start">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="agreedToTerms"
+                        name="agreedToTerms"
+                        type="checkbox"
+                        checked={formData.agreedToTerms}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            agreedToTerms: e.target.checked,
+                          }))
+                        }
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        required
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="agreedToTerms"
+                        className="font-medium text-gray-700 dark:text-gray-300"
+                      >
+                        I agree to the{" "}
+                        <a
+                          href="/terms-of-service"
+                          // target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          Terms & Conditions
+                        </a>{" "}
+                        and{" "}
+                        <a
+                          href="/privacy-policy"
+                          // target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          Privacy Policy
+                        </a>
+                        <span className="text-red-500">*</span>
+                      </label>
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-25 flex justify-center self-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                      isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    } mt-4`}
                   >
                     {isSubmitting ? (
                       <>
