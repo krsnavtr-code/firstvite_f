@@ -62,6 +62,7 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [activeSection, setActiveSection] = useState(null);
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
   const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -834,26 +835,26 @@ const CourseDetail = () => {
             >
               Curriculum
             </button>
-            {/* <button
-              onClick={() => setActiveTab("instructor")}
+            <button
+              onClick={() => setActiveTab("skills")}
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                activeTab === "instructor"
+                activeTab === "skills"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Instructor
-            </button> */}
-            {/* <button
-              onClick={() => setActiveTab("reviews")}
+              Skills
+            </button>
+            <button
+              onClick={() => setActiveTab("faq")}
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                activeTab === "reviews"
+                activeTab === "faq"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Reviews
-            </button> */}
+              FAQ
+            </button>
           </nav>
         </div>
 
@@ -1033,213 +1034,191 @@ const CourseDetail = () => {
             </div>
           )}
 
-          {activeTab === "instructor" && (
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="md:w-1/4">
-                <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-                  <div className="flex flex-col items-center">
-                    <img
-                      src={
-                        course.instructor?.avatar ||
-                        "/images/avatar-placeholder.png"
-                      }
-                      alt={course.instructor?.name || "Instructor"}
-                      className="h-24 w-24 rounded-full mb-4 object-cover"
-                    />
-                    <h3 className="text-xl font-bold">
-                      {course.instructor?.name || "Instructor Name"}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
-                      {course.instructor?.title || "Course Instructor"}
-                    </p>
-                    <div className="flex space-x-4">
-                      <a href="#" className="text-gray-400 hover:text-blue-500">
-                        <span className="sr-only">Twitter</span>
+          {activeTab === "skills" && (
+            <div className="flex flex-col gap-8">
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                  Skills Student Will Learn
+                </h3>
+                {course.skills?.length > 0 ? (
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {course.skills.map((skill, index) => (
+                      <li key={index} className="flex items-start">
                         <svg
-                          className="h-6 w-6"
-                          fill="currentColor"
+                          className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
                           viewBox="0 0 24 24"
-                          aria-hidden="true"
+                          stroke="currentColor"
                         >
-                          <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
-                      </a>
-                      <a href="#" className="text-gray-400 hover:text-blue-700">
-                        <span className="sr-only">LinkedIn</span>
-                        <svg
-                          className="h-6 w-6"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                        >
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                        </svg>
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-4">
-                    <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">
-                        Total Students
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        10,000+
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">
-                        Courses
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-300">15+</p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">
-                        Reviews
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-300">4,500+</p>
-                    </div>
-                  </div>
-                </div>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {skill}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No skills available for this course.
+                  </p>
+                )}
               </div>
-              <div className="md:w-3/4">
-                <h3 className="text-2xl font-bold mb-4">
-                  About the Instructor
-                </h3>
-                <div className="prose max-w-none dark:prose-invert">
-                  <p className="mb-4">
-                    {course.instructor?.bio ||
-                      "No biography available for this instructor."}
-                  </p>
-                  <p>
-                    With years of experience in the field, our instructor is
-                    dedicated to providing high-quality education and helping
-                    students achieve their learning goals. Their teaching
-                    approach focuses on practical, real-world applications to
-                    ensure you gain the skills you need to succeed.
-                  </p>
-                </div>
 
-                <h3 className="text-xl font-semibold mt-8 mb-4">
-                  Other Courses by This Instructor
+              {/* What Students Will Learn */}
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                  Topics Student Will Learn
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3].map((item) => (
-                    <div
-                      key={item}
-                      className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                    >
-                      <div className="h-40 bg-gray-200 dark:bg-slate-700"></div>
-                      <div className="p-4">
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-                          Course Title {item}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-3">
-                          Brief description of the course content and what
-                          students will learn.
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                            View Course
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            ${item * 20 + 29}.99
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {course.whatYouWillLearn?.length > 0 ? (
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {course.whatYouWillLearn.map((skill, index) => (
+                      <li key={index} className="flex items-start">
+                        <svg
+                          className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {skill}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No skills available for this course.
+                  </p>
+                )}
+              </div>
+
+              {/* prerequisites/ Requremnts */}
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                  Requremnts
+                </h3>
+                {course.prerequisites?.length > 0 ? (
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {course.prerequisites.map((prerequisite, index) => (
+                      <li key={index} className="flex items-start">
+                        <svg
+                          className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {prerequisite}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No prerequisites available for this course.
+                  </p>
+                )}
               </div>
             </div>
           )}
 
-          {activeTab === "reviews" && (
-            <div>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                <div>
-                  <p className="text-lg font-bold">Student Feedback</p>
-                  <div className="flex flex-wrap items-center mt-2">
-                    <div className="flex items-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg
-                          key={star}
-                          className={`h-5 w-5 ${
-                            star <= Math.round(course.rating || 0)
-                              ? "text-yellow-400"
-                              : "text-gray-300"
-                          }`}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="ml-2 text-gray-600 dark:text-gray-300 text-sm">
-                      {course.rating?.toFixed(1) || "No"} rating •{" "}
-                      {course.reviews?.length || 0} reviews
-                    </span>
-                  </div>
-                </div>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium self-start sm:self-auto">
-                  Write a Review
-                </button>
-              </div>
-
-              {course.reviews?.length > 0 ? (
-                <div className="space-y-6">
-                  {course.reviews.map((review, index) => (
-                    <div
-                      key={index}
-                      className="border-b border-gray-200 dark:border-gray-700 pb-6"
-                    >
-                      <div className="flex items-start">
-                        <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center text-gray-600 dark:text-gray-300 font-medium mr-4">
-                          {review.user?.name?.charAt(0) || "U"}
+          {activeTab === "faq" && (
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                Frequently Asked Questions
+              </h3>
+              
+              {course.faqs?.length > 0 ? (
+                <div className="space-y-4">
+                  {course.faqs.map((faq, index) => (
+                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                      <button
+                        className="w-full px-6 py-4 text-left bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200"
+                        onClick={() => {
+                          const newOpenIndex = openFaqIndex === index ? null : index;
+                          setOpenFaqIndex(newOpenIndex);
+                        }}
+                        aria-expanded={openFaqIndex === index}
+                        aria-controls={`faq-${index}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            Q{index + 1}: {faq.question}
+                          </h4>
+                          <svg
+                            className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                              openFaqIndex === index ? 'transform rotate-180' : ''
+                            }`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-medium text-gray-900 dark:text-white">
-                                {review.user?.name || "Anonymous User"}
-                              </h4>
-                              <div className="flex items-center mt-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <svg
-                                    key={star}
-                                    className={`h-4 w-4 ${
-                                      star <= review.rating
-                                        ? "text-yellow-400"
-                                        : "text-gray-300"
-                                    }`}
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                  >
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                  </svg>
-                                ))}
-                                <span className="ml-2 text-sm text-gray-500">
-                                  {new Date(review.date).toLocaleDateString()}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <p className="mt-2 text-gray-600 dark:text-gray-300">
-                            {review.comment}
-                          </p>
-                        </div>
+                      </button>
+                      <div
+                        id={`faq-${index}`}
+                        className={`px-6 overflow-hidden transition-all duration-200 ${
+                          openFaqIndex === index ? 'max-h-96 py-4' : 'max-h-0 py-0'
+                        }`}
+                      >
+                        <p className="text-gray-600 dark:text-gray-300">
+                          {faq.answer}
+                        </p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12">
+                <div className="text-center py-8">
                   <p className="text-gray-500 dark:text-gray-400">
-                    No reviews yet. Be the first to review this course!
+                    No FAQs available for this course yet.
                   </p>
                 </div>
               )}
+              
+              <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+                <h4 className="text-lg font-medium text-blue-800 dark:text-blue-200 mb-2">
+                  Still have questions?
+                </h4>
+                <p className="text-blue-700 dark:text-blue-300 mb-4">
+                  Can't find the answer you're looking for? Our team is here to help.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowContactForm(true);
+                  }}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Contact Support
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -1436,7 +1415,7 @@ const CourseDetail = () => {
                     value={formData.phone}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="+1 (123) 456-7890"
+                    placeholder="+91 8080808080"
                   />
                 </div>
 
