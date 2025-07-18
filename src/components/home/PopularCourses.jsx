@@ -194,27 +194,27 @@ const CourseCard = ({ course }) => {
         </div>
 
         <div className="p-4">
-          <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2 mb-0 h-14">
+          <h3 className="font-bold text-black dark:text-white text-lg mb-2 line-clamp-2 mb-0 h-14">
             {course.title}
           </h3>
-          <p className="text-gray-600 dark:text-gray-300 mt-0 text-sm mb-3 line-clamp-2 h-10">
+          <p className="text-black dark:text-white mt-0 text-sm mb-3 line-clamp-2 h-10">
             {course.shortDescription
               ?.replace(/^<p>/i, "")
               .replace(/<\/p>$/i, "")}
           </p>
           <div className="flex items-center mb-2">
-            <div className="flex text-yellow-400">
-              {renderStars(course.rating || 0)}
+            <div className="flex" style={{ color: "#F47C26" }}>
+              {renderStars(course.rating || 4)}
             </div>
-            <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+            {/* <span className="ml-2 text-sm text-black dark:text-gray-400">
               ({course.enrollmentCount || course.enrolledStudents || 0}{" "}
               students)
-            </span>
+            </span> */}
           </div>
           <div className="flex justify-between items-center">
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center text-sm text-black dark:text-gray-400">
               <FaRegClock className="mr-1" />
-              {course.duration || "Self-paced"}
+              {course.duration || "Self-paced"} Weeks
             </div>
             <span className="text-sm px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded">
               {course.level || "All Levels"}
@@ -245,11 +245,11 @@ const PopularCourses = () => {
         const response = await axios.get("/courses", {
           params: {
             showOnHome: "true",
-            limit: 6, // Limit to 6 featured courses
+            limit: 8, // Limit to 6 featured courses
             sort: "-createdAt", // Show most recently added first
             isPublished: "true", // Only get published courses
           },
-          signal: controller.signal
+          signal: controller.signal,
         });
 
         // Clear the timeout if the request completes
@@ -266,19 +266,19 @@ const PopularCourses = () => {
         } else if (response.data && response.data.courses) {
           courses = response.data.courses;
         } else {
-          throw new Error('Invalid response format from server');
+          throw new Error("Invalid response format from server");
         }
 
         console.log("Parsed featured courses:", courses);
 
         // Filter courses that are marked to show on home page
         // If no courses are marked, show the most recent published courses
-        const featuredCourses = courses.filter(course => 
-          course.showOnHome !== false // Include if true or undefined
+        const featuredCourses = courses.filter(
+          (course) => course.showOnHome !== false // Include if true or undefined
         );
 
         console.log("Filtered featured courses:", featuredCourses);
-        
+
         // Set the courses, or an empty array if none found
         setCourses(featuredCourses);
       } catch (err) {
@@ -296,10 +296,10 @@ const PopularCourses = () => {
     <div className="bg-white dark:bg-gray-900 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
             Best E-Learning Courses
           </h1>
-          <p className="mt-4 text-xl text-center text-gray-600 dark:text-gray-300">
+          <p className="mt-4 text-xl text-center text-black dark:text-white">
             Practical, skill-based online courses in areas like IT, business,
             design, and marketing. Learn at your own pace with real-world
             projects and expert-led content
@@ -339,7 +339,7 @@ const PopularCourses = () => {
         <div className="mt-8 text-center">
           <Link
             to="/courses"
-            className="inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
+            className="inline-flex text-white items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
           >
             View All Courses
           </Link>

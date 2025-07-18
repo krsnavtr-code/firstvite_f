@@ -25,7 +25,7 @@ const Newsletter = () => {
           <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
             Stay Updated with New Releases
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Subscribe to our newsletter and be the first to know about new books, exclusive offers, and reading recommendations.
           </p>
           
@@ -47,7 +47,7 @@ const Newsletter = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-3 border border-transparent placeholder-gray-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-700 focus:ring-white focus:border-white sm:max-w-xs rounded-md"
+                className="w-full px-5 py-3 border border-transparent placeholder-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-700 focus:ring-white focus:border-white sm:max-w-xs rounded-md"
                 placeholder="Enter your email"
               />
               <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
@@ -62,7 +62,7 @@ const Newsletter = () => {
             </form>
           )}
           
-          <p className="mt-3 text-sm text-blue-100">
+          <p className="mt-3 text-sm text-white">
             We respect your privacy. Unsubscribe at any time.
           </p>
         </div>

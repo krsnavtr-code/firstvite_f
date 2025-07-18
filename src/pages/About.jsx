@@ -21,11 +21,11 @@ export default function About() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
               Our Story
             </h2>
             <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
               Founded in 2023, our FirstVite has been a trusted source of
               knowledge and learning materials for students, professionals, and
               lifelong learners. We believe in making quality education
@@ -68,10 +68,10 @@ export default function About() {
                 className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center"
               >
                 <div className="flex justify-center">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+                <h3 className="text-xl font-semibold mb-2 text-black dark:text-white">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-black dark:text-white">
                   {feature.description}
                 </p>
               </div>
@@ -80,7 +80,7 @@ export default function About() {
 
           {/* Team Section */}
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
               Our Team
             </h2>
             <div className="w-20 h-1 bg-blue-600 mx-auto mb-12"></div>
@@ -133,11 +133,11 @@ export default function About() {
                     className="w-full h-64 object-cover"
                   />
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-xl font-semibold text-black dark:text-white">
                       {member.name}
                     </h3>
                     <p className="text-blue-600 mb-3">{member.role}</p>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    <p className="text-black dark:text-white">
                       {member.bio}
                     </p>
                   </div>
@@ -147,11 +147,11 @@ export default function About() {
           </div>
 
           {/* CTA Section */}
-          <div className="mt-20 bg-blue-50 dark:bg-blue-900 rounded-xl p-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="mt-20 bg-blue-900 rounded-xl p-8 text-center">
+            <h2 className="text-2xl font-bold text-white dark:text-white mb-4">
               Ready to start learning?
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+            <p className="text-white dark:text-white mb-6 max-w-2xl mx-auto">
               Join thousands of students who are already advancing their careers
               with our courses.
             </p>

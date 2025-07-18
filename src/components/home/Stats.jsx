@@ -30,10 +30,10 @@ const Stats = () => {
                   <stat.icon className="h-8 w-8" aria-hidden="true" />
                 </div>
               </div>
-              <h3 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
+              <h3 className="mt-6 text-3xl font-bold text-black dark:text-white">
                 {stat.value}
               </h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">
+              <p className="mt-2 text-black dark:text-white">
                 {stat.name}
               </p>
             </motion.div>

@@ -45,7 +45,7 @@ const HowWillYourTrainingWork = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+        <h2 className="text-3xl font-bold text-black dark:text-white sm:text-4xl">
           How will your training work? – with FirstVITE
         </h2>
       </div>
@@ -57,10 +57,10 @@ const HowWillYourTrainingWork = () => {
             className="flex flex-col items-start space-y-3 hover:scale-[1.02] transition-transform duration-200"
           >
             <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">{step.icon}</div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-black dark:text-white">
               {step.title}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{step.desc}</p>
+            <p className="text-sm text-black dark:text-white">{step.desc}</p>
           </div>
         ))}
       </div>

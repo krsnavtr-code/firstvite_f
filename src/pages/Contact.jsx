@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  FaMapMarkerAlt, 
-  FaPhone, 
-  FaEnvelope, 
-  FaPaperPlane, 
-  FaCheckCircle, 
-  FaFacebook, 
-  FaTwitter, 
-  FaInstagram, 
-  FaLinkedin 
-} from 'react-icons/fa';
-import { toast } from 'react-toastify';
-import { submitContactForm } from '../api/contactApi';
-import { getCourses } from '../api/courseApi';
+import React, { useState, useEffect } from "react";
+import {
+  FaMapMarkerAlt,
+  FaPhone,
+  FaEnvelope,
+  FaPaperPlane,
+  FaCheckCircle,
+  FaFacebook,
+  FaTwitter,
+  FaInstagram,
+  FaLinkedin,
+} from "react-icons/fa";
+import { toast } from "react-toastify";
+import { submitContactForm } from "../api/contactApi";
+import { getCourses } from "../api/courseApi";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-    courseInterest: '', // Changed from array to single value
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+    courseInterest: "", // Changed from array to single value
     courseInterests: [], // Keeping for backward compatibility
-    agreedToTerms: false
+    agreedToTerms: false,
   });
-  
+
   const [courses, setCourses] = useState([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -35,40 +35,47 @@ export default function Contact() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        console.log('Fetching courses...');
-        const response = await getCourses('', false); // Empty string for category to get all courses, false for published only
-        console.log('Courses API response:', response);
-        
+        console.log("Fetching courses...");
+        const response = await getCourses("", false); // Empty string for category to get all courses, false for published only
+        console.log("Courses API response:", response);
+
         // Check different possible response structures
         let coursesData = [];
-        
+
         if (Array.isArray(response)) {
           // If response is directly an array
           coursesData = response;
         } else if (response && Array.isArray(response.data)) {
           // If response has a data property that's an array
           coursesData = response.data;
-        } else if (response && response.success && Array.isArray(response.data)) {
+        } else if (
+          response &&
+          response.success &&
+          Array.isArray(response.data)
+        ) {
           // If response has success and data properties
           coursesData = response.data;
         }
-        
+
         if (coursesData.length > 0) {
           // Map the API response to match the expected format
-          const formattedCourses = coursesData.map(course => ({
+          const formattedCourses = coursesData.map((course) => ({
             id: course._id || course.id,
-            name: course.title || course.name || 'Untitled Course'
+            name: course.title || course.name || "Untitled Course",
           }));
-          
-          console.log('Formatted courses:', formattedCourses);
+
+          console.log("Formatted courses:", formattedCourses);
           setCourses(formattedCourses);
         } else {
-          console.warn('No courses found in the response');
+          console.warn("No courses found in the response");
           setCourses([]);
         }
       } catch (error) {
-        console.error('Error fetching courses:', error);
-        toast.error('Failed to load course options. ' + (error.response?.data?.message || ''));
+        console.error("Error fetching courses:", error);
+        toast.error(
+          "Failed to load course options. " +
+            (error.response?.data?.message || "")
+        );
       } finally {
         setIsLoadingCourses(false);
       }
@@ -79,56 +86,60 @@ export default function Contact() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   // Keeping handleCheckboxChange for backward compatibility
   const handleCheckboxChange = (courseId) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       courseInterest: courseId,
-      courseInterests: [courseId] // Maintain compatibility with existing code
+      courseInterests: [courseId], // Maintain compatibility with existing code
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.agreedToTerms) {
-      toast.error('Please accept the terms & conditions and privacy policy', {
-        position: 'top-center',
+      toast.error("Please accept the terms & conditions and privacy policy", {
+        position: "top-center",
         autoClose: 5000,
       });
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await submitContactForm(formData);
       setIsSuccess(true);
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
         courseInterests: [],
-        agreedToTerms: false
+        agreedToTerms: false,
       });
-      
-      toast.success('Your message has been sent successfully!', {
-        position: 'top-center',
+
+      toast.success("Your message has been sent successfully!", {
+        position: "top-center",
         autoClose: 5000,
       });
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error(error.response?.data?.message || 'Failed to send message. Please try again.', {
-        position: 'top-center',
-        autoClose: 5000,
-      });
+      console.error("Error submitting form:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to send message. Please try again.",
+        {
+          position: "top-center",
+          autoClose: 5000,
+        }
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -139,11 +150,11 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
             Contact Us
           </h1>
           <div className="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg text-black dark:text-white max-w-3xl mx-auto">
             Have questions or feedback? We'd love to hear from you. Fill out the
             form below or reach out to us directly.
           </p>
@@ -153,7 +164,7 @@ export default function Contact() {
           {/* Contact Information */}
           <div className="space-y-8">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-2xl font-semibold text-black dark:text-white mb-6">
                 Get in Touch
               </h2>
 
@@ -163,7 +174,7 @@ export default function Contact() {
                     <FaMapMarkerAlt className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-medium text-black dark:text-white">
                       Address
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-300">
@@ -178,7 +189,7 @@ export default function Contact() {
                     <FaPhone className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-medium text-black dark:text-white">
                       Phone
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-300">
@@ -194,10 +205,10 @@ export default function Contact() {
                     <FaEnvelope className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-medium text-black dark:text-white">
                       Email
                     </h3>
-                    <p className="mt-1 text-gray-600 dark:text-gray-300">
+                    <p className="mt-1 text-black dark:text-white">
                       info@firstvite.com
                       <br />
                       We'll respond within 24 hours
@@ -208,7 +219,7 @@ export default function Contact() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-xl font-semibold text-black dark:text-white mb-4">
                 Follow Us
               </h2>
               <div className="flex space-x-4">
@@ -251,17 +262,17 @@ export default function Contact() {
 
           {/* Contact Form */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-semibold text-black dark:text-white mb-6">
               Send us a Message
             </h2>
 
             {isSuccess ? (
               <div className="text-center py-12">
                 <FaCheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
-                <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
+                <h3 className="text-xl font-medium text-black dark:text-white mb-2">
                   Message Sent Successfully!
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                <p className="text-black dark:text-white mb-6">
                   Thank you for contacting us. We'll get back to you soon.
                 </p>
                 <button
@@ -276,7 +287,7 @@ export default function Contact() {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-black dark:text-white mb-1"
                   >
                     Full Name <span className="text-red-500">*</span>
                   </label>
@@ -296,7 +307,7 @@ export default function Contact() {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                      className="block text-sm font-medium text-black dark:text-white mb-1"
                     >
                       Email <span className="text-red-500">*</span>
                     </label>
@@ -315,7 +326,7 @@ export default function Contact() {
                   <div>
                     <label
                       htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                      className="block text-sm font-medium text-black dark:text-white mb-1"
                     >
                       Phone Number
                     </label>
@@ -332,7 +343,10 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label htmlFor="courseInterest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="courseInterest"
+                    className="block text-sm font-medium text-black dark:text-white mb-1"
+                  >
                     I'm interested in: (Optional)
                   </label>
                   {isLoadingCourses ? (
@@ -355,10 +369,12 @@ export default function Contact() {
                         id="courseInterest"
                         name="courseInterest"
                         value={formData.courseInterest}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          courseInterest: e.target.value
-                        }))}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            courseInterest: e.target.value,
+                          }))
+                        }
                         className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       >
                         <option value="">Select a course (optional)</option>
@@ -384,7 +400,7 @@ export default function Contact() {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-black dark:text-white mb-1"
                   >
                     Your Message <span className="text-red-500">*</span>
                   </label>
@@ -421,7 +437,7 @@ export default function Contact() {
                     <div className="ml-3 text-sm">
                       <label
                         htmlFor="agreedToTerms"
-                        className="font-medium text-gray-700 dark:text-gray-300"
+                        className="font-medium text-black dark:text-white"
                       >
                         I agree to the{" "}
                         <a

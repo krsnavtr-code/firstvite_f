@@ -71,10 +71,10 @@ const ContactSection = () => {
     <section className="py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+          <h2 className="text-3xl font-bold text-black dark:text-white sm:text-4xl">
             Get In Touch
           </h2>
-          <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
+          <p className="mt-4 text-xl text-black dark:text-white">
             We'd love to hear from you. Send us a message and we'll respond as
             soon as possible.
           </p>
@@ -94,10 +94,10 @@ const ContactSection = () => {
                     {item.icon}
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-medium text-black dark:text-white">
                       {item.title}
                     </h3>
-                    <p className="mt-1 text-gray-600 dark:text-gray-300">
+                    <p className="mt-1 text-black dark:text-gray-300">
                       {item.description}
                     </p>
                     <a
@@ -132,10 +132,10 @@ const ContactSection = () => {
                   <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900">
                     <FaCheck className="h-8 w-8 text-green-600 dark:text-green-400" />
                   </div>
-                  <h3 className="mt-4 text-xl font-medium text-gray-900 dark:text-white">
+                  <h3 className="mt-4 text-xl font-medium text-black dark:text-white">
                     Message Sent!
                   </h3>
-                  <p className="mt-2 text-gray-600 dark:text-gray-300">
+                  <p className="mt-2 text-black dark:text-gray-300">
                     Thank you for contacting us. We'll get back to you soon!
                   </p>
                   <button
@@ -151,7 +151,7 @@ const ContactSection = () => {
                     <div>
                       <label
                         htmlFor="name"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-black dark:text-white"
                       >
                         Full Name <span className="text-red-500">*</span>
                       </label>
@@ -172,7 +172,7 @@ const ContactSection = () => {
                     <div>
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-black dark:text-white"
                       >
                         Email Address <span className="text-red-500">*</span>
                       </label>
@@ -194,7 +194,7 @@ const ContactSection = () => {
                   <div>
                     <label
                       htmlFor="subject"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      className="block text-sm font-medium text-black dark:text-white"
                     >
                       Subject <span className="text-red-500">*</span>
                     </label>
@@ -215,7 +215,7 @@ const ContactSection = () => {
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      className="block text-sm font-medium text-black dark:text-white"
                     >
                       Your Message <span className="text-red-500">*</span>
                     </label>

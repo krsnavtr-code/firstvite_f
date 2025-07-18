@@ -11,10 +11,10 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
               About Us
             </h3>
-            <p className="text-base text-gray-600 dark:text-gray-300">
+            <p className="text-base text-black dark:text-white">
               Empowering learners with high-quality courses and resources to
               achieve their educational goals.
             </p>
@@ -23,7 +23,7 @@ function Footer() {
                 href="https://wa.me/919990056799"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
               >
                 <FaWhatsapp className="h-6 w-6" />
               </a>
@@ -31,7 +31,7 @@ function Footer() {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-blue-500 dark:hover:text-blue-400"
+                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
               >
                 <FaTwitter className="h-6 w-6" />
               </a>
@@ -39,7 +39,7 @@ function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-blue-700 dark:hover:text-blue-500"
+                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
               >
                 <FaLinkedin className="h-6 w-6" />
               </a>
@@ -47,7 +47,7 @@ function Footer() {
                 href="https://www.facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
               >
                 <FaFacebook className="h-6 w-6" />
               </a>
@@ -56,14 +56,14 @@ function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
               Quick Links
             </h3>
             <ul className="mt-4 space-y-2">
               <li>
                 <Link
                   to="/courses"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   Browse Courses
                 </Link>
@@ -71,7 +71,7 @@ function Footer() {
               <li>
                 <Link
                   to="/about"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   About Us
                 </Link>
@@ -79,7 +79,7 @@ function Footer() {
               <li>
                 <Link
                   to="/contact"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   Contact
                 </Link>
@@ -87,7 +87,7 @@ function Footer() {
               <li>
                 <Link
                   to="/blog"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   Blog
                 </Link>
@@ -97,14 +97,14 @@ function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
               Resources
             </h3>
             <ul className="mt-4 space-y-2">
               <li>
                 <Link
                   to="/faq"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   Help Center
                 </Link>
@@ -112,7 +112,7 @@ function Footer() {
               <li>
                 <Link
                   to="/privacy-policy"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   Privacy Policy
                 </Link>
@@ -120,7 +120,7 @@ function Footer() {
               <li>
                 <Link
                   to="/terms-of-service"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   Terms of Service
                 </Link>
@@ -128,7 +128,7 @@ function Footer() {
               <li>
                 <Link
                   to="/faq"
-                  className="text-base text-gray-600 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
                 >
                   FAQs
                 </Link>
@@ -138,13 +138,13 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
               Contact Us
             </h3>
             <ul className="mt-4 space-y-2">
               <li className="flex items-center">
                 <svg
-                  className="h-5 w-5 text-gray-500 mr-2"
+                  className="h-5 w-5 text-black mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -156,13 +156,13 @@ function Footer() {
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
-                <span className="text-gray-600 dark:text-gray-300">
+                <span className="text-black dark:text-white">
                   info@FirstVite.com
                 </span>
               </li>
               <li className="flex items-center">
                 <svg
-                  className="h-5 w-5 text-gray-500 mr-2"
+                  className="h-12 w-12 text-black mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -180,7 +180,7 @@ function Footer() {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span className="text-gray-600 dark:text-gray-300">
+                <span className="text-black dark:text-white">
                   H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301
                 </span>
               </li>
@@ -191,12 +191,12 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-base text-gray-500 dark:text-gray-400">
+            <p className="text-base text-black dark:text-white">
               &copy; {currentYear} FirstVite. All rights reserved.
             </p>
             <div className="flex items-center mt-4 md:mt-0">
               <FaBook className="h-5 w-5 text-pink-500 mr-2" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <span className="text-sm font-medium text-black dark:text-white">
                 Learn something new today
               </span>
             </div>

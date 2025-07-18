@@ -85,7 +85,7 @@ const FAQPage = () => {
           {faqs.length > 0 ? (
             faqs.map((faq, index) => (
               <div 
-                key={faq._id} 
+                key={faq._id || faq.id} 
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
               >
                 <button

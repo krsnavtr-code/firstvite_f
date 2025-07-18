@@ -8,36 +8,20 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   FaStar,
-  FaUsers,
   FaClock,
   FaPlay,
   FaShare,
-  FaBook,
   FaCertificate,
-  FaMoneyBillWave,
   FaGlobe,
-  FaCheck,
   FaFileAlt,
-  FaUserTie,
-  FaGraduationCap,
   FaTag,
   FaMobileAlt,
-  FaListOl,
-  FaQuestionCircle,
-  FaPen,
   FaBookOpen,
-  FaBriefcase,
-  FaTwitter,
-  FaLinkedin,
-  FaGithub,
   FaTimes,
   FaShoppingCart,
-  FaHeart,
-  FaBookmark,
-  FaDollarSign,
   FaRegStar,
   FaArrowRight,
-  FaInfinity,
+  FaCalendar,
 } from "react-icons/fa";
 import {
   FaMessage as MessageSquare,
@@ -71,10 +55,13 @@ const CourseDetail = () => {
   // Initialize expanded sections when course data is loaded
   useEffect(() => {
     if (course?.curriculum?.length > 0) {
-      const initialExpandedState = course.curriculum.reduce((acc, _, index) => ({
-        ...acc,
-        [index]: true
-      }), {});
+      const initialExpandedState = course.curriculum.reduce(
+        (acc, _, index) => ({
+          ...acc,
+          [index]: true,
+        }),
+        {}
+      );
       setExpandedSections(initialExpandedState);
     }
   }, [course]);
@@ -90,11 +77,11 @@ const CourseDetail = () => {
   // Auto-fill user data when component mounts or user changes
   useEffect(() => {
     if (currentUser) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         name: currentUser.name || prev.name,
         email: currentUser.email || prev.email,
-        phone: currentUser.phone || prev.phone
+        phone: currentUser.phone || prev.phone,
       }));
     }
   }, [currentUser]);
@@ -140,23 +127,23 @@ const CourseDetail = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
         <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+          <h2 className="text-2xl font-bold text-black dark:text-white mb-4">
             Course Not Found
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-black dark:text-gray-300 mb-6">
             The course you're looking for doesn't exist or may have been
             removed.
           </p>
           <div className="space-y-3">
             <Link
               to="/courses"
-              className="inline-block w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block w-full px-6 py-3 bg-blue-600 text-black rounded-lg hover:bg-blue-700 transition-colors"
             >
               Browse All Courses
             </Link>
             <Link
               to="/"
-              className="inline-block w-full px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              className="inline-block w-full px-6 py-3 bg-gray-100 dark:bg-slate-700 text-black dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
             >
               Go to Homepage
             </Link>
@@ -188,14 +175,14 @@ const CourseDetail = () => {
   const handleEnroll = async () => {
     if (!isAuthenticated) {
       // If user is not authenticated, redirect to login
-      navigate('/login', { state: { from: `/courses/${course._id}` } });
+      navigate("/login", { state: { from: `/courses/${course._id}` } });
       return;
     }
 
     setIsSubmitting(true);
     try {
       const enrollmentResponse = await enrollInCourse(course._id);
-      
+
       if (enrollmentResponse.success) {
         toast.success(
           "Your enrollment request has been received. Our team will contact you shortly.",
@@ -217,12 +204,17 @@ const CourseDetail = () => {
           // The AuthContext will handle the logout
         } else {
           // Show error message to user
-          toast.error(enrollmentResponse.message || "Failed to process enrollment. Please try again.");
+          toast.error(
+            enrollmentResponse.message ||
+              "Failed to process enrollment. Please try again."
+          );
         }
       }
     } catch (enrollError) {
       console.error("Error in enrollment process:", enrollError);
-      toast.error("An error occurred while processing your request. Please try again later.");
+      toast.error(
+        "An error occurred while processing your request. Please try again later."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -522,7 +514,7 @@ const CourseDetail = () => {
 
               {/* Course Title */}
               <div className="space-y-4">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+                <h1 className="text-3xl md:text-4xl font-bold text-black dark:text-white leading-tight">
                   {course.title}
                 </h1>
 
@@ -546,13 +538,13 @@ const CourseDetail = () => {
                       </span>
                     </span>
                   </div>
-                  <span className="mx-3 text-gray-300 dark:text-gray-600">
+                  {/* <span className="mx-3 text-gray-300 dark:text-gray-600">
                     •
-                  </span>
-                  <span className="text-gray-600 dark:text-gray-400">
+                  </span> */}
+                  {/* <span className="text-gray-600 dark:text-gray-400">
                     {course.enrolledStudents?.toLocaleString() || "500+"}{" "}
                     Students
-                  </span>
+                  </span> */}
                 </div>
 
                 {/* Course Description */}
@@ -575,10 +567,10 @@ const CourseDetail = () => {
                       <FaClock className="w-4 h-4" />
                     </div>
                     <div className="ml-3">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-black dark:text-white">
                         Duration
                       </p>
-                      <p className="font-medium text-xs text-gray-900 dark:text-white">
+                      <p className="font-medium text-xs text-black dark:text-white">
                         {course.duration || "Lifetime"} Weeks
                       </p>
                     </div>
@@ -593,10 +585,10 @@ const CourseDetail = () => {
                       <FaBookOpen className="w-4 h-4" />
                     </div>
                     <div className="ml-3">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-black dark:text-white">
                         Lessons
                       </p>
-                      <p className="font-medium text-xs text-gray-900 dark:text-white">
+                      <p className="font-medium text-xs text-black dark:text-white">
                         {course.curriculum?.length
                           ? course.curriculum.length * 2
                           : 0}
@@ -613,10 +605,10 @@ const CourseDetail = () => {
                       <FaCertificate className="w-4 h-4" />
                     </div>
                     <div className="ml-3">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-black dark:text-white">
                         Certificate
                       </p>
-                      <p className="font-medium text-xs text-gray-900 dark:text-white">
+                      <p className="font-medium text-xs text-black dark:text-white">
                         Included
                       </p>
                     </div>
@@ -631,10 +623,10 @@ const CourseDetail = () => {
                         <FaGlobe className="w-4 h-4" />
                       </div>
                       <div className="ml-3">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-black dark:text-white">
                           Language
                         </p>
-                        <p className="font-medium text-xs text-gray-900 dark:text-white">
+                        <p className="font-medium text-xs text-black dark:text-white">
                           {course.language}
                         </p>
                       </div>
@@ -645,14 +637,14 @@ const CourseDetail = () => {
 
               {/* Course Description */}
               <div className="prose prose-gray max-w-none dark:prose-invert mb-6">
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-black dark:text-white">
                   {course.shortDescription || "No description available."}
                 </p>
               </div>
 
               {/* Course Includes */}
               {/* <div className="prose prose-gray max-w-none dark:prose-invert mb-6">
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-black dark:text-white">
                   {course.includes || "No includes available."}
                 </p>
               </div> */}
@@ -661,31 +653,23 @@ const CourseDetail = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => {
-                    if (!isAuthenticated) {
-                      // Redirect to login page with a return URL
-                      navigate("/login", { state: { from: `/courses/${id}` } });
-                      toast.info("Please log in to enroll in this course");
-                      return;
-                    }
+                    // if (!isAuthenticated) {
+                    //   // Redirect to login page with a return URL
+                    //   navigate("/login", { state: { from: `/courses/${id}` } });
+                    //   toast.info("Please log in to enroll in this course");
+                    //   return;
+                    // }
                     setShowCheckoutOptions(true);
                   }}
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
                 >
-                  Enroll Now <FaArrowRight className="ml-2" />
+                  Download Brochure <FaArrowRight className="ml-2" />
                 </button>
                 {course.previewVideo && (
                   <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center">
                     <FaPlay className="mr-2" /> Preview this course
                   </button>
                 )}
-              </div>
-              <div className="mt-5 border-t border-gray-100 dark:border-gray-700">
-                {/* <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                          30-Day Money-Back Guarantee
-                        </p> */}
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Full Lifetime Access.
-                </p>
               </div>
             </div>
 
@@ -736,7 +720,7 @@ const CourseDetail = () => {
                     <div className="flex items-center justify-between">
                       {/* Course Price */}
                       <div className="flex items-center">
-                        <span className="text-xl font-bold text-gray-900 dark:text-white">
+                        <span className="text-xl font-bold text-black dark:text-white">
                           {course.price > 0
                             ? formatPrice(course.price)
                             : "Free"}
@@ -756,7 +740,7 @@ const CourseDetail = () => {
 
                     {/* Course Includes */}
                     <div className="mt-2">
-                      <p className="text-gray-900 dark:text-white">
+                      <p className="text-black dark:text-white">
                         This course includes:
                       </p>
                       <ul className="space-y-2">
@@ -765,9 +749,7 @@ const CourseDetail = () => {
                             icon: (
                               <FaPlay className="text-blue-500 w-5 h-5 flex-shrink-0" />
                             ),
-                            text: `${
-                              course.totalHours || 0
-                            } hours on-demand video`,
+                            text: "On-demand video",
                           },
                           {
                             icon: (
@@ -779,13 +761,13 @@ const CourseDetail = () => {
                             icon: (
                               <FaMobileAlt className="text-green-500 w-5 h-5 flex-shrink-0" />
                             ),
-                            text: "Access on mobile and TV",
+                            text: "Access on mobile and Tablet",
                           },
                           {
                             icon: (
-                              <FaInfinity className="text-amber-500 w-5 h-5 flex-shrink-0" />
+                              <FaCalendar className="text-amber-500 w-5 h-5 flex-shrink-0" />
                             ),
-                            text: "Full lifetime access",
+                            text: "1 year full access",
                           },
                           {
                             icon: (
@@ -796,7 +778,7 @@ const CourseDetail = () => {
                         ].map((item, index) => (
                           <li key={index} className="flex items-start">
                             <span className="mt-0.5 text-sm">{item.icon}</span>
-                            <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
+                            <span className="ml-3 text-sm text-black dark:text-white">
                               {item.text}
                             </span>
                           </li>
@@ -820,7 +802,7 @@ const CourseDetail = () => {
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "overview"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                  : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
               Overview
@@ -830,7 +812,7 @@ const CourseDetail = () => {
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "curriculum"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                  : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
               Curriculum
@@ -840,7 +822,7 @@ const CourseDetail = () => {
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "skills"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                  : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
               Skills
@@ -850,7 +832,7 @@ const CourseDetail = () => {
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "faq"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                  : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
               FAQ
@@ -861,7 +843,7 @@ const CourseDetail = () => {
         {/* Tab Content */}
         <div className="mb-12">
           {activeTab === "overview" && (
-            <div className="text-gray-700 dark:text-gray-300 prose max-w-none dark:prose-invert">
+            <div className="text-black dark:text-white prose max-w-none dark:prose-invert">
               <h2 className="text-2xl font-bold mb-4">About This Course</h2>
               <div
                 className="mb-6"
@@ -912,7 +894,7 @@ const CourseDetail = () => {
           )}
 
           {activeTab === "curriculum" && (
-            <div>
+            <div className="text-black dark:text-white">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Full Curriculum</h2>
                 <div className="flex space-x-2 mt-3 sm:mt-0">
@@ -935,7 +917,7 @@ const CourseDetail = () => {
                 {course.curriculum?.length > 0 ? (
                   <div className="space-y-3">
                     {course.curriculum.map((section, sectionIndex) => (
-                      <div
+                      <div 
                         key={sectionIndex}
                         className="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden transition-all duration-200"
                       >
@@ -956,18 +938,18 @@ const CourseDetail = () => {
                               }`}
                             ></div>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                              <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">
+                              <p className="text-black dark:text-white font-semibold text-sm sm:text-base">
                                 {section.title}
                               </p>
                               <div className="flex flex-wrap gap-1.5">
-                                <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                <span className="inline-flex items-center text-xs text-black dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
                                   Week {section.week}
                                 </span>
-                                <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                <span className="inline-flex items-center text-xs text-black dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
                                   {section.topics?.length || 0} topics
                                 </span>
                                 {section.duration && (
-                                  <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                  <span className="inline-flex items-center text-xs text-black dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
                                     {section.duration} hours
                                   </span>
                                 )}
@@ -1003,10 +985,10 @@ const CourseDetail = () => {
                             >
                               <div className="divide-y divide-gray-100 dark:divide-slate-700">
                                 <div className="p-4">
-                                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                  <p className="text-sm text-black dark:text-white mb-3">
                                     {section.description}
                                   </p>
-                                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                                  <h4 className="text-sm font-medium text-black dark:text-white mb-2">
                                     Topics Covered:
                                   </h4>
                                   <ul className="list-disc list-inside space-y-1">
@@ -1014,7 +996,7 @@ const CourseDetail = () => {
                                       (topic, topicIndex) => (
                                         <li
                                           key={topicIndex}
-                                          className="text-sm text-gray-600 dark:text-gray-300"
+                                          className="text-sm text-black dark:text-white"
                                         >
                                           {topic}
                                         </li>
@@ -1032,7 +1014,7 @@ const CourseDetail = () => {
                 ) : (
                   <div className="text-center py-8">
                     <FaBookOpen className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 className="mt-2 text-lg font-medium text-black dark:text-white">
                       No curriculum available
                     </h3>
                     <p className="mt-1 text-gray-500 dark:text-gray-400">
@@ -1047,7 +1029,7 @@ const CourseDetail = () => {
           {activeTab === "skills" && (
             <div className="flex flex-col gap-8">
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                <h3 className="text-xl font-bold mb-6 text-black dark:text-white">
                   Skills Student Will Learn
                 </h3>
                 {course.skills?.length > 0 ? (
@@ -1067,7 +1049,7 @@ const CourseDetail = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        <span className="text-gray-700 dark:text-gray-300">
+                        <span className="text-black dark:text-white">
                           {skill}
                         </span>
                       </li>
@@ -1082,7 +1064,7 @@ const CourseDetail = () => {
 
               {/* What Students Will Learn */}
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                <h3 className="text-xl font-bold mb-6 text-black dark:text-white">
                   Topics Student Will Learn
                 </h3>
                 {course.whatYouWillLearn?.length > 0 ? (
@@ -1102,7 +1084,7 @@ const CourseDetail = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        <span className="text-gray-700 dark:text-gray-300">
+                        <span className="text-black dark:text-white">
                           {skill}
                         </span>
                       </li>
@@ -1117,7 +1099,7 @@ const CourseDetail = () => {
 
               {/* prerequisites/ Requremnts */}
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                <h3 className="text-xl font-bold mb-6 text-black dark:text-white">
                   Requremnts
                 </h3>
                 {course.prerequisites?.length > 0 ? (
@@ -1137,7 +1119,7 @@ const CourseDetail = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        <span className="text-gray-700 dark:text-gray-300">
+                        <span className="text-black dark:text-white">
                           {prerequisite}
                         </span>
                       </li>
@@ -1154,30 +1136,36 @@ const CourseDetail = () => {
 
           {activeTab === "faq" && (
             <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <h3 className="text-2xl font-bold text-black dark:text-white mb-6">
                 Frequently Asked Questions
               </h3>
-              
+
               {course.faqs?.length > 0 ? (
                 <div className="space-y-4">
                   {course.faqs.map((faq, index) => (
-                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div
+                      key={index}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+                    >
                       <button
                         className="w-full px-6 py-4 text-left bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200"
                         onClick={() => {
-                          const newOpenIndex = openFaqIndex === index ? null : index;
+                          const newOpenIndex =
+                            openFaqIndex === index ? null : index;
                           setOpenFaqIndex(newOpenIndex);
                         }}
                         aria-expanded={openFaqIndex === index}
                         aria-controls={`faq-${index}`}
                       >
                         <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-gray-900 dark:text-white">
+                          <h4 className="font-medium text-black dark:text-white">
                             Q{index + 1}: {faq.question}
                           </h4>
                           <svg
                             className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                              openFaqIndex === index ? 'transform rotate-180' : ''
+                              openFaqIndex === index
+                                ? "transform rotate-180"
+                                : ""
                             }`}
                             fill="none"
                             viewBox="0 0 24 24"
@@ -1195,10 +1183,12 @@ const CourseDetail = () => {
                       <div
                         id={`faq-${index}`}
                         className={`px-6 overflow-hidden transition-all duration-200 ${
-                          openFaqIndex === index ? 'max-h-96 py-4' : 'max-h-0 py-0'
+                          openFaqIndex === index
+                            ? "max-h-96 py-4"
+                            : "max-h-0 py-0"
                         }`}
                       >
-                        <p className="text-gray-600 dark:text-gray-300">
+                        <p className="text-black dark:text-white">
                           {faq.answer}
                         </p>
                       </div>
@@ -1212,13 +1202,14 @@ const CourseDetail = () => {
                   </p>
                 </div>
               )}
-              
+
               <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                 <h4 className="text-lg font-medium text-blue-800 dark:text-blue-200 mb-2">
                   Still have questions?
                 </h4>
                 <p className="text-blue-700 dark:text-blue-300 mb-4">
-                  Can't find the answer you're looking for? Our team is here to help.
+                  Can't find the answer you're looking for? Our team is here to
+                  help.
                 </p>
                 <button
                   onClick={() => {
@@ -1251,7 +1242,7 @@ const CourseDetail = () => {
               exit={{ y: 20, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-xl font-bold mb-6 text-center dark:text-white">
+              <h3 className="text-xl font-bold mb-6 text-center text-black dark:text-white">
                 Choose Enrollment Option
               </h3>
 
@@ -1276,7 +1267,7 @@ const CourseDetail = () => {
 
               <button
                 onClick={() => setShowCheckoutOptions(false)}
-                className="mt-6 w-full py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
+                className="mt-6 w-full py-2 text-black dark:text-white hover:text-gray-800 dark:hover:text-black transition-colors"
               >
                 Cancel
               </button>
@@ -1303,12 +1294,12 @@ const CourseDetail = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6">
-                <p className="text-lg font-bold dark:text-white">
+                <p className="text-lg font-bold text-black dark:text-white">
                   Process Your Enrollment by Fill the Form
                 </p>
                 <button
                   onClick={() => setShowContactForm(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-black"
                   aria-label="Close"
                 >
                   <FaTimes size={20} />
@@ -1329,7 +1320,7 @@ const CourseDetail = () => {
                     {isSubmitting ? (
                       <>
                         <svg
-                          className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                          className="animate-spin -ml-1 mr-2 h-5 w-5 text-black"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -1360,7 +1351,7 @@ const CourseDetail = () => {
                   </button>
                   {course.hasDiscount && course.originalPrice && (
                     <div className="absolute -bottom-5 left-0 right-0 text-center">
-                      <span className="inline-block px-2 py-0.5 text-xs font-medium text-white bg-amber-500 rounded-full">
+                      <span className="inline-block px-2 py-0.5 text-xs font-medium text-black bg-amber-500 rounded-full">
                         {Math.round(
                           (1 - course.price / course.originalPrice) * 100
                         )}
@@ -1375,7 +1366,7 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-black dark:text-white mb-1"
                   >
                     Full Name *
                   </label>
@@ -1394,7 +1385,7 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-black dark:text-white mb-1"
                   >
                     Email Address *
                   </label>
@@ -1402,11 +1393,11 @@ const CourseDetail = () => {
                     type="email"
                     id="email"
                     name="email"
-                    disabled
+                    disabled={!!currentUser}
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full cursor-not-allowed px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className={`w-full px-3 py-2 border ${currentUser ? 'cursor-not-allowed' : ''} border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white`}
                     placeholder="your@email.com"
                   />
                 </div>
@@ -1414,7 +1405,7 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="phone"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-black dark:text-white mb-1"
                   >
                     Phone Number
                   </label>
@@ -1440,7 +1431,7 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-black dark:text-white mb-1"
                   >
                     Your Message *
                   </label>
@@ -1460,14 +1451,14 @@ const CourseDetail = () => {
                   <button
                     type="button"
                     onClick={() => setShowContactForm(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                    className="px-4 py-2 text-sm font-medium text-black bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
                     disabled={isSubmitting}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                    className="px-4 py-2 text-sm text-white font-medium bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Submitting..." : "Submit"}

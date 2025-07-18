@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaSearch,
   FaBookOpen,
@@ -8,6 +8,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import axios from "axios";
 const bannerImg =
   "http://firstvite.com/api/upload/file/img-1752554019521-300496356.png";
 import "./Banner.css";
@@ -15,13 +16,28 @@ import "../styles/typography.css";
 
 function Banner() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [courseCount, setCourseCount] = useState(0);
+
+  useEffect(() => {
+    const fetchCourseCount = async () => {
+      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4002/api';
+      try {
+        const response = await axios.get(`${API_URL}/courses?fields=_id`);
+        setCourseCount(response.data.length + 100);
+      } catch (error) {
+        console.error('Error fetching course count:', error);
+      }
+    };
+
+    fetchCourseCount();
+  }, []);
 
   const features = [
     {
       icon: (
         <FaBookOpen className="text-2xl text-blue-500 dark:text-blue-400" />
       ),
-      title: "1000+ Courses",
+      title: `${courseCount}+ Courses`,
       desc: "Wide range of topics",
     },
     {
@@ -65,39 +81,12 @@ function Banner() {
                 </div>
               </div>
             </div>
-            <p className="text-sm-mobile text-base-tablet text-base-desktop text-thin text-gray-600 dark:text-gray-300">
+            <p className="text-sm-mobile text-base-tablet text-base-desktop text-thin text-black dark:text-white">
               No schedule limits, no boundaries. Learn anytime you choose and
               make progress every day with simple, effective online education
               built for real growth.
             </p>
-            {/* Search Bar */}
-            {/* <div className="relative max-w-xl">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaSearch className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 text-base transition-colors duration-200"
-                placeholder="What do you want to learn today?"
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && searchQuery.trim()) {
-                    window.location.href = `/courses?search=${encodeURIComponent(
-                      searchQuery
-                    )}`;
-                  }
-                }}
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <Link
-                  to={`/courses?search=${encodeURIComponent(searchQuery)}`}
-                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition duration-200 flex items-center"
-                >
-                  <FaSearch className="mr-2" /> Search
-                </Link>
-              </div>
-            </div> */}
+
             {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
               {features.map((feature, index) => (
@@ -109,10 +98,10 @@ function Banner() {
                     {feature.icon}
                   </div>
                   <div className="min-w-0">
-                    <h4 className="font-semibold text-gray-900 dark:text-white text-[13px] sm:text-[15px] leading-tight">
+                    <h4 className="font-semibold text-black dark:text-white text-[13px] sm:text-[15px] leading-tight">
                       {feature.title}
                     </h4>
-                    <p className="text-[11px] sm:text-[13px] text-gray-500 dark:text-gray-400 leading-tight mt-0.5">
+                    <p className="text-[11px] sm:text-[13px] text-black dark:text-gray-400 leading-tight mt-0.5">
                       {feature.desc}
                     </p>
                   </div>
@@ -146,19 +135,6 @@ function Banner() {
                   className="w-full h-auto rounded-none"
                 />
               </div>
-
-              {/* Floating elements */}
-              {/* <div className="absolute -bottom-6 -left-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-20">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                    <FaUsers className="text-green-500 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">10,000+</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Active Students</p>
-                  </div>
-                </div>
-              </div> */}
 
               {/* Decorative elements */}
               <div className="absolute -top-6 -right-6 w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>

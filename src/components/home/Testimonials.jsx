@@ -82,10 +82,10 @@ const Testimonials = () => {
     <section className="py-16 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+          <h2 className="text-3xl font-bold text-black dark:text-white sm:text-4xl">
             What Our Readers Say
           </h2>
-          <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
+          <p className="mt-4 text-xl text-black dark:text-white">
             Join thousands of satisfied readers
           </p>
         </div>
@@ -105,18 +105,18 @@ const Testimonials = () => {
                   />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-medium text-black dark:text-white">
                     {testimonial.name}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-black dark:text-white">
                     {testimonial.role}
                   </p>
                 </div>
               </div>
               <div className="flex mb-4">{renderStars(testimonial.rating)}</div>
               <div className="relative">
-                <FaQuoteLeft className="text-gray-200 dark:text-gray-700 text-4xl absolute -top-2 -left-2" />
-                <p className="relative z-10 text-gray-600 dark:text-gray-300 italic">
+                <FaQuoteLeft className="text-gray-200 dark:text-white text-4xl absolute -top-2 -left-2" />
+                <p className="relative z-10 text-black dark:text-white italic">
                   {testimonial.content}
                 </p>
               </div>

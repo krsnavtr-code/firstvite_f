@@ -128,7 +128,7 @@ const CoursesByCategory = () => {
                   className={`block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
                     !categoryName
                       ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-gray-700 dark:text-white"
+                      : "text-black dark:text-white"
                   }`}
                 >
                   All Courses
@@ -141,7 +141,7 @@ const CoursesByCategory = () => {
                     className={`block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
                       category?._id === cat._id
                         ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 dark:text-white"
+                        : "text-black dark:text-white"
                     }`}
                   >
                     {cat.name}
@@ -158,12 +158,12 @@ const CoursesByCategory = () => {
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
               {category ? `${category.name} Courses` : "All Courses"}
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">Total Courses: {courses.length}</p>
+            <p className="text-black dark:text-white">Total Courses: {courses.length}</p>
           </div>
 
           {courses.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
+              <p className="text-black dark:text-white text-lg">
                 No courses found in this category.
               </p>
               <Link
@@ -324,7 +324,7 @@ const CourseCard = ({ course }) => {
               </div>
             ) : imageState.hasError || !course.thumbnail ? (
               <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-black dark:text-white">
                   No image available
                 </span>
               </div>
@@ -346,11 +346,11 @@ const CourseCard = ({ course }) => {
         </div>
 
         <div className="p-4">
-          <h3 className="font-bold text-lg mb-2 line-clamp-2 h-14 text-gray-800 dark:text-white">
+          <h3 className="font-bold text-lg mb-2 line-clamp-2 h-14 text-black dark:text-white">
             {course.title}
           </h3>
 
-          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
+          <div className="flex items-center text-sm text-black dark:text-gray-300 mb-2">
             <span className="flex items-center mr-4">
               <FaStar className="text-yellow-400 mr-1" />
               {course.rating?.toFixed(1) || "New"}
@@ -361,16 +361,16 @@ const CourseCard = ({ course }) => {
             </span>
           </div>
 
-          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-3">
+          <div className="flex items-center text-sm text-black dark:text-gray-300 mb-3">
             <FaClock className="mr-1 text-gray-600 dark:text-gray-300" />
             {course.duration || "Self-paced"} Weeks
           </div>
 
           <div className="flex flex-col justify-between">
-            <span className="font-bold text-lg text-gray-800 dark:text-white">
+            <span className="font-bold text-lg text-black dark:text-white">
               {course.price > 0 ? `${formatPrice(course.price)}` : "Free"}
               {course.originalPrice > course.price && (
-                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">
+                <span className="ml-2 text-sm text-black dark:text-gray-400 line-through">
                   {formatPrice(course.originalPrice)}
                 </span>
               )}
