@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:4002',
+        target: 'https://firstvite-b.onrender.com',
         changeOrigin: true,
         secure: false,
         ws: true,
