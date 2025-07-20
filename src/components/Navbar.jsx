@@ -10,20 +10,32 @@ import {
   FaBars,
   FaSignInAlt,
   FaUserPlus,
+  FaCreditCard,
 } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
 import api from "../api/axios";
+import PaymentForm from "./PaymentForm";
 
 function Navbar() {
   const { authUser, isAuthenticated, isAdmin, isApproved, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handlePaymentClick = () => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to make a payment");
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
+    setShowPaymentForm(true);
+  };
 
   // Clean up event listeners on unmount
   useEffect(() => {
@@ -320,7 +332,7 @@ function Navbar() {
     { to: "/", label: "Home" },
     { to: "/courses", label: "Courses" },
     // { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
+    // { to: "/contact", label: "Contact" },
     ...(isAuthenticated && isApproved
       ? [
           { to: "/my-learning", label: "My Learning" },
@@ -384,6 +396,7 @@ function Navbar() {
             {/* Desktop menu */}
             <div className="hidden md:flex md:items-center xl:ml-8 lg:ml-6">
               <div className="flex-shrink-0">{renderNavItems()}</div>
+
               <Link
                 to="/lms"
                 className="ml-2 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 whitespace-nowrap"
@@ -537,6 +550,15 @@ function Navbar() {
               )}
             </button>
 
+            {/* Payment Button */}
+            <button
+              onClick={handlePaymentClick}
+              className="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <FaCreditCard className="mr-2" />
+              Make Payment
+            </button>
+
             {/* User menu */}
             {isAuthenticated ? (
               <div className="relative">
@@ -605,6 +627,12 @@ function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
+                <button
+                  onClick={handlePaymentClick}
+                  className="flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors duration-200"
+                >
+                  <FaCreditCard className="mr-1" /> Make Payment
+                </button>
                 <Link
                   to="/login"
                   state={{ from: location }}
@@ -670,6 +698,13 @@ function Navbar() {
           </div>
         </div>
       </div>
+      
+      {/* Payment Form Modal */}
+      {showPaymentForm && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <PaymentForm onClose={() => setShowPaymentForm(false)} />
+        </div>
+      )}
     </div>
   );
 }

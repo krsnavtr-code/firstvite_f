@@ -17,6 +17,7 @@ import AdminEnrollments from "./pages/admin/Enrollments";
 import PrivateRoute from './components/PrivateRoute';
 import Unauthorized from './pages/Unauthorized';
 import Navbar from './components/Navbar';
+// import Navbar from './components/NewNavbar';
 import Footer from './components/Footer';
 import CoursesByCategory from './pages/user/CoursesByCategory';
 import AllCategories from './pages/user/AllCategories';
