@@ -1,0 +1,33 @@
+{
+  "admin": {
+    "enrollments": {
+      "title": "Enrollments Management",
+      "table": {
+        "student": "Student",
+        "course": "Course",
+        "status": "Status",
+        "date": "Enrollment Date",
+        "actions": "Actions",
+        "instructor": "Instructor",
+        "complete": "complete"
+      },
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "rejected": "Rejected",
+        "completed": "Completed",
+        "unknown": "Unknown"
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "markCompleted": "Mark as Completed",
+        "viewDetails": "View Details"
+      },
+      "searchPlaceholder": "Search enrollments...",
+      "noEnrollments": "No enrollments found",
+      "loading": "Loading enrollments...",
+      "error": "Error loading enrollments"
+    }
+  }
+}

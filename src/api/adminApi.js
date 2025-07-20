@@ -23,13 +23,34 @@ export const updateEnrollmentStatus = async (enrollmentId, status) => {
   }
 };
 
-// Get all enrollments (for admin dashboard)
+// Get all enrollments with complete user details (Admin only)
 export const getAllEnrollments = async (filters = {}) => {
   try {
-    const response = await axios.get('/enrollments', { params: filters });
+    const response = await axios.get('/enrollments/all', { 
+      params: { 
+        ...filters,
+        language: localStorage.getItem('i18nextLng') || 'en' 
+      } 
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching all enrollments:', error);
+    throw error;
+  }
+};
+
+// Get enrollments with filters (for admin dashboard)
+export const getEnrollments = async (filters = {}) => {
+  try {
+    const response = await axios.get('/enrollments', { 
+      params: { 
+        ...filters,
+        language: localStorage.getItem('i18nextLng') || 'en' 
+      } 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching enrollments:', error);
     throw error;
   }
 };
