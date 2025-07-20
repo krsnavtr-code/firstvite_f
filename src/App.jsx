@@ -50,6 +50,12 @@ import UsersPage from './pages/admin/UsersPage';
 import LMS from './pages/lms';
 import InactiveAccount from './pages/auth/InactiveAccount';
 
+// Blog Components
+import BlogListPage from './pages/blog/BlogListPage';
+import BlogDetailPage from './pages/blog/BlogDetailPage';
+import BlogPostList from './pages/admin/BlogListPage';
+import BlogPostForm from './pages/admin/BlogPostForm';
+
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
   const location = useLocation();
@@ -203,6 +209,19 @@ function App() {
           </MainLayout>
         } />
 
+        {/* Blog Routes */}
+        <Route path="/blog" element={
+          <MainLayout>
+            <BlogListPage />
+          </MainLayout>
+        } />
+        
+        <Route path="/blog/:slug" element={
+          <MainLayout>
+            <BlogDetailPage />
+          </MainLayout>
+        } />
+
         {/* Protected routes - Basic website access (only requires active account) */}
         <Route
           path="/profile"
@@ -283,6 +302,11 @@ function App() {
           <Route path="/admin/image-upload" element={<ImageUploadDemo />} />
           <Route path="/admin/image-gallery" element={<ImageGallery />} />
           <Route path="/admin/enrollments" element={<AdminEnrollments />} />
+          
+          {/* Blog Admin Routes */}
+          <Route path="/admin/blog" element={<BlogPostList />} />
+          <Route path="/admin/blog/new" element={<BlogPostForm />} />
+          <Route path="/admin/blog/edit/:id" element={<BlogPostForm />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
