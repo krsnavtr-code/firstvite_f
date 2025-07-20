@@ -1,22 +1,43 @@
-import { useState, useEffect } from 'react';
-import React from 'react';
-import ContactFormModal from '../components/common/ContactFormModal.jsx';
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import React from "react";
+import ContactFormModal from "../components/common/ContactFormModal.jsx";
 
-const CONTACT_FORM_SHOWN_KEY = 'contactFormShown';
+const CONTACT_FORM_SHOWN_KEY = "contactFormShown";
 
 const useContactFormPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    // Show the popup on every page load after a delay
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-      setIsInitialized(true);
-    }, 3000); // Show after 3 seconds
-    
-    return () => clearTimeout(timer);
-  }, []);
+    // Check if current path should show the contact form
+    const shouldShowForm = () => {
+      const path = location.pathname;
+      // Don't show on admin or LMS routes
+      if (
+        path.startsWith("/admin") ||
+        path.startsWith("/lms") ||
+        path.startsWith("/login") ||
+        path.startsWith("/signup") ||
+        path.startsWith("/profile") ||
+        path.startsWith("/my-learning")
+      ) {
+        return false;
+      }
+      return true;
+    };
+
+    // Only show the popup on allowed routes
+    if (shouldShowForm()) {
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+        setIsInitialized(true);
+      }, 3000); // Show after 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname]);
 
   const closeModal = () => {
     setIsOpen(false);
@@ -30,7 +51,7 @@ const useContactFormPopup = () => {
     ContactFormPopup,
     isInitialized,
     openContactForm: () => setIsOpen(true),
-    closeContactForm: closeModal
+    closeContactForm: closeModal,
   };
 };
 
