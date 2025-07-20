@@ -133,6 +133,14 @@ function Footer() {
                   FAQs
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/payment-t-and-c"
+                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                >
+                  Payment T&C
+                </Link>
+              </li>
             </ul>
           </div>
 

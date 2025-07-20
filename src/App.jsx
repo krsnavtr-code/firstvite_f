@@ -44,6 +44,7 @@ import useContactFormPopup from './hooks/useContactFormPopup.jsx';
 import SuspendedAccount from './pages/SuspendedAccount';
 import PendingApproval from './pages/PendingApproval';
 import LMSLayout from './components/LMSLayout';
+import PaymentTAndC from './pages/PaymentTAndC';
 
 // LMS Components
 import RegisterPage from './pages/auth/RegisterPage';
@@ -220,6 +221,12 @@ function App() {
         <Route path="/blog/:slug" element={
           <MainLayout>
             <BlogDetailPage />
+          </MainLayout>
+        } />
+
+        <Route path="/payment-t-and-c" element={
+          <MainLayout>
+            <PaymentTAndC />
           </MainLayout>
         } />
 
