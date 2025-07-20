@@ -4,7 +4,8 @@ import axios from './axios';
 export const getPendingEnrollments = async () => {
   try {
     const response = await axios.get('/enrollments/pending');
-    return response.data;
+    // Return the data with the expected structure { enrollments: [...] }
+    return { data: { enrollments: response.data.enrollments || [] } };
   } catch (error) {
     console.error('Error fetching pending enrollments:', error);
     throw error;
