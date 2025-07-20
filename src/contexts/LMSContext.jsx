@@ -25,8 +25,11 @@ export const LMSProvider = ({ children }) => {
     setError(null);
     
     try {
-      const data = await getMyEnrollments();
-      setEnrollments(data);
+      const response = await getMyEnrollments();
+      // The response should be an array of enrollments
+      const enrollmentsData = Array.isArray(response) ? response : (response.data || []);
+      console.log('Fetched enrollments:', enrollmentsData);
+      setEnrollments(enrollmentsData);
     } catch (err) {
       console.error('Error loading enrollments:', err);
       setError(err.message || 'Failed to load enrollments');

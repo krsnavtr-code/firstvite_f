@@ -47,7 +47,9 @@ export function AuthProvider({ children }) {
               email: response.data.email,
               role: response.data.role,
               isApproved: response.data.isApproved,
-              isActive: response.data.isActive !== false // Default to true if not specified
+              isActive: response.data.isActive !== false, // Default to true if not specified
+              phone: response.data.phone || '',
+              address: response.data.address || ''
             };
             
             localStorage.setItem('user', JSON.stringify(userData));
@@ -99,7 +101,9 @@ export function AuthProvider({ children }) {
                   email: user.email,
                   role: user.role,
                   isActive: user.isActive !== false, // Default to true if not specified
-                  isApproved: user.isApproved
+                  isApproved: user.isApproved,
+                  phone: user.phone || '',
+                  address: user.address || ''
                 };
                 
                 localStorage.setItem('user', JSON.stringify(userData));
@@ -299,10 +303,17 @@ export function AuthProvider({ children }) {
 
   // Update user function
   const updateUser = (userData) => {
-    setCurrentUser(prev => ({
-      ...prev,
-      ...userData
-    }));
+    setCurrentUser(prev => {
+      const updatedUser = {
+        ...prev,
+        ...userData
+      };
+      
+      // Also update localStorage to persist the changes
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      return updatedUser;
+    });
   };
 
   const value = {

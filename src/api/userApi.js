@@ -64,30 +64,33 @@ const userApi = {
   // Update user profile (phone, address)
   updateProfile: async (profileData) => {
     try {
-      // Get token from localStorage
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
+      // Use the correct endpoint /auth/profile (baseURL already includes /api)
+      const response = await api.put('/auth/profile', profileData);
+      
+      // Check for success response
+      if (response.data && response.data.success) {
+        // Update the user data in localStorage if available
+        if (response.data.user) {
+          const currentUser = JSON.parse(localStorage.getItem('Users') || '{}');
+          localStorage.setItem('Users', JSON.stringify({
+            ...currentUser,
+            ...response.data.user
+          }));
+        }
+        return response.data;
       }
       
-      // Use the correct endpoint /api/users/profile
-      const response = await api.put('/users/profile', profileData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      return response.data;
+      throw new Error(response.data?.message || 'Failed to update profile');
     } catch (error) {
       console.error('Error updating profile:', error);
       if (error.response?.status === 401) {
         // Clear invalid token and redirect to login
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         localStorage.removeItem('Users');
         window.location.href = '/login';
       }
-      throw error;
+      throw error.response?.data || error;
     }
   },
 

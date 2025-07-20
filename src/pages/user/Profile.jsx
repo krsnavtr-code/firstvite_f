@@ -10,7 +10,7 @@ const getAuthToken = () => {
 };
 
 const Profile = () => {
-  const { authUser, updateAuthUser } = useAuth();
+  const { currentUser: authUser, updateUser } = useAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -68,28 +68,27 @@ const Profile = () => {
       
       // Only send phone and address to the profile update endpoint
       const { phone, address } = formData;
-      const token = getAuthToken();
       
-      if (!token) {
-        throw new Error('No authentication token found');
+      // Validate at least one field is being updated
+      if (!phone && !address) {
+        throw new Error('Please provide at least one field to update');
       }
       
       const response = await userApi.updateProfile({ phone, address });
       
       if (response && response.success) {
         // Update the local auth user with the new data
-        updateAuthUser({
+        updateUser({
           ...authUser,
-          phone: response.user.phone,
-          address: response.user.address
+          ...(phone && { phone }),
+          ...(address && { address })
         });
         
-        // Update localStorage with new user data
-        const userData = JSON.parse(localStorage.getItem('Users') || '{}');
-        localStorage.setItem('Users', JSON.stringify({
-          ...userData,
-          phone: response.user.phone,
-          address: response.user.address
+        // Update the form data with the latest values
+        setFormData(prev => ({
+          ...prev,
+          phone: phone || prev.phone,
+          address: address || prev.address
         }));
         
         toast.success('Profile updated successfully');
@@ -331,7 +330,7 @@ const Profile = () => {
       </div>
       
       {/* Order History Section */}
-      <div className="mt-8">
+      {/* <div className="mt-8">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Order History
         </h2>
@@ -339,9 +338,9 @@ const Profile = () => {
           <p className="text-gray-600 dark:text-gray-400">
             Your order history will appear here.
           </p>
-          {/* Order history list will be implemented later */}
+          Order history list will be implemented later
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

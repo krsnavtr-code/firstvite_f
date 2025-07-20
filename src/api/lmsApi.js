@@ -21,8 +21,18 @@ export const enrollInCourse = async (courseId) => {
  */
 export const getMyEnrollments = async () => {
   try {
-    const response = await axios.get('/lms/my-courses');
-    return response.data;
+    // Use the correct endpoint that matches the backend
+    const response = await axios.get('/enrollments/me', {
+      params: {
+        status: undefined // Get all enrollments regardless of status
+      }
+    });
+    
+    // The backend returns { success, data, message } format
+    if (response.data && response.data.success) {
+      return response.data.data || [];
+    }
+    return [];
   } catch (error) {
     console.error('Error fetching enrollments:', error);
     throw error.response?.data || { message: 'Error fetching enrollments' };
