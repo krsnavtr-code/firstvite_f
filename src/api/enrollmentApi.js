@@ -156,18 +156,20 @@ export const getUserEnrollments = async (userId, options = {}) => {
 
     console.log('Fetching enrollments for user:', userId);
 
-    // Build query parameters
-    const params = new URLSearchParams();
-    if (status) params.append('status', status);
-    params.append('limit', limit);
-    params.append('page', page);
-    params.append('userId', userId); // Add userId as a query parameter
+    // Build request data without userId since it comes from the JWT token
+    const requestData = {
+      status,
+      limit,
+      page
+    };
 
-    console.log('Sending request to /enrollments/me with params:', params.toString());
+    console.log('Sending request to /enrollments/me with data:', requestData);
 
-    const response = await axios.get(`/enrollments/me?${params.toString()}`, {
+    const response = await axios.get('/enrollments/me', {
+      params: requestData,
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       },
       timeout: 10000 // 10 seconds timeout
     });

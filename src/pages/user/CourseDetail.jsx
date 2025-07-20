@@ -917,7 +917,7 @@ const CourseDetail = () => {
                 {course.curriculum?.length > 0 ? (
                   <div className="space-y-3">
                     {course.curriculum.map((section, sectionIndex) => (
-                      <div 
+                      <div
                         key={sectionIndex}
                         className="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden transition-all duration-200"
                       >
@@ -1397,7 +1397,9 @@ const CourseDetail = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className={`w-full px-3 py-2 border ${currentUser ? 'cursor-not-allowed' : ''} border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white`}
+                    className={`w-full px-3 py-2 border ${
+                      currentUser ? "cursor-not-allowed" : ""
+                    } border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white`}
                     placeholder="your@email.com"
                   />
                 </div>
@@ -1445,6 +1447,39 @@ const CourseDetail = () => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Tell us how we can help you..."
                   ></textarea>
+                </div>
+
+                {/* privacy polocy check box */}
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="privacy-policy"
+                    name="privacy-policy"
+                    value="privacy-policy"
+                    onChange={handleInputChange}
+                    required
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:checked:bg-blue-600"
+                  />
+                  <label
+                    htmlFor="privacy-policy"
+                    className="ml-2 text-sm font-medium text-black dark:text-white"
+                  >
+                    I hereby agree with{" "}
+                    <Link
+                      to="/terms-of-service"
+                      className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      Terms & Conditions
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      to="/privacy-policy"
+                      className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      Privacy Policy
+                    </Link>
+                    <span className="text-red-500">*</span>
+                  </label>
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-2">

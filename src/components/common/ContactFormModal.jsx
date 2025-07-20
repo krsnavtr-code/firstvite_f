@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { submitContactForm } from '../../api/contactApi';
+import { Link } from 'react-router-dom';
 
 const ContactFormModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -259,13 +260,13 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                   <div className="text-xs">
                     <label htmlFor="agreedToTerms" className="font-medium text-gray-700 dark:text-gray-300">
                       I hereby agree to receive the promotional emails & messages{' '}
-                      <a href="/terms-of-service" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                      <Link to="/terms-of-service" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
                         Terms & Conditions
-                      </a>{' '}
+                      </Link>{' '}
                       and{' '}
-                      <a href="/privacy-policy" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                      <Link to="/privacy-policy" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
                         Privacy Policy
-                      </a>
+                      </Link>
                       <span className="text-red-500">*</span>
                     </label>
                   </div>

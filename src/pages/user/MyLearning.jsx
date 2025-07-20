@@ -24,42 +24,51 @@ const MyLearning = () => {
   });
 
   console.log("Auth context:", auth);
-  console.log("Current user:", auth?.user);
+  console.log("Current user:", auth?.currentUser);
 
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
         setLoading(true);
-        const userId = auth?.authUser?._id;
+        const userId = auth?.currentUser?._id;
         if (!userId) {
-          console.error('User ID not found in auth context');
-          setError('Please log in to view your enrolled courses');
+          console.error("User ID not found in auth context");
+          setError("Please log in to view your enrolled courses");
           setLoading(false);
           return;
         }
-        
-        console.log('Fetching enrollments for user:', userId);
-        // Remove status filter to get all enrollments
-        const response = await getUserEnrollments(userId);
-        
-        console.log('API Response:', response);
-        
+
+        console.log("Fetching enrollments for user:", userId);
+        // Get the token from localStorage
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+        // Get enrollments with 'not_started' status to match the database record
+        const response = await getUserEnrollments(userId, {
+          token,
+          status: "not_started", // Match the status in the database
+        });
+
+        console.log("API Response:", response);
+
         if (!response || !response.success) {
-          const errorMessage = response?.message || 'Failed to fetch enrollments';
-          console.error('Error fetching enrollments:', errorMessage);
+          const errorMessage =
+            response?.message || "Failed to fetch enrollments";
+          console.error("Error fetching enrollments:", errorMessage);
           setError(errorMessage);
           setLoading(false);
           return;
         }
-        
-        console.log('Raw enrollments data:', response.data);
-        
+
+        console.log("Raw enrollments data:", response.data);
+
         // The response now has a 'data' array containing the enrollments
         const enrollments = response.data || [];
-        console.log('Fetched enrollments:', enrollments);
-        
+        console.log("Fetched enrollments:", enrollments);
+
         if (enrollments.length === 0) {
-          console.log('No active enrollments found');
+          console.log("No active enrollments found");
           setEnrolledCourses([]);
           setStats({
             totalEnrolled: 0,
@@ -72,48 +81,59 @@ const MyLearning = () => {
 
         // Transform the data to match our component's expected format
         const courses = enrollments.map((enrollment) => {
-          console.log('Processing enrollment:', enrollment);
-          
+          console.log("Processing enrollment:", enrollment);
+
           // Extract course data from the enrollment
           const course = enrollment.course || {};
-          const instructor = typeof course.instructor === 'object' 
-            ? course.instructor?.name || 'Instructor' 
-            : 'Instructor';
-            
+          const instructor =
+            typeof course.instructor === "object"
+              ? course.instructor?.name || "Instructor"
+              : "Instructor";
+
           return {
             id: enrollment._id,
             courseId: course._id || enrollment.courseId,
-            title: course.title || enrollment.courseTitle || 'Course Title Not Available',
+            title:
+              course.title ||
+              enrollment.courseTitle ||
+              "Course Title Not Available",
             instructor: instructor,
-            thumbnail: course.thumbnail || 'https://via.placeholder.com/300x150?text=Course+Image',
+            thumbnail:
+              course.thumbnail ||
+              "https://via.placeholder.com/300x150?text=Course+Image",
             progress: enrollment.progress || 0,
             lastAccessed: enrollment.lastAccessed
               ? new Date(enrollment.lastAccessed).toLocaleDateString()
-              : 'Never',
-            status: enrollment.status || 'active',
-            totalLessons: course.modules?.reduce(
-              (total, module) => total + (module.lessons?.length || 0),
-              0
-            ) || 0,
-            completedLessons: Math.floor((enrollment.progress || 0) / 100 * (course.modules?.reduce(
-              (total, module) => total + (module.lessons?.length || 0),
-              0
-            ) || 1)),
-            duration: course.duration || 'N/A'
+              : "Never",
+            status: enrollment.status || "active",
+            totalLessons:
+              course.modules?.reduce(
+                (total, module) => total + (module.lessons?.length || 0),
+                0
+              ) || 0,
+            completedLessons: Math.floor(
+              ((enrollment.progress || 0) / 100) *
+                (course.modules?.reduce(
+                  (total, module) => total + (module.lessons?.length || 0),
+                  0
+                ) || 1)
+            ),
+            duration: course.duration || "N/A",
           };
         });
 
-        console.log('Processed courses:', courses);
+        console.log("Processed courses:", courses);
         setEnrolledCourses(courses);
 
         // Calculate stats
         const stats = {
           totalEnrolled: courses.length,
-          inProgress: courses.filter(c => c.progress > 0 && c.progress < 100).length,
-          completed: courses.filter(c => c.progress === 100).length,
+          inProgress: courses.filter((c) => c.progress > 0 && c.progress < 100)
+            .length,
+          completed: courses.filter((c) => c.progress === 100).length,
         };
-        
-        console.log('Calculated stats:', stats);
+
+        console.log("Calculated stats:", stats);
         setStats(stats);
       } catch (error) {
         console.error("Error fetching enrolled courses:", error);
@@ -124,12 +144,14 @@ const MyLearning = () => {
       }
     };
 
-    if (auth?.authUser) {
+    if (auth?.currentUser) {
+      console.log("User is authenticated, fetching courses...");
       fetchEnrolledCourses();
     } else {
+      console.log("No authenticated user found, not fetching courses");
       setLoading(false);
     }
-  }, [auth?.user]);
+  }, [auth?.currentUser]);
 
   if (loading) {
     return (
@@ -209,7 +231,10 @@ const MyLearning = () => {
     storedUser: localStorage.getItem("Users"),
   });
 
-  if (!auth?.authUser) {
+  if (!auth?.currentUser) {
+    console.log("Auth context:", auth);
+    console.log("Current user from context:", auth?.currentUser);
+    console.log("Token in localStorage:", localStorage.getItem("token"));
     console.log("No user found, showing sign-in prompt");
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pt-24 pb-16 px-4">
@@ -345,7 +370,7 @@ const MyLearning = () => {
                       <span className="text-xs font-medium text-pink-600 dark:text-pink-400">
                         {Math.round(course.progress)}% Complete
                       </span>
-                      <span
+                      {/* <span
                         className={`text-xs px-2 py-1 rounded-full ${
                           course.status === "pending"
                             ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
@@ -355,7 +380,16 @@ const MyLearning = () => {
                         {course.status === "pending"
                           ? "Pending Approval"
                           : "Active"}
-                      </span>
+                      </span> */}
+                      {/* {course.payment && course.payment.status === "paid" ? (
+                        <span className="text-xs font-medium text-pink-600 dark:text-pink-400">
+                          Paid
+                        </span>
+                      ) : (
+                        <span className="text-xs font-medium text-pink-600 dark:text-pink-400">
+                          Not Paid
+                        </span>
+                      )} */}
                     </div>
 
                     <button

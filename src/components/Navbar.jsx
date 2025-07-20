@@ -564,6 +564,17 @@ function Navbar() {
                     aria-labelledby="user-menu"
                   >
                     <Link
+                      to="/my-learning"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      role="menuitem"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      My Learning
+                    </Link>
+                    {/* <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                      Dashboard
+                    </Link> */}
+                    <Link
                       to="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                       role="menuitem"
@@ -581,7 +592,7 @@ function Navbar() {
                       onClick={() => {
                         logout();
                         setIsProfileMenuOpen(false);
-                        toast.success("Logged out successfully");
+                        // toast.success("Logged out successfully");
                         navigate("/");
                       }}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"
