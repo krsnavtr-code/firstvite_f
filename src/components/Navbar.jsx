@@ -29,11 +29,11 @@ function Navbar() {
   const location = useLocation();
 
   const handlePaymentClick = () => {
-    if (!isAuthenticated) {
-      toast.error("Please log in to make a payment");
-      navigate("/login", { state: { from: location.pathname } });
-      return;
-    }
+    // if (!isAuthenticated) {
+    //   toast.error("Please log in to make a payment");
+    //   navigate("/login", { state: { from: location.pathname } });
+    //   return;
+    // }
     setShowPaymentForm(true);
   };
 
@@ -553,10 +553,10 @@ function Navbar() {
             {/* Payment Button */}
             <button
               onClick={handlePaymentClick}
-              className="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="flex hidden lg:block md:block items-center flex-col px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              <FaCreditCard className="mr-2" />
-              Make Payment
+              {/* <FaCreditCard className="mr-2" /> */}
+              Pay Now
             </button>
 
             {/* User menu */}
@@ -627,12 +627,6 @@ function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <button
-                  onClick={handlePaymentClick}
-                  className="flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors duration-200"
-                >
-                  <FaCreditCard className="mr-1" /> Make Payment
-                </button>
                 <Link
                   to="/login"
                   state={{ from: location }}
@@ -694,6 +688,18 @@ function Navbar() {
               >
                 Agent Register
               </a>
+            </div>
+            <div className="w-full mt-2">
+              <button
+                onClick={() => {
+                  handlePaymentClick();
+                  toggleMobileMenu();
+                }}
+                className="flex items-center justify-center w-full px-4 py-2 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <FaCreditCard className="mr-2" />
+                Pay Now
+              </button>
             </div>
           </div>
         </div>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaSearch, FaEdit, FaTrash, FaFilePdf, FaDownload } from 'react-icons/fa';
 import { getCourses, deleteCourse, getCategoriesForForm } from '../../../api/courseApi';
+import api from '../../../api/axios';
 
 const CoursesList = () => {
   const [courses, setCourses] = useState([]);
@@ -11,6 +12,8 @@ const CoursesList = () => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showHomeFilter, setShowHomeFilter] = useState('all'); // 'all', 'yes', 'no'
+  const [generatingPdf, setGeneratingPdf] = useState(null);
+  const [pdfUrls, setPdfUrls] = useState({});
 
   // Fetch courses and categories
   useEffect(() => {
@@ -74,6 +77,61 @@ const CoursesList = () => {
         toast.error('Failed to delete course');
       }
     }
+  };
+
+  const handleGeneratePdf = async (course) => {
+    try {
+      setGeneratingPdf(course._id);
+      
+      // Use the configured axios instance which handles authentication automatically
+      const response = await api.get(`/courses/${course._id}/generate-pdf`, {
+        responseType: 'blob', // Important for handling binary data
+        headers: {
+          'Accept': 'application/pdf',
+          'Cache-Control': 'no-cache',
+        },
+      });
+
+      // Get the blob data from the response
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      
+      // Create a blob URL for the PDF
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const filename = `${course.title.replace(/\s+/g, '_')}_${course._id}.pdf`;
+      
+      // Set up the download
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+      
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error(error.response?.data?.message || 'Failed to generate PDF');
+    } finally {
+      setGeneratingPdf(null);
+    }
+  };
+
+  const handleDownloadPdf = (courseId) => {
+    const pdfInfo = pdfUrls[courseId];
+    if (!pdfInfo) return;
+    
+    // Create a temporary link and trigger download
+    const link = document.createElement('a');
+    link.href = pdfInfo.url;
+    link.download = pdfInfo.filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (loading) {
@@ -258,6 +316,46 @@ const CoursesList = () => {
                           >
                             <FaTrash />
                           </button>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <div className="flex space-x-3">
+                            <Link
+                              to={`/admin/courses/edit/${course._id}`}
+                              className="text-indigo-600 hover:text-indigo-900"
+                              title="Edit course"
+                            >
+                              <FaEdit className="h-5 w-5" />
+                            </Link>
+                            <button
+                              onClick={() => handleDelete(course._id)}
+                              className="text-red-600 hover:text-red-900"
+                              title="Delete course"
+                            >
+                              <FaTrash className="h-5 w-5" />
+                            </button>
+                            {pdfUrls[course._id] ? (
+                              <button
+                                onClick={() => handleDownloadPdf(course._id)}
+                                className="text-green-600 hover:text-green-900"
+                                title="Download PDF"
+                              >
+                                <FaDownload className="h-5 w-5" />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleGeneratePdf(course)}
+                                disabled={generatingPdf === course._id}
+                                className={`text-blue-600 hover:text-blue-900 ${generatingPdf === course._id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                title="Generate PDF"
+                              >
+                                {generatingPdf === course._id ? (
+                                  <div className="animate-spin h-5 w-5 border-t-2 border-blue-500 rounded-full"></div>
+                                ) : (
+                                  <FaFilePdf className="h-5 w-5" />
+                                )}
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
