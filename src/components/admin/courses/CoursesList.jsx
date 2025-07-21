@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { FaSearch, FaEdit, FaTrash, FaFilePdf, FaDownload } from 'react-icons/fa';
+import { FaSearch, FaEdit, FaTrash, FaFilePdf, FaDownload, FaPaperPlane } from 'react-icons/fa';
 import { getCourses, deleteCourse, getCategoriesForForm } from '../../../api/courseApi';
 import api from '../../../api/axios';
+import SendCoursePdfModal from './SendCoursePdfModal';
 
 const CoursesList = () => {
   const [courses, setCourses] = useState([]);
@@ -14,6 +15,8 @@ const CoursesList = () => {
   const [showHomeFilter, setShowHomeFilter] = useState('all'); // 'all', 'yes', 'no'
   const [generatingPdf, setGeneratingPdf] = useState(null);
   const [pdfUrls, setPdfUrls] = useState({});
+  const [showSendPdfModal, setShowSendPdfModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   // Fetch courses and categories
   useEffect(() => {
@@ -323,7 +326,7 @@ const CoursesList = () => {
                           {course.instructor}
                         </td> */}
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          ${course.price.toFixed(2)}
+                          ${course.price?.toFixed(2) || '0.00'}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
                           <span
@@ -347,46 +350,59 @@ const CoursesList = () => {
                             {course.isPublished ? "Published" : "Draft"}
                           </span>
                         </td>
-                        <td className="flex justify-center items-center relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <Link
-                            to={`/admin/courses/${course._id}/edit`}
-                            className="text-indigo-600 cursor-pointer hover:text-indigo-900 p-2"
-                          >
-                            <FaEdit />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(course._id)}
-                            className="text-red-600 cursor-pointer hover:text-red-900 ml-2 p-2"
-                          >
-                            <FaTrash />
-                          </button>
-
-                          {pdfUrls[course._id] ? (
-                            <button
-                              onClick={() => handleDownloadPdf(course._id)}
-                              className="ms-2 text-green-600 hover:text-green-900"
-                              title="Download PDF"
+                        <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          <div className="flex items-center justify-end space-x-2">
+                            <Link
+                              to={`/admin/courses/edit/${course._id}`}
+                              className="text-blue-600 hover:text-blue-900"
+                              title="Edit Course"
                             >
-                              <FaDownload className="h-5 w-5" />
-                            </button>
-                          ) : (
+                              <FaEdit className="w-5 h-5" />
+                            </Link>
                             <button
-                              onClick={() => handleGeneratePdf(course)}
-                              disabled={generatingPdf === course._id}
-                              className={`ms-2 text-blue-600 hover:text-blue-900 ${
-                                generatingPdf === course._id
-                                  ? "opacity-50 cursor-not-allowed"
-                                  : ""
-                              }`}
-                              title="Generate PDF"
+                              onClick={() => handleDelete(course._id)}
+                              className="text-red-600 hover:text-red-900"
+                              title="Delete Course"
                             >
-                              {generatingPdf === course._id ? (
-                                <div className="animate-spin h-5 w-5 border-t-2 border-blue-500 rounded-full"></div>
-                              ) : (
-                                <FaFilePdf className="h-5 w-5" />
-                              )}
+                              <FaTrash className="w-5 h-5" />
                             </button>
-                          )}
+                            <button
+                              onClick={() => {
+                                setSelectedCourse(course);
+                                setShowSendPdfModal(true);
+                              }}
+                              className="text-green-600 hover:text-green-900"
+                              title="Send PDF to Student"
+                            >
+                              <FaPaperPlane className="w-5 h-5" />
+                            </button>
+                            {pdfUrls[course._id] ? (
+                              <button
+                                onClick={() => handleDownloadPdf(course._id)}
+                                className="text-blue-600 hover:text-blue-900"
+                                title="Download PDF"
+                              >
+                                <FaDownload className="w-5 h-5" />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleGeneratePdf(course)}
+                                disabled={generatingPdf === course._id}
+                                className={`text-gray-600 hover:text-gray-900 ${
+                                  generatingPdf === course._id
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                                }`}
+                                title="Generate PDF"
+                              >
+                                {generatingPdf === course._id ? (
+                                  <div className="animate-spin h-5 w-5 border-t-2 border-blue-500 rounded-full"></div>
+                                ) : (
+                                  <FaFilePdf className="w-5 h-5" />
+                                )}
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -397,6 +413,22 @@ const CoursesList = () => {
           </div>
         </div>
       </div>
+      
+      {/* Send PDF Modal */}
+      {selectedCourse && (
+        <SendCoursePdfModal
+          course={selectedCourse}
+          isOpen={showSendPdfModal}
+          onClose={() => {
+            setShowSendPdfModal(false);
+            setSelectedCourse(null);
+          }}
+          onSuccess={() => {
+            // Refresh courses list or show success message
+            fetchCourses();
+          }}
+        />
+      )}
     </div>
   );
 };
