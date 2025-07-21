@@ -148,7 +148,8 @@ const CoursesList = () => {
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">Courses</h1>
           <p className="mt-2 text-sm text-gray-700">
-            A list of all the courses in your account including their title, category, and status.
+            A list of all the courses in your account including their title,
+            category, and status.
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -166,7 +167,10 @@ const CoursesList = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search Input */}
           <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="search"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Search
             </label>
             <div className="relative">
@@ -186,7 +190,10 @@ const CoursesList = () => {
 
           {/* Category Filter */}
           <div>
-            <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="category-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Category
             </label>
             <select
@@ -206,7 +213,10 @@ const CoursesList = () => {
 
           {/* Show on Home Filter */}
           <div>
-            <label htmlFor="show-home-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="show-home-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Show on Home
             </label>
             <select
@@ -230,25 +240,43 @@ const CoursesList = () => {
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                    <th
+                      scope="col"
+                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                    >
                       Title
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Category
                     </th>
                     {/* <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Instructor
                     </th> */}
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Price
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                       Home
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Home
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Status
                     </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <th
+                      scope="col"
+                      className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                    >
                       <span className="sr-only">Actions</span>
                     </th>
                   </tr>
@@ -256,8 +284,12 @@ const CoursesList = () => {
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {courses.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="px-3 py-4 text-sm text-gray-500 text-center">
-                        No courses found. Create your first course to get started.
+                      <td
+                        colSpan="6"
+                        className="px-3 py-4 text-sm text-gray-500 text-center"
+                      >
+                        No courses found. Create your first course to get
+                        started.
                       </td>
                     </tr>
                   ) : (
@@ -267,17 +299,25 @@ const CoursesList = () => {
                           <div className="flex items-center">
                             {course.image && (
                               <div className="h-10 w-10 flex-shrink-0">
-                                <img className="h-10 w-10 rounded-full object-cover" src={course.image} alt={course.title} />
+                                <img
+                                  className="h-10 w-10 rounded-full object-cover"
+                                  src={course.image}
+                                  alt={course.title}
+                                />
                               </div>
                             )}
-                            <div className={`${course.image ? 'ml-4' : ''}`}>
-                              <div className="font-medium text-gray-900">{course.title}</div>
-                              <div className="text-gray-500">{course.level}</div>
+                            <div className={`${course.image ? "ml-4" : ""}`}>
+                              <div className="font-medium text-gray-900">
+                                {course.title}
+                              </div>
+                              <div className="text-gray-500">
+                                {course.level}
+                              </div>
                             </div>
                           </div>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {course.category?.name || 'Uncategorized'}
+                          {course.category?.name || "Uncategorized"}
                         </td>
                         {/* <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {course.instructor}
@@ -286,26 +326,30 @@ const CoursesList = () => {
                           ${course.price.toFixed(2)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
-                          <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                            course.showOnHome 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {course.showOnHome ? 'Yes' : 'No'}
+                          <span
+                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                              course.showOnHome
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {course.showOnHome ? "Yes" : "No"}
                           </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
-                          <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                            course.isPublished 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {course.isPublished ? 'Published' : 'Draft'}
+                          <span
+                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                              course.isPublished
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {course.isPublished ? "Published" : "Draft"}
                           </span>
                         </td>
                         <td className="flex justify-center items-center relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                           <Link
-                             to={`/admin/courses/${course._id}/edit`}
+                          <Link
+                            to={`/admin/courses/${course._id}/edit`}
                             className="text-indigo-600 cursor-pointer hover:text-indigo-900 p-2"
                           >
                             <FaEdit />
@@ -316,46 +360,33 @@ const CoursesList = () => {
                           >
                             <FaTrash />
                           </button>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <div className="flex space-x-3">
-                            <Link
-                              to={`/admin/courses/edit/${course._id}`}
-                              className="text-indigo-600 hover:text-indigo-900"
-                              title="Edit course"
-                            >
-                              <FaEdit className="h-5 w-5" />
-                            </Link>
+
+                          {pdfUrls[course._id] ? (
                             <button
-                              onClick={() => handleDelete(course._id)}
-                              className="text-red-600 hover:text-red-900"
-                              title="Delete course"
+                              onClick={() => handleDownloadPdf(course._id)}
+                              className="ms-2 text-green-600 hover:text-green-900"
+                              title="Download PDF"
                             >
-                              <FaTrash className="h-5 w-5" />
+                              <FaDownload className="h-5 w-5" />
                             </button>
-                            {pdfUrls[course._id] ? (
-                              <button
-                                onClick={() => handleDownloadPdf(course._id)}
-                                className="text-green-600 hover:text-green-900"
-                                title="Download PDF"
-                              >
-                                <FaDownload className="h-5 w-5" />
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleGeneratePdf(course)}
-                                disabled={generatingPdf === course._id}
-                                className={`text-blue-600 hover:text-blue-900 ${generatingPdf === course._id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                title="Generate PDF"
-                              >
-                                {generatingPdf === course._id ? (
-                                  <div className="animate-spin h-5 w-5 border-t-2 border-blue-500 rounded-full"></div>
-                                ) : (
-                                  <FaFilePdf className="h-5 w-5" />
-                                )}
-                              </button>
-                            )}
-                          </div>
+                          ) : (
+                            <button
+                              onClick={() => handleGeneratePdf(course)}
+                              disabled={generatingPdf === course._id}
+                              className={`ms-2 text-blue-600 hover:text-blue-900 ${
+                                generatingPdf === course._id
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                              title="Generate PDF"
+                            >
+                              {generatingPdf === course._id ? (
+                                <div className="animate-spin h-5 w-5 border-t-2 border-blue-500 rounded-full"></div>
+                              ) : (
+                                <FaFilePdf className="h-5 w-5" />
+                              )}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))
