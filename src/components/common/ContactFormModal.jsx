@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { FaTimes } from 'react-icons/fa';
-import { toast } from 'react-toastify';
-import { submitContactForm } from '../../api/contactApi';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { FaTimes } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { submitContactForm } from "../../api/contactApi";
+import { Link } from "react-router-dom";
 
 const ContactFormModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-    courseInterest: '',
-    agreedToTerms: false
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+    courseInterest: "",
+    agreedToTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -22,13 +22,13 @@ const ContactFormModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     const loadCourses = async () => {
       try {
-        const response = await fetch('/api/courses');
+        const response = await fetch("/api/courses");
         if (response.ok) {
           const data = await response.json();
           setCourses(Array.isArray(data) ? data : data.data || []);
         }
       } catch (error) {
-        console.error('Error loading courses:', error);
+        console.error("Error loading courses:", error);
       } finally {
         setIsLoadingCourses(false);
       }
@@ -39,44 +39,46 @@ const ContactFormModal = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.agreedToTerms) {
-      toast.error('Please accept the terms & conditions and privacy policy');
+      toast.error("Please accept the terms & conditions and privacy policy");
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await submitContactForm(formData);
       setIsSuccess(true);
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
-        courseInterest: '',
-        agreedToTerms: false
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+        courseInterest: "",
+        agreedToTerms: false,
       });
-      
-      toast.success('Your message has been sent successfully!');
-      
+
+      toast.success("Your message has been sent successfully!");
+
       // Close the modal after 2 seconds
       setTimeout(() => {
         onClose();
       }, 2000);
-      
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error(error.response?.data?.message || 'Failed to send message. Please try again.');
+      console.error("Error submitting form:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to send message. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -143,7 +145,10 @@ const ContactFormModal = ({ isOpen, onClose }) => {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -159,7 +164,10 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -175,7 +183,10 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Phone Number
                   </label>
                   <input
@@ -190,7 +201,10 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="courseInterest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="courseInterest"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     I'm interested in: (Optional)
                   </label>
                   {isLoadingCourses ? (
@@ -214,7 +228,10 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     >
                       <option value="">Select a course (optional)</option>
                       {courses.map((course) => (
-                        <option key={course._id || course.id} value={course._id || course.id}>
+                        <option
+                          key={course._id || course.id}
+                          value={course._id || course.id}
+                        >
                           {course.title || course.name}
                         </option>
                       ))}
@@ -232,7 +249,10 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
                     Your Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -258,13 +278,23 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     required
                   />
                   <div className="text-xs">
-                    <label htmlFor="agreedToTerms" className="font-medium text-gray-700 dark:text-gray-300">
-                      I hereby agree to receive the promotional emails & messages{' '}
-                      <Link to="/terms-of-service" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
-                        Terms & Conditions
-                      </Link>{' '}
-                      and{' '}
-                      <Link to="/privacy-policy" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                    <label
+                      htmlFor="agreedToTerms"
+                      className="font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      I hereby agree to receive the promotional emails &
+                      messages through WhatApp/RCS/SMS{" "}
+                      <Link
+                        to="/terms-of-service"
+                        className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
+                        T&C
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        to="/privacy-policy"
+                        className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
                         Privacy Policy
                       </Link>
                       <span className="text-red-500">*</span>
@@ -277,10 +307,10 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     type="submit"
                     disabled={isSubmitting}
                     className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                      isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                      isSubmitting ? "opacity-70 cursor-not-allowed" : ""
                     }`}
                   >
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </button>
                 </div>
               </form>
