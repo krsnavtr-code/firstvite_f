@@ -47,15 +47,15 @@ const AdminLayout = () => {
     <div className="min-h-screen bg-gray-100">
       <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
-        <div className="bg-indigo-800 text-white w-64 flex-shrink-0">
-          <div className="p-4">
+        <div className="pb-8 bg-indigo-800 text-white w-64 flex-shrink-0 flex flex-col h-screen">
+          <div className="p-4 flex-shrink-0">
             <h1 className="text-2xl font-bold text-indigo-100">Admin Panel</h1>
             <p className="text-indigo-200 text-sm">
               Welcome, {currentUser?.fullname || "Admin"}
             </p>
           </div>
 
-          <nav className="mt-5">
+          <nav className="flex-1 overflow-y-auto">
             <div>
               <Link
                 to="/admin/dashboard"
