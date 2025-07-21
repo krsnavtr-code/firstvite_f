@@ -45,6 +45,8 @@ import SuspendedAccount from './pages/SuspendedAccount';
 import PendingApproval from './pages/PendingApproval';
 import LMSLayout from './components/LMSLayout';
 import PaymentTAndC from './pages/PaymentTAndC';
+import PaymentsList from './pages/admin/PaymentsList';
+import PaymentDetails from './pages/admin/PaymentDetails';
 
 // LMS Components
 import RegisterPage from './pages/auth/RegisterPage';
@@ -310,6 +312,10 @@ function App() {
           <Route path="/admin/image-upload" element={<ImageUploadDemo />} />
           <Route path="/admin/image-gallery" element={<ImageGallery />} />
           <Route path="/admin/enrollments" element={<AdminEnrollments />} />
+          
+          {/* Payment Admin Routes */}
+          <Route path="/admin/payments" element={<PaymentsList />} />
+          <Route path="/admin/payments/:id" element={<PaymentDetails />} />
           
           {/* Blog Admin Routes */}
           <Route path="/admin/blog" element={<BlogPostList />} />
