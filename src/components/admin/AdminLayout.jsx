@@ -1,17 +1,15 @@
-import React, { useEffect } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useEffect } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const AdminLayout = () => {
   const { currentUser, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
-
-
   const handleLogout = () => {
-    console.log('AdminLayout - Logging out');
+    console.log("AdminLayout - Logging out");
     // The logout function should be provided by the AuthContext
-    navigate('/login');
+    navigate("/login");
   };
 
   // Show loading state
@@ -26,15 +24,17 @@ const AdminLayout = () => {
   // Since we're already wrapped in PrivateRoute with allowedRoles=['admin'],
   // we can assume the user is an admin at this point
   if (!currentUser || !isAuthenticated) {
-    console.log('AdminLayout - No user or not authenticated');
+    console.log("AdminLayout - No user or not authenticated");
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            Access Denied
+          </h2>
           <p className="mb-4">You must be logged in to access this page.</p>
-          <Link 
-            to="/login" 
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          <Link
+            to="/login"
+            className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Login
           </Link>
@@ -49,20 +49,20 @@ const AdminLayout = () => {
         {/* Sidebar */}
         <div className="bg-indigo-800 text-white w-64 flex-shrink-0">
           <div className="p-4">
-            <h1 className="text-2xl font-bold">Admin Panel</h1>
+            <h1 className="text-2xl font-bold text-indigo-100">Admin Panel</h1>
             <p className="text-indigo-200 text-sm">
               Welcome, {currentUser?.fullname || "Admin"}
             </p>
           </div>
 
-          <nav className="mt-6">
+          <nav className="mt-5">
             <div>
               <Link
                 to="/admin/dashboard"
                 className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
               >
                 <svg
-                  className="w-5 h-5 mr-3"
+                  className="h-5 w-5 mr-3"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -71,15 +71,36 @@ const AdminLayout = () => {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
+                    strokeWidth="2"
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
+                  ></path>
                 </svg>
                 Dashboard
               </Link>
-
               <Link
                 to="/admin/courses"
+                className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
+              >
+                <svg
+                  className="h-5 w-5 mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  ></path>
+                </svg>
+                Courses
+              </Link>
+              
+              
+              <Link
+                to="/admin/send-brochure"
                 className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
               >
                 <svg
@@ -93,10 +114,10 @@ const AdminLayout = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
                   />
                 </svg>
-                Courses
+                Send Brochure
               </Link>
 
               <Link

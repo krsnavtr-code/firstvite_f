@@ -47,6 +47,7 @@ import LMSLayout from './components/LMSLayout';
 import PaymentTAndC from './pages/PaymentTAndC';
 import PaymentsList from './pages/admin/PaymentsList';
 import PaymentDetails from './pages/admin/PaymentDetails';
+import SendBrochure from './pages/admin/SendBrochure';
 
 // LMS Components
 import RegisterPage from './pages/auth/RegisterPage';
@@ -321,6 +322,10 @@ function App() {
           <Route path="/admin/blog" element={<BlogPostList />} />
           <Route path="/admin/blog/new" element={<BlogPostForm />} />
           <Route path="/admin/blog/edit/:id" element={<BlogPostForm />} />
+          
+          {/* Send Brochure Route */}
+          <Route path="/admin/send-brochure" element={<SendBrochure />} />
+          
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
