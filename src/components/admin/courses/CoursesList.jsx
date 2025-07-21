@@ -14,7 +14,17 @@ const CoursesList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showHomeFilter, setShowHomeFilter] = useState('all'); // 'all', 'yes', 'no'
   const [generatingPdf, setGeneratingPdf] = useState(null);
-  const [pdfUrls, setPdfUrls] = useState({});
+  const [deletingPdf, setDeletingPdf] = useState(null);
+  const [pdfUrls, setPdfUrls] = useState(() => {
+    // Load from localStorage on initial render
+    const saved = localStorage.getItem('pdfUrls');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [coursesWithPdf, setCoursesWithPdf] = useState(() => {
+    // Load from localStorage on initial render
+    const saved = localStorage.getItem('coursesWithPdf');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const [showSendPdfModal, setShowSendPdfModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
 
@@ -69,6 +79,12 @@ const CoursesList = () => {
     fetchCourses();
   }, [selectedCategory, searchTerm, showHomeFilter]);
 
+  // Save to localStorage whenever coursesWithPdf or pdfUrls change
+  useEffect(() => {
+    localStorage.setItem('coursesWithPdf', JSON.stringify(Array.from(coursesWithPdf)));
+    localStorage.setItem('pdfUrls', JSON.stringify(pdfUrls));
+  }, [coursesWithPdf, pdfUrls]);
+
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this course?')) {
       try {
@@ -86,36 +102,26 @@ const CoursesList = () => {
     try {
       setGeneratingPdf(course._id);
       
-      // Use the configured axios instance which handles authentication automatically
-      const response = await api.get(`/courses/${course._id}/generate-pdf`, {
-        responseType: 'blob', // Important for handling binary data
-        headers: {
-          'Accept': 'application/pdf',
-          'Cache-Control': 'no-cache',
-        },
-      });
-
-      // Get the blob data from the response
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      // Generate and save PDF on the server
+      const response = await api.post(
+        `/courses/${course._id}/generate-pdf`
+      );
       
-      // Create a blob URL for the PDF
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const filename = `${course.title.replace(/\s+/g, '_')}_${course._id}.pdf`;
+      // Update state to show download button
+      const newCoursesWithPdf = new Set([...coursesWithPdf, course._id]);
+      const newPdfUrls = {
+        ...pdfUrls,
+        [course._id]: {
+          url: response.data.fileUrl,
+          filename: response.data.filename
+        }
+      };
       
-      // Set up the download
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
+      // Update both states at once to minimize re-renders
+      setCoursesWithPdf(newCoursesWithPdf);
+      setPdfUrls(newPdfUrls);
       
-      // Clean up
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-      
-      toast.success('PDF downloaded successfully');
+      toast.success('PDF generated successfully. You can now download it.');
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast.error(error.response?.data?.message || 'Failed to generate PDF');
@@ -124,17 +130,46 @@ const CoursesList = () => {
     }
   };
 
-  const handleDownloadPdf = (courseId) => {
-    const pdfInfo = pdfUrls[courseId];
-    if (!pdfInfo) return;
-    
-    // Create a temporary link and trigger download
-    const link = document.createElement('a');
-    link.href = pdfInfo.url;
-    link.download = pdfInfo.filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDeletePdf = async (course) => {
+    if (!window.confirm('Are you sure you want to delete this PDF? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setDeletingPdf(course._id);
+      
+      // Get the PDF URL from the stored URLs
+      const pdfInfo = pdfUrls[course._id];
+      if (!pdfInfo || !pdfInfo.url) {
+        throw new Error('PDF URL not found');
+      }
+      
+      // Call the API to delete the PDF with the file URL in the request body
+      await api.delete(`/courses/${course._id}/pdf`, {
+        data: { fileUrl: pdfInfo.url }
+      });
+      
+      // Update the local state
+      const newPdfUrls = { ...pdfUrls };
+      delete newPdfUrls[course._id];
+      
+      const newCoursesWithPdf = new Set(coursesWithPdf);
+      newCoursesWithPdf.delete(course._id);
+      
+      setPdfUrls(newPdfUrls);
+      setCoursesWithPdf(newCoursesWithPdf);
+      
+      // Update localStorage
+      localStorage.setItem('pdfUrls', JSON.stringify(newPdfUrls));
+      localStorage.setItem('coursesWithPdf', JSON.stringify(Array.from(newCoursesWithPdf)));
+      
+      toast.success('PDF deleted successfully');
+    } catch (error) {
+      console.error('Error deleting PDF:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete PDF');
+    } finally {
+      setDeletingPdf(null);
+    }
   };
 
   if (loading) {
@@ -378,27 +413,32 @@ const CoursesList = () => {
                             </button>
                             {pdfUrls[course._id] ? (
                               <button
-                                onClick={() => handleDownloadPdf(course._id)}
-                                className="text-blue-600 hover:text-blue-900"
-                                title="Download PDF"
+                                onClick={() => handleDeletePdf(course)}
+                                className="p-2 rounded-md text-red-600 hover:bg-gray-100"
+                                title="Delete PDF"
+                                disabled={deletingPdf === course._id}
                               >
-                                <FaDownload className="w-5 h-5" />
+                                {deletingPdf === course._id ? (
+                                  <span className="loading loading-spinner loading-xs"></span>
+                                ) : (
+                                  <FaTrash className="h-5 w-5" />
+                                )}
                               </button>
                             ) : (
                               <button
                                 onClick={() => handleGeneratePdf(course)}
                                 disabled={generatingPdf === course._id}
-                                className={`text-gray-600 hover:text-gray-900 ${
+                                className={`p-2 rounded-md ${
                                   generatingPdf === course._id
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : ""
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-gray-700 hover:bg-gray-100'
                                 }`}
                                 title="Generate PDF"
                               >
                                 {generatingPdf === course._id ? (
-                                  <div className="animate-spin h-5 w-5 border-t-2 border-blue-500 rounded-full"></div>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-indigo-500"></div>
                                 ) : (
-                                  <FaFilePdf className="w-5 h-5" />
+                                  <FaFilePdf className="h-5 w-5" />
                                 )}
                               </button>
                             )}
