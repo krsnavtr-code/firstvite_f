@@ -84,7 +84,8 @@ export const getCourseById = async (id) => {
                     'rating', 'enrolledStudents', 'duration', 'whatYouWillLearn', 'requirements',
                     'whoIsThisFor', 'curriculum', 'reviews', 'isFeatured', 'slug', 'status',
                     'metaTitle', 'metaDescription', 'tags', 'prerequisites', 'skills',
-                    'certificateIncluded', 'isPublished', 'language', 'level', 'mentors', 'faqs'
+                    'certificateIncluded', 'isPublished', 'language', 'level', 'mentors', 'faqs',
+                    'brochureUrl', 'brochureGeneratedAt'
                 ].join(',')
             }
         });
@@ -480,6 +481,46 @@ export const getCoursesByCategory = async (categoryId = '') => {
 };
 
 // Get all categories for course form
+// Download course brochure
+export const downloadBrochure = async (courseId) => {
+    try {
+        const response = await axios.get(`/courses/${courseId}/download-brochure`, {
+            responseType: 'blob', // Important for downloading files
+        });
+        
+        // Create a blob from the response
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        
+        // Create a temporary anchor element to trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Get the filename from the content-disposition header or use a default name
+        const contentDisposition = response.headers['content-disposition'];
+        let filename = 'course-brochure.pdf';
+        
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (filenameMatch != null && filenameMatch[1]) { 
+                filename = filenameMatch[1].replace(/['"]/g, '');
+            }
+        }
+        
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        
+        // Clean up
+        link.remove();
+        window.URL.revokeObjectURL(url);
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Error downloading brochure:', error);
+        throw error;
+    }
+};
+
 export const getCategoriesForForm = async () => {   
     try {
         console.log('Fetching categories for form');

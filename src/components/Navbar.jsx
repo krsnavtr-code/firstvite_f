@@ -401,7 +401,7 @@ function Navbar() {
                 to="/lms"
                 className="ml-2 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 whitespace-nowrap"
               >
-                LMS
+                Smart Board
               </Link>
               <a
                 href="https://genlead.in/agent/register"
@@ -675,7 +675,7 @@ function Navbar() {
                 className="block text-center w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
                 onClick={toggleMobileMenu}
               >
-                LMS
+                Smart Board
               </Link>
             </div>
             <div className="w-full mt-2">

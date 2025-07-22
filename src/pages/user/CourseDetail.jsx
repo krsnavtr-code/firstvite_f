@@ -304,10 +304,26 @@ const CourseDetail = () => {
 
         setShowContactForm(false);
 
-        // Refresh the page to update the UI
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        // Trigger brochure download
+        console.log('Checking for brochure download...');
+        console.log('Course brochure URL:', course.brochureUrl);
+        
+        if (course.brochureUrl) {
+          console.log('Brochure URL found, initiating download...');
+          // Give the browser a moment to process the form submission
+          setTimeout(() => {
+            try {
+              downloadBrochure();
+            } catch (error) {
+              console.error('Error in brochure download:', error);
+            }
+          }, 1000);
+        } else {
+          console.log('No brochure URL found for this course');
+        }
+        
+        // Close the form
+        setShowContactForm(false);
       } else {
         throw new Error(response.data.message || "Failed to submit enrollment");
       }
@@ -385,18 +401,66 @@ const CourseDetail = () => {
     }
   };
 
+  // Function to handle brochure download
+  const downloadBrochure = async () => {
+    try {
+      if (!course?._id) {
+        toast.error('Course information is not available');
+        return;
+      }
+
+      // Show loading state
+      const toastId = toast.loading('Preparing brochure download...');
+      
+      try {
+        // Make API call to download brochure (no auth required)
+        const response = await axios.get(`/api/courses/${course._id}/download-brochure`, {
+          responseType: 'blob' // Important for file downloads
+        });
+
+        // Create a blob from the response
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        
+        // Create a temporary anchor element
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Brochure-${course.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.pdf`);
+        
+        // Append to body, click and remove
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+        
+        toast.success('Brochure download started', { id: toastId });
+      } catch (error) {
+        console.error('Error downloading brochure:', error);
+        
+        // Handle specific error cases
+        if (error.response?.status === 404) {
+          toast.error('Brochure not available for this course', { id: toastId });
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message, { id: toastId });
+        } else {
+          toast.error('Failed to download brochure. Please try again.', { id: toastId });
+        }
+      }
+    } catch (error) {
+      console.error('Error in downloadBrochure:', error);
+      toast.error('An unexpected error occurred. Please try again later.');
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     console.log("Input changed:", { name, value, type });
 
-    setFormData((prev) => {
-      const newData = {
-        ...prev,
-        [name]: value,
-      };
-      console.log("New form data:", newData);
-      return newData;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Toggle section expansion
@@ -507,9 +571,20 @@ const CourseDetail = () => {
                   }}
                   className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
                   aria-label="Share course"
+                  title="Share this course"
                 >
                   <FaShare className="w-5 h-5" />
                 </button>
+                {course.brochureUrl && (
+                  <button
+                    onClick={downloadBrochure}
+                    className="text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 transition-colors"
+                    aria-label="Download brochure"
+                    title="Download course brochure"
+                  >
+                    <FaFileAlt className="w-5 h-5" />
+                  </button>
+                )}
               </div>
 
               {/* Course Title */}
