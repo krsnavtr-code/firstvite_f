@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Courses from "./components/Courses";
 import Signup from "./components/Signup";
 import LoginPage from "./pages/auth/LoginPage";
+import FreeCourses from "./pages/FreeCourses";
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "./contexts/AuthContext";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -157,6 +158,12 @@ function App() {
         <Route path="/courses" element={
           <MainLayout>
             <CoursesByCategory />
+          </MainLayout>
+        } />
+        
+        <Route path="/free-courses" element={
+          <MainLayout>
+            <FreeCourses />
           </MainLayout>
         } />
         

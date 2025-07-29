@@ -331,6 +331,8 @@ function Navbar() {
   const navItems = [
     { to: "/", label: "Home" },
     { to: "/courses", label: "Courses" },
+    { to: "/free-courses", highlight: true, label: "Courses" },
+
     // { to: "/about", label: "About" },
     // { to: "/contact", label: "Contact" },
     ...(isAuthenticated && isApproved
@@ -347,8 +349,17 @@ function Navbar() {
         <Link
           key={item.to}
           to={item.to}
-          className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 whitespace-nowrap ${className}`}
+          className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap ${
+            item.highlight 
+              ? 'text-black dark:text-white hover:bg-orange-50 dark:hover:bg-orange-900/30' 
+              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
+          } ${className}`}
         >
+          {item.highlight && (
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs font-medium text-orange-800 dark:text-orange-300 rounded-full">
+              Free
+            </span>
+          )}
           {item.label}
         </Link>
       ))}
@@ -401,7 +412,7 @@ function Navbar() {
                 to="/lms"
                 className="ml-2 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 whitespace-nowrap"
               >
-                Smart Board
+                Smart <span style={{ color: "#F47C26" }}>Board</span>
               </Link>
               <a
                 href="https://genlead.in/agent/register"

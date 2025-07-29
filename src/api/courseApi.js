@@ -164,6 +164,12 @@ const prepareCourseData = (courseData) => {
         }];
     }
     
+    // If course is marked as free, ensure price is 0
+    if (cleanData.isFree === true) {
+        cleanData.price = 0;
+        cleanData.originalPrice = 0;
+    }
+    
     // Ensure required fields have default values
     const defaults = {
         title: 'Untitled Course',
@@ -178,7 +184,8 @@ const prepareCourseData = (courseData) => {
         certificateIncluded: true,
         isFeatured: false,
         isPublished: false,
-        status: 'draft'
+        status: 'draft',
+        isFree: false  // Ensure isFree has a default value
     };
     
     // Handle number fields
@@ -241,19 +248,24 @@ export const createCourse = async (courseData) => {
     try {
         console.log('Original course data:', courseData);
         
-        // Check for required fields
-        const requiredFields = ['title', 'description', 'category', 'instructor', 'price', 'level'];
-        const missingFields = requiredFields.filter(field => !courseData[field]);
+        // Clean and format the course data first
+        const cleanData = prepareCourseData(courseData);
+        console.log('Prepared course data:', cleanData);
+        
+        // Check for required fields after processing
+        const requiredFields = ['title', 'description', 'category', 'instructor', 'level'];
+        const missingFields = requiredFields.filter(field => !cleanData[field]);
+        
+        // Only require price if the course is not free
+        if (!cleanData.isFree && (cleanData.price === undefined || cleanData.price === null)) {
+            missingFields.push('price');
+        }
         
         if (missingFields.length > 0) {
             const error = new Error(`Missing required fields: ${missingFields.join(', ')}`);
             error.name = 'ValidationError';
             throw error;
         }
-        
-        // Clean and format the course data
-        const cleanData = prepareCourseData(courseData);
-        console.log('Prepared course data:', cleanData);
         
         // Log the exact data being sent
         console.log('Sending to server:', JSON.stringify(cleanData, null, 2));

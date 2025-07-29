@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { 
-  createCourse, 
-  updateCourse, 
-  getCourseById, 
-  getCategoriesForForm, 
-  uploadCourseImage 
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import {
+  createCourse,
+  updateCourse,
+  getCourseById,
+  getCategoriesForForm,
+  uploadCourseImage,
 } from "../../../api/courseApi";
 import userApi from "../../../api/userApi";
 
@@ -25,7 +25,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Error in FileUploadInput:', error, errorInfo);
+    console.error("Error in FileUploadInput:", error, errorInfo);
   }
 
   render() {
@@ -33,7 +33,7 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="text-red-600 p-4 border border-red-300 bg-red-50 rounded">
           <p>Something went wrong with the file upload.</p>
-          <button 
+          <button
             onClick={() => this.setState({ hasError: false, error: null })}
             className="mt-2 text-sm text-blue-600 hover:underline"
           >
@@ -57,36 +57,40 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
 
     try {
       setIsUploading(true);
-      
+
       // Validate file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('File size too large. Maximum size is 5MB.');
+        toast.error("File size too large. Maximum size is 5MB.");
         return;
       }
-      
+
       // Reset file input to allow re-uploading the same file
-      e.target.value = '';
-      
+      e.target.value = "";
+
       const formData = new FormData();
-      formData.append('image', file);
-      
-      console.log('Starting file upload...');
+      formData.append("image", file);
+
+      console.log("Starting file upload...");
       const response = await uploadCourseImage(formData);
-      console.log('Upload response:', response);
-      
+      console.log("Upload response:", response);
+
       if (!response || !response.success) {
-        throw new Error(response?.message || 'Upload failed');
+        throw new Error(response?.message || "Upload failed");
       }
-      
+
       // Make sure we're storing just the path part, not the full URL
       const imagePath = response.location;
-      console.log('Setting image path:', imagePath);
-      
+      console.log("Setting image path:", imagePath);
+
       onFileSelect(imagePath);
-      toast.success('Thumbnail uploaded successfully');
+      toast.success("Thumbnail uploaded successfully");
     } catch (error) {
-      console.error('Error in file upload:', error);
-      toast.error(error.response?.data?.message || error.message || 'Failed to upload thumbnail');
+      console.error("Error in file upload:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to upload thumbnail"
+      );
     } finally {
       setIsUploading(false);
     }
@@ -94,41 +98,42 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
 
   // Create a safe thumbnail URL
   const getThumbnailUrl = (thumb) => {
-    if (!thumb) return '';
+    if (!thumb) return "";
     try {
-      if (thumb.startsWith('http')) return thumb;
+      if (thumb.startsWith("http")) return thumb;
       // Ensure there's exactly one slash between domain and path
       const baseUrl = import.meta.env.VITE_API_URL;
-      const path = thumb.startsWith('/') ? thumb : `/${thumb}`;
+      const path = thumb.startsWith("/") ? thumb : `/${thumb}`;
       return `${baseUrl}${path}`;
     } catch (error) {
-      console.error('Error creating thumbnail URL:', error);
-      return '';
+      console.error("Error creating thumbnail URL:", error);
+      return "";
     }
   };
 
   const thumbnailUrl = getThumbnailUrl(thumbnail);
-  
+
   return (
     <div className="flex items-center space-x-6">
       {/* Thumbnail Preview */}
       <div className="flex-shrink-0">
         <div className="w-40 h-32 bg-gray-100 rounded-md overflow-hidden border border-gray-300 flex items-center justify-center">
           {thumbnail ? (
-            <img 
+            <img
               key={thumbnail} // Force re-render when thumbnail changes
               src={thumbnailUrl}
-              alt="Course thumbnail" 
+              alt="Course thumbnail"
               className="w-full h-full object-cover"
               onError={(e) => {
-                console.error('Error loading image:', e);
-                console.error('Failed to load image at URL:', e.target.src);
-                console.error('Current thumbnail value:', thumbnail);
+                console.error("Error loading image:", e);
+                console.error("Failed to load image at URL:", e.target.src);
+                console.error("Current thumbnail value:", thumbnail);
                 e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/400x225?text=Thumbnail+Not+Found';
+                e.target.src =
+                  "https://via.placeholder.com/400x225?text=Thumbnail+Not+Found";
               }}
               onLoad={(e) => {
-                console.log('Image loaded successfully:', e.target.src);
+                console.log("Image loaded successfully:", e.target.src);
               }}
             />
           ) : (
@@ -136,12 +141,14 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
           )}
         </div>
       </div>
-      
+
       {/* Upload Controls */}
       <div className="flex-1">
         <div className="flex items-center space-x-4">
-          <label 
-            className={`relative cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          <label
+            className={`relative cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+              isUploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={(e) => {
               if (isUploading) {
                 e.preventDefault();
@@ -149,7 +156,7 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
               }
             }}
           >
-            {isUploading ? 'Uploading...' : 'Choose File'}
+            {isUploading ? "Uploading..." : "Choose File"}
             <input
               type="file"
               className="sr-only"
@@ -178,7 +185,14 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
 };
 
 // Component to handle each week in the curriculum
-const WeekItem = ({ week, weekIndex, removeWeek, register, control, errors }) => {
+const WeekItem = ({
+  week,
+  weekIndex,
+  removeWeek,
+  register,
+  control,
+  errors,
+}) => {
   const {
     fields: topicFields,
     append: appendTopic,
@@ -186,7 +200,7 @@ const WeekItem = ({ week, weekIndex, removeWeek, register, control, errors }) =>
   } = useFieldArray({
     control,
     name: `curriculum.${weekIndex}.topics`,
-    keyName: 'topicId' // Ensure we have a unique key for each topic
+    keyName: "topicId", // Ensure we have a unique key for each topic
   });
 
   return (
@@ -265,7 +279,7 @@ const WeekItem = ({ week, weekIndex, removeWeek, register, control, errors }) =>
               <input
                 type="text"
                 {...register(`curriculum.${weekIndex}.topics.${topicIndex}`, {
-                  required: "Topic is required"
+                  required: "Topic is required",
                 })}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={`Topic ${topicIndex + 1}`}
@@ -303,21 +317,22 @@ export const CourseForm = ({ isEdit = false }) => {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     setValue,
     watch,
     reset,
     getValues,
     trigger,
-    formState: { isSubmitting },
   } = useForm({
     defaultValues: {
       title: "",
       slug: "",
       shortDescription: "",
       description: "",
+      benefits: ["", "", ""],
       category: "",
       instructor: "",
+      isFree: false,
       price: 0,
       originalPrice: 0,
       discount: 0,
@@ -351,14 +366,16 @@ export const CourseForm = ({ isEdit = false }) => {
       ],
     },
   });
-  
-  // FAQ form array methods
-  const { fields: faqFields, append: appendFaq, remove: removeFaq } = useFieldArray({
-    control,
-    name: 'faqs',
-  });
 
-   
+  // FAQ form array methods
+  const {
+    fields: faqFields,
+    append: appendFaq,
+    remove: removeFaq,
+  } = useFieldArray({
+    control,
+    name: "faqs",
+  });
 
   // Fetch course data in edit mode
   useEffect(() => {
@@ -379,11 +396,12 @@ export const CourseForm = ({ isEdit = false }) => {
           try {
             const response = await getCourseById(id);
             const courseData = response.data;
-            console.log('Fetched course data:', courseData);
-            console.log('showOnHome in response:', courseData.showOnHome);
-            
+            console.log("Fetched course data:", courseData);
+            console.log("showOnHome in response:", courseData.showOnHome);
+
             // Helper function to ensure array fields have at least one empty string
-            const ensureArray = (arr) => Array.isArray(arr) && arr.length > 0 ? arr : [''];
+            const ensureArray = (arr) =>
+              Array.isArray(arr) && arr.length > 0 ? arr : [""];
 
             // Format the data to match form structure
             const formattedData = {
@@ -398,32 +416,41 @@ export const CourseForm = ({ isEdit = false }) => {
               prerequisites: ensureArray(courseData.prerequisites),
               skills: ensureArray(courseData.skills),
               // Handle curriculum - ensure it has at least one week
-              curriculum: courseData.curriculum?.length ? courseData.curriculum : [
-                {
-                  week: 1,
-                  title: "Introduction",
-                  description: "",
-                  duration: 0,
-                  topics: [""],
-                },
-              ],
+              curriculum: courseData.curriculum?.length
+                ? courseData.curriculum
+                : [
+                    {
+                      week: 1,
+                      title: "Introduction",
+                      description: "",
+                      duration: 0,
+                      topics: [""],
+                    },
+                  ],
               // Handle other fields
               tags: courseData.tags || [],
               faqs: courseData.faqs || [],
               // Ensure boolean fields are properly set
+              isFree: Boolean(courseData.isFree),
               isFeatured: Boolean(courseData.isFeatured),
               isPublished: Boolean(courseData.isPublished),
               showOnHome: Boolean(courseData.showOnHome),
               certificateIncluded: courseData.certificateIncluded !== false, // default to true if not set
             };
-            
-            console.log('Formatted course data:', formattedData);
-            console.log('showOnHome in formatted data:', formattedData.showOnHome);
+
+            console.log("Formatted course data:", formattedData);
+            console.log(
+              "showOnHome in formatted data:",
+              formattedData.showOnHome
+            );
             reset(formattedData);
-            
+
             // Log the form values after reset to verify
             const formValues = getValues();
-            console.log('Form values after reset - showOnHome:', formValues.showOnHome);
+            console.log(
+              "Form values after reset - showOnHome:",
+              formValues.showOnHome
+            );
           } catch (error) {
             console.error("Error loading course data:", error);
             toast.error("Failed to load course data. Please try again.");
@@ -436,7 +463,7 @@ export const CourseForm = ({ isEdit = false }) => {
         setLoading(false);
       }
     };
-    
+
     fetchCourseData();
   }, [id, isEdit, reset, getCategoriesForForm, userApi, getCourseById, toast]);
 
@@ -447,7 +474,7 @@ export const CourseForm = ({ isEdit = false }) => {
     remove: removeWeek,
   } = useFieldArray({
     control,
-    name: 'curriculum',
+    name: "curriculum",
     shouldUnregister: true,
   });
 
@@ -457,7 +484,7 @@ export const CourseForm = ({ isEdit = false }) => {
     remove: removePrerequisite,
   } = useFieldArray({
     control,
-    name: 'prerequisites',
+    name: "prerequisites",
   });
 
   const {
@@ -466,7 +493,7 @@ export const CourseForm = ({ isEdit = false }) => {
     remove: removeLearning,
   } = useFieldArray({
     control,
-    name: 'whatYouWillLearn',
+    name: "whatYouWillLearn",
   });
 
   const {
@@ -475,20 +502,20 @@ export const CourseForm = ({ isEdit = false }) => {
     remove: removeSkill,
   } = useFieldArray({
     control,
-    name: 'skills',
+    name: "skills",
   });
 
   // Handle image upload
   const handleImageUpload = async (file) => {
     try {
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append("image", file);
       const response = await uploadCourseImage(formData);
       return { location: response.imageUrl };
     } catch (error) {
-      console.error('Image upload failed:', error);
-      toast.error('Failed to upload image');
-      return { location: '' };
+      console.error("Image upload failed:", error);
+      toast.error("Failed to upload image");
+      return { location: "" };
     }
   };
 
@@ -496,44 +523,60 @@ export const CourseForm = ({ isEdit = false }) => {
   const onSubmit = async (formData) => {
     try {
       setLoading(true);
-      console.log('Form submitted with data:', formData);
-      console.log('isFeatured in form data:', formData.isFeatured, 'type:', typeof formData.isFeatured);
-      
+      console.log("Form submitted with data:", formData);
+      console.log(
+        "isFeatured in form data:",
+        formData.isFeatured,
+        "type:",
+        typeof formData.isFeatured
+      );
+
       // Validate required fields
       if (!formData.title || formData.title.trim().length < 5) {
-        throw new Error('Title must be at least 5 characters long');
+        throw new Error("Title must be at least 5 characters long");
       }
-      
+
       if (!formData.description || formData.description.trim().length < 10) {
-        throw new Error('Description must be at least 10 characters long');
+        throw new Error("Description must be at least 10 characters long");
       }
-      
+
       if (!formData.category) {
-        throw new Error('Please select a category');
+        throw new Error("Please select a category");
       }
-      
+
       if (!formData.instructor || formData.instructor.trim().length < 2) {
-        throw new Error('Instructor name is required');
+        throw new Error("Instructor name is required");
       }
-      
+
       // Clean and format the data before sending to API
-      console.log('Before cleaning - isFeatured:', formData.isFeatured, 'type:', typeof formData.isFeatured);
+      console.log(
+        "Before cleaning - isFeatured:",
+        formData.isFeatured,
+        "type:",
+        typeof formData.isFeatured
+      );
+      
+      // Ensure price is always included and properly formatted
+      const price = formData.isFree ? 0 : Math.max(0, Number(formData.price) || 0);
+      const originalPrice = formData.isFree ? 0 : Math.max(0, Number(formData.originalPrice) || price);
+      
       const dataToSend = {
         ...formData,
         // Ensure boolean fields are properly set
+        isFree: Boolean(formData.isFree),
         isFeatured: Boolean(formData.isFeatured),
         isPublished: Boolean(formData.isPublished),
         certificateIncluded: formData.certificateIncluded !== false,
-        
+
         // Ensure strings are properly trimmed
         title: formData.title?.toString().trim(),
         description: formData.description?.toString().trim(),
         instructor: formData.instructor?.toString().trim(),
         shortDescription: formData.shortDescription?.toString().trim() || "",
 
-        // Convert string numbers to actual numbers
-        price: Math.max(0, Number(formData.price) || 0),
-        originalPrice: Math.max(0, Number(formData.originalPrice) || 0),
+        // Set price and originalPrice with proper formatting
+        price: price,
+        originalPrice: originalPrice,
         totalHours: Math.max(0, Number(formData.totalHours) || 0),
 
         // Ensure arrays are properly formatted
@@ -596,8 +639,10 @@ export const CourseForm = ({ isEdit = false }) => {
             ],
         // Ensure boolean fields are properly set
         certificateIncluded: formData.certificateIncluded !== false,
-        isFeatured: formData.isFeatured === true || formData.isFeatured === 'true',
-        isPublished: formData.isPublished === true || formData.isPublished === 'true',
+        isFeatured:
+          formData.isFeatured === true || formData.isFeatured === "true",
+        isPublished:
+          formData.isPublished === true || formData.isPublished === "true",
         // Ensure required fields have values
         level: ["Beginner", "Intermediate", "Advanced"].includes(formData.level)
           ? formData.level
@@ -605,20 +650,20 @@ export const CourseForm = ({ isEdit = false }) => {
         language: formData.language?.toString().trim() || "English",
         duration: formData.duration?.toString().trim() || "0 min",
       };
-      
-      console.log('Submitting course data:', dataToSend);
-      
+
+      console.log("Submitting course data:", dataToSend);
+
       if (isEdit) {
         await updateCourse(id, dataToSend);
-        toast.success('Course updated successfully!');
+        toast.success("Course updated successfully!");
       } else {
         await createCourse(dataToSend);
-        toast.success('Course created successfully!');
+        toast.success("Course created successfully!");
       }
-      navigate('/admin/courses');
+      navigate("/admin/courses");
     } catch (error) {
-      console.error('Error saving course:', error);
-      toast.error(error.response?.data?.message || 'Failed to save course');
+      console.error("Error saving course:", error);
+      toast.error(error.response?.data?.message || "Failed to save course");
     } finally {
       setLoading(false);
     }
@@ -626,11 +671,11 @@ export const CourseForm = ({ isEdit = false }) => {
 
   // Generate slug from title
   const updateSlug = (title) => {
-    if (!title) return '';
+    if (!title) return "";
     return title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
       .trim();
   };
 
@@ -644,7 +689,7 @@ export const CourseForm = ({ isEdit = false }) => {
 
   return (
     // Your existing form JSX
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto text-black px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">
         {isEdit ? "Edit Course" : "Create New Course"}
       </h1>
@@ -698,7 +743,7 @@ export const CourseForm = ({ isEdit = false }) => {
               </label>
               <select
                 {...register("category", { required: "Category is required" })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a category</option>
                 {Array.isArray(categories) &&
@@ -723,7 +768,7 @@ export const CourseForm = ({ isEdit = false }) => {
                 {...register("instructor", {
                   required: "Instructor is required",
                 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select an instructor</option>
                 {Array.isArray(instructors) &&
@@ -754,7 +799,7 @@ export const CourseForm = ({ isEdit = false }) => {
                 },
               })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="A brief summary of the course (max 300 characters)"
             />
             {errors.shortDescription && (
@@ -803,7 +848,7 @@ export const CourseForm = ({ isEdit = false }) => {
                       "image",
                     ]}
                     placeholder="Enter course description..."
-                    className="h-64 bg-white"
+                    className="h-64 bg-gray-300"
                   />
                 )}
               />
@@ -822,17 +867,50 @@ export const CourseForm = ({ isEdit = false }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price (INR) *
-              </label>
+              <div className="flex items-center mb-1">
+                <label className="block text-sm font-medium text-gray-700 mr-2">
+                  Price (INR) *
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isFree"
+                    {...register("isFree")}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor="isFree"
+                    className="ml-2 text-sm text-gray-700"
+                  >
+                    Free Course
+                  </label>
+                </div>
+              </div>
               <input
                 type="number"
                 {...register("price", {
-                  required: "Price is required",
+                  required: !watch("isFree") ? "Price is required" : false,
                   min: { value: 0, message: "Price cannot be negative" },
+                  valueAsNumber: true,
+                  validate: (value) => {
+                    if (watch("isFree") && value !== 0) {
+                      return "Price must be 0 for free courses";
+                    }
+                    return true;
+                  },
                 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 2999"
+                disabled={watch("isFree")}
+                className={`w-full px-3 py-2 border ${
+                  watch("isFree")
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : "bg-white"
+                } border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                placeholder={watch("isFree") ? "Free" : "e.g., 2999"}
+                value={watch("isFree") ? 0 : watch("price") || ""}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 0;
+                  setValue("price", value, { shouldValidate: true });
+                }}
               />
               {errors.price && (
                 <p className="mt-1 text-sm text-red-600">
@@ -850,8 +928,13 @@ export const CourseForm = ({ isEdit = false }) => {
                 {...register("originalPrice", {
                   min: { value: 0, message: "Price cannot be negative" },
                 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 4999"
+                disabled={watch("isFree")}
+                className={`w-full px-3 py-2 border ${
+                  watch("isFree")
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : "bg-white"
+                } border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                placeholder={watch("isFree") ? "N/A" : "e.g., 4999"}
               />
               {errors.originalPrice && (
                 <p className="mt-1 text-sm text-red-600">
@@ -940,8 +1023,8 @@ export const CourseForm = ({ isEdit = false }) => {
                 <input
                   type="checkbox"
                   id="isFeatured"
-                  {...register('isFeatured', { value: false })}
-                  defaultChecked={watch('isFeatured')}
+                  {...register("isFeatured", { value: false })}
+                  defaultChecked={watch("isFeatured")}
                   className="h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
@@ -1293,4 +1376,3 @@ export const CourseForm = ({ isEdit = false }) => {
 };
 
 export default CourseForm;
-

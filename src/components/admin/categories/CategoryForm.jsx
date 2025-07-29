@@ -314,7 +314,7 @@ const CategoryForm = () => {
               className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               disabled={loading}
             />
-            <label htmlFor="isActive" className="ml-2 block text-sm text-white">
+            <label htmlFor="isActive" className="ml-2 block text-sm text-black">
               Active
             </label>
           </div>
@@ -330,7 +330,7 @@ const CategoryForm = () => {
             />
             <label
               htmlFor="showOnHome"
-              className="ml-2 block text-sm text-white"
+              className="ml-2 block text-sm text-black"
             >
               Show on Home Page
             </label>
