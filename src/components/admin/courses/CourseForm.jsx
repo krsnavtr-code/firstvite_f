@@ -328,6 +328,7 @@ export const CourseForm = ({ isEdit = false }) => {
       certificateIncluded: true,
       isFeatured: false,
       isPublished: false,
+      showOnHome: false,
       status: "draft",
       image: "",
       thumbnail: "",
@@ -379,6 +380,7 @@ export const CourseForm = ({ isEdit = false }) => {
             const response = await getCourseById(id);
             const courseData = response.data;
             console.log('Fetched course data:', courseData);
+            console.log('showOnHome in response:', courseData.showOnHome);
             
             // Helper function to ensure array fields have at least one empty string
             const ensureArray = (arr) => Array.isArray(arr) && arr.length > 0 ? arr : [''];
@@ -411,11 +413,17 @@ export const CourseForm = ({ isEdit = false }) => {
               // Ensure boolean fields are properly set
               isFeatured: Boolean(courseData.isFeatured),
               isPublished: Boolean(courseData.isPublished),
+              showOnHome: Boolean(courseData.showOnHome),
               certificateIncluded: courseData.certificateIncluded !== false, // default to true if not set
             };
             
             console.log('Formatted course data:', formattedData);
+            console.log('showOnHome in formatted data:', formattedData.showOnHome);
             reset(formattedData);
+            
+            // Log the form values after reset to verify
+            const formValues = getValues();
+            console.log('Form values after reset - showOnHome:', formValues.showOnHome);
           } catch (error) {
             console.error("Error loading course data:", error);
             toast.error("Failed to load course data. Please try again.");
@@ -488,6 +496,8 @@ export const CourseForm = ({ isEdit = false }) => {
   const onSubmit = async (formData) => {
     try {
       setLoading(true);
+      console.log('Form submitted with data:', formData);
+      console.log('isFeatured in form data:', formData.isFeatured, 'type:', typeof formData.isFeatured);
       
       // Validate required fields
       if (!formData.title || formData.title.trim().length < 5) {
@@ -507,8 +517,14 @@ export const CourseForm = ({ isEdit = false }) => {
       }
       
       // Clean and format the data before sending to API
+      console.log('Before cleaning - isFeatured:', formData.isFeatured, 'type:', typeof formData.isFeatured);
       const dataToSend = {
         ...formData,
+        // Ensure boolean fields are properly set
+        isFeatured: Boolean(formData.isFeatured),
+        isPublished: Boolean(formData.isPublished),
+        certificateIncluded: formData.certificateIncluded !== false,
+        
         // Ensure strings are properly trimmed
         title: formData.title?.toString().trim(),
         description: formData.description?.toString().trim(),
@@ -580,8 +596,8 @@ export const CourseForm = ({ isEdit = false }) => {
             ],
         // Ensure boolean fields are properly set
         certificateIncluded: formData.certificateIncluded !== false,
-        isFeatured: Boolean(formData.isFeatured),
-        isPublished: Boolean(formData.isPublished),
+        isFeatured: formData.isFeatured === true || formData.isFeatured === 'true',
+        isPublished: formData.isPublished === true || formData.isPublished === 'true',
         // Ensure required fields have values
         level: ["Beginner", "Intermediate", "Advanced"].includes(formData.level)
           ? formData.level
@@ -893,7 +909,6 @@ export const CourseForm = ({ isEdit = false }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="Beginner">Beginner</option>
-                <option value="Intermediate">Intermediate</option>
                 <option value="Advanced">Advanced</option>
               </select>
               {errors.level && (
@@ -902,14 +917,16 @@ export const CourseForm = ({ isEdit = false }) => {
                 </p>
               )}
             </div>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   id="certificateIncluded"
                   {...register("certificateIncluded")}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="certificateIncluded"
@@ -923,8 +940,9 @@ export const CourseForm = ({ isEdit = false }) => {
                 <input
                   type="checkbox"
                   id="isFeatured"
-                  {...register("isFeatured")}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  {...register('isFeatured', { value: false })}
+                  defaultChecked={watch('isFeatured')}
+                  className="h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="isFeatured"
@@ -939,7 +957,7 @@ export const CourseForm = ({ isEdit = false }) => {
                   type="checkbox"
                   id="isPublished"
                   {...register("isPublished")}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="isPublished"
@@ -954,7 +972,7 @@ export const CourseForm = ({ isEdit = false }) => {
                   type="checkbox"
                   id="showOnHome"
                   {...register("showOnHome")}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="showOnHome"

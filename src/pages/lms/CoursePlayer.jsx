@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLMS } from '../../contexts/LMSContext';
-import { Layout, Menu, Button, Typography, Divider, Skeleton, message } from 'antd';
+import { Layout, Menu, Button, Typography, Divider, Skeleton, message, Tooltip } from 'antd';
 import { 
   PlayCircleOutlined, 
   CheckCircleOutlined, 
   BookOutlined, 
   ArrowLeftOutlined,
   DownloadOutlined,
-  TrophyOutlined
+  TrophyOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  HomeOutlined,
+  FileTextOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons';
 import './lms.css';
 
@@ -27,10 +32,12 @@ const CoursePlayer = () => {
     isEnrolled
   } = useLMS();
   
-  const [selectedLesson, setSelectedLesson] = useState(null);
+    const [selectedLesson, setSelectedLesson] = useState(null);
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [generatingCert, setGeneratingCert] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const [collapsed, setCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(300);
   
   // Load course content when component mounts or courseId changes
   useEffect(() => {
@@ -103,9 +110,14 @@ const CoursePlayer = () => {
   
   if (loading || !currentCourse) {
     return (
-      <div className="course-player">
-        <Skeleton active paragraph={{ rows: 10 }} />
-      </div>
+      <Layout className="course-player">
+        <Sider width={300} className="course-sidebar">
+          <Skeleton active paragraph={{ rows: 10 }} />
+        </Sider>
+        <Content className="course-content">
+          <Skeleton active />
+        </Content>
+      </Layout>
     );
   }
   
@@ -122,57 +134,120 @@ const CoursePlayer = () => {
     sections[section].push(lesson);
   });
   
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+    setSidebarWidth(collapsed ? 300 : 80);
+  };
+
   return (
     <Layout className="course-player">
-      <Sider width={300} className="course-sidebar">
+      <Sider 
+        width={sidebarWidth} 
+        className="course-sidebar"
+        collapsed={collapsed}
+        collapsedWidth={80}
+        collapsible
+        trigger={null}
+      >
         <div className="course-sidebar-header">
-          <Button 
-            type="text" 
-            icon={<ArrowLeftOutlined />} 
-            onClick={() => navigate('/lms')}
-          >
-            Back to Dashboard
-          </Button>
-          <Title level={4} className="course-title" ellipsis={{ rows: 2 }}>
-            {course.title}
-          </Title>
-          <div className="course-progress">
-            <Text>Course Progress</Text>
-            <Progress 
-              percent={enrollment.progress || 0} 
-              status={isCourseCompleted ? 'success' : 'active'}
-            />
-            <Text type="secondary">
-              {enrollment.completedLessons?.length || 0} of {course.lessons?.length} lessons completed
-            </Text>
-          </div>
-          
-          {isCourseCompleted && !enrollment.certificateIssued && (
+          {!collapsed ? (
             <Button 
-              type="primary" 
-              icon={<TrophyOutlined />}
-              loading={generatingCert}
-              onClick={handleGenerateCertificate}
-              block
-              className="certificate-btn"
+              type="text" 
+              icon={<ArrowLeftOutlined />} 
+              onClick={() => navigate('/lms')}
+              className="sidebar-nav-btn"
             >
-              Get Certificate
+              Back to Dashboard
             </Button>
+          ) : (
+            <Tooltip title="Back to Dashboard" placement="right">
+              <Button 
+                type="text" 
+                icon={<HomeOutlined />} 
+                onClick={() => navigate('/lms')}
+                className="sidebar-nav-btn collapsed"
+              />
+            </Tooltip>
           )}
-          
-          {enrollment.certificateIssued && (
-            <Button 
-              type="primary" 
-              icon={<DownloadOutlined />}
-              block
-              className="certificate-btn"
-              onClick={() => {
-                // In a real app, this would download the certificate
-                message.info('Downloading certificate...');
-              }}
-            >
-              Download Certificate
-            </Button>
+          {!collapsed ? (
+            <>
+              <Title level={4} className="course-title" ellipsis={{ rows: 2 }}>
+                {course.title}
+              </Title>
+              <div className="course-progress">
+                <Text>Course Progress</Text>
+                <Progress 
+                  percent={enrollment.progress || 0} 
+                  status={isCourseCompleted ? 'success' : 'active'}
+                />
+                <Text type="secondary">
+                  {enrollment.completedLessons?.length || 0} of {course.lessons?.length} lessons completed
+                </Text>
+              </div>
+              
+              {isCourseCompleted && !enrollment.certificateIssued && (
+                <Button 
+                  type="primary" 
+                  icon={<TrophyOutlined />}
+                  loading={generatingCert}
+                  onClick={handleGenerateCertificate}
+                  block
+                  className="certificate-btn"
+                >
+                  Get Certificate
+                </Button>
+              )}
+              
+              {enrollment.certificateIssued && (
+                <Button 
+                  type="primary" 
+                  icon={<DownloadOutlined />}
+                  block
+                  className="certificate-btn"
+                  onClick={() => {
+                    // In a real app, this would download the certificate
+                    message.info('Downloading certificate...');
+                  }}
+                >
+                  Download Certificate
+                </Button>
+              )}
+            </>
+          ) : (
+            <div className="collapsed-progress">
+              <Progress 
+                type="circle"
+                percent={enrollment.progress || 0} 
+                status={isCourseCompleted ? 'success' : 'active'}
+                width={60}
+                format={percent => `${percent}%`}
+              />
+              
+              <div className="collapsed-actions">
+                {isCourseCompleted && !enrollment.certificateIssued && (
+                  <Tooltip title="Get Certificate" placement="right">
+                    <Button 
+                      type="primary" 
+                      icon={<TrophyOutlined />}
+                      loading={generatingCert}
+                      onClick={handleGenerateCertificate}
+                      className="collapsed-btn"
+                    />
+                  </Tooltip>
+                )}
+                
+                {enrollment.certificateIssued && (
+                  <Tooltip title="Download Certificate" placement="right">
+                    <Button 
+                      type="primary" 
+                      icon={<DownloadOutlined />}
+                      onClick={() => message.info('Downloading certificate...')}
+                      className="collapsed-btn"
+                    />
+                  </Tooltip>
+                )}
+              </div>
+            </div>
           )}
         </div>
         
@@ -183,8 +258,19 @@ const CoursePlayer = () => {
                 className={`section-header ${activeSection === section ? 'active' : ''}`}
                 onClick={() => setActiveSection(activeSection === section ? '' : section)}
               >
-                <Text strong>{section}</Text>
-                <Text type="secondary">{lessons.length} lessons</Text>
+                {!collapsed ? (
+                  <>
+                    <Text strong>{section}</Text>
+                    <Text type="secondary">{lessons.length} lessons</Text>
+                  </>
+                ) : (
+                  <Tooltip title={section} placement="right">
+                    <span className="collapsed-section">
+                      <FileTextOutlined />
+                      <span className="lesson-count">{lessons.length}</span>
+                    </span>
+                  </Tooltip>
+                )}
               </div>
               
               {(activeSection === section || !activeSection) && (

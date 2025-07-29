@@ -388,7 +388,7 @@ const CoursesList = () => {
                         <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <div className="flex items-center justify-end space-x-2">
                             <Link
-                              to={`/admin/courses/edit/${course._id}`}
+                              to={`/admin/courses/${course._id}/edit`}
                               className="text-blue-600 hover:text-blue-900"
                               title="Edit Course"
                             >

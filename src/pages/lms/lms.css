@@ -116,6 +116,9 @@
 .course-player {
   min-height: calc(100vh - 64px);
   background: #fff;
+  display: flex;
+  flex-direction: row;
+  position: relative;
 }
 
 .course-sidebar {
@@ -126,11 +129,126 @@
   top: 0;
   left: 0;
   overflow-y: auto;
+  transition: all 0.2s;
+  z-index: 10;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.course-sidebar.collapsed {
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+}
+
+.course-content {
+  flex: 1;
+  padding: 24px;
+  transition: margin-left 0.2s;
+  overflow-y: auto;
+  height: calc(100vh - 64px);
+}
+
+/* Toggle button */
+.sidebar-toggle {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.toggle-btn {
+  transition: all 0.3s;
+  border: none;
+  box-shadow: none;
+}
+
+.toggle-btn:hover {
+  background: #f5f5f5;
+  transform: scale(1.1);
+}
+
+/* Collapsed state styles */
+.collapsed-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+  gap: 24px;
+}
+
+.collapsed-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+.collapsed-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.collapsed-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  width: 100%;
+  position: relative;
+}
+
+.lesson-count {
+  position: absolute;
+  top: -5px;
+  right: 5px;
+  background: #1890ff;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-nav-btn {
+  width: 100%;
+  text-align: left;
+  height: auto;
+  padding: 8px 12px;
+  margin: 0;
+  border-radius: 4px;
+}
+
+.sidebar-nav-btn.collapsed {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  margin: 0 auto;
+  width: 40px;
+  height: 40px;
+}
+
+.sidebar-nav-btn:hover {
+  background: #f5f5f5;
 }
 
 .course-sidebar-header {
   padding: 16px;
   border-bottom: 1px solid #f0f0f0;
+  position: relative;
+  padding-bottom: 72px; /* Space for the toggle button */
 }
 
 .course-title {
@@ -163,7 +281,15 @@
   align-items: center;
   background: #fafafa;
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.3s;
+  transition: all 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-sidebar.collapsed .section-header {
+  padding: 12px 8px;
+  justify-content: center;
 }
 
 .section-header:hover {
@@ -177,15 +303,38 @@
 
 .lessons-menu {
   border-right: none;
+  background: transparent;
+}
+
+.course-sidebar.collapsed .ant-menu-item {
+  padding: 0 16px !important;
+  margin: 4px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.course-sidebar.collapsed .ant-menu-item .ant-menu-title-content {
+  display: none;
 }
 
 .lesson-item {
   padding: 12px 16px !important;
   margin: 0 !important;
-  border-radius: 0 !important;
+  border-radius: 8px !important;
   display: flex !important;
   align-items: center;
-  transition: background 0.3s;
+  transition: all 0.3s;
+  margin: 4px 8px !important;
+  width: auto !important;
+}
+
+.course-sidebar.collapsed .lesson-item {
+  padding: 12px 0 !important;
+  margin: 4px 0 !important;
+  justify-content: center;
+  width: 40px !important;
+  height: 40px;
+  border-radius: 50% !important;
 }
 
 .lesson-item:hover {

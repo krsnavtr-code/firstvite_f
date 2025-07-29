@@ -82,7 +82,7 @@ export const getCourseById = async (id) => {
                     'title', 'description', 'shortDescription', 'category', 'instructor',
                     'price', 'originalPrice', 'discount', 'totalHours', 'thumbnail', 'image',
                     'rating', 'enrolledStudents', 'duration', 'whatYouWillLearn', 'requirements',
-                    'whoIsThisFor', 'curriculum', 'reviews', 'isFeatured', 'slug', 'status',
+                    'whoIsThisFor', 'curriculum', 'reviews', 'isFeatured', 'showOnHome', 'slug', 'status',
                     'metaTitle', 'metaDescription', 'tags', 'prerequisites', 'skills',
                     'certificateIncluded', 'isPublished', 'language', 'level', 'mentors', 'faqs',
                     'brochureUrl', 'brochureGeneratedAt'
@@ -181,13 +181,21 @@ const prepareCourseData = (courseData) => {
         status: 'draft'
     };
     
+    // Handle number fields
+    const numberFields = ['price', 'originalPrice', 'totalHours'];
+    numberFields.forEach(field => {
+        cleanData[field] = Number(cleanData[field]) || 0;
+    });
+    
+    // Apply defaults only for undefined/null/empty values, but preserve boolean values
     Object.entries(defaults).forEach(([key, value]) => {
-        // Ensure numbers are properly formatted
-        const numberFields = ['price', 'originalPrice', 'totalHours'];
-        numberFields.forEach(field => {
-            cleanData[field] = Number(cleanData[field]) || 0;
-        });
+        // Skip boolean fields if they are explicitly set
+        const isBooleanField = ['isFeatured', 'isPublished', 'certificateIncluded'].includes(key);
+        if (isBooleanField && cleanData[key] !== undefined) {
+            return; // Keep the existing boolean value
+        }
         
+        // For non-boolean fields, apply defaults if empty
         if (cleanData[key] === undefined || cleanData[key] === null || cleanData[key] === '') {
             cleanData[key] = value;
         }
@@ -357,6 +365,9 @@ export const updateCourse = async (id, courseData, isPartial = false) => {
             return [];
         };
         
+        // Log the raw isFeatured value for debugging
+        console.log('Raw isFeatured value:', courseData.isFeatured, 'type:', typeof courseData.isFeatured);
+        
         // Clean and format the data
         const cleanData = {
             ...courseData,
@@ -364,10 +375,10 @@ export const updateCourse = async (id, courseData, isPartial = false) => {
             price: courseData.price !== undefined ? Number(courseData.price) : 0,
             originalPrice: courseData.originalPrice !== undefined ? Number(courseData.originalPrice) : 0,
             totalHours: courseData.totalHours !== undefined ? Number(courseData.totalHours) : 0,
-            // Convert booleans
+            // Convert booleans - ensure they are proper booleans
             certificateIncluded: courseData.certificateIncluded !== false, // default to true if not set
-            isFeatured: Boolean(courseData.isFeatured),
-            isPublished: Boolean(courseData.isPublished),
+            isFeatured: courseData.isFeatured === true || courseData.isFeatured === 'true',
+            isPublished: courseData.isPublished === true || courseData.isPublished === 'true',
             // Clean array fields
             benefits: cleanArrayField(courseData.benefits),
             prerequisites: cleanArrayField(courseData.prerequisites),
