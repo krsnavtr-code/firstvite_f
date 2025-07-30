@@ -10,8 +10,9 @@ import {
   FaBars,
   FaSignInAlt,
   FaUserPlus,
-  FaCreditCard,
+  FaCreditCard
 } from "react-icons/fa";
+import CourseMenu from "./CourseMenu";
 import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
 import api from "../api/axios";
@@ -22,11 +23,13 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
   const navigate = useNavigate();
   const location = useLocation();
+  const courseMenuRef = useRef(null);
 
   const handlePaymentClick = () => {
     // if (!isAuthenticated) {
@@ -41,6 +44,7 @@ function Navbar() {
   useEffect(() => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      // Cleanup any other event listeners if needed
     };
   }, []);
 
@@ -327,14 +331,13 @@ function Navbar() {
     };
   }, [handleScroll]);
 
+
+
   // Navigation items
   const navItems = [
     { to: "/", label: "Home" },
-    { to: "/courses", label: "Courses" },
-    { to: "/free-courses", highlight: true, label: "Courses" },
-
-    // { to: "/about", label: "About" },
-    // { to: "/contact", label: "Contact" },
+    { to: "/free-courses", label: "Free Courses" },
+    // Removed individual course links as they'll be in the course menu
     ...(isAuthenticated && isApproved
       ? [
           { to: "/my-learning", label: "My Learning" },
@@ -345,14 +348,15 @@ function Navbar() {
 
   const renderNavItems = (className = "") => (
     <div className="flex items-center space-x-0.5">
+      {/* Other navigation items */}
       {navItems.map((item) => (
         <Link
           key={item.to}
           to={item.to}
           className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap ${
-            item.highlight 
-              ? 'text-black dark:text-white hover:bg-orange-50 dark:hover:bg-orange-900/30' 
-              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
+            item.highlight
+              ? "text-black dark:text-white hover:bg-orange-50 dark:hover:bg-orange-900/30"
+              : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
           } ${className}`}
         >
           {item.highlight && (
@@ -363,6 +367,9 @@ function Navbar() {
           {item.label}
         </Link>
       ))}
+
+      {/* Course Menu */}
+      <CourseMenu className={className} />
     </div>
   );
 
@@ -722,6 +729,8 @@ function Navbar() {
           <PaymentForm onClose={() => setShowPaymentForm(false)} />
         </div>
       )}
+
+
     </div>
   );
 }
