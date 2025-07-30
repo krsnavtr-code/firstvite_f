@@ -84,7 +84,7 @@ const CoursesByCategory = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 dark:text-white mt-16">
+    <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 dark:text-white">
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-2">

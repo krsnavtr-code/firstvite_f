@@ -10,7 +10,7 @@ import {
   FaBars,
   FaSignInAlt,
   FaUserPlus,
-  FaCreditCard
+  FaCreditCard,
 } from "react-icons/fa";
 import CourseMenu from "./CourseMenu";
 import { toast } from "react-hot-toast";
@@ -331,12 +331,12 @@ function Navbar() {
     };
   }, [handleScroll]);
 
-
-
   // Navigation items
   const navItems = [
-    { to: "/", label: "Home" },
+    // { to: "/", label: "Home" },
     { to: "/free-courses", label: "Free Courses" },
+    { to: "/lms", lmscolors: true },
+
     // Removed individual course links as they'll be in the course menu
     ...(isAuthenticated && isApproved
       ? [
@@ -347,391 +347,418 @@ function Navbar() {
   ];
 
   const renderNavItems = (className = "") => (
-    <div className="flex items-center space-x-0.5">
+    <div className="flex items-center">
+      {/* Home */}
+      <Link
+        to="/"
+        className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap ${
+          false
+            ? "text-black dark:text-white hover:bg-orange-50 dark:hover:bg-orange-900/30"
+            : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+        } ${className}`}
+      >
+        Home
+      </Link>
+
+      {/* Course Menu */}
+      <CourseMenu className={className} />
+
       {/* Other navigation items */}
       {navItems.map((item) => (
         <Link
           key={item.to}
           to={item.to}
           className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap ${
-            item.highlight
+            item.lmscolors
               ? "text-black dark:text-white hover:bg-orange-50 dark:hover:bg-orange-900/30"
               : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
           } ${className}`}
         >
-          {item.highlight && (
-            <span className="ml-1.5 px-1.5 py-0.5 text-xs font-medium text-orange-800 dark:text-orange-300 rounded-full">
-              Free
+          {item.lmscolors && (
+            <span className="px-1 py-1 font-bold text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded hover:bg-blue-300 dark:hover:bg-blue-900/30">
+              Smart <span className=" text-orange-600">Board</span>
             </span>
           )}
           {item.label}
         </Link>
       ))}
-
-      {/* Course Menu */}
-      <CourseMenu className={className} />
     </div>
   );
 
   return (
-    <div
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white dark:bg-gray-900"
-      id="main-navbar"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Mobile menu button */}
-          <div className="flex items-center">
-            <button
-              type="button"
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-              onClick={toggleMobileMenu}
-              aria-expanded={isMobileMenuOpen}
-              aria-label="Toggle menu"
-            >
-              <span className="sr-only">Open main menu</span>
-              <FaBars
-                className={`block h-6 w-6 ${
-                  isMobileMenuOpen ? "hidden" : "block"
-                }`}
-                aria-hidden="true"
-              />
-              <FaTimes
-                className={`h-6 w-6 ${isMobileMenuOpen ? "block" : "hidden"}`}
-                aria-hidden="true"
-              />
-            </button>
-            <div className="flex-shrink-0">
-              <Link
-                to="/"
-                className="text-2xl font-bold text-blue-600 dark:text-blue-400"
+    <>
+      {/* Nabvar */}
+      <div
+        className="z-50 transition-all duration-300 bg-white dark:bg-gray-900 h-16"
+        id="main-navbar"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Mobile menu button */}
+            <div className="flex items-center">
+              <button
+                type="button"
+                className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                onClick={toggleMobileMenu}
+                aria-expanded={isMobileMenuOpen}
+                aria-label="Toggle menu"
               >
-                <span style={{ color: "#F47C26" }}>First</span>
-                <span style={{ color: "#1E90FF" }}>VITE</span>
-              </Link>
-            </div>
-
-            {/* Desktop menu */}
-            <div className="hidden md:flex md:items-center xl:ml-8 lg:ml-6">
-              <div className="flex-shrink-0">{renderNavItems()}</div>
-
-              <Link
-                to="/lms"
-                className="ml-2 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 whitespace-nowrap"
-              >
-                Smart <span style={{ color: "#F47C26" }}>Board</span>
-              </Link>
-              <a
-                href="https://genlead.in/agent/register"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-2 px-2.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors duration-200 text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 whitespace-nowrap"
-              >
-                Agent Register
-              </a>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="relative" ref={searchRef}>
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSearchOpen(!isSearchOpen);
-                    if (!isSearchOpen) {
-                      setTimeout(() => {
-                        searchInputRef.current?.focus();
-                      }, 0);
-                    }
-                  }}
-                  className="p-2 rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors duration-200 search-icon-container"
-                  aria-label="Search"
+                <span className="sr-only">Open main menu</span>
+                <FaBars
+                  className={`block h-6 w-6 ${
+                    isMobileMenuOpen ? "hidden" : "block"
+                  }`}
+                  aria-hidden="true"
+                />
+                <FaTimes
+                  className={`h-6 w-6 ${isMobileMenuOpen ? "block" : "hidden"}`}
+                  aria-hidden="true"
+                />
+              </button>
+              <div className="flex-shrink-0">
+                <Link
+                  to="/"
+                  className="text-lg font-bold text-blue-600 dark:text-blue-400"
                 >
-                  <FaSearch className="w-5 h-5" />
-                </button>
+                  <span style={{ color: "#F47C26" }}>First</span>
+                  <span style={{ color: "#1E90FF" }}>VITE</span>
+                </Link>
               </div>
 
-              {/* Search Dropdown */}
-              <div
-                className={`absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 ease-in-out transform ${
-                  isSearchOpen
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 -translate-y-2 pointer-events-none"
-                }`}
-                style={{ zIndex: 50 }}
-              >
-                <form onSubmit={handleSearchSubmit} className="relative">
-                  <div className="relative">
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onFocus={() => setShowResults(true)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Escape") {
-                          setShowResults(false);
-                          setIsSearchOpen(false);
-                        }
-                      }}
-                      className="w-full px-4 py-2 pl-10 pr-8 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Search courses..."
-                      aria-label="Search courses"
-                      autoComplete="off"
-                    />
-                    <FaSearch className="absolute left-3 top-3 text-gray-400" />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery("");
-                          setSearchResults({ courses: [], categories: [] });
-                          searchInputRef.current?.focus();
-                        }}
-                        className="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                        aria-label="Clear search"
-                      >
-                        <FaTimes className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
+              {/* Desktop menu */}
+              <div className="hidden md:flex md:items-center xl:ml-8 lg:ml-6">
+                <div className="flex-shrink-0">{renderNavItems()}</div>
+              </div>
+            </div>
 
-                  {/* Search Results */}
-                  {showResults && searchQuery.trim() && (
-                    <div className="mt-1 bg-white dark:bg-gray-800 rounded-b-lg shadow-lg border-t border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto">
-                      {isSearching ? (
-                        <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                          Searching...
-                        </div>
-                      ) : searchResults.courses.length === 0 ? (
-                        <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                          No courses found
-                        </div>
-                      ) : (
-                        <>
-                          {searchResults.courses.length > 0 && (
-                            <div className="border-b border-gray-200 dark:border-gray-700">
-                              <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Courses
-                              </div>
-                              {searchResults.courses.map((course) => (
-                                <button
-                                  key={course._id}
-                                  onClick={() => {
-                                    handleResultClick("course", course);
-                                    setIsSearchOpen(false);
-                                  }}
-                                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center"
-                                >
-                                  <div className="flex-shrink-0 w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden flex items-center justify-center">
-                                    <div className="text-gray-400 text-xs text-center p-1">
-                                      {course.title?.charAt(0)?.toUpperCase() ||
-                                        "C"}
-                                    </div>
-                                  </div>
-                                  <div className="ml-3">
-                                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                      {course.title}
-                                    </div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                                      {course.instructor}
-                                    </div>
-                                  </div>
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </>
+            <div className="flex items-center space-x-2">
+              {/* Search */}
+              <div className="relative" ref={searchRef}>
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSearchOpen(!isSearchOpen);
+                      if (!isSearchOpen) {
+                        setTimeout(() => {
+                          searchInputRef.current?.focus();
+                        }, 0);
+                      }
+                    }}
+                    className="p-2 rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors duration-200 search-icon-container"
+                    aria-label="Search"
+                  >
+                    <FaSearch className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Search Dropdown */}
+                <div
+                  className={`absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 ease-in-out transform ${
+                    isSearchOpen
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-2 pointer-events-none"
+                  }`}
+                  style={{ zIndex: 50 }}
+                >
+                  <form onSubmit={handleSearchSubmit} className="relative">
+                    <div className="relative">
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onFocus={() => setShowResults(true)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") {
+                            setShowResults(false);
+                            setIsSearchOpen(false);
+                          }
+                        }}
+                        className="w-full px-4 py-2 pl-10 pr-8 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Search courses..."
+                        aria-label="Search courses"
+                        autoComplete="off"
+                      />
+                      <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                      {searchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery("");
+                            setSearchResults({ courses: [], categories: [] });
+                            searchInputRef.current?.focus();
+                          }}
+                          className="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                          aria-label="Clear search"
+                        >
+                          <FaTimes className="w-4 h-4" />
+                        </button>
                       )}
                     </div>
-                  )}
-                </form>
-              </div>
-            </div>
 
-            {/* Theme Toggle */}
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-0 m-0 rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors duration-200"
-              aria-label={
-                theme === "dark"
-                  ? "Switch to light mode"
-                  : "Switch to dark mode"
-              }
-            >
-              {theme === "dark" ? (
-                <FaSun className="w-5 h-5 p-0 m-0" />
-              ) : (
-                <FaMoon className="w-5 h-5 p-0 m-0" />
-              )}
-            </button>
-
-            {/* Payment Button */}
-            <button
-              onClick={handlePaymentClick}
-              className="flex hidden lg:block md:block items-center flex-col px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              {/* <FaCreditCard className="mr-2" /> */}
-              Pay Now
-            </button>
-
-            {/* User menu */}
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  className="flex items-center space-x-2 focus:outline-none"
-                  onClick={toggleProfileMenu}
-                  aria-label="User menu"
-                  aria-haspopup="true"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                    <FaUser className="text-gray-600 dark:text-gray-300" />
-                  </div>
-                  {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {authUser?.fullname || authUser?.name || "Profile"}
-                  </span> */}
-                </button>
-
-                {isProfileMenuOpen && (
-                  <div
-                    id="user-menu"
-                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="user-menu"
-                  >
-                    <Link
-                      to="/my-learning"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                      role="menuitem"
-                      onClick={() => setIsProfileMenuOpen(false)}
-                    >
-                      My Learning
-                    </Link>
-                    {/* <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                      Dashboard
-                    </Link> */}
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                      role="menuitem"
-                      onClick={() => setIsProfileMenuOpen(false)}
-                    >
-                      My Profile
-                    </Link>
-                    {!isApproved && (
-                      <div className="px-4 py-2 text-sm text-yellow-600 dark:text-yellow-400">
-                        Pending Approval
+                    {/* Search Results */}
+                    {showResults && searchQuery.trim() && (
+                      <div className="mt-1 bg-white dark:bg-gray-800 rounded-b-lg shadow-lg border-t border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto">
+                        {isSearching ? (
+                          <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                            Searching...
+                          </div>
+                        ) : searchResults.courses.length === 0 ? (
+                          <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                            No courses found
+                          </div>
+                        ) : (
+                          <>
+                            {searchResults.courses.length > 0 && (
+                              <div className="border-b border-gray-200 dark:border-gray-700">
+                                <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                  Courses
+                                </div>
+                                {searchResults.courses.map((course) => (
+                                  <button
+                                    key={course._id}
+                                    onClick={() => {
+                                      handleResultClick("course", course);
+                                      setIsSearchOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center"
+                                  >
+                                    <div className="flex-shrink-0 w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden flex items-center justify-center">
+                                      <div className="text-gray-400 text-xs text-center p-1">
+                                        {course.title
+                                          ?.charAt(0)
+                                          ?.toUpperCase() || "C"}
+                                      </div>
+                                    </div>
+                                    <div className="ml-3">
+                                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {course.title}
+                                      </div>
+                                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {course.instructor}
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     )}
-                    <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                    <button
-                      onClick={() => {
-                        logout();
-                        setIsProfileMenuOpen(false);
-                        // toast.success("Logged out successfully");
-                        navigate("/");
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"
-                      role="menuitem"
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                )}
+                  </form>
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link
-                  to="/login"
-                  state={{ from: location }}
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                >
-                  <FaSignInAlt className="mr-1" /> Sign In
-                </Link>
-                {/* <Link
-                  to="/register"
-                  state={{ from: location }}
-                  className="flex hidden lg:block items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200"
-                >
-                  <FaUserPlus className="mr-1" /> Sign Up
-                </Link> */}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {/* Mobile menu */}
-      <div
-        style={{ maxWidth: "250px" }}
-        className={`mobile-menu-container md:hidden transition-all duration-300 ease-in-out transform ${
-          isMobileMenuOpen
-            ? "translate-y-0 opacity-100 visible"
-            : "-translate-y-full opacity-0 invisible"
-        } absolute left-0 right-0 top-16 bg-white dark:bg-gray-900 shadow-lg z-40 overflow-x-auto`}
-      >
-        <div className="flex flex-col px-2 py-3 space-y-2 sm:px-3">
-          {navItems.map((item) => (
-            <div key={item.to} className="w-full">
-              <Link
-                to={item.to}
-                className="block w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                onClick={toggleMobileMenu}
+              {/* Theme Toggle */}
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="p-0 m-0 rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors duration-200"
+                aria-label={
+                  theme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
               >
-                {item.label}
-              </Link>
-            </div>
-          ))}
-          <div className="w-full px-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-            <div className="w-full">
-              <Link
-                to="/lms"
-                className="block text-center w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
-                onClick={toggleMobileMenu}
-              >
-                Smart Board
-              </Link>
-            </div>
-            <div className="w-full mt-2">
+                {theme === "dark" ? (
+                  <FaSun className="w-4 h-4 p-0 m-0" />
+                ) : (
+                  <FaMoon className="w-4 h-4 p-0 m-0" />
+                )}
+              </button>
+
+              {/* Payment Button */}
               <a
                 href="https://genlead.in/agent/register"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-                onClick={toggleMobileMenu}
+                className="flex hidden lg:block items-center flex-col px-2 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Agent Register
               </a>
-            </div>
-            <div className="w-full mt-2">
               <button
-                onClick={() => {
-                  handlePaymentClick();
-                  toggleMobileMenu();
-                }}
-                className="flex items-center justify-center w-full px-4 py-2 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={handlePaymentClick}
+                className="flex hidden lg:block md:block items-center flex-col px-2 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                <FaCreditCard className="mr-2" />
+                {/* <FaCreditCard className="mr-2" /> */}
                 Pay Now
               </button>
+
+              {/* User menu */}
+              {isAuthenticated ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="flex items-center focus:outline-none"
+                    onClick={toggleProfileMenu}
+                    aria-label="User menu"
+                    aria-haspopup="true"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                      <FaUser className="text-gray-600 dark:text-gray-300" />
+                    </div>
+                    {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {authUser?.fullname || authUser?.name || "Profile"}
+                  </span> */}
+                  </button>
+
+                  {isProfileMenuOpen && (
+                    <div
+                      id="user-menu"
+                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="user-menu"
+                    >
+                      <Link
+                        to="/my-learning"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                        role="menuitem"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        My Learning
+                      </Link>
+                      {/* <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                      Dashboard
+                    </Link> */}
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                        role="menuitem"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        My Profile
+                      </Link>
+                      {!isApproved && (
+                        <div className="px-4 py-2 text-sm text-yellow-600 dark:text-yellow-400">
+                          Pending Approval
+                        </div>
+                      )}
+                      <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsProfileMenuOpen(false);
+                          // toast.success("Logged out successfully");
+                          navigate("/");
+                        }}
+                        className="w-full text-left px-2 py-1 text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"
+                        role="menuitem"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <Link
+                    to="/login"
+                    state={{ from: location }}
+                    className="flex items-center px-2 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                  >
+                    <FaSignInAlt className="mr-0.5" /> Sign In
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
-      
-      {/* Payment Form Modal */}
-      {showPaymentForm && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <PaymentForm onClose={() => setShowPaymentForm(false)} />
+
+        {/* Mobile menu */}
+        <div
+          style={{ maxWidth: "250px" }}
+          className={`mobile-menu-container md:hidden transition-all duration-300 ease-in-out transform ${
+            isMobileMenuOpen
+              ? "translate-y-0 opacity-100 visible"
+              : "-translate-y-full opacity-0 invisible"
+          } absolute left-0 right-0 top-16 bg-white dark:bg-gray-900 shadow-lg z-40 overflow-x-auto`}
+        >
+          <div className="flex flex-col px-2 py-3 space-y-2 sm:px-3">
+            {/* Home */}
+            <Link
+              to="/"
+              className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap ${
+                false
+                  ? "text-black dark:text-white hover:bg-orange-50 dark:hover:bg-orange-900/30"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+              }`}
+            >
+              Home
+            </Link>
+
+            {/* Course Menu */}
+            <CourseMenu />
+
+            {navItems.map((item) => (
+              <div key={item.to} className="w-full">
+                <Link
+                  to={item.to}
+                  className="block w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                  onClick={toggleMobileMenu}
+                >
+                  {item.label}
+                </Link>
+              </div>
+            ))}
+            <div className="w-full px-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="w-full">
+                <Link
+                  to="/lms"
+                  className="block text-center w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                  onClick={toggleMobileMenu}
+                >
+                  Smart Board
+                </Link>
+              </div>
+              <div className="w-full mt-2">
+                <a
+                  href="https://genlead.in/agent/register"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+                  onClick={toggleMobileMenu}
+                >
+                  Agent Register
+                </a>
+              </div>
+              <div className="w-full mt-2">
+                <button
+                  onClick={() => {
+                    handlePaymentClick();
+                    toggleMobileMenu();
+                  }}
+                  className="flex items-center justify-center w-full px-4 py-2 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <FaCreditCard className="mr-2" />
+                  Pay Now
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
+        {/* Payment Form Modal */}
+        {showPaymentForm && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50">
+            <PaymentForm onClose={() => setShowPaymentForm(false)} />
+          </div>
+        )}
+      </div>
 
-    </div>
+      {/*  */}
+      {/* <div className="w-fit">
+        <div className="hidden md:flex md:items-center xl:ml-8 lg:ml-6 w-50 space-x-2 px-2">
+          <a
+            href="https://genlead.in/agent/register"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+          >
+            Agent Register
+          </a>
+        </div>
+      </div> */}
+    </>
   );
 }
 

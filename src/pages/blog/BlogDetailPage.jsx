@@ -334,7 +334,7 @@ export default function BlogDetailPage() {
 
           {/* Related Posts */}
           {relatedPosts.length > 0 && (
-            <section className="mt-16">
+            <section className="">
               <Divider orientation="left" className="text-xl font-semibold">
                 Related Articles
               </Divider>
@@ -413,7 +413,7 @@ export default function BlogDetailPage() {
 
           {/* Related Posts Full Width */}
           {relatedPosts.length > 0 && (
-            <section className="mt-16">
+            <section className="">
               <Divider orientation="left" className="text-xl font-semibold">
                 Related Articles
               </Divider>

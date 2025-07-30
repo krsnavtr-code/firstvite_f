@@ -45,6 +45,7 @@ import useContactFormPopup from './hooks/useContactFormPopup.jsx';
 import SuspendedAccount from './pages/SuspendedAccount';
 import PendingApproval from './pages/PendingApproval';
 import LMSLayout from './components/LMSLayout';
+import ChatButton from './components/common/ChatButton';
 import PaymentTAndC from './pages/PaymentTAndC';
 import PaymentsList from './pages/admin/PaymentsList';
 import PaymentDetails from './pages/admin/PaymentDetails';
@@ -75,6 +76,7 @@ const MainLayout = ({ children }) => {
         {children}
       </main>
       {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <ChatButton />}
     </div>
   );
 };

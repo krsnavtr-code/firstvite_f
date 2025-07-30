@@ -4,7 +4,7 @@ import { FaBookOpen, FaGraduationCap, FaUsers, FaAward } from "react-icons/fa";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-16">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto text-center">

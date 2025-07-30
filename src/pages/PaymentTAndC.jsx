@@ -2,7 +2,7 @@ import React from "react";
 
 const PaymentTAndC = () => {
   return (
-    <div className="max-w-3xl mx-auto p-4 text-black dark:text-white mt-16">
+    <div className="max-w-3xl mx-auto p-4 text-black dark:text-white">
       <h2 className="text-2xl font-bold mb-4">Payment Terms & Conditions</h2>
       <p className="mb-4">
         By making this payment, I hereby confirm that the funds used for this

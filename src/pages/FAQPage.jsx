@@ -71,7 +71,7 @@ const FAQPage = () => {
         <meta name="description" content="Find answers to common questions about our courses, payments, and more." />
       </Helmet>
 
-      <div className="max-w-4xl mx-auto mt-16">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Frequently Asked Questions
