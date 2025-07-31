@@ -122,13 +122,13 @@ const ContactFormModal = ({ isOpen, onClose }) => {
         <div className="fixed inset-0 transition-opacity" aria-hidden="true">
           <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
-        
+
         {/* Modal panel */}
         <div className="inline-block align-middle bg-white dark:bg-gray-800 rounded-lg text-left overflow-y-auto shadow-xl transform transition-all max-h-[90vh] sm:my-4 sm:align-middle sm:max-w-lg sm:w-full">
           <div className="bg-white dark:bg-gray-800 px-4 py-4 sm:px-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Query Form
+                Request A Call Back
               </h3>
               <button
                 onClick={onClose}

@@ -168,20 +168,62 @@ const submitContactForm = async (formData) => {
 
     console.log('Submitting contact form with data:', requestData);
 
-    try {
-      // Make the API call with the correct endpoint
-      const response = await api.post('/api/contact', requestData);
-      
-      console.log('Contact form submission successful:', response.data);
-      
-      return {
-        success: true,
-        data: response.data,
-        message: 'Your message has been sent successfully!'
-      };
-    } catch (error) {
-      console.error('API Error:', error.response?.data || error.message);
-      throw error;
+    // Add retry logic for rate limiting
+    const maxRetries = 2;
+    let lastError;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        // Add a small delay between retries
+        if (attempt > 0) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+        
+        // Make the API call with the correct endpoint
+        const response = await api.post('/api/contact', requestData);
+        
+        console.log('Contact form submission successful:', response.data);
+        
+        // Use the server's response directly
+        return {
+          success: response.data?.success || true,
+          data: response.data?.data || response.data,
+          message: response.data?.message || 'Your message has been sent successfully!'
+        };
+        
+      } catch (error) {
+        lastError = error;
+        
+        // Log the error for debugging
+        console.error(`API Error (attempt ${attempt + 1}/${maxRetries + 1}):`, {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+          code: error.code
+        });
+        
+        // If it's a rate limit error and we have retries left, continue the loop
+        if (error.response?.status === 429 && attempt < maxRetries) {
+          console.log(`Rate limited, retrying in ${attempt + 1} second(s)...`);
+          continue;
+        }
+        
+        // For all other errors, break out of the retry loop
+        break;
+      }
+    }
+    
+    // If we get here, all retries failed or it's a non-retryable error
+    if (lastError.response?.status === 429) {
+      throw new Error('Too many requests. Please wait a moment and try again.');
+    } else if (!lastError.response) {
+      throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+    } else {
+      // For other HTTP errors, use the server's error message if available
+      const errorMessage = lastError.response?.data?.message || 
+                         lastError.message || 
+                         'An error occurred while submitting the form. Please try again.';
+      throw new Error(errorMessage);
     }
     
   } catch (error) {
