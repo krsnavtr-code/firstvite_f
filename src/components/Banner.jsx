@@ -35,19 +35,19 @@ function Banner() {
   const features = [
     {
       icon: (
-        <FaBookOpen className="text-2xl text-blue-500 dark:text-blue-400" />
+        <FaBookOpen className="text-2xl text-[#F47C26] " />
       ),
       title: `${courseCount}+ Courses`,
       desc: "Wide range of topics",
     },
     {
-      icon: <FaUsers className="text-2xl text-green-500 dark:text-green-400" />,
+      icon: <FaUsers className="text-2xl text-[#F47C26]" />,
       title: "Expert Instructors",
       desc: "Learn from the best",
     },
     {
       icon: (
-        <FaCertificate className="text-2xl text-yellow-500 dark:text-yellow-400" />
+        <FaCertificate className="text-2xl text-[#F47C26]" />
       ),
       title: "Certification",
       desc: "Get certified",
@@ -61,9 +61,19 @@ function Banner() {
           {/* Left Content */}
           <div className="lg:w-1/2 space-y-8">
             <div className="space-y-2 w-full">
+              <div className="flex items-center gap-1 text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
+                <img
+                  src="../public/images/firstvite-logo-mini.png"
+                  alt="logo"
+                  className="w-6"
+                />
+                <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                  Be The First
+                </span>
+              </div>
               <div className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
                 <span className="whitespace-nowrap">Learn</span>
-                <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                <span className="text-[#F47C26] whitespace-nowrap">
                   {" "}
                   Anytime,
                 </span>
@@ -73,7 +83,7 @@ function Banner() {
                   <div className="w-12 xs:w-16 sm:w-20 md:w-24 flex-shrink-0"></div>
                   <div>
                     <span className="whitespace-nowrap">Grow</span>
-                    <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                    <span className="text-[#F47C26] whitespace-nowrap">
                       {" "}
                       Every Day
                     </span>
