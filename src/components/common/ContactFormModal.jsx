@@ -76,14 +76,14 @@ const ContactFormModal = ({ isOpen, onClose }) => {
       if (result.success) {
         // Track form submission with Google Tag Manager
         if (window.gtag) {
-          window.gtag('event', 'conversion', {
-            'send_to': 'AW-16986190204/8vHpCK2T1JgZEMH3zJ8q',
-            'transaction_id': '',
-            'value': 1.0,
-            'currency': 'INR',
-            'event_callback': function() {
-              console.log('Conversion tracked successfully');
-            }
+          window.gtag("event", "conversion", {
+            send_to: "AW-16986190204/pOYXCKjcwfwaEPzi0qM_",
+            transaction_id: "",
+            value: 1.0,
+            currency: "INR",
+            event_callback: function () {
+              console.log("Conversion tracked successfully");
+            },
           });
         }
         
