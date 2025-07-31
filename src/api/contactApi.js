@@ -170,7 +170,7 @@ const submitContactForm = async (formData) => {
 
     try {
       // Make the API call with the correct endpoint
-      const response = await api.post('/api/contacts', requestData);
+      const response = await api.post('/api/contact', requestData);
       
       console.log('Contact form submission successful:', response.data);
       

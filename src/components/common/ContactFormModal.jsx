@@ -56,28 +56,57 @@ const ContactFormModal = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      await submitContactForm(formData);
-      setIsSuccess(true);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-        courseInterest: "",
-        agreedToTerms: false,
-      });
+      // Prepare the data to match backend expectations
+      const submissionData = {
+        ...formData,
+        // Map courseInterest to courseId and find the course title
+        courseId: formData.courseInterest,
+        courseTitle: formData.courseInterest 
+          ? courses.find(c => c._id === formData.courseInterest)?.title || ''
+          : '',
+      };
+      
+      // Remove the courseInterest field as it's not needed by the backend
+      delete submissionData.courseInterest;
 
-      toast.success("Your message has been sent successfully!");
+      console.log('Submitting form data:', submissionData);
+      
+      const result = await submitContactForm(submissionData);
+      
+      if (result.success) {
+        setIsSuccess(true);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+          courseInterest: "",
+          agreedToTerms: false,
+        });
 
-      // Close the modal after 2 seconds
-      setTimeout(() => {
-        onClose();
-      }, 2000);
+        toast.success(result.message || "Your message has been sent successfully!");
+
+        // Close the modal after 2 seconds
+        setTimeout(() => {
+          onClose();
+          setIsSuccess(false);
+        }, 2000);
+      } else {
+        // Handle API validation errors
+        if (result.errors) {
+          Object.values(result.errors).forEach(error => {
+            toast.error(error);
+          });
+        } else {
+          toast.error(result.message || "Failed to send message. Please try again.");
+        }
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(
+        error.message || 
         error.response?.data?.message ||
-          "Failed to send message. Please try again."
+        "Failed to send message. Please try again later."
       );
     } finally {
       setIsSubmitting(false);
