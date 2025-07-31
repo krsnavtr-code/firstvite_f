@@ -63,7 +63,7 @@ function Banner() {
             <div className="space-y-2 w-full">
               <div className="flex items-center gap-1 text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
                 <img
-                  src="../public/images/firstvite-logo-mini.png"
+                  src="../../public/images/firstvite-logo-mini.png"
                   alt="logo"
                   className="w-6"
                 />
