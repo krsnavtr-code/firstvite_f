@@ -11,6 +11,9 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 const bannerImg =
   "http://firstvite.com/api/upload/file/img-1752554019521-300496356.png";
+
+const logoImg =
+  "http://firstvite.com/api/upload/file/img-1753961989896-7541613.png";
 import "./Banner.css";
 import "../styles/typography.css";
 
@@ -63,7 +66,7 @@ function Banner() {
             <div className="space-y-2 w-full">
               <div className="flex items-center gap-1 text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
                 <img
-                  src="../../public/images/firstvite-logo-mini.png"
+                  src={logoImg}
                   alt="logo"
                   className="w-6"
                 />
