@@ -31,6 +31,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { formatDuration, formatPrice } from "../../utils/format";
 import { getImageUrl } from "../../utils/imageUtils";
 import { useCart } from "../../contexts/CartContext";
+import PaymentForm from "../../components/PaymentForm";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -49,8 +50,10 @@ const CourseDetail = () => {
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
   const [showCheckoutOptions, setShowCheckoutOptions] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
+  
 
   // Initialize expanded sections when course data is loaded
   useEffect(() => {
@@ -1331,9 +1334,8 @@ const CourseDetail = () => {
                 </button>
 
                 <button
-                  // onClick={() => navigate(`/checkout?courseId=${id}`)}
-                  disabled
-                  className="cursor-not-allowed w-full flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg transition-colors"
+                  onClick={() => setShowPaymentForm(true)}
+                  className="w-full flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg transition-colors"
                 >
                   <CreditCard className="h-5 w-5" />
                   <span>Proceed with Payment</span>
@@ -1577,6 +1579,18 @@ const CourseDetail = () => {
               </form>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Payment Form Modal */}
+      <AnimatePresence>
+        {showPaymentForm && (
+          <PaymentForm 
+            onClose={() => setShowPaymentForm(false)}
+            courseId={id}
+            courseName={course?.title}
+            price={course?.price}
+          />
         )}
       </AnimatePresence>
     </div>

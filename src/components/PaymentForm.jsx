@@ -10,7 +10,6 @@ const PaymentForm = ({ onClose }) => {
     email: "",
     phone: "",
     course: "",
-    address: "",
     paymentAmount: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,7 +60,6 @@ const PaymentForm = ({ onClose }) => {
               email: "",
               phone: "",
               course: "",
-              address: "",
               paymentAmount: "",
             });
           } else {
@@ -248,24 +246,6 @@ const PaymentForm = ({ onClose }) => {
                 className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
-            </div>
-
-            <div>
-              <label
-                htmlFor="address"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Address
-              </label>
-              <textarea
-                id="address"
-                name="address"
-                rows="2"
-                value={formData.address}
-                onChange={handleChange}
-                className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                required
-              ></textarea>
             </div>
 
             <div>
