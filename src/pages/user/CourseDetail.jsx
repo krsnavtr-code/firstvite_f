@@ -677,7 +677,7 @@ const CourseDetail = () => {
 
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
 
-                <div className="flex items-center text-sm">
+                <div className="flex items-center text-sm group relative">
                   <div className="flex items-center">
                     <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">
                       <FaCertificate className="w-4 h-4" />
@@ -690,6 +690,20 @@ const CourseDetail = () => {
                         Included
                       </p>
                     </div>
+                  </div>
+                  <div className="hidden group-hover:block absolute left-0 -top-40 w-64 bg-white dark:bg-slate-800 shadow-xl rounded-lg p-2 z-10 border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Sample Certificate
+                    </p>
+                    <img
+                      src="http://firstvite.com/api/upload/file/img-1754049281541-71023912.png"
+                      alt="Course Certificate Sample"
+                      className="w-full h-auto rounded border border-gray-200 dark:border-gray-700"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/placeholder-certificate.jpg";
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -1300,6 +1314,40 @@ const CourseDetail = () => {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Certificate Preview Section */}
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-0">Certificate Preview</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <div className="p-4 border-b border-gray-100 dark:border-slate-700">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              Course Completion Certificate
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              This is a sample of the certificate you'll receive upon course completion
+            </p>
+          </div>
+          <div className="relative w-full overflow-hidden bg-gray-50 dark:bg-slate-900">
+            <div className="relative pt-[70%] sm:pt-[56.25%] md:pt-[50%] lg:pt-[40%] xl:pt-[35%]">
+              <img
+                src="http://firstvite.com/api/upload/file/img-1754049281541-71023912.png"
+                alt="Course Certificate Sample"
+                className="absolute top-0 left-0 w-full h-full object-contain p-4 md:p-8"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/placeholder-certificate.jpg';
+                  e.target.className = 'absolute top-0 left-0 w-full h-full object-cover p-4 md:p-8 opacity-80';
+                }}
+              />
+            </div>
+          </div>
+          <div className="p-4 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+              The actual certificate will include your name, course details, and completion date
+            </p>
+          </div>
         </div>
       </div>
 
