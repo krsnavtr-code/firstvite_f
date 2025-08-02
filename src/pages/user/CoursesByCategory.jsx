@@ -113,10 +113,11 @@ const CoursesByCategory = () => {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar with categories */}
         <div className="w-full md:w-1/4 lg:w-1/5 mt-14">
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sticky top-4 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sticky top-4 border border-gray-200 dark:border-gray-700 h-[calc(100vh-6rem)] flex flex-col">
             <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
               Categories
             </h2>
+            <div className="overflow-y-auto flex-1 pr-2 -mr-2">
             <ul className="space-y-2">
               <li>
                 <Link
@@ -134,21 +135,33 @@ const CoursesByCategory = () => {
                   All Courses
                 </Link>
               </li>
-              {allCategories.map((cat) => (
-                <li key={cat._id}>
-                  <Link
-                    to={`/courses/category/${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    className={`block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                      category?._id === cat._id
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-black dark:text-white"
-                    }`}
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
+              {allCategories
+                .sort((a, b) => {
+                  const order = {
+                    "ERP Academy": 1,
+                    "Professional Language": 2,
+                    "Data Science & ML": 3,
+                  };
+                  const aOrder = order[a.name] || 999;
+                  const bOrder = order[b.name] || 999;
+                  return aOrder - bOrder || a.name.localeCompare(b.name);
+                })
+                .map((cat) => (
+                  <li key={cat._id}>
+                    <Link
+                      to={`/courses/category/${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
+                      className={`block px-1 py-0 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                        category?._id === cat._id
+                          ? "bg-blue-50 text-blue-600 font-medium"
+                          : "text-black dark:text-white"
+                      }`}
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
             </ul>
+            </div>
           </div>
         </div>
 
@@ -329,13 +342,15 @@ const CourseCard = ({ course }) => {
                 </span>
               </div>
             ) : (
-              <img
-                src={imageState.url}
-                alt={course.title || "Course image"}
-                className="w-full h-full object-cover"
-                onError={handleImageError}
-                loading="lazy"
-              />
+              <div className="w-full h-[200px] bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                <img
+                  src={imageState.url}
+                  alt={course.title || "Course image"}
+                  className="max-w-full max-h-full object-contain transition-opacity duration-300"
+                  onError={handleImageError}
+                  loading="lazy"
+                />
+              </div>
             )}
           </div>
           {course.isFeatured && (

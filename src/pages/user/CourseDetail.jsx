@@ -757,11 +757,11 @@ const CourseDetail = () => {
               <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-slate-700 transition-all duration-300 hover:shadow-2xl">
                 {/* Course Media */}
                 <div className="relative group">
-                  <div className="overflow-hidden rounded p-4">
+                  <div className="overflow-hidden rounded p-4 group">
                     <img
                       src={getImageUrl(course.thumbnail)}
                       alt={course.title}
-                      className="w-full rounded h-48 md:h-56 object-cover transition-transform group-hover:scale-105"
+                      className="w-full h-48 md:h-56 rounded object-cover transition-transform duration-300 group-hover:scale-105"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = "/images/course-placeholder.jpg";
@@ -1585,7 +1585,7 @@ const CourseDetail = () => {
       {/* Payment Form Modal */}
       <AnimatePresence>
         {showPaymentForm && (
-          <PaymentForm 
+          <PaymentForm
             onClose={() => setShowPaymentForm(false)}
             courseId={id}
             courseName={course?.title}

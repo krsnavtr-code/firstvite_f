@@ -160,20 +160,22 @@ const CourseCard = ({ course }) => {
                 </div>
               </div>
             ) : (
-              <img
-                src={imageState.url}
-                alt={course.title || "Course image"}
-                className="w-full h-full object-cover transition-opacity duration-300"
-                style={{ opacity: imageState.loading ? 0 : 1 }}
-                loading="lazy"
-                onError={() => {
-                  setImageState({
-                    url: "/images/course-placeholder.jpg",
-                    error: true,
-                    loading: false,
-                  });
-                }}
-              />
+              <div className="w-full h-[200px] bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                <img
+                  src={imageState.url}
+                  alt={course.title || "Course image"}
+                  className="max-w-full max-h-full object-contain transition-opacity duration-300"
+                  style={{ opacity: imageState.loading ? 0 : 1 }}
+                  loading="lazy"
+                  onError={() => {
+                    setImageState({
+                      url: "/images/course-placeholder.jpg",
+                      error: true,
+                      loading: false,
+                    });
+                  }}
+                />
+              </div>
             )}
             {/* Hidden debug info - only shown in development */}
             {process.env.NODE_ENV === "development" && (
@@ -331,9 +333,10 @@ const PopularCourses = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {courses.map((course) => (
-              <CourseCard key={course._id} course={course} />
-            ))}
+            {courses
+              .map((course) => (
+                <CourseCard key={course._id} course={course} />
+              ))}
           </div>
         )}
         <div className="mt-8 text-center">
