@@ -488,7 +488,7 @@ const CourseDetail = () => {
   const rating = course.rating || 4;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 mt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Course Header */}
       <div className="">
         <div className="container mx-auto px-4">

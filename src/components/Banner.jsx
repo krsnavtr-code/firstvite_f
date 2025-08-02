@@ -54,6 +54,7 @@ function Banner() {
       ),
       title: "Certification",
       desc: "Get certified",
+      onClick: () => window.open('http://firstvite.com/api/upload/file/img-1754049281541-71023912.png', '_blank')
     },
   ];
 
@@ -105,7 +106,10 @@ function Banner() {
               {features.map((feature, index) => (
                 <div
                   key={index}
-                  className="flex flex-nowrap items-start p-2.5 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg hover:shadow-md dark:hover:shadow-gray-700 transition-all duration-300 border border-gray-100 dark:border-gray-700"
+                  onClick={feature.onClick}
+                  className={`flex flex-nowrap items-start p-2.5 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg hover:shadow-md dark:hover:shadow-gray-700 transition-all duration-300 border border-gray-100 dark:border-gray-700 ${
+                    feature.onClick ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750' : ''
+                  }`}
                 >
                   <div className="flex-shrink-0 p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full mr-3">
                     {feature.icon}

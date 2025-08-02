@@ -61,18 +61,18 @@ const ContactFormModal = ({ isOpen, onClose }) => {
         ...formData,
         // Map courseInterest to courseId and find the course title
         courseId: formData.courseInterest,
-        courseTitle: formData.courseInterest 
-          ? courses.find(c => c._id === formData.courseInterest)?.title || ''
-          : '',
+        courseTitle: formData.courseInterest
+          ? courses.find((c) => c._id === formData.courseInterest)?.title || ""
+          : "",
       };
-      
+
       // Remove the courseInterest field as it's not needed by the backend
       delete submissionData.courseInterest;
 
-      console.log('Submitting form data:', submissionData);
-      
+      console.log("Submitting form data:", submissionData);
+
       const result = await submitContactForm(submissionData);
-      
+
       if (result.success) {
         // Track form submission with Google Tag Manager
         if (window.gtag) {
@@ -86,7 +86,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
             },
           });
         }
-        
+
         setIsSuccess(true);
         setFormData({
           name: "",
@@ -97,7 +97,9 @@ const ContactFormModal = ({ isOpen, onClose }) => {
           agreedToTerms: false,
         });
 
-        toast.success(result.message || "Your message has been sent successfully!");
+        toast.success(
+          result.message || "Your message has been sent successfully!"
+        );
 
         // Close the modal after 2 seconds
         setTimeout(() => {
@@ -107,19 +109,21 @@ const ContactFormModal = ({ isOpen, onClose }) => {
       } else {
         // Handle API validation errors
         if (result.errors) {
-          Object.values(result.errors).forEach(error => {
+          Object.values(result.errors).forEach((error) => {
             toast.error(error);
           });
         } else {
-          toast.error(result.message || "Failed to send message. Please try again.");
+          toast.error(
+            result.message || "Failed to send message. Please try again."
+          );
         }
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(
-        error.message || 
-        error.response?.data?.message ||
-        "Failed to send message. Please try again later."
+        error.message ||
+          error.response?.data?.message ||
+          "Failed to send message. Please try again later."
       );
     } finally {
       setIsSubmitting(false);
@@ -229,7 +233,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     htmlFor="phone"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
-                    Phone Number
+                    Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
@@ -237,6 +241,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
+                    required
                     className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="+91 8080808080"
                   />

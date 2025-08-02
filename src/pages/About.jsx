@@ -9,7 +9,7 @@ export default function About() {
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            About Our FirstVite
+            About Us – FirstVITE
           </h1>
           <p className="text-xl md:text-2xl max-w-3xl mx-auto">
             Empowering minds through knowledge and learning resources
@@ -22,18 +22,133 @@ export default function About() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
-              Our Story
+              Empowering Learners. Shaping Futures.
             </h2>
             <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
             <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
-              Founded in 2023, our FirstVite has been a trusted source of
-              knowledge and learning materials for students, professionals, and
-              lifelong learners. We believe in making quality education
-              accessible to everyone, regardless of their background or
-              location.
+              We believe that education should be accessible, practical, and
+              aligned with real-world needs. As a leading e-learning platform,
+              we offer high-quality certification programs, degree courses, and
+              career development tools — designed for students, graduates, and
+              working professionals seeking to stay competitive in today’s
+              fast-changing world.
             </p>
           </div>
-
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+              Who We Are
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
+              Our journey began with a clear purpose: to bridge the gap between
+              theoretical education and industry requirements. Backed by a
+              passionate team of academic experts, corporate trainers, and
+              technology professionals, we are committed to delivering a
+              future-ready learning experience.
+            </p>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto mt-5">
+              We work in collaboration with recognized universities, global
+              educators, and experienced mentors to develop relevant,
+              career-focused content that supports learners at every stage of
+              their professional journey.
+            </p>
+          </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+              What We Offer
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
+              We provide a wide range of{" "}
+              <strong>online programs and skill-based training,</strong>{" "}
+              including:
+            </p>
+            <ul className="list-disc list-inside font-bold text-lg text-black dark:text-white max-w-4xl mx-auto">
+              <li>Professional Certifications & Short-Term Courses</li>
+              <li>Corporate Training & Skill Development Modules</li>
+            </ul>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto mt-5">
+              Every course is designed to be{" "}
+              <strong>
+                flexible, mobile-friendly, and globally recognized,
+              </strong>{" "}
+              allowing learners to study at their own pace and convenience.
+            </p>
+          </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+              Our Vision
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
+              To become a trusted learning destination for individuals and
+              professionals seeking to build skills, grow careers, and embrace
+              lifelong learning through modern education.
+            </p>
+          </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+              Our Mission
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <ul className="list-disc list-none list-inside text-lg text-black dark:text-white max-w-4xl mx-auto">
+              <li>
+                Make{" "}
+                <strong>quality education accessible and affordable</strong>
+              </li>
+              <li>
+                Promote{" "}
+                <strong>career-centric, industry-relevant skills</strong>
+              </li>
+              <li>
+                Offer flexible programs that suit different learning needs
+              </li>
+              <li>
+                Empower learners to{" "}
+                <strong> achieve career success and personal growth</strong>
+              </li>
+            </ul>
+          </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+              Focused on Learner Success
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
+              Each learner’s journey is unique, and our platform is designed to
+              support that:
+            </p>
+            <ul className="list-disc list-none list-inside text-lg text-black dark:text-white max-w-4xl mx-auto">
+              <li>Interactive Learning Modules</li>
+              <li>Live Webinars & Mentorship Sessions</li>
+              <li>Placement Assistance & Interview Prep</li>
+              <li>Progress Tracking & Certification</li>
+            </ul>
+          </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+              Trusted by Thousands
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
+              With a growing base of satisfied learners across India and beyond,
+              we have built a platform that is trusted by students, working
+              professionals, and even corporate clients. Whether you're looking
+              to upskill, change careers, or prepare for the future, we’re here
+              to guide you every step of the way.
+            </p>
+          </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
+              Let’s Learn, Grow & Succeed Together
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <p className="text-lg text-black dark:text-white max-w-4xl mx-auto">
+              Education is more than just a certificate — it's a pathway to
+              opportunity. Begin your learning journey with us today and take
+              one step closer to achieving your professional and personal goals.
+            </p>
+          </div>
           {/* Features */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {[
@@ -77,7 +192,6 @@ export default function About() {
               </div>
             ))}
           </div>
-
           {/* Team Section */}
           <div className="text-center">
             <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
@@ -137,15 +251,12 @@ export default function About() {
                       {member.name}
                     </h3>
                     <p className="text-blue-600 mb-3">{member.role}</p>
-                    <p className="text-black dark:text-white">
-                      {member.bio}
-                    </p>
+                    <p className="text-black dark:text-white">{member.bio}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
           {/* CTA Section */}
           <div className="mt-20 bg-blue-900 rounded-xl p-8 text-center">
             <h2 className="text-2xl font-bold text-white dark:text-white mb-4">
@@ -162,6 +273,9 @@ export default function About() {
               Browse Courses
             </Link>
           </div>
+          <p className="text-center text-lg text-black dark:text-white mt-12">
+            Welcome to FirstVITE — your partner in skill-building and success.
+          </p>
         </div>
       </section>
     </div>

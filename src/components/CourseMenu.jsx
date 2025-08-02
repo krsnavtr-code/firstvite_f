@@ -221,7 +221,7 @@ const CourseMenu = () => {
                 [...categories]
                   .sort((a, b) => {
                     const order = {
-                      SAP: 1,
+                      "ERP Academy": 1,
                       "Professional Language": 2,
                       "Data Science & ML": 3,
                     };
@@ -304,7 +304,19 @@ const CourseMenu = () => {
                               </div>
                             ) : categoryCourses[category.id]?.length > 0 ? (
                               <div className="py-1">
-                                {categoryCourses[category.id]
+                                {(category.name === 'ERP Academy' 
+                                  ? [...categoryCourses[category.id]]
+                                      .sort((a, b) => {
+                                        const order = {
+                                          'SAP FICO Training Course': 1,
+                                          'SAP MM Training Course': 2,
+                                          'SAP PP Training Course': 3,
+                                        };
+                                        const aOrder = order[a.title] || 999;
+                                        const bOrder = order[b.title] || 999;
+                                        return aOrder - bOrder;
+                                      })
+                                  : categoryCourses[category.id])
                                   .slice(0, 5)
                                   .map((course) => (
                                     <Link
