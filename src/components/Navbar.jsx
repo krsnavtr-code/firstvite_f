@@ -410,6 +410,7 @@ function Navbar() {
         className="z-50 transition-all duration-300 bg-white dark:bg-gray-900 h-16"
         id="main-navbar"
       >
+        {/* Desktop Navbar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Mobile menu button */}

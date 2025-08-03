@@ -1418,7 +1418,7 @@ const CourseDetail = () => {
               exit={{ y: 20, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-2">
                 <p className="text-lg font-bold text-black dark:text-white">
                   Process Your Enrollment by Fill the Form
                 </p>
@@ -1431,12 +1431,12 @@ const CourseDetail = () => {
                 </button>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+              <div className="flex flex-col sm:flex-row gap-0 mb-2">
                 <div className="relative flex-1">
                   <button
                     onClick={handleEnroll}
                     disabled={isSubmitting}
-                    className={`w-full flex items-center justify-center px-6 py-3.5 rounded-lg font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ${
+                    className={`w-full flex items-center justify-center px-2 py-2 rounded-lg font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ${
                       isSubmitting
                         ? "opacity-80 cursor-not-allowed"
                         : "shadow-md hover:shadow-lg"
@@ -1475,7 +1475,7 @@ const CourseDetail = () => {
                     )}
                   </button>
                   {course.hasDiscount && course.originalPrice && (
-                    <div className="absolute -bottom-5 left-0 right-0 text-center">
+                    <div className="absolute bottom-0 left-0 right-0 text-center">
                       <span className="inline-block px-2 py-0.5 text-xs font-medium text-black bg-amber-500 rounded-full">
                         {Math.round(
                           (1 - course.price / course.originalPrice) * 100
@@ -1491,9 +1491,9 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-black dark:text-white mb-1"
+                    className="block text-sm font-medium text-black dark:text-white"
                   >
-                    Full Name *
+                    Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -1502,7 +1502,7 @@ const CourseDetail = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Your name"
                   />
                 </div>
@@ -1510,9 +1510,9 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-black dark:text-white mb-1"
+                    className="block text-sm font-medium text-black dark:text-white"
                   >
-                    Email Address *
+                    Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -1522,7 +1522,7 @@ const CourseDetail = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className={`w-full px-3 py-2 border ${
+                    className={`w-full px-3 py-1 border ${
                       currentUser ? "cursor-not-allowed" : ""
                     } border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white`}
                     placeholder="your@email.com"
@@ -1532,9 +1532,9 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="phone"
-                    className="block text-sm font-medium text-black dark:text-white mb-1"
+                    className="block text-sm font-medium text-black dark:text-white"
                   >
-                    Phone Number
+                    Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
@@ -1542,7 +1542,8 @@ const CourseDetail = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    required
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="+91 8080808080"
                   />
                 </div>
@@ -1558,18 +1559,17 @@ const CourseDetail = () => {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-black dark:text-white mb-1"
+                    className="block text-sm font-medium text-black dark:text-white"
                   >
-                    Your Message *
+                    Your Message
                   </label>
                   <textarea
                     id="message"
                     name="message"
-                    rows="4"
+                    rows="1"
                     value={formData.message}
                     onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Tell us how we can help you..."
                   ></textarea>
                 </div>
@@ -1583,11 +1583,11 @@ const CourseDetail = () => {
                     value="privacy-policy"
                     onChange={handleInputChange}
                     required
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:checked:bg-blue-600"
+                    className="w-3 h-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:checked:bg-blue-600"
                   />
                   <label
                     htmlFor="privacy-policy"
-                    className="ml-2 text-sm font-medium text-black dark:text-white"
+                    className="ml-2 text-xs font-medium text-black dark:text-white"
                   >
                     I hereby agree with{" "}
                     <Link

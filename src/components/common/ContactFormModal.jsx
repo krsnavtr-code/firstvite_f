@@ -133,7 +133,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto mt-20">
+    <div className="fixed inset-0 z-50 mt-20">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div className="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -143,7 +143,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
         {/* Modal panel */}
         <div className="inline-block align-middle bg-white dark:bg-gray-800 rounded-lg text-left overflow-y-auto shadow-xl transform transition-all max-h-[90vh] sm:my-4 sm:align-middle sm:max-w-lg sm:w-full">
           <div className="bg-white dark:bg-gray-800 px-4 py-4 sm:px-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 Request A Call Back
               </h3>
@@ -193,7 +193,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Full Name <span className="text-red-500">*</span>
                   </label>
@@ -212,7 +212,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Email Address <span className="text-red-500">*</span>
                   </label>
@@ -231,7 +231,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 <div>
                   <label
                     htmlFor="phone"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Phone Number <span className="text-red-500">*</span>
                   </label>
@@ -250,7 +250,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 <div>
                   <label
                     htmlFor="courseInterest"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     I'm interested in: (Optional)
                   </label>
@@ -298,7 +298,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Your Message <span className="text-red-500">*</span>
                   </label>
