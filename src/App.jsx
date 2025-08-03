@@ -2,11 +2,9 @@ import React from "react";
 import Home from "./home/Home";
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Courses from "./components/Courses";
-import Signup from "./components/Signup";
 import LoginPage from "./pages/auth/LoginPage";
 import FreeCourses from "./pages/FreeCourses";
 import { Toaster } from "react-hot-toast";
-import { useAuth } from "./contexts/AuthContext";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from './components/admin/AdminDashboard';
 import CategoriesList from './components/admin/categories/CategoriesList';
@@ -37,7 +35,6 @@ import ImageGallery from './components/admin/ImageGallery';
 import CourseForm from './components/admin/courses/CourseForm';
 import MediaGallery from './pages/admin/MediaGallery';
 import { CartProvider } from './contexts/CartContext';
-import Cart from './components/cart/Cart';
 import Profile from './pages/user/Profile';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -53,7 +50,6 @@ import SendBrochure from './pages/admin/SendBrochure';
 
 // LMS Components
 import RegisterPage from './pages/auth/RegisterPage';
-import UsersPage from './pages/admin/UsersPage';
 import LMS from './pages/lms';
 import InactiveAccount from './pages/auth/InactiveAccount';
 
@@ -82,7 +78,6 @@ const MainLayout = ({ children }) => {
 };
 
 function App() {
-  const { authUser } = useAuth();
   const { ContactFormPopup } = useContactFormPopup();
   
   return (
@@ -348,7 +343,7 @@ function App() {
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Cart />
+      {/* <Cart /> */}
     </CartProvider>
   );
 }

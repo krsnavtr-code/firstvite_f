@@ -49,17 +49,22 @@ const RegisterForm = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
       <div>
-        <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="fullname"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Full Name
         </label>
         <input
           id="fullname"
           type="text"
-          {...register('fullname', { required: 'Full name is required' })}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            errors.fullname ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+          {...register("fullname", { required: "Full name is required" })}
+          className={`mt-1 block w-full px-3 py-1 border ${
+            errors.fullname
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.fullname && (
@@ -68,21 +73,26 @@ const RegisterForm = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Email address
         </label>
         <input
           id="email"
           type="email"
-          {...register('email', {
-            required: 'Email is required',
+          {...register("email", {
+            required: "Email is required",
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: 'Invalid email address',
+              message: "Invalid email address",
             },
           })}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+          className={`mt-1 block w-full px-3 py-1 border ${
+            errors.email
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.email && (
@@ -91,21 +101,54 @@ const RegisterForm = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="phone"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Phone Number
+        </label>
+        <input
+          id="phone"
+          type="tel"
+          {...register("phone", {
+            required: "Phone number is required",
+            pattern: {
+              value: /^[0-9]{10,15}$/,
+              message: "Please enter a valid phone number",
+            },
+          })}
+          className={`mt-1 block w-full px-3 py-1 border ${
+            errors.phone
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
+          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
+        />
+        {errors.phone && (
+          <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Password
         </label>
         <input
           id="password"
           type="password"
-          {...register('password', {
-            required: 'Password is required',
+          {...register("password", {
+            required: "Password is required",
             minLength: {
               value: 6,
-              message: 'Password must be at least 6 characters',
+              message: "Password must be at least 6 characters",
             },
           })}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+          className={`mt-1 block w-full px-3 py-1 border ${
+            errors.password
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.password && (
@@ -114,36 +157,48 @@ const RegisterForm = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="confirmPassword"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Confirm Password
         </label>
         <input
           id="confirmPassword"
           type="password"
-          {...register('confirmPassword', {
+          {...register("confirmPassword", {
             validate: (value) =>
-              value === watch('password') || 'Passwords do not match',
+              value === watch("password") || "Passwords do not match",
           })}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            errors.confirmPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+          className={`mt-1 block w-full px-3 py-1 border ${
+            errors.confirmPassword
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.confirmPassword && (
-          <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.confirmPassword.message}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="role"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           I am a
         </label>
         <select
           id="role"
-          {...register('role', { required: 'Please select a role' })}
+          {...register("role", { required: "Please select a role" })}
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
           defaultValue=""
         >
-          <option value="" disabled>Select role</option>
+          <option value="" disabled>
+            Select role
+          </option>
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
         </select>
@@ -153,42 +208,26 @@ const RegisterForm = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label htmlFor="department" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="department"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Department
         </label>
         <input
           id="department"
           type="text"
-          {...register('department', { required: 'Department is required' })}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            errors.department ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+          {...register("department", { required: "Department is required" })}
+          className={`mt-1 block w-full px-3 py-1 border ${
+            errors.department
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.department && (
-          <p className="mt-1 text-sm text-red-600">{errors.department.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Phone Number
-        </label>
-        <input
-          id="phone"
-          type="tel"
-          {...register('phone', {
-            required: 'Phone number is required',
-            pattern: {
-              value: /^[0-9]{10,15}$/,
-              message: 'Please enter a valid phone number',
-            },
-          })}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
-        />
-        {errors.phone && (
-          <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.department.message}
+          </p>
         )}
       </div>
 
@@ -196,19 +235,19 @@ const RegisterForm = ({ onSuccess }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="w-full flex justify-center py-1 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
         >
-          {isSubmitting ? 'Registering...' : 'Register'}
+          {isSubmitting ? "Registering..." : "Register"}
         </button>
       </div>
 
       <div className="text-sm text-center">
         <span className="text-gray-600 dark:text-gray-400">
-          Already have an account?{' '}
+          Already have an account?{" "}
         </span>
         <button
           type="button"
-          onClick={() => navigate('/login')}
+          onClick={() => navigate("/login")}
           className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
         >
           Sign in

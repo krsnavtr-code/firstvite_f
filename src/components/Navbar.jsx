@@ -394,7 +394,7 @@ function Navbar() {
         >
           {item.lmscolors && (
             <span className="px-1 py-1 font-bold text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded hover:bg-blue-300 dark:hover:bg-blue-900/30">
-              Smart <span className=" text-orange-600">Board</span>
+              Smart <span className=" text-orange-500">Board</span>
             </span>
           )}
           {item.label}
@@ -407,7 +407,7 @@ function Navbar() {
     <>
       {/* Nabvar */}
       <div
-        className="z-50 transition-all duration-300 bg-white dark:bg-gray-900 h-16"
+        className="z-50 transition-all duration-300 bg-white dark:bg-gray-900 h-16 sticky top-0 left-0 right-0"
         id="main-navbar"
       >
         {/* Desktop Navbar */}
@@ -497,7 +497,7 @@ function Navbar() {
                         className="w-full px-4 py-2 pl-10 pr-8 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                         placeholder="Search courses..."
                         aria-label="Search courses"
-                        autoComplete="off"
+                        autoComplete="on"
                       />
                       <FaSearch className="absolute left-3 top-3 text-gray-400" />
                       {searchQuery && (
@@ -543,19 +543,9 @@ function Navbar() {
                                     }}
                                     className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center"
                                   >
-                                    <div className="flex-shrink-0 w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden flex items-center justify-center">
-                                      <div className="text-gray-400 text-xs text-center p-1">
-                                        {course.title
-                                          ?.charAt(0)
-                                          ?.toUpperCase() || "C"}
-                                      </div>
-                                    </div>
                                     <div className="ml-3">
                                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         {course.title}
-                                      </div>
-                                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        {course.instructor}
                                       </div>
                                     </div>
                                   </button>
@@ -573,7 +563,7 @@ function Navbar() {
               {/* Theme Toggle */}
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-0 m-0 rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors duration-200"
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors duration-200"
                 aria-label={
                   theme === "dark"
                     ? "Switch to light mode"
@@ -590,7 +580,7 @@ function Navbar() {
               {/* Payment Button */}
               <a
                 href="https://genlead.in/agent/register"
-                className="flex hidden lg:block items-center flex-col px-2 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="flex hidden lg:block items-center flex-col px-1 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Agent Register
               </a>
@@ -598,12 +588,12 @@ function Navbar() {
               {/* Payment Dropdown */}
               <div className="relative hidden lg:block md:block">
                 <button
-                  className="flex items-center px-2 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="flex items-center px-1 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
                 >
                   Pay Now
                   <svg
-                    className="w-4 h-4 ml-1"
+                    className="w-3 h-3"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -618,7 +608,10 @@ function Navbar() {
                   </svg>
                 </button>
                 {showPaymentDropdown && (
-                  <div ref={dropdownRef} className="absolute right-0 z-10 w-64 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div
+                    ref={dropdownRef}
+                    className="absolute right-0 z-10 w-64 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                  >
                     <div className="px-3 py-2 border-b border-gray-100">
                       <button
                         onClick={handlePaymentClick}
@@ -626,7 +619,8 @@ function Navbar() {
                         role="menuitem"
                       >
                         <span>
-                          Pay Using <span className="text-orange-600">RazorPay</span>
+                          Pay Using{" "}
+                          <span className="text-orange-600">RazorPay</span>
                         </span>
                         <svg
                           className="w-4 h-4 ml-2 text-indigo-600"
@@ -661,7 +655,8 @@ function Navbar() {
                     >
                       <div className="space-y-2 p-4">
                         <h3 className="font-medium text-blue-600 mb-3">
-                          Pay Using <span className="text-orange-600">Bank Transfer</span>
+                          Pay Using{" "}
+                          <span className="text-orange-600">Bank Transfer</span>
                         </h3>
                         <div className="space-y-2">
                           {[
@@ -782,9 +777,10 @@ function Navbar() {
                   <Link
                     to="/login"
                     state={{ from: location }}
-                    className="flex items-center px-2 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                    className="flex items-center px-1 py-1 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
                   >
-                    <FaSignInAlt className="mr-0.5" /> Sign In
+                    <FaSignInAlt className="mr-0.5" />
+                    Login
                   </Link>
                 </div>
               )}
@@ -846,7 +842,7 @@ function Navbar() {
               >
                 Smart Board
               </Link>
-              
+
               <a
                 href="https://genlead.in/agent/register"
                 target="_blank"
@@ -856,7 +852,7 @@ function Navbar() {
               >
                 Agent Register
               </a>
-              
+
               <button
                 onClick={() => {
                   handlePaymentClick();
@@ -867,7 +863,7 @@ function Navbar() {
                 <FaCreditCard className="mr-2" />
                 Pay Now
               </button>
-              
+
               {/* Theme Toggle - Mobile */}
               <div className="flex items-center justify-center pt-2">
                 <button

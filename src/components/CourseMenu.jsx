@@ -242,14 +242,14 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
-          className="flex items-center text-sm px-3 py-2 text-blue-900 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded transition-colors duration-200 font-medium"
+          className="flex items-center text-sm px-1 py-1 text-blue-900 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded transition-colors duration-200 font-medium"
           aria-expanded={isOpen}
           aria-haspopup="true"
           aria-controls="course-menu-dropdown"
         >
           <span>Course Menu</span>
           <svg
-            className={`w-4 h-4 ml-1 transition-transform duration-200 ${
+            className={`w-3 h-3 transition-transform duration-200 ${
               isOpen ? "transform rotate-180" : ""
             }`}
             fill="none"
@@ -294,7 +294,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
                 aria-label="Close menu"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

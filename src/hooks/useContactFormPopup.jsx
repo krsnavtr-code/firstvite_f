@@ -20,8 +20,12 @@ const useContactFormPopup = () => {
         path.startsWith("/lms") ||
         path.startsWith("/login") ||
         path.startsWith("/signup") ||
+        path.startsWith("/forgot-password") ||
+        path.startsWith("/register") ||
         path.startsWith("/profile") ||
-        path.startsWith("/my-learning")
+        path.startsWith("/my-learning") ||
+        path.startsWith("/blog") ||
+        path.startsWith("/contact")
       ) {
         return false;
       }
