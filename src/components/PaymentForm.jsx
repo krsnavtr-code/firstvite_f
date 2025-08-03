@@ -8,28 +8,155 @@ const PaymentForm = ({ onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    countryCode: "+91",
     phone: "",
     course: "",
+    coursePrice: "",
     paymentAmount: "",
+    terms: false,
   });
+
+  const countryCodes = [
+    { code: "+91", flag: "🇮🇳", name: "India" },
+    { code: "+1", flag: "🇺🇸", name: "USA" },
+    { code: "+44", flag: "🇬🇧", name: "UK" },
+    { code: "+61", flag: "🇦🇺", name: "Australia" },
+    { code: "+65", flag: "🇸🇬", name: "Singapore" },
+    { code: "+971", flag: "🇦🇪", name: "UAE" },
+    { code: "+92", flag: "🇵🇰", name: "Pakistan" },
+    { code: "+86", flag: "🇨🇳", name: "China" },
+  ];
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
+  const [courses, setCourses] = useState(() => {
+    // Try to load from sessionStorage on initial render
+    const cachedCourses = sessionStorage.getItem('cachedCourses');
+    return cachedCourses ? JSON.parse(cachedCourses) : [];
+  });
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [coursePage, setCoursePage] = useState(1);
+  const [hasMoreCourses, setHasMoreCourses] = useState(true);
 
-  // Load Razorpay script when component mounts
+  // Load Razorpay script and courses when component mounts
   useEffect(() => {
+    // Load Razorpay
     loadRazorpay().then((success) => {
       if (!success) {
         toast.error("Failed to load payment gateway. Please try again later.");
       }
       setIsRazorpayLoaded(success);
     });
-  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+    // Only fetch if we don't have cached courses
+    if (courses.length > 0) {
+      setLoadingCourses(false);
+      return;
+    }
+
+    const fetchCourses = async () => {
+      try {
+        setLoadingCourses(true);
+        console.time('FetchCourses');
+        
+        // Fetch minimal course data needed for the dropdown
+        const response = await api.get(`/courses?isPublished=true&limit=20&page=${coursePage}&fields=title,price`, {
+          timeout: 10000, // 10 seconds should be enough for minimal data
+        });
+        
+        console.timeEnd('FetchCourses');
+        
+        let coursesData = [];
+        let totalCourses = 0;
+        
+        // Handle different response structures
+        if (Array.isArray(response.data)) {
+          coursesData = response.data;
+          totalCourses = response.data.length;
+        } else if (Array.isArray(response.data?.data)) {
+          coursesData = response.data.data;
+          totalCourses = response.data.total || response.data.data.length;
+        } else if (Array.isArray(response.data?.courses)) {
+          coursesData = response.data.courses;
+          totalCourses = response.data.total || response.data.courses.length;
+        }
+        
+        if (coursesData.length === 0) {
+          console.warn('No courses found in the response');
+          toast.error('No courses available at the moment');
+          return;
+        }
+        
+        // Cache the courses in sessionStorage
+        sessionStorage.setItem('cachedCourses', JSON.stringify(coursesData));
+        sessionStorage.setItem('coursesLastFetched', Date.now().toString());
+        
+        setCourses(prevCourses => {
+          // Create a map to avoid duplicates
+          const courseMap = new Map(prevCourses.map(course => [course._id, course]));
+          // Add or update courses
+          coursesData.forEach(course => courseMap.set(course._id, course));
+          return Array.from(courseMap.values());
+        });
+        
+        setHasMoreCourses(coursesData.length >= 20);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        let errorMessage = 'Failed to load courses';
+        
+        if (error.code === 'ECONNABORTED') {
+          errorMessage = 'Request timed out. Please check your connection and try again.';
+        } else if (error.response) {
+          // The request was made and the server responded with a status code
+          console.error('Response data:', error.response.data);
+          console.error('Response status:', error.response.status);
+          errorMessage = `Server error: ${error.response.status}`;
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error('No response received:', error.request);
+          errorMessage = 'No response from server. Please try again later.';
+        }
+        
+        toast.error(errorMessage);
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    // Check if we need to refresh the cache (older than 5 minutes)
+    const lastFetched = sessionStorage.getItem('coursesLastFetched');
+    const shouldRefresh = !lastFetched || (Date.now() - parseInt(lastFetched, 10)) > 5 * 60 * 1000;
+    
+    if (courses.length === 0 || shouldRefresh) {
+      fetchCourses();
+    } else {
+      setLoadingCourses(false);
+    }
+    
+    // Cleanup function
+    return () => {
+      // Any cleanup if needed
+    };
+  }, [coursePage]);
+
+  const handleCourseChange = (e) => {
+    const selectedCourseTitle = e.target.value;
+    const selectedCourse = courses.find(
+      (course) => course.title === selectedCourseTitle
+    );
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      course: selectedCourseTitle,
+      coursePrice: selectedCourse?.price || "",
+      paymentAmount: selectedCourse?.price || "",
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -58,9 +185,11 @@ const PaymentForm = ({ onClose }) => {
             setFormData({
               name: "",
               email: "",
+              countryCode: "+91",
               phone: "",
               course: "",
               paymentAmount: "",
+              terms: false,
             });
           } else {
             toast.error("Payment verification failed. Please contact support.");
@@ -73,7 +202,7 @@ const PaymentForm = ({ onClose }) => {
       prefill: {
         name: formData.name,
         email: formData.email,
-        contact: formData.phone,
+        contact: formData.countryCode + formData.phone,
       },
       theme: {
         color: "#4F46E5",
@@ -99,6 +228,7 @@ const PaymentForm = ({ onClose }) => {
     if (
       !formData.name ||
       !formData.email ||
+      !formData.countryCode ||
       !formData.phone ||
       !formData.course ||
       !formData.paymentAmount
@@ -179,7 +309,7 @@ const PaymentForm = ({ onClose }) => {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Full Name
               </label>
@@ -189,7 +319,7 @@ const PaymentForm = ({ onClose }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="p-2 block w-full text-white rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -197,7 +327,7 @@ const PaymentForm = ({ onClose }) => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Email
               </label>
@@ -207,51 +337,105 @@ const PaymentForm = ({ onClose }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="p-2 block w-full text-white rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                required
-              />
+              <div className="space-y-1">
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-black"
+                >
+                  Phone Number
+                </label>
+                <div className="flex rounded-md shadow-sm">
+                  <select
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleChange}
+                    className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-black dark:text-white rounded-l-md border border-r-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 h-10 px-2"
+                  >
+                    {countryCodes.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.flag} {country.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+                      if (value.length <= 10) {
+                        // Increased limit for international numbers
+                        handleChange({
+                          target: {
+                            name: "phone",
+                            value: value,
+                          },
+                        });
+                      }
+                    }}
+                    pattern="[0-9]{10}"
+                    inputMode="numeric"
+                    maxLength={10}
+                    className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-l-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Full number: {formData.countryCode} {formData.phone}
+                </p>
+              </div>
             </div>
 
             <div>
               <label
                 htmlFor="course"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Course Name
               </label>
-              <input
-                type="text"
-                id="course"
-                name="course"
-                value={formData.course}
-                onChange={handleChange}
-                className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                required
-              />
+              {loadingCourses ? (
+                <div className="animate-pulse">
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+                </div>
+              ) : (
+                <>
+                  <select
+                    id="course"
+                    name="course"
+                    value={formData.course}
+                    onChange={handleCourseChange}
+                    className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-white"
+                    required
+                  >
+                    <option value="">Select a course</option>
+                    {[...courses]
+                      .sort((a, b) => a.title.localeCompare(b.title, 'en', {sensitivity: 'base'}))
+                      .map((course) => (
+                        <option key={course._id} value={course.title}>
+                          {course.title}
+                        </option>
+                      ))}
+                  </select>
+                  {formData.coursePrice && (
+                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                      Price: ₹{formData.coursePrice}
+                    </p>
+                  )}
+                </>
+              )}
             </div>
 
             <div>
               <label
                 htmlFor="paymentAmount"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Payment Amount (₹)
               </label>
@@ -263,7 +447,8 @@ const PaymentForm = ({ onClose }) => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                placeholder="Enter amount"
+                className="p-2 block w-full text-white rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -281,7 +466,7 @@ const PaymentForm = ({ onClose }) => {
               />
               <label
                 htmlFor="terms"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 I accept the payment <Link to="/payment-t-and-c">T&C</Link>
               </label>
@@ -292,7 +477,7 @@ const PaymentForm = ({ onClose }) => {
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex justify-center py-1 px-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="flex justify-center py-1 px-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-black bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
               >
                 Cancel
               </button>

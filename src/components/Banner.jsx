@@ -6,8 +6,9 @@ import {
   FaCertificate,
   FaPlay,
   FaArrowRight,
+  FaTimes,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 const bannerImg =
   "http://firstvite.com/api/upload/file/img-1752554019521-300496356.png";
@@ -16,6 +17,33 @@ const logoImg =
   "http://firstvite.com/api/upload/file/img-1753961989896-7541613.png";
 import "./Banner.css";
 import "../styles/typography.css";
+
+const CertificateModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-[550px] w-full max-h-[550px] overflow-auto relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+        >
+          <FaTimes className="text-2xl" />
+        </button>
+        <div className="p-6">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Our Certificate
+          </h3>
+          <img
+            src="http://firstvite.com/api/upload/file/img-1754049281541-71023912.png"
+            alt="Certificate Sample"
+            className="w-full h-auto rounded-lg shadow-lg"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function Banner() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,10 +63,12 @@ function Banner() {
     fetchCourseCount();
   }, []);
 
+  const [showCertificate, setShowCertificate] = useState(false);
+
   const features = [
     {
       icon: (
-        <FaBookOpen className="text-2xl text-[#F47C26] " />
+        <FaBookOpen className="text-2xl text-[#F47C26]" />
       ),
       title: `${courseCount}+ Courses`,
       desc: "Wide range of topics",
@@ -54,7 +84,7 @@ function Banner() {
       ),
       title: "Certification",
       desc: "Get certified",
-      onClick: () => window.open('http://firstvite.com/api/upload/file/img-1754049281541-71023912.png', '_blank')
+      onClick: () => setShowCertificate(true)
     },
   ];
 
@@ -161,6 +191,10 @@ function Banner() {
           </div>
         </div>
       </div>
+      <CertificateModal
+        isOpen={showCertificate}
+        onClose={() => setShowCertificate(false)}
+      />
     </div>
   );
 }

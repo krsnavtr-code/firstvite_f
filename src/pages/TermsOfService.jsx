@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const TermsOfService = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pt-24 pb-16 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-16 px-4">
       <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-black dark:text-white mb-6">Terms of Service</h1>
         <p className="text-black dark:text-white mb-6">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>

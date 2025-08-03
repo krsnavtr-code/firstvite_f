@@ -1,6 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaGithub, FaTwitter, FaLinkedin, FaBook, FaWhatsapp, FaFacebook } from "react-icons/fa";
+import {
+  FaGithub,
+  FaTwitter,
+  FaLinkedin,
+  FaBook,
+  FaWhatsapp,
+  FaFacebook,
+} from "react-icons/fa";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
@@ -23,7 +30,7 @@ function Footer() {
                 href="https://wa.me/919990056799"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
+                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
               >
                 <FaWhatsapp className="h-6 w-6" />
               </a>
@@ -31,23 +38,23 @@ function Footer() {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
+                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
               >
                 <FaTwitter className="h-6 w-6" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/firstvite/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
+                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
               >
                 <FaLinkedin className="h-6 w-6" />
               </a>
               <a
-                href="https://www.facebook.com"
+                href="https://www.facebook.com/firstviteeducation/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-pink-400 dark:hover:text-pink-400"
+                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
               >
                 <FaFacebook className="h-6 w-6" />
               </a>
@@ -63,7 +70,7 @@ function Footer() {
               <li>
                 <Link
                   to="/courses"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Browse Courses
                 </Link>
@@ -71,7 +78,7 @@ function Footer() {
               <li>
                 <Link
                   to="/about"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   About Us
                 </Link>
@@ -79,7 +86,7 @@ function Footer() {
               <li>
                 <Link
                   to="/contact"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Contact
                 </Link>
@@ -87,7 +94,7 @@ function Footer() {
               <li>
                 <Link
                   to="/blog"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Blog
                 </Link>
@@ -104,7 +111,7 @@ function Footer() {
               <li>
                 <Link
                   to="/faq"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Help Center
                 </Link>
@@ -112,7 +119,7 @@ function Footer() {
               <li>
                 <Link
                   to="/privacy-policy"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Privacy Policy
                 </Link>
@@ -120,7 +127,7 @@ function Footer() {
               <li>
                 <Link
                   to="/terms-of-service"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Terms of Service
                 </Link>
@@ -128,7 +135,7 @@ function Footer() {
               <li>
                 <Link
                   to="/faq"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   FAQs
                 </Link>
@@ -136,7 +143,7 @@ function Footer() {
               <li>
                 <Link
                   to="/payment-t-and-c"
-                  className="text-base text-black hover:text-pink-600 dark:text-white dark:hover:text-pink-400"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Payment T&C
                 </Link>
@@ -152,7 +159,7 @@ function Footer() {
             <ul className="mt-4 space-y-2">
               <li className="flex items-center">
                 <svg
-                  className="h-5 w-5 text-black mr-2"
+                  className="h-5 w-5 text-black dark:text-white mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -164,13 +171,31 @@ function Footer() {
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
-                <span className="text-black dark:text-white">
-                  info@FirstVite.com
+                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
+                  <a href="mailto:info@FirstVite.com">info@FirstVite.com</a>
                 </span>
               </li>
               <li className="flex items-center">
                 <svg
-                  className="h-12 w-12 text-black mr-2"
+                  className="h-5 w-5 text-black dark:text-white mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.12 3.37a1 1 0 01-.24 1.04l-2.06 2.06a16 16 0 006.59 6.59l2.06-2.06a1 1 0 011.04-.24l3.37 1.12a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.16 21 3 14.84 3 7V6a2 2 0 012-1z"
+                  />
+                </svg>
+                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
+                  <a href="tel:+919990056799">+91 9990056799</a>
+                </span>
+              </li>
+              <li className="flex items-center">
+                <svg
+                  className="h-12 w-12 text-black dark:text-white mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -188,8 +213,9 @@ function Footer() {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span className="text-black dark:text-white">
-                  H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301
+                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
+                  H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar
+                  Uttar Pradesh 201301
                 </span>
               </li>
             </ul>
@@ -203,7 +229,7 @@ function Footer() {
               &copy; {currentYear} FirstVite. All rights reserved.
             </p>
             <div className="flex items-center mt-4 md:mt-0">
-              <FaBook className="h-5 w-5 text-pink-500 mr-2" />
+              <FaBook className="h-5 w-5 text-blue-500 mr-2" />
               <span className="text-sm font-medium text-black dark:text-white">
                 Learn something new today
               </span>

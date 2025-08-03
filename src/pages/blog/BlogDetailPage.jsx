@@ -176,25 +176,29 @@ export default function BlogDetailPage() {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Header with back button and share */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <Button
-            type="text"
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate("/blog")}
-            className="flex items-center"
-          >
-            Back to Blog
-          </Button>
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Button
+              type="text"
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate("/blog")}
+              className="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              size="large"
+            >
+              Back to Blog
+            </Button>
 
-          <Button
-            type="text"
-            icon={<ShareAltOutlined />}
-            onClick={handleShare}
-            className="flex items-center"
-          >
-            Share
-          </Button>
+            <Button
+              type="primary"
+              icon={<ShareAltOutlined />}
+              onClick={handleShare}
+              className="flex items-center bg-blue-600 hover:bg-blue-700 border-none"
+              size="large"
+            >
+              Share Article
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -216,8 +220,8 @@ export default function BlogDetailPage() {
               )}
 
               {/* Article Header */}
-              <div className="p-6 sm:p-8 md:p-12">
-                <div className="flex flex-wrap gap-2 mb-4">
+              <div className="p-3 sm:p-6 md:p-12">
+                <div className="flex flex-wrap gap-2 mb-2">
                   {categories?.map((category) => (
                     <Link
                       key={category._id}
@@ -231,37 +235,37 @@ export default function BlogDetailPage() {
                   ))}
                 </div>
 
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3">
                   {title}
                 </h1>
 
-                <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mb-8">
-                  {/* <div className="flex items-center mr-6 mb-2 sm:mb-0">
+                <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <div className="flex items-center mr-6 mb-2 sm:mb-0">
                     <UserOutlined className="mr-1" />
                     <span>{author?.name || "FirstVITE"}</span>
-                  </div> */}
+                  </div>
                   <div className="flex items-center mr-6 mb-2 sm:mb-0">
                     <CalendarOutlined className="mr-1" />
                     <time dateTime={createdAt}>
                       {dayjs(createdAt).format("MMMM D, YYYY")}
                     </time>
                   </div>
-                  {/* <div className="flex items-center">
+                  <div className="flex items-center">
                     <ClockCircleOutlined className="mr-1" />
                     <span>{Math.ceil(readingTime || 5)} min read</span>
-                  </div> */}
+                  </div>
                 </div>
 
                 {excerpt && (
-                  <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 font-medium">
+                  <p className="text-xl text-gray-600 dark:text-gray-300 mb-3 font-medium">
                     {excerpt}
                   </p>
                 )}
               </div>
 
               {/* Article Content */}
-              <div className="px-6 sm:px-8 md:px-12 pb-12">
-                <div className="prose dark:prose-invert max-w-none markdown-body">
+              <div className="px-3 sm:px-6 md:px-12 pb-6">
+                <div className="text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeRaw]}
@@ -290,13 +294,13 @@ export default function BlogDetailPage() {
                       }) => {
                         const match = /language-(\w+)/.exec(className || "");
                         return !inline && match ? (
-                          <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto">
+                          <pre className="bg-white p-4 rounded-lg overflow-x-auto">
                             <code className={className} {...props}>
                               {children}
                             </code>
                           </pre>
                         ) : (
-                          <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm">
+                          <code className="bg-white px-1.5 py-0.5 rounded text-sm">
                             {children}
                           </code>
                         );
@@ -310,7 +314,7 @@ export default function BlogDetailPage() {
 
               {/* Tags */}
               {tags?.length > 0 && (
-                <div className="px-6 sm:px-8 md:px-12 pb-8">
+                <div className="px-3 sm:px-6 md:px-12 pb-6">
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
                     <div className="flex flex-wrap items-center gap-2">
                       <TagOutlined className="text-gray-500 mr-2" />
@@ -344,7 +348,7 @@ export default function BlogDetailPage() {
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={i}
-                      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
+                      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden p-3 sm:p-6 md:p-12"
                     >
                       <Skeleton.Image className="w-full h-48" />
                       <div className="p-6">
@@ -358,7 +362,7 @@ export default function BlogDetailPage() {
                   {relatedPosts.map((relatedPost) => (
                     <article
                       key={relatedPost._id}
-                      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 p-3 sm:p-6 md:p-12"
                     >
                       {relatedPost.featuredImage && (
                         <Link
@@ -434,9 +438,9 @@ export default function BlogDetailPage() {
               {author?.bio ||
                 "This author loves writing about technology, design, and web development."}
             </p>
-            <p className="text-sm text-gray-400">
+            {/* <p className="text-sm text-gray-400">
               Written by <strong>{author?.name || "Admin"}</strong>
-            </p>
+            </p> */}
           </div>
 
           {/* Share Button */}

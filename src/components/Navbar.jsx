@@ -11,6 +11,8 @@ import {
   FaSignInAlt,
   FaUserPlus,
   FaCreditCard,
+  FaCopy,
+  FaCheck,
 } from "react-icons/fa";
 import CourseMenu from "./CourseMenu";
 import { toast } from "react-hot-toast";
@@ -23,6 +25,22 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState(null);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowPaymentDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
@@ -575,13 +593,122 @@ function Navbar() {
               >
                 Agent Register
               </a>
-              <button
-                onClick={handlePaymentClick}
-                className="flex hidden lg:block md:block items-center flex-col px-2 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {/* <FaCreditCard className="mr-2" /> */}
-                Pay Now
-              </button>
+
+              {/* Payment Dropdown */}
+              <div className="relative hidden lg:block md:block">
+                <button
+                  className="flex items-center px-2 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                >
+                  Pay Now
+                  <svg
+                    className="w-4 h-4 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {showPaymentDropdown && (
+                  <div ref={dropdownRef} className="absolute right-0 z-10 w-64 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div className="px-3 py-2 border-b border-gray-100">
+                      <button
+                        onClick={handlePaymentClick}
+                        className="flex items-center justify-between w-full px-4 py-2.5 text-sm font-medium text-indigo-700 transition-colors bg-indigo-50 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                        role="menuitem"
+                      >
+                        <span>
+                          Pay Using <span className="text-orange-600">RazorPay</span>
+                        </span>
+                        <svg
+                          className="w-4 h-4 ml-2 text-indigo-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    {/* <div className="px-3 py-2 border-b border-gray-100">
+                      <button
+                        className="flex flex-col justify-between w-full px-4 py-2.5 text-sm font-medium text-indigo-700 transition-colors bg-indigo-50 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                        role="menuitem"
+                      >
+                        <span>Pay with QR Code</span>
+                        <img src="" alt="QR Code" className="w-12 h-12" />
+                      </button>
+                    </div> */}
+
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                    >
+                      <div className="space-y-2 p-4">
+                        <h3 className="font-medium text-blue-600 mb-3">
+                          Pay Using <span className="text-orange-600">Bank Transfer</span>
+                        </h3>
+                        <div className="space-y-2">
+                          {[
+                            {
+                              label: "Bank Name",
+                              value: "FirstVITE e learning Pvt Ltd.",
+                            },
+                            { label: "Account Number", value: "025305010216" },
+                            { label: "IFSC Code", value: "ICIC0000253" },
+                            { label: "Branch", value: "ICICI Bank" },
+                            { label: "Branch Name", value: "Noida Sector 61" },
+                          ].map((item, index) => (
+                            <div key={index} className="group relative">
+                              <div className="flex flex-col justify-between">
+                                <span className="text-sm font-medium text-black w-full">
+                                  {item.label}:
+                                </span>
+                                <div className="flex items-center">
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(item.value);
+                                      setCopiedIndex(index);
+                                      setTimeout(() => {
+                                        setCopiedIndex(null);
+                                      }, 2000);
+                                    }}
+                                    className="pe-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                    title={`Copy ${item.label}`}
+                                  >
+                                    {copiedIndex === index ? (
+                                      <FaCheck className="text-green-500" />
+                                    ) : (
+                                      <FaCopy />
+                                    )}
+                                  </button>
+                                  <span className="text-sm text-black font-mono">
+                                    {item.value}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* User menu */}
               {isAuthenticated ? (
