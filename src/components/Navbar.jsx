@@ -794,71 +794,92 @@ function Navbar() {
 
         {/* Mobile menu */}
         <div
-          style={{ maxWidth: "250px" }}
-          className={`mobile-menu-container md:hidden transition-all duration-300 ease-in-out transform ${
+          className={`mobile-menu-container md:hidden fixed inset-0 top-16 bg-white dark:bg-gray-900 shadow-lg z-40 overflow-y-auto transition-all duration-300 ease-in-out transform ${
             isMobileMenuOpen
-              ? "translate-y-0 opacity-100 visible"
-              : "-translate-y-full opacity-0 invisible"
-          } absolute left-0 right-0 top-16 bg-white dark:bg-gray-900 shadow-lg z-40 overflow-x-auto`}
+              ? "translate-x-0 opacity-100 visible"
+              : "-translate-x-full opacity-0 invisible"
+          }`}
         >
-          <div className="flex flex-col px-2 py-3 space-y-2 sm:px-3">
-            {/* Home */}
-            <Link
-              to="/"
-              className={`px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap ${
-                false
-                  ? "text-black dark:text-white hover:bg-orange-50 dark:hover:bg-orange-900/30"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-              }`}
-            >
-              Home
-            </Link>
+          <div className="flex flex-col h-full">
+            <div className="flex-1 px-4 py-3 space-y-1">
+              {/* Home */}
+              <Link
+                to="/"
+                className={`block px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
+                  location.pathname === "/"
+                    ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                }`}
+                onClick={toggleMobileMenu}
+              >
+                Home
+              </Link>
 
-            {/* Course Menu */}
-            <CourseMenu />
+              {/* Course Menu - Mobile Version */}
+              <div className="mobile-course-menu">
+                <CourseMenu isMobile={true} onItemClick={toggleMobileMenu} />
+              </div>
 
-            {navItems.map((item) => (
-              <div key={item.to} className="w-full">
+              {/* Other Navigation Items */}
+              {navItems.map((item) => (
                 <Link
+                  key={item.to}
                   to={item.to}
-                  className="block w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                  className={`block px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
+                    location.pathname === item.to
+                      ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                  }`}
                   onClick={toggleMobileMenu}
                 >
                   {item.label}
                 </Link>
-              </div>
-            ))}
-            <div className="w-full px-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-              <div className="w-full">
-                <Link
-                  to="/lms"
-                  className="block text-center w-full px-4 py-2 text-base font-medium rounded-md transition-colors duration-200 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
-                  onClick={toggleMobileMenu}
-                >
-                  Smart Board
-                </Link>
-              </div>
-              <div className="w-full mt-2">
-                <a
-                  href="https://genlead.in/agent/register"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-                  onClick={toggleMobileMenu}
-                >
-                  Agent Register
-                </a>
-              </div>
-              <div className="w-full mt-2">
+              ))}
+            </div>
+
+            {/* Bottom Action Buttons */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+              <Link
+                to="/lms"
+                className="flex items-center justify-center w-full px-4 py-2.5 text-base font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 transition-colors duration-200"
+                onClick={toggleMobileMenu}
+              >
+                Smart Board
+              </Link>
+              
+              <a
+                href="https://genlead.in/agent/register"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-full px-4 py-2.5 text-base font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
+                onClick={toggleMobileMenu}
+              >
+                Agent Register
+              </a>
+              
+              <button
+                onClick={() => {
+                  handlePaymentClick();
+                  toggleMobileMenu();
+                }}
+                className="flex items-center justify-center w-full px-4 py-2.5 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <FaCreditCard className="mr-2" />
+                Pay Now
+              </button>
+              
+              {/* Theme Toggle - Mobile */}
+              <div className="flex items-center justify-center pt-2">
                 <button
-                  onClick={() => {
-                    handlePaymentClick();
-                    toggleMobileMenu();
-                  }}
-                  className="flex items-center justify-center w-full px-4 py-2 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors duration-200"
+                  aria-label="Toggle theme"
                 >
-                  <FaCreditCard className="mr-2" />
-                  Pay Now
+                  {theme === "dark" ? (
+                    <FaSun className="w-5 h-5" />
+                  ) : (
+                    <FaMoon className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
