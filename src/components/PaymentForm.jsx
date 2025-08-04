@@ -170,13 +170,22 @@ const PaymentForm = ({ onClose }) => {
       order_id: orderData.id,
       handler: async function (response) {
         try {
-          // Verify payment on the server
-          const verifyResponse = await api.post("/payments/verify", {
+          // Prepare payment data with all required fields
+          const paymentData = {
             orderId: orderData.id,
             paymentId: response.razorpay_payment_id,
             signature: response.razorpay_signature,
-            ...formData,
-          });
+            name: formData.name,
+            email: formData.email,
+            phone: formData.countryCode + formData.phone,
+            course: formData.course,
+            paymentAmount: parseFloat(formData.paymentAmount),
+            address: "Not provided", // Default value for address
+            userId: localStorage.getItem('userId') || null // Get userId from localStorage if available
+          };
+
+          // Verify payment on the server
+          const verifyResponse = await api.post("/payments/verify", paymentData);
 
           if (verifyResponse.data.success) {
             toast.success("Payment successful!");
@@ -192,11 +201,12 @@ const PaymentForm = ({ onClose }) => {
               terms: false,
             });
           } else {
-            toast.error("Payment verification failed. Please contact support.");
+            toast.error(verifyResponse.data.message || "Payment verification failed. Please contact support.");
           }
         } catch (error) {
           console.error("Payment verification error:", error);
-          toast.error("Error verifying payment. Please contact support.");
+          const errorMessage = error.response?.data?.message || "Error verifying payment. Please contact support.";
+          toast.error(errorMessage);
         }
       },
       prefill: {
