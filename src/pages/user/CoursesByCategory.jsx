@@ -31,15 +31,27 @@ const CoursesByCategory = () => {
         setCategory(null);
 
         if (categoryName) {
-          console.log('Category name from URL:', categoryName);
-          // Decode the URL-encoded category name and replace hyphens with spaces
-          const decodedCategoryName = decodeURIComponent(categoryName.replace(/-/g, ' '));
-          console.log('Decoded category name:', decodedCategoryName);
+          console.log('Category slug from URL:', categoryName);
           
-          // Find the category by name (case insensitive and trim whitespace)
-          const categoryData = categoriesData.find(
-            (cat) => cat?.name?.trim().toLowerCase() === decodedCategoryName.trim().toLowerCase()
+          // First try to find by slug (exact match)
+          let categoryData = categoriesData.find(
+            (cat) => cat?.slug?.toLowerCase() === categoryName.toLowerCase()
           );
+          
+          // If not found by slug, try by name (with spaces replaced by hyphens)
+          if (!categoryData) {
+            categoryData = categoriesData.find(
+              (cat) => cat?.name?.toLowerCase().replace(/\s+/g, '-') === categoryName.toLowerCase()
+            );
+          }
+          
+          // If still not found, try by name (with spaces)
+          if (!categoryData) {
+            const decodedCategoryName = decodeURIComponent(categoryName.replace(/-/g, ' '));
+            categoryData = categoriesData.find(
+              (cat) => cat?.name?.trim().toLowerCase() === decodedCategoryName.trim().toLowerCase()
+            );
+          }
           
           console.log('Found category data:', categoryData);
           
