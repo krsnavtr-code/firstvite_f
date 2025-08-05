@@ -36,6 +36,7 @@ const PaymentForm = ({ onClose }) => {
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [coursePage, setCoursePage] = useState(1);
   const [hasMoreCourses, setHasMoreCourses] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Load Razorpay script and courses when component mounts
   useEffect(() => {
@@ -47,37 +48,30 @@ const PaymentForm = ({ onClose }) => {
       setIsRazorpayLoaded(success);
     });
 
-    // Only fetch if we don't have cached courses
-    if (courses.length > 0) {
-      setLoadingCourses(false);
-      return;
-    }
-
     const fetchCourses = async () => {
       try {
         setLoadingCourses(true);
         console.time('FetchCourses');
         
-        // Fetch minimal course data needed for the dropdown
-        const response = await api.get(`/courses?isPublished=true&limit=20&page=${coursePage}&fields=title,price`, {
-          timeout: 10000, // 10 seconds should be enough for minimal data
+        // Fetch all published courses with a high limit
+        const response = await api.get(`/courses?isPublished=true&limit=100&page=1&all=true&fields=title,price`, {
+          timeout: 15000, // Increased timeout for larger payload
         });
         
+        console.log('Courses API response:', response);
+        
         console.timeEnd('FetchCourses');
+        console.log('API Response:', response);
         
         let coursesData = [];
-        let totalCourses = 0;
         
         // Handle different response structures
         if (Array.isArray(response.data)) {
           coursesData = response.data;
-          totalCourses = response.data.length;
         } else if (Array.isArray(response.data?.data)) {
           coursesData = response.data.data;
-          totalCourses = response.data.total || response.data.data.length;
         } else if (Array.isArray(response.data?.courses)) {
           coursesData = response.data.courses;
-          totalCourses = response.data.total || response.data.courses.length;
         }
         
         if (coursesData.length === 0) {
@@ -85,6 +79,9 @@ const PaymentForm = ({ onClose }) => {
           toast.error('No courses available at the moment');
           return;
         }
+        
+        console.log('Courses data received:', coursesData); // Debug log
+        console.log('Total courses received:', coursesData.length); // Debug log
         
         // Cache the courses in sessionStorage
         sessionStorage.setItem('cachedCourses', JSON.stringify(coursesData));
@@ -98,7 +95,7 @@ const PaymentForm = ({ onClose }) => {
           return Array.from(courseMap.values());
         });
         
-        setHasMoreCourses(coursesData.length >= 20);
+        setHasMoreCourses(false); // No more pages to load since we're fetching all at once
       } catch (error) {
         console.error("Error fetching courses:", error);
         let errorMessage = 'Failed to load courses';
@@ -122,15 +119,8 @@ const PaymentForm = ({ onClose }) => {
       }
     };
 
-    // Check if we need to refresh the cache (older than 5 minutes)
-    const lastFetched = sessionStorage.getItem('coursesLastFetched');
-    const shouldRefresh = !lastFetched || (Date.now() - parseInt(lastFetched, 10)) > 5 * 60 * 1000;
-    
-    if (courses.length === 0 || shouldRefresh) {
-      fetchCourses();
-    } else {
-      setLoadingCourses(false);
-    }
+    // Always refresh courses on initial load
+    fetchCourses();
     
     // Cleanup function
     return () => {
@@ -329,7 +319,7 @@ const PaymentForm = ({ onClose }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="p-2 block w-full text-white rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -347,7 +337,7 @@ const PaymentForm = ({ onClose }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="p-2 block w-full text-white rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -393,11 +383,11 @@ const PaymentForm = ({ onClose }) => {
                     pattern="[0-9]{10}"
                     inputMode="numeric"
                     maxLength={10}
-                    className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-l-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none bg-gray-700 rounded-r-md border border-l-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
                     required
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-black mt-1">
                   Full number: {formData.countryCode} {formData.phone}
                 </p>
               </div>
@@ -421,7 +411,7 @@ const PaymentForm = ({ onClose }) => {
                     name="course"
                     value={formData.course}
                     onChange={handleCourseChange}
-                    className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-white"
+                    className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-white bg-gray-700"
                     required
                   >
                     <option value="">Select a course</option>
@@ -458,7 +448,7 @@ const PaymentForm = ({ onClose }) => {
                 min="0"
                 step="0.01"
                 placeholder="Enter amount"
-                className="p-2 block w-full text-white rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
