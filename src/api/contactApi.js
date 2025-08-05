@@ -343,6 +343,7 @@ const getContacts = async (options = {}) => {
     if (options.page) params.append('page', options.page.toString());
     if (options.limit) params.append('limit', options.limit.toString());
     if (options.date) params.append('date', options.date);
+    if (options.course) params.append('course', options.course);
 
     console.log('Making request to:', `/api/contacts?${params.toString()}`);
     

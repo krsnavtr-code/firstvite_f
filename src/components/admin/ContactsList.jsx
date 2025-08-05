@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getContacts, updateContactStatus } from "../../api/contactApi";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
+import { saveAs } from 'file-saver';
 
 const statusColors = {
   new: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
@@ -42,32 +43,122 @@ const ContactsList = () => {
   });
   const [filters, setFilters] = useState({
     status: "",
-    date: ""
+    date: "",
+    course: ""
   });
+  
+  const handleExport = async () => {
+    try {
+      // Get all contacts with current filters
+      const response = await getContacts({
+        ...(filters.status && { status: filters.status }),
+        ...(filters.date && { date: filters.date }),
+        ...(filters.course && { course: filters.course }),
+        limit: 1000 // Get more records for export
+      });
 
-  const fetchContacts = async () => {
+      if (response.success && response.data?.length > 0) {
+        // Convert data to CSV format
+        const headers = [
+          'S.No',
+          'Name',
+          'Email',
+          'Phone',
+          'Course',
+          'Message',
+          'Status',
+          'Submitted Date',
+          'Submitted Time'
+        ];
+
+        const csvRows = [];
+        
+        // Add headers
+        csvRows.push(headers.join(','));
+        
+        // Add data rows
+        response.data.forEach((contact, index) => {
+          // Format phone number to prevent Excel from interpreting it as a formula
+          const formatPhoneNumber = (phone) => {
+            if (!phone) return '';
+            // If the number starts with +, prefix with ' to force text format in Excel
+            return phone.startsWith('+') ? `'${phone}` : phone;
+          };
+
+          const row = [
+            index + 1,
+            `"${contact.name.replace(/"/g, '""')}"`,
+            `"${contact.email}"`,
+            `"${formatPhoneNumber(contact.phone)}"`,
+            `"${contact.courseTitle || ''}"`,
+            `"${(contact.message || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+            `"${contact.status.replace('_', ' ')}"`,
+            `"${format(new Date(contact.submittedAt || contact.createdAt), 'MMM d, yyyy')}"`,
+            `"${format(new Date(contact.submittedAt || contact.createdAt), 'h:mm a')}"`
+          ];
+          csvRows.push(row.join(','));
+        });
+
+        // Create CSV file
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const fileName = `contacts_export_${format(new Date(), 'yyyyMMdd_HHmmss')}.csv`;
+        
+        // Download the file
+        saveAs(blob, fileName);
+        toast.success('Export completed successfully');
+      } else {
+        toast.warning('No data available to export');
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export contacts');
+    }
+  };
+
+  const fetchContacts = async (exportMode = false) => {
     if (!isAuthenticated) {
       setLoading(false);
-      return;
+      return { success: false };
     }
 
     try {
-      setLoading(true);
+      if (!exportMode) {
+        setLoading(true);
+      }
+      
       const params = {
-        page: pagination.page,
-        limit: pagination.limit,
+        page: exportMode ? 1 : pagination.page,
+        limit: exportMode ? 1000 : pagination.limit, // Get more records for export
         ...(filters.status && { status: filters.status }),
         ...(filters.date && { date: filters.date }),
+        ...(filters.course && { course: filters.course }), // Add course filter
       };
       
       console.log('Fetching contacts with filters:', {
         status: filters.status,
         date: filters.date,
+        course: filters.course,
         page: pagination.page,
-        limit: pagination.limit
+        limit: pagination.limit,
+        params: params // Log the actual params being sent
       });
 
       const response = await getContacts(params);
+      console.log('API Response:', {
+        success: response.success,
+        dataLength: response.data?.length,
+        filtersApplied: {
+          status: filters.status,
+          date: filters.date,
+          course: filters.course
+        },
+        responseData: response.data?.map(c => ({
+          id: c._id,
+          courseTitle: c.courseTitle,
+          status: c.status
+        }))
+      });
 
       if (response.success) {
         setContacts(response.data || []);
@@ -177,9 +268,20 @@ const ContactsList = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-          Contact Submissions
-        </h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+            Contact Submissions
+          </h2>
+          <button
+            onClick={handleExport}
+            className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Export
+          </button>
+        </div>
 
         {/* Filter By Status */}
         <div className="w-full sm:w-auto flex gap-2">
@@ -189,12 +291,29 @@ const ContactsList = () => {
               setFilters({ ...filters, status: e.target.value });
               setPagination((prev) => ({ ...prev, page: 1 }));
             }}
-            className="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+            className="block w-full px-2 py-1 sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
           >
             <option value="">All Status</option>
             {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option key={`status-${option.value}`} value={option.value}>
                 {option.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Filter By Course */}
+          <select
+            value={filters.course}
+            onChange={(e) => {
+              setFilters({ ...filters, course: e.target.value });
+              setPagination((prev) => ({ ...prev, page: 1 }));
+            }}
+            className="block w-full px-2 py-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+          >
+            <option value="">All Courses</option>
+            {Array.from(new Set(contacts.map(contact => contact.courseTitle).filter(Boolean))).map((course, index) => (
+              <option key={`course-${index}`} value={course}>
+                {course}
               </option>
             ))}
           </select>
@@ -209,7 +328,7 @@ const ContactsList = () => {
               setFilters({ ...filters, date: e.target.value });
               setPagination((prev) => ({ ...prev, page: 1 }));
             }}
-            className="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+            className="block w-full px-2 py-1 sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
           />
           {filters.date && (
             <button
