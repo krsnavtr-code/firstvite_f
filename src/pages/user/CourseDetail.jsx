@@ -53,7 +53,7 @@ const CourseDetail = () => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
-  
+  const [showCertificate, setShowCertificate] = useState(false);
 
   // Initialize expanded sections when course data is loaded
   useEffect(() => {
@@ -308,23 +308,23 @@ const CourseDetail = () => {
         setShowContactForm(false);
 
         // Trigger brochure download
-        console.log('Checking for brochure download...');
-        console.log('Course brochure URL:', course.brochureUrl);
-        
+        console.log("Checking for brochure download...");
+        console.log("Course brochure URL:", course.brochureUrl);
+
         if (course.brochureUrl) {
-          console.log('Brochure URL found, initiating download...');
+          console.log("Brochure URL found, initiating download...");
           // Give the browser a moment to process the form submission
           setTimeout(() => {
             try {
               downloadBrochure();
             } catch (error) {
-              console.error('Error in brochure download:', error);
+              console.error("Error in brochure download:", error);
             }
           }, 1000);
         } else {
-          console.log('No brochure URL found for this course');
+          console.log("No brochure URL found for this course");
         }
-        
+
         // Close the form
         setShowContactForm(false);
       } else {
@@ -408,51 +408,63 @@ const CourseDetail = () => {
   const downloadBrochure = async () => {
     try {
       if (!course?._id) {
-        toast.error('Course information is not available');
+        toast.error("Course information is not available");
         return;
       }
 
       // Show loading state
-      const toastId = toast.loading('Preparing brochure download...');
-      
+      const toastId = toast.loading("Preparing brochure download...");
+
       try {
         // Make API call to download brochure (no auth required)
-        const response = await axios.get(`/api/courses/${course._id}/download-brochure`, {
-          responseType: 'blob' // Important for file downloads
-        });
+        const response = await axios.get(
+          `/api/courses/${course._id}/download-brochure`,
+          {
+            responseType: "blob", // Important for file downloads
+          }
+        );
 
         // Create a blob from the response
         const url = window.URL.createObjectURL(new Blob([response.data]));
-        
+
         // Create a temporary anchor element
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', `Brochure-${course.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.pdf`);
-        
+        link.setAttribute(
+          "download",
+          `Brochure-${course.title
+            .replace(/[^a-z0-9]/gi, "-")
+            .toLowerCase()}.pdf`
+        );
+
         // Append to body, click and remove
         document.body.appendChild(link);
         link.click();
-        
+
         // Cleanup
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
-        
-        toast.success('Brochure download started', { id: toastId });
+
+        toast.success("Brochure download started", { id: toastId });
       } catch (error) {
-        console.error('Error downloading brochure:', error);
-        
+        console.error("Error downloading brochure:", error);
+
         // Handle specific error cases
         if (error.response?.status === 404) {
-          toast.error('Brochure not available for this course', { id: toastId });
+          toast.error("Brochure not available for this course", {
+            id: toastId,
+          });
         } else if (error.response?.data?.message) {
           toast.error(error.response.data.message, { id: toastId });
         } else {
-          toast.error('Failed to download brochure. Please try again.', { id: toastId });
+          toast.error("Failed to download brochure. Please try again.", {
+            id: toastId,
+          });
         }
       }
     } catch (error) {
-      console.error('Error in downloadBrochure:', error);
-      toast.error('An unexpected error occurred. Please try again later.');
+      console.error("Error in downloadBrochure:", error);
+      toast.error("An unexpected error occurred. Please try again later.");
     }
   };
 
@@ -489,6 +501,111 @@ const CourseDetail = () => {
   };
 
   const rating = course.rating || 4;
+
+  const CertificateModal = ({ isOpen, onClose }) => {
+    // Prevent right-click context menu
+    useEffect(() => {
+      const handleContextMenu = (e) => {
+        if (isOpen) {
+          e.preventDefault();
+        }
+      };
+
+      document.addEventListener("contextmenu", handleContextMenu);
+      return () => {
+        document.removeEventListener("contextmenu", handleContextMenu);
+      };
+    }, [isOpen]);
+
+    if (!isOpen) return null;
+
+    return (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-[550px] w-full max-h-[550px] overflow-auto relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white z-20"
+          >
+            <FaTimes className="text-2xl" />
+          </button>
+          <div className="p-6 relative">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Simple Certificate
+            </h3>
+            {/* Image Container with Protection */}
+            <div className="relative">
+              <div
+                className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 z-10 pointer-events-none"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px)",
+                  mixBlendMode: "multiply",
+                }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <div className="text-2xl font-bold text-gray-400 opacity-30 transform -rotate-45 select-none">
+                  SAMPLE CERTIFICATE
+                </div>
+              </div>
+              <div className="relative">
+                {/* This is a decoy element that will appear in dev tools */}
+                <div
+                  className="hidden"
+                  data-decoysrc="ignore-this-decoysrc"
+                  style={{ display: "none" }}
+                >
+                  <img
+                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                    alt=""
+                  />
+                </div>
+
+                {/* Actual image with obfuscated attributes */}
+                <div
+                  className="certificate-image-container"
+                  style={{
+                    backgroundImage:
+                      "url('http://firstvite.com/api/upload/file/img-1754374737042-580116956.jpg')",
+                    backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                    width: "100%",
+                    aspectRatio: "4/3",
+                    filter: "blur(1px)",
+                    WebkitUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    userSelect: "none",
+                    pointerEvents: "none",
+                    WebkitTouchCallout: "none",
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
+                />
+
+                {/* Add some noise to make screenshotting harder */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background:
+                      "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E\")",
+                    pointerEvents: "none",
+                    mixBlendMode: "overlay",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
@@ -678,7 +795,10 @@ const CourseDetail = () => {
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
 
                 <div className="flex items-center text-sm group relative">
-                  <div className="flex items-center">
+                  <div
+                    className="flex items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-1 rounded-lg transition-colors"
+                    onClick={() => setShowCertificate(true)}
+                  >
                     <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">
                       <FaCertificate className="w-4 h-4" />
                     </div>
@@ -691,12 +811,12 @@ const CourseDetail = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="hidden group-hover:block absolute left-0 -top-40 w-64 bg-white dark:bg-slate-800 shadow-xl rounded-lg p-2 z-10 border border-gray-200 dark:border-gray-700">
+                  {/* <div className="hidden group-hover:block absolute left-0 -top-40 w-64 bg-white dark:bg-slate-800 shadow-xl rounded-lg p-2 z-10 border border-gray-200 dark:border-gray-700">
                     <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Sample Certificate
                     </p>
                     <img
-                      src="http://firstvite.com/api/upload/file/img-1754049281541-71023912.png"
+                      src="http://firstvite.com/api/upload/file/img-1754374737042-580116956.jpg"
                       alt="Course Certificate Sample"
                       className="w-full h-auto rounded border border-gray-200 dark:border-gray-700"
                       onError={(e) => {
@@ -704,7 +824,7 @@ const CourseDetail = () => {
                         e.target.src = "/placeholder-certificate.jpg";
                       }}
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 {course.language && (
@@ -1317,40 +1437,6 @@ const CourseDetail = () => {
         </div>
       </div>
 
-      {/* Certificate Preview Section */}
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-0">Certificate Preview</h2>
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
-          <div className="p-4 border-b border-gray-100 dark:border-slate-700">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Course Completion Certificate
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              This is a sample of the certificate you'll receive upon course completion
-            </p>
-          </div>
-          <div className="relative w-full overflow-hidden bg-gray-50 dark:bg-slate-900">
-            <div className="relative pt-[70%] sm:pt-[56.25%] md:pt-[50%] lg:pt-[40%] xl:pt-[35%]">
-              <img
-                src="http://firstvite.com/api/upload/file/img-1754049281541-71023912.png"
-                alt="Course Certificate Sample"
-                className="absolute top-0 left-0 w-full h-full object-contain p-4 md:p-8"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/placeholder-certificate.jpg';
-                  e.target.className = 'absolute top-0 left-0 w-full h-full object-cover p-4 md:p-8 opacity-80';
-                }}
-              />
-            </div>
-          </div>
-          <div className="p-4 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-700">
-            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-              The actual certificate will include your name, course details, and completion date
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Checkout Options Modal */}
       <AnimatePresence>
         {showCheckoutOptions && (
@@ -1641,6 +1727,12 @@ const CourseDetail = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* Certificate Modal */}
+      <CertificateModal
+        isOpen={showCertificate}
+        onClose={() => setShowCertificate(false)}
+      />
     </div>
   );
 };
