@@ -41,7 +41,26 @@ const ContactsList = () => {
   });
   const [filters, setFilters] = useState({
     status: "",
+    course: "",
   });
+  const [courses, setCourses] = useState([]);
+
+  // Fetch available courses for the filter
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch('/api/courses');
+        if (response.ok) {
+          const data = await response.json();
+          setCourses(data.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const fetchContacts = async () => {
     if (!isAuthenticated) {
@@ -55,6 +74,7 @@ const ContactsList = () => {
         page: pagination.page,
         limit: pagination.limit,
         ...(filters.status && { status: filters.status }),
+        ...(filters.course && { courseId: filters.course }),
       };
 
       const response = await getContacts(params);
@@ -153,6 +173,8 @@ const ContactsList = () => {
         <h2 className="text-lg font-medium text-gray-900 dark:text-white">
           Contact Submissions
         </h2>
+
+        {/* Filter By Status */}
         <div className="w-full sm:w-auto flex gap-2">
           <select
             value={filters.status}
@@ -170,6 +192,27 @@ const ContactsList = () => {
             ))}
           </select>
         </div>
+
+        {/* Filter By Course */}
+        <div className="w-full sm:w-auto flex gap-2">
+          <select
+            value={filters.course}
+            onChange={(e) => {
+              setFilters({ ...filters, course: e.target.value });
+              setPagination((prev) => ({ ...prev, page: 1 }));
+            }}
+            className="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+          >
+            <option value="">All Courses</option>
+            {courses.map((course) => (
+              <option key={course._id} value={course._id}>
+                {course.title}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+
       </div>
 
       <div className="overflow-x-auto">
@@ -197,29 +240,29 @@ const ContactsList = () => {
                   <div className="grid grid-cols-12 gap-4 px-6 py-4">
                     <div className="col-span-12 sm:col-span-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        Name: {contact.name}
+                        <span className="text-blue-600">Name:</span> {contact.name}
                       </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        Email: {contact.email}
+                      <div className="text-sm text-gray-900 dark:text-gray-400">
+                        <span className="text-blue-600">Email:</span> {contact.email}
                       </div>
                       {contact.phone && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          Number: {contact.phone}
+                        <div className="text-sm text-gray-900 dark:text-gray-400">
+                          <span className="text-blue-600">Number:</span> {contact.phone}
                         </div>
                       )}
                       {contact.message && (
-                        <div className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                          Message: {contact.message}
+                        <div className="mt-2 text-sm text-gray-900 dark:text-gray-300 line-clamp-2">
+                          <span className="text-blue-600">Message:</span> {contact.message}
                         </div>
                       )}
                     </div>
 
                     <div className="col-span-12 text-black sm:col-span-4">
-                      {contact.courseTitle}
+                      <span className="text-blue-600">Course Name:</span> {contact.courseTitle}
                     </div>
 
                     <div className="col-span-6 sm:col-span-2">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-sm text-gray-900 dark:text-gray-400">
                         {format(
                           new Date(contact.submittedAt || contact.createdAt),
                           "MMM d, yyyy"
