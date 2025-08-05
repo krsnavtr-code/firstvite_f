@@ -36,31 +36,14 @@ const ContactsList = () => {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 15,
     total: 0,
+    totalPages: 1
   });
   const [filters, setFilters] = useState({
     status: "",
-    course: "",
+    date: ""
   });
-  const [courses, setCourses] = useState([]);
-
-  // Fetch available courses for the filter
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch('/api/courses');
-        if (response.ok) {
-          const data = await response.json();
-          setCourses(data.data || []);
-        }
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-      }
-    };
-
-    fetchCourses();
-  }, []);
 
   const fetchContacts = async () => {
     if (!isAuthenticated) {
@@ -74,17 +57,41 @@ const ContactsList = () => {
         page: pagination.page,
         limit: pagination.limit,
         ...(filters.status && { status: filters.status }),
-        ...(filters.course && { courseId: filters.course }),
+        ...(filters.date && { date: filters.date }),
       };
+      
+      console.log('Fetching contacts with filters:', {
+        status: filters.status,
+        date: filters.date,
+        page: pagination.page,
+        limit: pagination.limit
+      });
 
       const response = await getContacts(params);
 
       if (response.success) {
         setContacts(response.data || []);
-        setPagination((prev) => ({
+        
+        // Calculate pagination values
+        const totalItems = response.meta?.total || response.meta?.totalItems || response.data?.length || 0;
+        const itemsPerPage = response.meta?.limit || pagination.limit;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+        const currentPage = response.meta?.currentPage || response.meta?.page || pagination.page;
+        
+        console.log('Updating pagination state:', {
+          total: totalItems,
+          totalPages,
+          currentPage,
+          limit: itemsPerPage
+        });
+        
+        // Update pagination state with calculated values
+        setPagination(prev => ({
           ...prev,
-          total: (response.meta?.totalPages || 1) * pagination.limit,
-          currentPage: response.meta?.currentPage || 1,
+          total: totalItems,
+          totalPages: totalPages,
+          page: currentPage,
+          limit: itemsPerPage
         }));
       } else {
         // Handle API error response
@@ -193,125 +200,183 @@ const ContactsList = () => {
           </select>
         </div>
 
-        {/* Filter By Course */}
+        {/* Filter By Date */}
         <div className="w-full sm:w-auto flex gap-2">
-          <select
-            value={filters.course}
+          <input
+            type="date"
+            value={filters.date || ""}
             onChange={(e) => {
-              setFilters({ ...filters, course: e.target.value });
+              setFilters({ ...filters, date: e.target.value });
               setPagination((prev) => ({ ...prev, page: 1 }));
             }}
-            className="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
-          >
-            <option value="">All Courses</option>
-            {courses.map((course) => (
-              <option key={course._id} value={course._id}>
-                {course.title}
-              </option>
-            ))}
-          </select>
+            className="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+          />
+          {filters.date && (
+            <button
+              onClick={() => setFilters({ ...filters, date: "" })}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              title="Clear date filter"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
         </div>
-        
-
       </div>
 
       <div className="overflow-x-auto">
-        <div className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <div className="bg-gray-50 dark:bg-gray-700">
-            <div className="grid grid-cols-12 gap-4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              <div className="col-span-12 sm:col-span-4">Contact Info</div>
-              <div className="col-span-12 sm:col-span-4">Courses</div>
-              <div className="col-span-6 sm:col-span-2">Submitted</div>
-              <div className="col-span-6 sm:col-span-2">Status</div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                S.No
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Contact Info
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Courses
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Submitted
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {contacts.length === 0 ? (
-              <div className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                No contact submissions found
-              </div>
+              <tr>
+                <td
+                  colSpan="5"
+                  className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+                >
+                  No contact submissions found
+                </td>
+              </tr>
             ) : (
-              contacts.map((contact) => (
-                <div
+              contacts.map((contact, index) => (
+                <tr
                   key={contact._id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <div className="grid grid-cols-12 gap-4 px-6 py-4">
-                    <div className="col-span-12 sm:col-span-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        <span className="text-blue-600">Name:</span> {contact.name}
+                  <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                    {/* Incress number with pagination */}
+                    {index + 1 + (pagination.page - 1) * pagination.limit}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                    <div>
+                      <span className="text-blue-600">Name:</span>{" "}
+                      {contact.name}
+                    </div>
+                    <div>
+                      <span className="text-blue-600">Email:</span>{" "}
+                      {contact.email}
+                    </div>
+                    {contact.phone && (
+                      <div>
+                        <span className="text-blue-600">Number:</span>{" "}
+                        {contact.phone}
                       </div>
-                      <div className="text-sm text-gray-900 dark:text-gray-400">
-                        <span className="text-blue-600">Email:</span> {contact.email}
+                    )}
+                    {contact.message && (
+                      <div className="mt-2 line-clamp-2">
+                        <span className="text-blue-600">Message:</span>{" "}
+                        {contact.message}
                       </div>
-                      {contact.phone && (
-                        <div className="text-sm text-gray-900 dark:text-gray-400">
-                          <span className="text-blue-600">Number:</span> {contact.phone}
-                        </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-black dark:text-white">
+                    <span className="text-blue-600">Course Name:</span>{" "}
+                    {contact.courseTitle}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-400">
+                    <div>
+                      {format(
+                        new Date(contact.submittedAt || contact.createdAt),
+                        "MMM d, yyyy"
                       )}
-                      {contact.message && (
-                        <div className="mt-2 text-sm text-gray-900 dark:text-gray-300 line-clamp-2">
-                          <span className="text-blue-600">Message:</span> {contact.message}
-                        </div>
+                    </div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500">
+                      {format(
+                        new Date(contact.submittedAt || contact.createdAt),
+                        "h:mm a"
                       )}
                     </div>
-
-                    <div className="col-span-12 text-black sm:col-span-4">
-                      <span className="text-blue-600">Course Name:</span> {contact.courseTitle}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-400">
+                    <div className="flex flex-col gap-2">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          statusColors[contact.status]
+                        }`}
+                      >
+                        {contact.status.replace("_", " ")}
+                      </span>
+                      <select
+                        value={contact.status}
+                        onChange={(e) =>
+                          handleStatusChange(contact._id, e.target.value)
+                        }
+                        className={`block w-full sm:w-32 text-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                          statusColors[contact.status]
+                        }`}
+                      >
+                        {statusOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-
-                    <div className="col-span-6 sm:col-span-2">
-                      <div className="text-sm text-gray-900 dark:text-gray-400">
-                        {format(
-                          new Date(contact.submittedAt || contact.createdAt),
-                          "MMM d, yyyy"
-                        )}
-                      </div>
-                      <div className="text-xs text-gray-400 dark:text-gray-500">
-                        {format(
-                          new Date(contact.submittedAt || contact.createdAt),
-                          "h:mm a"
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="col-span-6 sm:col-span-2">
-                      <div className="flex flex-col gap-2">
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            statusColors[contact.status]
-                          }`}
-                        >
-                          {contact.status.replace("_", " ")}
-                        </span>
-                        <select
-                          value={contact.status}
-                          onChange={(e) =>
-                            handleStatusChange(contact._id, e.target.value)
-                          }
-                          className={`block w-full sm:w-32 text-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                            statusColors[contact.status]
-                          }`}
-                        >
-                          {statusOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  </td>
+                </tr>
               ))
             )}
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
 
+      {/* Debug Info - Commented out for production
+      <div className="bg-yellow-50 p-2 mb-4 rounded text-xs text-gray-700">
+        <p>Debug Info:</p>
+        <p>Total Items: {pagination.total}</p>
+        <p>Items per Page: {pagination.limit}</p>
+        <p>Total Pages: {pagination.totalPages}</p>
+        <p>Current Page: {pagination.page}</p>
+        <p>Show Pagination: {pagination.total > pagination.limit ? 'Yes' : 'No'}</p>
+      </div>
+      */}
+
       {/* Pagination */}
-      {pagination.total > pagination.limit && (
+      <div className="bg-white dark:bg-gray-800 px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+      {pagination.total > 0 && (
         <div className="bg-white dark:bg-gray-800 px-6 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
@@ -337,83 +402,111 @@ const ContactsList = () => {
             </button>
           </div>
 
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                Showing{" "}
-                <span className="font-medium">
-                  {(pagination.page - 1) * pagination.limit + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium">
-                  {Math.min(
-                    pagination.page * pagination.limit,
-                    pagination.total
-                  )}
-                </span>{" "}
-                of <span className="font-medium">{pagination.total}</span>{" "}
-                results
-              </p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
+              Showing{" "}
+              <span className="font-medium">
+                {pagination.total === 0
+                  ? 0
+                  : (pagination.page - 1) * pagination.limit + 1}
+              </span>{" "}
+              to{" "}
+              <span className="font-medium">
+                {Math.min(pagination.page * pagination.limit, pagination.total)}
+              </span>{" "}
+              of <span className="font-medium">{pagination.total}</span>{" "}
+              {pagination.total === 1 ? "entry" : "entries"}
             </div>
-            <div>
-              <nav
-                className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                aria-label="Pagination"
-              >
+
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center space-x-2">
                 <button
-                  onClick={() =>
-                    setPagination((prev) => ({
-                      ...prev,
-                      page: Math.max(1, prev.page - 1),
-                    }))
-                  }
+                  onClick={() => {
+                    const newPage = Math.max(1, pagination.page - 1);
+                    setPagination((prev) => ({ ...prev, page: newPage }));
+                  }}
                   disabled={pagination.page === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
-                  <span className="sr-only">Previous</span>
-                  <svg
-                    className="h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  Previous
                 </button>
+
+                <div className="flex items-center space-x-1">
+                  {Array.from(
+                    { length: Math.min(5, pagination.totalPages) },
+                    (_, i) => {
+                      let pageNum;
+                      if (pagination.totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (pagination.page <= 3) {
+                        pageNum = i + 1;
+                      } else if (pagination.page >= pagination.totalPages - 2) {
+                        pageNum = pagination.totalPages - 4 + i;
+                      } else {
+                        pageNum = pagination.page - 2 + i;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() =>
+                            setPagination((prev) => ({
+                              ...prev,
+                              page: pageNum,
+                            }))
+                          }
+                          className={`min-w-[32px] h-8 flex items-center justify-center rounded-md ${
+                            pagination.page === pageNum
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+                          } text-sm font-medium`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    }
+                  )}
+
+                  {pagination.totalPages > 5 &&
+                    pagination.page < pagination.totalPages - 2 && (
+                      <span className="px-2 text-gray-500">...</span>
+                    )}
+
+                  {pagination.totalPages > 5 &&
+                    pagination.page < pagination.totalPages - 2 && (
+                      <button
+                        onClick={() =>
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: pagination.totalPages,
+                          }))
+                        }
+                        className="min-w-[32px] h-8 flex items-center justify-center rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 text-sm font-medium"
+                      >
+                        {pagination.totalPages}
+                      </button>
+                    )}
+                </div>
+
                 <button
-                  onClick={() =>
-                    setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
-                  }
-                  disabled={
-                    pagination.page * pagination.limit >= pagination.total
-                  }
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    const newPage = Math.min(
+                      pagination.page + 1,
+                      pagination.totalPages
+                    );
+                    setPagination((prev) => ({ ...prev, page: newPage }));
+                  }}
+                  disabled={pagination.page >= pagination.totalPages}
+                  className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
-                  <span className="sr-only">Next</span>
-                  <svg
-                    className="h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  Next
                 </button>
-              </nav>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

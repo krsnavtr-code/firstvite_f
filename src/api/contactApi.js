@@ -322,6 +322,19 @@ const getContacts = async (options = {}) => {
       };
     }
 
+    // Get token from localStorage
+    const authToken = localStorage.getItem('token');
+    if (!authToken) {
+      console.error('No authentication token found');
+      return {
+        success: false,
+        message: 'Authentication required. Please log in again.',
+        shouldLogout: true,
+        data: [],
+        meta: {}
+      };
+    }
+
     // Build query parameters
     const params = new URLSearchParams();
     if (options.status) params.append('status', options.status);
@@ -329,9 +342,16 @@ const getContacts = async (options = {}) => {
     if (options.sort) params.append('sort', options.sort);
     if (options.page) params.append('page', options.page.toString());
     if (options.limit) params.append('limit', options.limit.toString());
+    if (options.date) params.append('date', options.date);
 
     console.log('Making request to:', `/api/contacts?${params.toString()}`);
-    const response = await api.get(`/api/contacts?${params.toString()}`);
+    
+    const response = await api.get(`/api/contacts?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
     
     return {
       success: true,

@@ -1007,7 +1007,7 @@ const CourseDetail = () => {
 
       {/* Course Tabs */}
       <div className="container mx-auto px-4 py-8">
-        <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
+        <div className="border-b border-gray-200 dark:border-gray-700 mb-8 sticky top-16 z-10 bg-white dark:bg-slate-900">
           <nav className="flex flex-wrap -mb-px whitespace-nowrap space-x-1">
             <button
               onClick={() => setActiveTab("overview")}
