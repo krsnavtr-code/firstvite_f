@@ -307,7 +307,7 @@ const AdminDashboard = () => {
               <h3 className="text-gray-500 text-sm font-medium">
                 Total Revenue
               </h3>
-              <p className="text-2xl font-semibold text-gray-800">$12,345</p>
+              <p className="text-2xl font-semibold text-gray-800">₹ 12,345</p>
             </div>
           </div>
         </div>

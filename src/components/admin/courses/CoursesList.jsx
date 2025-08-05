@@ -361,7 +361,7 @@ const CoursesList = () => {
                           {course.instructor}
                         </td> */}
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          ${course.price?.toFixed(2) || '0.00'}
+                          ₹ {course.price?.toFixed(2) || '0.00'}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
                           <span

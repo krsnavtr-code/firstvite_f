@@ -16,13 +16,17 @@ const api = axios.create({
 // Request interceptor for adding auth token and logging
 api.interceptors.request.use(
   (config) => {
+    console.log('LocalStorage token:', localStorage.getItem('token')); // Debug log
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('Setting Authorization header with token:', token.substring(0, 10) + '...'); // Log first 10 chars
+    } else {
+      console.warn('No token found in localStorage');
     }
     
     // Log request details in development
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV || true) { // Force logging in all environments for now
       console.log(`[${config.method?.toUpperCase()}] ${config.url}`, {
         data: config.data,
         params: config.params,
@@ -71,9 +75,15 @@ api.interceptors.response.use(
       
       // Handle common error statuses
       if (status === 401) {
-        // Unauthorized - redirect to login
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        // For contacts API, we'll handle 401 in the component
+        if (!error.config.url.includes('/contacts')) {
+          // Only redirect for non-contacts API calls
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+          }
+        } else {
+          errorResponse.shouldLogout = true;
+          errorResponse.message = 'Your session has expired. Please log in again.';
         }
       } else if (status === 403) {
         // Forbidden - show access denied
@@ -263,7 +273,7 @@ const submitContactForm = async (formData) => {
 const updateContactStatus = async (id, status, token) => {
   try {
     const response = await api.patch(
-      `/contacts/${id}/status`,
+      `/api/contacts/${id}/status`,
       { status },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -320,7 +330,8 @@ const getContacts = async (options = {}) => {
     if (options.page) params.append('page', options.page.toString());
     if (options.limit) params.append('limit', options.limit.toString());
 
-    const response = await api.get(`/contacts?${params.toString()}`);
+    console.log('Making request to:', `/api/contacts?${params.toString()}`);
+    const response = await api.get(`/api/contacts?${params.toString()}`);
     
     return {
       success: true,
