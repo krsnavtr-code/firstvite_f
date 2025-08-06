@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo } from "react";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 const AdminLayout = () => {
@@ -21,9 +21,22 @@ const AdminLayout = () => {
     );
   }
 
-  // Since we're already wrapped in PrivateRoute with allowedRoles=['admin'],
-  // we can assume the user is an admin at this point
-  if (!currentUser || !isAuthenticated) {
+  // Check if user has any admin role
+  const hasAdminAccess = useMemo(() => {
+    return currentUser && ['superChildAdmin', 'admin', 'childAdmin'].includes(currentUser.role);
+  }, [currentUser]);
+
+  const location = useLocation();
+
+  // Redirect to unauthorized if user doesn't have admin access
+  useEffect(() => {
+    if (!loading && (!currentUser || !hasAdminAccess)) {
+      console.log('AdminLayout - Redirecting to unauthorized');
+      navigate('/unauthorized');
+    }
+  }, [currentUser, hasAdminAccess, loading, navigate]);
+
+  if (!currentUser || !isAuthenticated || !hasAdminAccess) {
     console.log("AdminLayout - No user or not authenticated");
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -49,14 +62,21 @@ const AdminLayout = () => {
         {/* Sidebar */}
         <div className="pb-8 bg-indigo-800 text-white w-64 flex-shrink-0 flex flex-col h-screen">
           <div className="p-4 flex-shrink-0">
-            <h1 className="text-2xl font-bold text-indigo-100">Admin Panel</h1>
+            <h1 className="text-2xl font-bold text-indigo-100">
+            {currentUser.role === 'superChildAdmin' ? 'Super Child Admin' : 
+             currentUser.role === 'admin' ? 'Admin' : 'Child Admin'} Panel
+          </h1>
             <p className="text-indigo-200 text-sm">
-              Welcome, {currentUser?.fullname || "Admin"}
+              Welcome, {currentUser?.fullname || "Admin"} 
+              <span className="ml-2 px-2 py-0.5 bg-indigo-600 rounded text-xs">
+                {currentUser.role}
+              </span>
             </p>
           </div>
 
           <nav className="flex-1 overflow-y-auto">
             <div>
+              {/* Dashboard - Accessible to all admin roles */}
               <Link
                 to="/admin/dashboard"
                 className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
@@ -73,10 +93,12 @@ const AdminLayout = () => {
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  ></path>
+                  />
                 </svg>
                 Dashboard
               </Link>
+
+              {/* Courses - Accessible to all admin roles */}
               <Link
                 to="/admin/courses"
                 className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
@@ -93,10 +115,64 @@ const AdminLayout = () => {
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  ></path>
+                  />
                 </svg>
                 Courses
               </Link>
+
+              {/* User Management - Only for superChildAdmin and admin */}
+              {(currentUser.role === 'superChildAdmin' || currentUser.role === 'admin') && (
+                <Link
+                  to="/admin/users"
+                  className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
+                >
+                  <svg
+                    className="h-5 w-5 mr-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                  User Management
+                </Link>
+              )}
+
+              {/* System Settings - Only for superChildAdmin */}
+              {currentUser.role === 'superChildAdmin' && (
+                <Link
+                  to="/admin/settings"
+                  className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
+                >
+                  <svg
+                    className="h-5 w-5 mr-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  System Settings
+                </Link>
+              )}
               
               
               <Link
