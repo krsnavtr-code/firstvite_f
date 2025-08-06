@@ -62,17 +62,22 @@ import BlogPostForm from './pages/admin/BlogPostForm';
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
   const location = useLocation();
+  // Check if the current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin');
+  // Check if the current route is an LMS route
+  const isLMSRoute = location.pathname.startsWith('/lms');
+  // Check if the current route is login, register, forgot-password, reset-password,
+  const isAuthRoute = location.pathname.startsWith('/login') || location.pathname.startsWith('/register') || location.pathname.startsWith('/forgot-password') || location.pathname.startsWith('/reset-password');
   
   return (
     <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
       <ScrollToTop />
-      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && !isLMSRoute && !isAuthRoute && <Navbar />}
       <main className="flex-grow bg-gray-50 dark:bg-gray-900">
         {children}
       </main>
-      {!isAdminRoute && <Footer />}
-      {!isAdminRoute && <ChatButton />}
+      {!isAdminRoute && !isLMSRoute && !isAuthRoute && <Footer />}
+      {!isAdminRoute && !isLMSRoute && !isAuthRoute && <ChatButton />}
     </div>
   );
 };

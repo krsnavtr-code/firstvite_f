@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import userApi from '../../api/userApi';
-import { useAuth } from '../../contexts/AuthContext';
 
 // Modal components
 const UserModal = ({ user, onClose, onSave, isOpen }) => {
@@ -66,14 +65,9 @@ const UserModal = ({ user, onClose, onSave, isOpen }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
-                disabled={user?.role === 'superChildAdmin'}
               >
                 <option value="user">User</option>
-                <option value="childAdmin">Child Admin</option>
                 <option value="admin">Admin</option>
-                {user?.role === 'superChildAdmin' && (
-                  <option value="superChildAdmin">Super Child Admin</option>
-                )}
               </select>
             </div>
             {!user && (
@@ -223,50 +217,16 @@ const ChangePasswordModal = ({ userId, onClose, onSave, isOpen }) => {
 };
 
 const Users = () => {
-  const { currentUser: authUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
-  
-  // Check if current user can edit a specific role
-  const canEditRole = (targetRole) => {
-    if (!authUser) return false;
-    
-    const userRole = authUser.role?.toLowerCase();
-    const targetRoleLower = targetRole?.toLowerCase();
-    
-    // Super Child Admin can edit all roles
-    if (userRole === 'superchildadmin') return true;
-    
-    // Admin can edit childAdmin and user roles
-    if (userRole === 'admin') {
-      return ['childadmin', 'user'].includes(targetRoleLower);
-    }
-    
-    // Child Admin can only edit user roles
-    if (userRole === 'childadmin') {
-      return targetRoleLower === 'user';
-    }
-    
-    return false;
-  };
-  
-  // Check if current user can delete a user based on their role
-  const canDeleteUser = (targetRole) => {
-    return canEditRole(targetRole);
-  };
-  // Check if current user is an admin of any level
-  const isAdminUser = authUser && ['superchildadmin', 'admin', 'childadmin'].includes(authUser.role?.toLowerCase());
-  
-  // Fetch users on component mount or when authUser changes
+  // Fetch users on component mount
   useEffect(() => {
-    if (authUser) {
-      fetchUsers();
-    }
-  }, [authUser]);
+    fetchUsers();
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -294,12 +254,6 @@ const Users = () => {
   };
 
   const handleCreateUser = async (userData) => {
-    // Check if current user has permission to create this role
-    if (!canEditRole(userData.role)) {
-      toast.error('You do not have permission to create a user with this role');
-      return;
-    }
-    
     try {
       await userApi.create(userData);
       toast.success('User created successfully');
@@ -314,16 +268,6 @@ const Users = () => {
   const handleUpdateUser = async (userData) => {
     if (!editingUserId) return;
     
-    // Find the user being edited
-    const targetUser = users.find(u => u._id === editingUserId);
-    if (!targetUser) return;
-    
-    // Check if current user has permission to update this user's role
-    if (userData.role !== targetUser.role && !canEditRole(userData.role)) {
-      toast.error('You do not have permission to assign this role');
-      return;
-    }
-    
     try {
       await userApi.update(editingUserId, userData);
       toast.success('User updated successfully');
@@ -335,18 +279,10 @@ const Users = () => {
     }
   };
 
-  const handleDeleteUser = async (user) => {
-    if (!user) return;
-    
-    // Check if current user has permission to delete this user
-    if (!canDeleteUser(user.role)) {
-      toast.error('You do not have permission to delete this user');
-      return;
-    }
-    
-    if (window.confirm(`Are you sure you want to delete ${user.fullname || 'this user'}?`)) {
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await userApi.delete(user._id);
+        await userApi.delete(userId);
         toast.success('User deleted successfully');
         await fetchUsers();
       } catch (error) {
@@ -368,17 +304,9 @@ const Users = () => {
     }
   };
 
-  const handleToggleStatus = async (user, currentStatus) => {
-    if (!user) return;
-    
-    // Check if current user has permission to modify this user
-    if (!canEditRole(user.role)) {
-      toast.error('You do not have permission to modify this user');
-      return;
-    }
-    
+  const handleToggleStatus = async (userId, currentStatus) => {
     try {
-      await userApi.updateStatus(user._id, !currentStatus);
+      await userApi.updateStatus(userId, !currentStatus);
       toast.success(`User ${currentStatus ? 'deactivated' : 'activated'} successfully`);
       await fetchUsers();
     } catch (error) {
@@ -388,24 +316,12 @@ const Users = () => {
   };
 
   const handleEditClick = (user) => {
-    // Check if current user has permission to edit this user
-    if (!canEditRole(user.role)) {
-      toast.error('You do not have permission to edit this user');
-      return;
-    }
-    
     setCurrentUser(user);
     setEditingUserId(user._id);
     setIsModalOpen(true);
   };
 
   const handleAddUser = () => {
-    // Check if current user has permission to add users
-    if (!authUser) {
-      toast.error('You must be logged in to add users');
-      return;
-    }
-    
     setCurrentUser(null);
     setEditingUserId(null);
     setIsModalOpen(true);
@@ -420,33 +336,19 @@ const Users = () => {
     );
   }
 
-  // Render unauthorized state for non-admin users
-  if (!isAdminUser) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64 space-y-4 text-center p-6">
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 w-full">
-          <p className="font-bold">Access Denied</p>
-          <p>You do not have permission to access this page.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Users Management</h2>
-        {canEditRole('user') && (
-          <button 
-            onClick={handleAddUser}
-            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add New User
-          </button>
-        )}
+        <button 
+          onClick={handleAddUser}
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add New User
+        </button>
       </div>
       
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -457,7 +359,7 @@ const Users = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -492,18 +394,16 @@ const Users = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.role === 'superChildAdmin' 
+                        user.role === 'admin' 
                           ? 'bg-purple-100 text-purple-800' 
-                          : user.role === 'admin' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : user.role === 'childAdmin' 
-                              ? 'bg-cyan-100 text-cyan-800' 
-                              : 'bg-gray-100 text-gray-800'
+                          : user.role === 'teacher'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-blue-100 text-blue-800'
                       }`}>
-                        {user.role}
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.role === 'student' && (
                         <div>
                           <div>ID: {user.studentId}</div>
@@ -520,56 +420,54 @@ const Users = () => {
                         </div>
                       )}
                       {user.role === 'admin' && 'System Administrator'}
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            user.isActive
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
+                      <div className="flex flex-col space-y-1">
+                        <span 
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer ${
+                            user.isActive 
+                              ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                              : 'bg-red-100 text-red-800 hover:bg-red-200'
                           }`}
+                          onClick={() => handleToggleStatus(user._id, user.isActive)}
                         >
                           {user.isActive ? 'Active' : 'Inactive'}
                         </span>
-                        {canEditRole(user.role) && (
-                          <button
-                            onClick={() => handleToggleStatus(user, user.isActive)}
-                            className="ml-2 text-xs text-gray-500 hover:text-indigo-600"
-                            title={user.isActive ? 'Deactivate user' : 'Activate user'}
-                          >
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={user.isActive ? "M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2 4h.01M9 16h6" : "M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2 4h.01M9 16h6"} />
-                          </svg>
+                        <span className="text-xs text-gray-500">
+                          Joined: {new Date(user.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => handleEditClick(user)}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          Edit
                         </button>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    {canEditRole(user.role) && (
-                      <button
-                        onClick={() => handleEditClick(user)}
-                        className="text-indigo-600 hover:text-indigo-900"
-                        title="Edit user"
-                      >
-                        Edit
-                      </button>
-                    )}
-                    {canDeleteUser(user.role) && (
-                      <button
-                        onClick={() => handleDeleteUser(user)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Delete user"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                        <button 
+                          onClick={() => {
+                            setCurrentUser(user);
+                            setIsPasswordModalOpen(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          Change Password
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteUser(user._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

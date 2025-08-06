@@ -16,11 +16,7 @@ export default function PrivateRoute({
   const { currentUser, isAuthenticated, loading, logout } = useAuth();
   const location = useLocation();
   const userRole = currentUser?.role?.toLowerCase();
-  
-  // Define admin roles with hierarchy
-  const isSuperChildAdmin = userRole === 'superchildadmin';
-  const isAdmin = userRole === 'admin' || isSuperChildAdmin;
-  const isChildAdmin = userRole === 'childadmin' || isAdmin;
+  const isAdmin = userRole === 'admin';
 
   if (loading) {
     return <LoadingSpinner />;
@@ -43,46 +39,26 @@ export default function PrivateRoute({
     return <Navigate to="/login?error=not_approved" replace />;
   }
 
-  // Check admin access with role hierarchy
-  if (location.pathname.startsWith('/admin')) {
-    // If no specific roles required, allow all admin roles
-    if (allowedRoles.length === 0) {
-      if (!isChildAdmin) {
-        console.log('Access denied: User does not have admin privileges');
-        return <Navigate to="/unauthorized" replace />;
-      }
-    } 
-    // If specific roles are required, check if user has any of them
-    else if (allowedRoles.length > 0) {
-      const hasRequiredRole = allowedRoles.some(role => {
-        const normalizedRole = role?.toLowerCase();
-        if (normalizedRole === 'superchildadmin') return isSuperChildAdmin;
-        if (normalizedRole === 'admin') return isAdmin;
-        if (normalizedRole === 'childadmin') return isChildAdmin;
-        return false;
-      });
-      
-      if (!hasRequiredRole) {
-        console.log(`Access denied: User role '${userRole}' is not in allowed roles:`, allowedRoles);
-        return <Navigate to="/unauthorized" replace />;
-      }
-    }
+  // Check admin access
+  if (location.pathname.startsWith('/admin') && !isAdmin) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   // Check allowed roles for non-admin routes
-  if (allowedRoles.length > 0 && !location.pathname.startsWith('/admin')) {
+  if (allowedRoles.length > 0) {
     const normalizedUserRole = userRole?.toLowerCase();
     const normalizedAllowedRoles = allowedRoles.map(role => role?.toLowerCase());
     
-    const hasRequiredRole = normalizedAllowedRoles.some(role => {
-      if (role === 'superchildadmin') return isSuperChildAdmin;
-      if (role === 'admin') return isAdmin;
-      if (role === 'childadmin') return isChildAdmin;
-      return normalizedUserRole === role;
-    });
-    
-    if (!hasRequiredRole) {
-      console.log(`Access denied: User role '${userRole}' is not in allowed roles:`, allowedRoles);
+    const hasAllowedRole = normalizedAllowedRoles.includes(normalizedUserRole);
+
+    if (!hasAllowedRole) {
+      console.log('PrivateRoute - Role-based access denied', {
+        currentRole: userRole,
+        normalizedUserRole,
+        allowedRoles,
+        normalizedAllowedRoles,
+        hasToken: !!localStorage.getItem('token')
+      });
       return <Navigate to="/unauthorized" replace />;
     }
   }
