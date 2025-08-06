@@ -181,30 +181,55 @@ const submitContactForm = async (formData) => {
     // Add retry logic for rate limiting
     const maxRetries = 2;
     let lastError;
+    let lastResponse;
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        // Add a small delay between retries
+        // Add an increasing delay between retries (exponential backoff)
         if (attempt > 0) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Max 5 seconds
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
         
         // Make the API call with the correct endpoint
-        const response = await api.post('/api/contact', requestData);
+        const response = await api.post('/api/contacts', requestData);
+        lastResponse = response;
         
+        // If we get here, the request was successful
         console.log('Contact form submission successful:', response.data);
         
-        // Use the server's response directly
         return {
           success: response.data?.success || true,
           data: response.data?.data || response.data,
-          message: response.data?.message || 'Your message has been sent successfully!'
+          message: response.data?.message || 'Your message has been sent successfully!',
         };
-        
       } catch (error) {
         lastError = error;
         
-        // Log the error for debugging
+        // If this is a 429 error, provide more specific feedback
+        if (error.response?.status === 429) {
+          const retryAfter = error.response?.headers?.['retry-after'] || 60; // Default to 60 seconds
+          const retryTime = typeof retryAfter === 'string' ? parseInt(retryAfter, 10) : retryAfter;
+          
+          console.warn(`Rate limited. Retry after ${retryTime} seconds. Attempt ${attempt + 1}/${maxRetries + 1}`);
+          
+          // If this is the last attempt, return a user-friendly error
+          if (attempt === maxRetries) {
+            return {
+              success: false,
+              message: `Too many requests. Please wait ${retryTime} seconds before trying again.`,
+              error: 'RATE_LIMIT_EXCEEDED',
+              retryAfter: retryTime,
+              status: 429
+            };
+          }
+          
+          // Wait for the retry-after period before the next attempt
+          await new Promise(resolve => setTimeout(resolve, (retryTime * 1000) + 1000));
+          continue;
+        }
+        
+        // For other errors, log and rethrow
         console.error(`API Error (attempt ${attempt + 1}/${maxRetries + 1}):`, {
           message: error.message,
           status: error.response?.status,
@@ -212,25 +237,23 @@ const submitContactForm = async (formData) => {
           code: error.code
         });
         
-        // If it's a rate limit error and we have retries left, continue the loop
-        if (error.response?.status === 429 && attempt < maxRetries) {
-          console.log(`Rate limited, retrying in ${attempt + 1} second(s)...`);
-          continue;
+        // If this is the last attempt, throw the error
+        if (attempt === maxRetries) {
+          throw error;
         }
-        
-        // For all other errors, break out of the retry loop
-        break;
       }
     }
     
-    // If we get here, all retries failed or it's a non-retryable error
-    if (lastError.response?.status === 429) {
-      throw new Error('Too many requests. Please wait a moment and try again.');
-    } else if (!lastError.response) {
-      throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
-    } else {
-      // For other HTTP errors, use the server's error message if available
-      const errorMessage = lastError.response?.data?.message || 
+    // If we get here, all retries failed
+    if (lastResponse) {
+      // If we have a response, use it
+      return {
+        success: lastResponse.data?.success || false,
+        data: lastResponse.data,
+        message: lastResponse.data?.message || 'Failed to process your request',
+        status: lastResponse.status,
+        error: lastResponse.data?.error || 'REQUEST_FAILED'
+      };
                          lastError.message || 
                          'An error occurred while submitting the form. Please try again.';
       throw new Error(errorMessage);
