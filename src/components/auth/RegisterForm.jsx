@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
-import api from '../../api/axios';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import api from "../../api/axios";
 
 const RegisterForm = ({ onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,31 +17,32 @@ const RegisterForm = ({ onSuccess }) => {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-      
+
       // Prepare user data
       const userData = {
-        fullname: data.fullname,  // Changed from name to fullname to match backend
+        fullname: data.fullname, // Changed from name to fullname to match backend
         email: data.email,
         password: data.password,
-        role: data.role || 'student', // Default to student if not specified
+        role: data.role || "student", // Default to student if not specified
         department: data.department,
         phone: data.phone,
       };
 
       // Make API call to register
-      const response = await api.post('/auth/register', userData);
-      
+      const response = await api.post("/auth/register", userData);
+
       // Show success message
-      toast.success('Registration successful! Please wait for admin approval.');
-      
+      toast.success("Registration successful! Please wait for admin approval.");
+
       // Call the success handler if provided
       if (onSuccess) {
         onSuccess(response.data);
       }
-      
     } catch (error) {
-      console.error('Registration error:', error);
-      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      console.error("Registration error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -49,11 +50,16 @@ const RegisterForm = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <p className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          Create your account
+        </p>
+      </div>
       <div>
         <label
           htmlFor="fullname"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-black dark:text-gray-300"
         >
           Full Name
         </label>
@@ -61,21 +67,21 @@ const RegisterForm = ({ onSuccess }) => {
           id="fullname"
           type="text"
           {...register("fullname", { required: "Full name is required" })}
-          className={`mt-1 block w-full px-3 py-1 border ${
+          className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.fullname
               ? "border-red-500"
               : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.fullname && (
-          <p className="mt-1 text-sm text-red-600">{errors.fullname.message}</p>
+          <p className="text-sm text-red-600">{errors.fullname.message}</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-black dark:text-gray-300"
         >
           Email address
         </label>
@@ -89,21 +95,21 @@ const RegisterForm = ({ onSuccess }) => {
               message: "Invalid email address",
             },
           })}
-          className={`mt-1 block w-full px-3 py-1 border ${
+          className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.email
               ? "border-red-500"
               : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+          <p className="text-sm text-red-600">{errors.email.message}</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="phone"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-black dark:text-gray-300"
         >
           Phone Number
         </label>
@@ -117,21 +123,21 @@ const RegisterForm = ({ onSuccess }) => {
               message: "Please enter a valid phone number",
             },
           })}
-          className={`mt-1 block w-full px-3 py-1 border ${
+          className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.phone
               ? "border-red-500"
               : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.phone && (
-          <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+          <p className="text-sm text-red-600">{errors.phone.message}</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-black dark:text-gray-300"
         >
           Password
         </label>
@@ -145,21 +151,21 @@ const RegisterForm = ({ onSuccess }) => {
               message: "Password must be at least 6 characters",
             },
           })}
-          className={`mt-1 block w-full px-3 py-1 border ${
+          className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.password
               ? "border-red-500"
               : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.password && (
-          <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+          <p className="text-sm text-red-600">{errors.password.message}</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="confirmPassword"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-black dark:text-gray-300"
         >
           Confirm Password
         </label>
@@ -170,14 +176,14 @@ const RegisterForm = ({ onSuccess }) => {
             validate: (value) =>
               value === watch("password") || "Passwords do not match",
           })}
-          className={`mt-1 block w-full px-3 py-1 border ${
+          className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.confirmPassword
               ? "border-red-500"
               : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.confirmPassword && (
-          <p className="mt-1 text-sm text-red-600">
+          <p className="text-sm text-red-600">
             {errors.confirmPassword.message}
           </p>
         )}
@@ -186,14 +192,14 @@ const RegisterForm = ({ onSuccess }) => {
       <div>
         <label
           htmlFor="role"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-black dark:text-gray-300"
         >
           I am a
         </label>
         <select
           id="role"
           {...register("role", { required: "Please select a role" })}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-800 dark:border-gray-600 focus:outline-none focus:ring-blue-500 sm:text-sm rounded-md dark:text-white bg-gray-50 border-gray-800 text-black"
           defaultValue=""
         >
           <option value="" disabled>
@@ -203,14 +209,14 @@ const RegisterForm = ({ onSuccess }) => {
           <option value="teacher">Teacher</option>
         </select>
         {errors.role && (
-          <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
+          <p className="text-sm text-red-600">{errors.role.message}</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="department"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-black dark:text-gray-300"
         >
           Department
         </label>
@@ -218,16 +224,14 @@ const RegisterForm = ({ onSuccess }) => {
           id="department"
           type="text"
           {...register("department", { required: "Department is required" })}
-          className={`mt-1 block w-full px-3 py-1 border ${
+          className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.department
               ? "border-red-500"
               : "border-gray-300 dark:border-gray-600"
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
         />
         {errors.department && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.department.message}
-          </p>
+          <p className="text-sm text-red-600">{errors.department.message}</p>
         )}
       </div>
 
@@ -242,7 +246,7 @@ const RegisterForm = ({ onSuccess }) => {
       </div>
 
       <div className="text-sm text-center">
-        <span className="text-gray-600 dark:text-gray-400">
+        <span className="text-black dark:text-gray-400">
           Already have an account?{" "}
         </span>
         <button

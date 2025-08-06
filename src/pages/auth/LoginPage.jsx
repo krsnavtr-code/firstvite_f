@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
-  const [message, setMessage] = useState(location.state?.message || '');
+  const from = location.state?.from?.pathname || "/";
+  const [message, setMessage] = useState(location.state?.message || "");
   const searchParams = new URLSearchParams(location.search);
-  const error = searchParams.get('error');
+  const error = searchParams.get("error");
+
+  const bgImage =
+    "http://firstvite.com/api/upload/file/img-1754467006583-638585158.jpg";
 
   const {
     register,
@@ -22,10 +25,14 @@ const LoginPage = () => {
 
   // Handle error messages from URL parameters
   useEffect(() => {
-    if (error === 'not_approved') {
-      setMessage('Your account is pending admin approval. Please contact support for assistance.');
-    } else if (error === 'account_suspended') {
-      setMessage('Your account has been deactivated. Please contact support for assistance.');
+    if (error === "not_approved") {
+      setMessage(
+        "Your account is pending admin approval. Please contact support for assistance."
+      );
+    } else if (error === "account_suspended") {
+      setMessage(
+        "Your account has been deactivated. Please contact support for assistance."
+      );
     }
   }, [error]);
 
@@ -39,34 +46,35 @@ const LoginPage = () => {
   const onSubmit = async (formData) => {
     try {
       setIsLoading(true);
-      
+
       // Call the login function from AuthProvider
       const loginResponse = await login(formData.email, formData.password);
-      
+
       if (loginResponse) {
         // Show success message
         // toast.success('Login successful!');
-        
+
         // Redirect to the intended page or home
         navigate(from, { replace: true });
       }
     } catch (error) {
-      console.error('Login error:', error);
-      
-      if (error.message.includes('account is pending approval')) {
+      console.error("Login error:", error);
+
+      if (error.message.includes("account is pending approval")) {
         // If account is not approved, show message
-        navigate('/login', { 
-          state: { 
-            message: 'Your account is pending admin approval. You will be notified once approved.' 
+        navigate("/login", {
+          state: {
+            message:
+              "Your account is pending admin approval. You will be notified once approved.",
           },
-          replace: true
+          replace: true,
         });
-      } else if (error.message.includes('account has been deactivated')) {
+      } else if (error.message.includes("account has been deactivated")) {
         // If account is inactive, redirect to inactive account page
-        navigate('/inactive-account', { replace: true });
+        navigate("/inactive-account", { replace: true });
       } else {
         // Show error message to user
-        toast.error(error.message || 'Login failed. Please try again.');
+        toast.error(error.message || "Login failed. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -74,13 +82,14 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 flex flex-col justify-center sm:px-6 lg:px-6">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md mt-5">
-        <p className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          Sign in to your account
-        </p>
-      </div>
-
+    <div
+      className="bg-gray-900 h-screen dark:bg-gray-900 flex flex-col justify-center sm:px-6 lg:px-6"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       {message && (
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div
@@ -113,13 +122,18 @@ const LoginPage = () => {
         </div>
       )}
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="mt-8 sm:mx-auto sm:w-full opacity-90 sm:max-w-md">
         <div className="bg-white dark:bg-gray-800 py-6 px-4 shadow sm:rounded-lg sm:px-10">
+          <div className="sm:mx-auto sm:w-full sm:max-w-md my-5">
+            <p className="text-center text-3xl font-extrabold text-black dark:text-white">
+              Sign in to your account
+            </p>
+          </div>
           <form className="space-y-2" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-black dark:text-gray-300"
               >
                 Email address
               </label>
@@ -130,9 +144,9 @@ const LoginPage = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  className={`appearance-none block w-full px-3 py-2 border bg-gray-50 border-gray-800 text-black${
                     errors.email ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white`}
+                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-black`}
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -152,7 +166,7 @@ const LoginPage = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-black dark:text-gray-300"
               >
                 Password
               </label>
@@ -163,9 +177,9 @@ const LoginPage = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  className={`appearance-none block w-full px-3 py-2 border bg-gray-50 border-gray-800 text-black ${
                     errors.password ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white`}
+                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-black`}
                   {...register("password", {
                     required: "Password is required",
                     minLength: {
@@ -193,7 +207,7 @@ const LoginPage = () => {
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-900 dark:text-gray-300"
+                  className="ml-2 block text-sm text-black dark:text-gray-300"
                 >
                   Remember me
                 </label>

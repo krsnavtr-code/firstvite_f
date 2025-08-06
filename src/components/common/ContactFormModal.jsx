@@ -204,7 +204,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 border-gray-800 text-black"
                     placeholder="Your name"
                   />
                 </div>
@@ -223,7 +223,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 border-gray-800 text-black"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -242,7 +242,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     value={formData.phone}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 border-gray-800 text-black"
                     placeholder="+91 8080808080"
                   />
                 </div>
@@ -260,7 +260,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                         id="courseInterest"
                         name="courseInterest"
                         disabled
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 bg-gray-50 border-gray-800 text-black"
                       >
                         <option>Loading courses...</option>
                       </select>
@@ -271,7 +271,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                       name="courseInterest"
                       value={formData.courseInterest}
                       onChange={handleChange}
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 border-gray-800 text-black"
                     >
                       <option value="">Select a course (optional)</option>
                       {courses.map((course) => (
@@ -288,7 +288,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                       id="courseInterest"
                       name="courseInterest"
                       disabled
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 bg-gray-50 border-gray-800 text-black"
                     >
                       <option>No courses available</option>
                     </select>
@@ -309,7 +309,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 border-gray-800 text-black"
                     placeholder="How can we help you?"
                   ></textarea>
                 </div>
@@ -321,7 +321,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     type="checkbox"
                     checked={formData.agreedToTerms}
                     onChange={handleChange}
-                    className="mt-1 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                    className="mt-1 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 bg-gray-50 border-gray-800 text-black"
                     required
                   />
                   <div className="text-xs">
