@@ -14,7 +14,7 @@ const useContactFormPopup = () => {
     // Check if current path should show the contact form
     const shouldShowForm = () => {
       const path = location.pathname;
-      // Don't show on admin or LMS routes
+      // Don't show on admin, LMS, auth, or thank you routes
       if (
         path.startsWith("/admin") ||
         path.startsWith("/lms") ||
@@ -25,7 +25,8 @@ const useContactFormPopup = () => {
         path.startsWith("/profile") ||
         path.startsWith("/my-learning") ||
         path.startsWith("/blog") ||
-        path.startsWith("/contact")
+        path.startsWith("/contact") ||
+        path.startsWith("/thank-you")
       ) {
         return false;
       }

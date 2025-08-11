@@ -29,6 +29,16 @@ const PaymentTAndC = () => {
         related to digital payments and financial transactions. I certify that
         this payment does not violate any local, national, or international law.
       </p>
+      <h3 className="text-xl font-bold mb-4">Refund Policy</h3>
+      <p className="mb-4">
+        Any scholarship admission is non-refundable.
+      </p>
+      <p className="mb-4">
+        Registration amount is non-refundable.
+      </p>
+      <p className="mb-4">
+        If the student gets access and is allocated a batch, the fee is non-refundable.
+      </p>
       <p className="mb-4">
         By completing this transaction, I acknowledge that I have read,
         understood, and agreed to all the terms and conditions mentioned above.
