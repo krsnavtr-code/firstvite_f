@@ -1154,9 +1154,9 @@ const CourseDetail = () => {
                                 {section.title}
                               </p>
                               <div className="flex flex-wrap gap-1.5">
-                                <span className="inline-flex items-center text-xs text-black dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                {/* <span className="inline-flex items-center text-xs text-black dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
                                   Week {section.week}
-                                </span>
+                                </span> */}
                                 <span className="inline-flex items-center text-xs text-black dark:text-white bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
                                   {section.topics?.length || 0} topics
                                 </span>
