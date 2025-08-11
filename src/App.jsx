@@ -47,6 +47,7 @@ import PaymentTAndC from './pages/PaymentTAndC';
 import PaymentsList from './pages/admin/PaymentsList';
 import PaymentDetails from './pages/admin/PaymentDetails';
 import SendBrochure from './pages/admin/SendBrochure';
+import ThankYouPage from './pages/ThankYouPage';
 
 // LMS Components
 import RegisterPage from './pages/auth/RegisterPage';
@@ -239,6 +240,12 @@ function App() {
         <Route path="/payment-t-and-c" element={
           <MainLayout>
             <PaymentTAndC />
+          </MainLayout>
+        } />
+
+        <Route path="/thank-you" element={
+          <MainLayout>
+            <ThankYouPage />
           </MainLayout>
         } />
 

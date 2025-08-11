@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { submitContactForm } from "../../api/contactApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const ContactFormModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -74,20 +75,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
       const result = await submitContactForm(submissionData);
 
       if (result.success) {
-        // Track form submission with Google Tag Manager
-        if (window.gtag) {
-          window.gtag("event", "conversion", {
-            send_to: "AW-16986190204/pOYXCKjcwfwaEPzi0qM_",
-            transaction_id: "",
-            value: 1.0,
-            currency: "INR",
-            event_callback: function () {
-              console.log("Conversion tracked successfully");
-            },
-          });
-        }
-
-        setIsSuccess(true);
+        // Reset form data
         setFormData({
           name: "",
           email: "",
@@ -97,15 +85,18 @@ const ContactFormModal = ({ isOpen, onClose }) => {
           agreedToTerms: false,
         });
 
-        toast.success(
-          result.message || "Your message has been sent successfully!"
-        );
-
-        // Close the modal after 2 seconds
-        setTimeout(() => {
-          onClose();
-          setIsSuccess(false);
-        }, 2000);
+        // Close the modal and redirect to thank you page
+        onClose();
+        navigate('/thank-you', {
+          state: {
+            message: result.message || 'Your message has been sent successfully!',
+            conversionData: {
+              transaction_id: '',
+              value: 1.0,
+              currency: 'INR'
+            }
+          }
+        });
       } else {
         // Handle API validation errors
         if (result.errors) {
