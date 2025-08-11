@@ -10,17 +10,38 @@ const FreeCourses = () => {
   const [filteredCourses, setFilteredCourses] = useState([]);
 
   useEffect(() => {
-    const fetchFreeCourses = async () => {
+    const fetchCategoryCourses = async () => {
       try {
         setLoading(true);
-        // Fetch only free courses (price = 0) that are published
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/courses?price=0&isPublished=true`);
-        console.log('Free courses response:', response.data);
-        // The backend returns the array directly, not wrapped in a data property
-        setCourses(Array.isArray(response.data) ? response.data : []);
-        setFilteredCourses(Array.isArray(response.data) ? response.data : []);
+        const categoryId = '68887f978b23a2d739ac5be4'; // The specified category ID
+        console.log(`Fetching courses for category: ${categoryId}`);
+        
+        // Fetch all published courses from the specified category
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/courses?category=${categoryId}&isPublished=true`
+        );
+        
+        console.log('Category courses response:', response.data);
+        
+        const coursesData = Array.isArray(response.data) ? response.data : [];
+        console.log(`Found ${coursesData.length} courses in this category`);
+        
+        // Sort courses: free ones first, then paid ones
+        const sortedCourses = [...coursesData].sort((a, b) => {
+          // If one is free and the other isn't, free comes first
+          if ((a.price === 0 || a.isFree) && (b.price > 0 && !b.isFree)) return -1;
+          if ((b.price === 0 || b.isFree) && (a.price > 0 && !a.isFree)) return 1;
+          
+          // If both are free or both are paid, sort by title
+          return a.title.localeCompare(b.title);
+        });
+        
+        setCourses(sortedCourses);
+        setFilteredCourses(sortedCourses);
+        
       } catch (error) {
-        console.error('Error fetching free courses:', error);
+        console.error('Error fetching category courses:', error);
+        console.error('Error details:', error.response?.data || error.message);
         setCourses([]);
         setFilteredCourses([]);
       } finally {
@@ -28,7 +49,7 @@ const FreeCourses = () => {
       }
     };
 
-    fetchFreeCourses();
+    fetchCategoryCourses();
   }, []);
 
   useEffect(() => {
@@ -117,10 +138,10 @@ const FreeCourses = () => {
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
                       {course.shortDescription || "No description available"}
                     </p>
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    {/* <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-2">
                       <FaUser className="mr-1" />
                       <span>{course.instructor || "Instructor"}</span>
-                    </div>
+                    </div> */}
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center text-yellow-400">
                         <FaStar className="mr-1" />
