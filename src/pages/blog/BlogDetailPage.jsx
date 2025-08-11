@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import SEO from "../../components/SEO";
 import { Skeleton, Button, message, Divider, Tag, Empty } from "antd";
 import {
   CalendarOutlined,
@@ -173,8 +174,27 @@ export default function BlogDetailPage() {
     readingTime,
   } = post;
 
+  // Generate SEO metadata based on the blog post
+  const seoTitle = post ? `${post.title} | FirstVITE Blog` : 'Blog Post | FirstVITE';
+  const seoDescription = post?.excerpt || 'Read this article on FirstVITE';
+  const seoKeywords = post?.tags?.join(', ') || 'blog, article, education, learning';
+  const canonicalUrl = post ? `https://firstvite.com/blog/${post.slug}` : 'https://firstvite.com/blog';
+
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title={seoTitle}
+        description={seoDescription}
+        keywords={seoKeywords}
+        canonical={canonicalUrl}
+        og={{
+          title: post?.title || 'FirstVITE Blog',
+          description: post?.excerpt || 'Read this article on FirstVITE',
+          type: 'article',
+          image: post?.imageUrl,
+          url: canonicalUrl
+        }}
+      />
       {/* Header with back button and share */}
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

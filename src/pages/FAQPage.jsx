@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { getFAQs } from '../api/faqApi';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
@@ -65,11 +65,18 @@ const FAQPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-4 sm:px-6 lg:px-8">
-      <Helmet>
-        <title>Frequently Asked Questions - BookStore</title>
-        <meta name="description" content="Find answers to common questions about our courses, payments, and more." />
-      </Helmet>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="Frequently Asked Questions | FirstVITE"
+        description="Find answers to common questions about our courses, payments, enrollment process, and more. Get help with your learning journey at FirstVITE."
+        keywords="FAQ, frequently asked questions, course help, payment questions, enrollment help, FirstVITE support, learning platform"
+        og={{
+          title: 'Frequently Asked Questions | FirstVITE',
+          description: 'Get answers to common questions about our courses, payments, and learning platform. Everything you need to know about FirstVITE in one place.',
+          type: 'website'
+        }}
+      />
+      <div className="py-16 px-4 sm:px-6 lg:px-8">
 
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
@@ -138,6 +145,7 @@ const FAQPage = () => {
             Contact Support
           </a>
         </div>
+      </div>
       </div>
     </div>
   );

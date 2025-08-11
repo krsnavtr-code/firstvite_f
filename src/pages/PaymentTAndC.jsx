@@ -1,8 +1,20 @@
 import React from "react";
+import SEO from "../components/SEO";
 
 const PaymentTAndC = () => {
   return (
-    <div className="max-w-3xl mx-auto p-4 text-black dark:text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+      <SEO 
+        title="Payment Terms & Conditions | FirstVITE"
+        description="Review our payment terms and conditions. Understand your rights and responsibilities when making payments on FirstVITE's learning platform."
+        keywords="payment terms, payment conditions, refund policy, online payment terms, FirstVITE payment, course payment terms"
+        og={{
+          title: 'Payment Terms & Conditions | FirstVITE',
+          description: 'Understand the terms and conditions governing payments on the FirstVITE platform. Learn about refunds, payment methods, and your financial responsibilities.',
+          type: 'article'
+        }}
+      />
+      <div className="max-w-3xl mx-auto p-4 text-black dark:text-white">
       <h2 className="text-2xl font-bold mb-4">Payment Terms & Conditions</h2>
       <p className="mb-4">
         By making this payment, I hereby confirm that the funds used for this
@@ -43,6 +55,7 @@ const PaymentTAndC = () => {
         By completing this transaction, I acknowledge that I have read,
         understood, and agreed to all the terms and conditions mentioned above.
       </p>
+      </div>
     </div>
   );
 };

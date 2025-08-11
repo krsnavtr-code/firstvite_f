@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate, Navigate } from "react-router-dom";
+import SEO from "../../components/SEO";
 import axios from "axios";
 import { getCourseById } from "../../api/courseApi";
 import { submitContactForm } from "../../api/contactApi";
@@ -607,8 +608,27 @@ const CourseDetail = () => {
     );
   };
 
+  // Generate SEO metadata
+  const seoTitle = course ? `${course.title} | FirstVITE` : 'Course Details | FirstVITE';
+  const seoDescription = course?.shortDescription || 'Learn valuable skills with our comprehensive course.';
+  const courseImage = course?.imageUrl || '/images/default-course-image.jpg';
+  const canonicalUrl = course ? `https://firstvite.com/course/${course._id}` : 'https://firstvite.com/courses';
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+      <SEO 
+        title={seoTitle}
+        description={seoDescription}
+        keywords={course?.tags?.join(', ') || 'online course, e-learning, professional development'}
+        canonical={canonicalUrl}
+        og={{
+          title: seoTitle,
+          description: seoDescription,
+          type: 'course',
+          image: courseImage,
+          url: canonicalUrl
+        }}
+      />
       {/* Course Header */}
       <div className="">
         <div className="container mx-auto px-4">

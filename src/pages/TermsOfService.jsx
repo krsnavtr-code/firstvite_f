@@ -1,9 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const TermsOfService = () => {
+  const lastUpdated = new Date().toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-16 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+      <SEO 
+        title="Terms of Service | FirstVITE"
+        description="Review the Terms of Service for using FirstVITE's learning platform. Understand your rights and responsibilities as a user of our services."
+        keywords="terms of service, terms and conditions, user agreement, FirstVITE terms, online learning terms"
+        og={{
+          title: 'Terms of Service | FirstVITE',
+          description: `Last updated ${lastUpdated}. By using FirstVITE, you agree to these terms and conditions.`,
+          type: 'article'
+        }}
+      />
+      <div className="pb-16 px-4">
       <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-black dark:text-white mb-6">Terms of Service</h1>
         <p className="text-black dark:text-white mb-6">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
@@ -72,6 +90,7 @@ const TermsOfService = () => {
             Email: info@firstvite.com
           </address>
         </div>
+      </div>
       </div>
     </div>
   );

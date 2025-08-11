@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
+import SEO from "../../components/SEO";
 import { getCoursesByCategory } from "../../api/courseApi";
 import { getCategories } from "../../api/categoryApi";
 import { toast } from "react-hot-toast";
@@ -95,8 +96,35 @@ const CoursesByCategory = () => {
     );
   }
 
+  // Format category name for display (replace hyphens with spaces and capitalize)
+  const formattedCategoryName = categoryName
+    ? categoryName
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    : 'Category';
+
+  // Generate SEO metadata
+  const seoTitle = `${formattedCategoryName} Courses | FirstVITE`;
+  const seoDescription = `Explore our ${formattedCategoryName} courses. Enhance your skills with expert-led training and industry-relevant curriculum.`;
+  const seoKeywords = `${formattedCategoryName} courses, ${formattedCategoryName} training, ${formattedCategoryName} certification, online ${formattedCategoryName} courses`;
+  const canonicalUrl = `https://firstvite.com/courses/category/${categoryName}`;
+
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title={seoTitle}
+        description={seoDescription}
+        keywords={seoKeywords}
+        canonical={canonicalUrl}
+        og={{
+          title: `Best ${formattedCategoryName} Courses Online | FirstVITE`,
+          description: `Learn ${formattedCategoryName} from industry experts. Enroll now for hands-on training and certification.`,
+          type: 'website',
+          url: canonicalUrl
+        }}
+      />
+      <div className="py-8 px-4 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-2">
@@ -206,6 +234,7 @@ const CoursesByCategory = () => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SEO from "../components/SEO";
 import {
   FaMapMarkerAlt,
   FaPhone,
@@ -146,13 +147,30 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Page Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
-            Contact Us
-          </h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO
+        title="Contact Us | FirstVITE - Get in Touch"
+        description="Have questions? Contact the FirstVITE team today. We're here to help with any inquiries about our courses, enrollment process, or technical support."
+        keywords="contact FirstVITE, support, help, inquiry, course information, customer service, email, phone, address"
+        og={{
+          title: 'Contact FirstVITE - We\'re Here to Help',
+          description: 'Get in touch with our team for any questions about our courses, enrollment, or support. We look forward to hearing from you!',
+          type: 'website'
+        }}
+      />
+      <div className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Page Header */}
+          <div className="text-center mb-16">
+            <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
+              Contact Us
+            </h1>
+            <div className="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
+            <p className="text-lg text-black dark:text-white max-w-3xl mx-auto">
+              Have questions or feedback? We'd love to hear from you. Fill out the
+              form below or reach out to us directly.
+            </p>
+          </div>
           <div className="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
           <p className="text-lg text-black dark:text-white max-w-3xl mx-auto">
             Have questions or feedback? We'd love to hear from you. Fill out the

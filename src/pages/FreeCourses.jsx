@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 import axios from 'axios';
 import { FaSearch, FaStar, FaClock, FaUser, FaBook } from 'react-icons/fa';
 
@@ -80,6 +81,16 @@ const FreeCourses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="Free Online Courses | Learn New Skills for Free | FirstVITE"
+        description="Access high-quality free courses on FirstVITE. Learn in-demand skills with our free online courses taught by industry experts. Start learning today!"
+        keywords="free courses, online learning, free online courses, learn new skills, free education, online courses, free certification, skill development"
+        og={{
+          title: 'Free Online Courses | Learn New Skills for Free | FirstVITE',
+          description: 'Start learning today with our collection of free online courses. No hidden fees, no credit card required. Enhance your skills at no cost!',
+          type: 'website'
+        }}
+      />
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">

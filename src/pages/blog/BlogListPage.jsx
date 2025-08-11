@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../../components/SEO';
 import { Skeleton, Empty, Pagination, Select } from 'antd';
 import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { getBlogPosts } from '../../api/blogApi';
@@ -79,7 +80,7 @@ export default function BlogListPage() {
         <h2 className="text-xl font-semibold mb-3 dark:text-white">
           <Link 
             to={`/blog/${post.slug}`} 
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2"
+            className="hover:text-blue-600 text-black dark:hover:text-blue-400 transition-colors line-clamp-2"
           >
             {post.title}
           </Link>
@@ -118,15 +119,26 @@ export default function BlogListPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-7xl">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Our Blog</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Insights, tutorials, and updates from our team
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="Blog | FirstVITE - Latest Articles & Insights"
+        description="Explore our latest blog posts on education, career development, and industry insights. Stay updated with FirstVITE's expert articles and resources."
+        keywords="education blog, career advice, learning resources, industry insights, FirstVITE articles, professional development"
+        og={{
+          title: 'FirstVITE Blog - Education & Career Insights',
+          description: 'Discover expert articles, study tips, and industry insights from FirstVITE. Stay ahead in your learning journey with our educational blog.',
+          type: 'website'
+        }}
+      />
+      <div className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Our Blog</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Insights, tutorials, and updates from our team
+          </p>
+        </div>
 
-      <div className="mb-5 text-right">
+        <div className="mb-5 text-right">
         <div className="text-sm text-gray-500 dark:text-gray-400">
           Showing {posts.length} of {total} posts
         </div>
@@ -171,6 +183,7 @@ export default function BlogListPage() {
           className="py-12"
         />
       )}
+      </div>
     </div>
   );
 }

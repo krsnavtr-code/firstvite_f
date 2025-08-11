@@ -1,10 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
 import { FaBookOpen, FaGraduationCap, FaUsers, FaAward } from "react-icons/fa";
 
 export default function About() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="About Us | FirstVITE - Empowering Minds Through Education"
+        description="Learn about FirstVITE's mission to provide accessible, high-quality education. Discover our story, values, and the team behind our innovative e-learning platform."
+        keywords="about FirstVITE, e-learning platform, online education, learn online, FirstVITE mission, education technology, online courses, professional development"
+        og={{
+          title: 'About FirstVITE - Empowering Learners Worldwide',
+          description: 'Discover how FirstVITE is transforming education through accessible, high-quality online learning experiences for students everywhere.',
+          type: 'website'
+        }}
+      />
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto text-center">
@@ -204,31 +215,31 @@ export default function About() {
                   name: "Sachin Sharma",
                   role: "SEO Expert",
                   bio: "Experienced SEO strategist helping educational platforms rank higher and reach the right audience.",
-                  image: "../../public/images/team-1.jpg",
+                  image: "/images/team-1.jpg",
                 },
                 {
                   name: "Krishna Avtar",
                   role: "Developer",
                   bio: "Full-stack developer with a strong focus on building scalable and secure learning platforms.",
-                  image: "../../public/images/team-5.jpg",
+                  image: "/images/team-5.jpg",
                 },
                 {
                   name: "Ritik Kumar",
                   role: "Content Writer",
                   bio: "Crafts compelling educational content that simplifies complex concepts for learners of all ages.",
-                  image: "../../public/images/team-3.jpg",
+                  image: "/images/team-3.jpg",
                 },
                 {
                   name: "Sudev Mohan",
                   role: "Designer",
                   bio: "Passionate UI/UX designer focused on creating intuitive and visually appealing e-learning interfaces.",
-                  image: "../../public/images/team-4.jpg",
+                  image: "/images/team-4.jpg",
                 },
                 {
                   name: "Kiran Rawat",
                   role: "SEO Team",
                   bio: "Optimizes website visibility through data-driven SEO practices tailored for the education sector.",
-                  image: "../../public/images/team-2.jpg",
+                  image: "/images/team-2.jpg",
                 },
                 {
                   name: "Mohit Rajput",

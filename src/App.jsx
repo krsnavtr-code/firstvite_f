@@ -1,4 +1,5 @@
 import React from "react";
+import { HelmetProvider } from 'react-helmet-async';
 import Home from "./home/Home";
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Courses from "./components/Courses";
@@ -87,276 +88,278 @@ function App() {
   const { ContactFormPopup } = useContactFormPopup();
   
   return (
-    <CartProvider>
-      <Toaster 
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: 'var(--color-bg-elevated)',
-            color: 'var(--color-fg-default)',
-            boxShadow: 'var(--shadow-lg)'
-          },
-          success: {
-            iconTheme: {
-              primary: '#10B981',
-              secondary: 'white',
+    <HelmetProvider>
+      <CartProvider>
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'var(--color-bg-elevated)',
+              color: 'var(--color-fg-default)',
+              boxShadow: 'var(--shadow-lg)'
             },
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: 'white',
+            success: {
+              iconTheme: {
+                primary: '#10B981',
+                secondary: 'white',
+              },
             },
-          },
-        }}
-      />
-      <ContactFormPopup />
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <Routes>
-        {/* Account Status Pages */}
-        <Route path="/suspended" element={<SuspendedAccount />} />
-        <Route path="/pending-approval" element={<PendingApproval />} />
-        <Route path="/inactive-account" element={<InactiveAccount />} />
-
-        {/* Public routes */}
-        <Route path="/" element={
-          <MainLayout>
-            <Home />
-          </MainLayout>
-        }>
-          {/* Add any nested public routes here */}
-        </Route>
-        
-        <Route path="/login" element={
-          <MainLayout>
-            <LoginPage />
-          </MainLayout>
-        } />
-        
-        {/* <Route path="/signup" element={
-          <MainLayout>
-            <Home />
-            <Signup />
-          </MainLayout>
-        } /> */}
-        
-        <Route path="/unauthorized" element={
-          <MainLayout>
-            <Unauthorized />
-          </MainLayout>
-        } />
-
-        {/* Public course routes */}
-        <Route path="/courses" element={
-          <MainLayout>
-            <CoursesByCategory />
-          </MainLayout>
-        } />
-        
-        <Route path="/free-courses" element={
-          <MainLayout>
-            <FreeCourses />
-          </MainLayout>
-        } />
-        
-        <Route path="/courses/category/:categoryName" element={
-          <MainLayout>
-            <CoursesByCategory />
-          </MainLayout>
-        } />
-        
-        <Route path="/categories" element={
-          <MainLayout>
-            <AllCategories />
-          </MainLayout>
-        } />
-        
-        <Route path="/course/:id" element={
-          <MainLayout>
-            <CourseDetail />
-          </MainLayout>
-        } />
-        
-        <Route path="/about" element={
-          <MainLayout>
-            <About />
-          </MainLayout>
-        } />
-        
-        <Route path="/contact" element={
-          <MainLayout>
-            <Contact />
-          </MainLayout>
-        } />
-        
-        <Route path="/faq" element={
-          <MainLayout>
-            <FAQPage />
-          </MainLayout>
-        } />
-        
-        <Route path="/corporate-training" element={
-          <MainLayout>
-            <CorporateTraining />
-          </MainLayout>
-        } />
-        
-        <Route path="/privacy-policy" element={
-          <MainLayout>
-            <PrivacyPolicy />
-          </MainLayout>
-        } />
-        
-        <Route path="/terms-of-service" element={
-          <MainLayout>
-            <TermsOfService />
-          </MainLayout>
-        } />
-
-        {/* Blog Routes */}
-        <Route path="/blog" element={
-          <MainLayout>
-            <BlogListPage />
-          </MainLayout>
-        } />
-        
-        <Route path="/blog/:slug" element={
-          <MainLayout>
-            <BlogDetailPage />
-          </MainLayout>
-        } />
-
-        <Route path="/payment-t-and-c" element={
-          <MainLayout>
-            <PaymentTAndC />
-          </MainLayout>
-        } />
-
-        <Route path="/thank-you" element={
-          <MainLayout>
-            <ThankYouPage />
-          </MainLayout>
-        } />
-
-        {/* Protected routes - Basic website access (only requires active account) */}
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute allowedRoles={['admin', 'user', 'student']}>
-              <MainLayout>
-                <Profile />
-              </MainLayout>
-            </PrivateRoute>
-          }
+            error: {
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: 'white',
+              },
+            },
+          }}
         />
+        <ContactFormPopup />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <Routes>
+          {/* Account Status Pages */}
+          <Route path="/suspended" element={<SuspendedAccount />} />
+          <Route path="/pending-approval" element={<PendingApproval />} />
+          <Route path="/inactive-account" element={<InactiveAccount />} />
 
-        {/* Protected routes - Requires active and approved account (LMS access) */}
-        <Route
-          path="/my-learning"
-          element={
+          {/* Public routes */}
+          <Route path="/" element={
+            <MainLayout>
+              <Home />
+            </MainLayout>
+          }>
+            {/* Add any nested public routes here */}
+          </Route>
+          
+          <Route path="/login" element={
+            <MainLayout>
+              <LoginPage />
+            </MainLayout>
+          } />
+          
+          {/* <Route path="/signup" element={
+            <MainLayout>
+              <Home />
+              <Signup />
+            </MainLayout>
+          } /> */}
+          
+          <Route path="/unauthorized" element={
+            <MainLayout>
+              <Unauthorized />
+            </MainLayout>
+          } />
+
+          {/* Public course routes */}
+          <Route path="/courses" element={
+            <MainLayout>
+              <CoursesByCategory />
+            </MainLayout>
+          } />
+          
+          <Route path="/free-courses" element={
+            <MainLayout>
+              <FreeCourses />
+            </MainLayout>
+          } />
+          
+          <Route path="/courses/category/:categoryName" element={
+            <MainLayout>
+              <CoursesByCategory />
+            </MainLayout>
+          } />
+          
+          <Route path="/categories" element={
+            <MainLayout>
+              <AllCategories />
+            </MainLayout>
+          } />
+          
+          <Route path="/course/:id" element={
+            <MainLayout>
+              <CourseDetail />
+            </MainLayout>
+          } />
+          
+          <Route path="/about" element={
+            <MainLayout>
+              <About />
+            </MainLayout>
+          } />
+          
+          <Route path="/contact" element={
+            <MainLayout>
+              <Contact />
+            </MainLayout>
+          } />
+          
+          <Route path="/faq" element={
+            <MainLayout>
+              <FAQPage />
+            </MainLayout>
+          } />
+          
+          <Route path="/corporate-training" element={
+            <MainLayout>
+              <CorporateTraining />
+            </MainLayout>
+          } />
+          
+          <Route path="/privacy-policy" element={
+            <MainLayout>
+              <PrivacyPolicy />
+            </MainLayout>
+          } />
+          
+          <Route path="/terms-of-service" element={
+            <MainLayout>
+              <TermsOfService />
+            </MainLayout>
+          } />
+
+          {/* Blog Routes */}
+          <Route path="/blog" element={
+            <MainLayout>
+              <BlogListPage />
+            </MainLayout>
+          } />
+          
+          <Route path="/blog/:slug" element={
+            <MainLayout>
+              <BlogDetailPage />
+            </MainLayout>
+          } />
+
+          <Route path="/payment-t-and-c" element={
+            <MainLayout>
+              <PaymentTAndC />
+            </MainLayout>
+          } />
+
+          <Route path="/thank-you" element={
+            <MainLayout>
+              <ThankYouPage />
+            </MainLayout>
+          } />
+
+          {/* Protected routes - Basic website access (only requires active account) */}
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute allowedRoles={['admin', 'user', 'student']}>
+                <MainLayout>
+                  <Profile />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* Protected routes - Requires active and approved account (LMS access) */}
+          <Route
+            path="/my-learning"
+            element={
+              <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
+                <MainLayout>
+                  <MyLearning />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/my-courses"
+            element={
+              <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
+                <MainLayout>
+                  <Courses />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* LMS Routes - Requires active and approved account */}
+          <Route path="/mylearning" element={
             <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
-              <MainLayout>
-                <MyLearning />
-              </MainLayout>
+              <Navigate to="/lms" replace />
             </PrivateRoute>
-          }
-        />
-        
-        <Route
-          path="/my-courses"
-          element={
+          } />
+          
+          <Route path="/lms/*" element={
             <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
-              <MainLayout>
-                <Courses />
-              </MainLayout>
+              <LMSLayout>
+                <LMS />
+              </LMSLayout>
             </PrivateRoute>
-          }
-        />
+          } />
 
-        {/* LMS Routes - Requires active and approved account */}
-        <Route path="/mylearning" element={
-          <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
-            <Navigate to="/lms" replace />
-          </PrivateRoute>
-        } />
-        
-        <Route path="/lms/*" element={
-          <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
-            <LMSLayout>
-              <LMS />
-            </LMSLayout>
-          </PrivateRoute>
-        } />
+          {/* Status pages */}
+          <Route path="/inactive-account" element={
+            <MainLayout>
+              <InactiveAccount />
+            </MainLayout>
+          } />
+          
+          <Route path="/pending-approval" element={
+            <MainLayout>
+              <PendingApproval />
+            </MainLayout>
+          } />
+          
+          <Route element={<PrivateRoute allowedRoles={['admin']}><AdminLayout /></PrivateRoute>}>
+            <Route path="/admin" element={<Navigate to="dashboard" replace />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/categories" element={<CategoriesList />} />
+            <Route path="/admin/categories/new" element={<CategoryForm />} />
+            <Route path="/admin/categories/:id/edit" element={<CategoryForm />} />
+            <Route path="/admin/courses" element={<CoursesList />} />
+            <Route path="/admin/courses/new" element={<CourseForm isEdit={false} />} />
+            <Route path="/admin/courses/:id/edit" element={<CourseForm isEdit={true} />} />
+            <Route path="/admin/course/:id" element={<CourseDetail />} />
+            <Route path="/admin/users" element={<Users />} />
+            <Route path="/admin/contacts" element={<ContactsList />} />
+            <Route path="/admin/faqs" element={<ManageFAQs />} />
+            <Route path="/admin/media" element={<MediaGallery />} />
+            <Route path="/admin/image-upload" element={<ImageUploadDemo />} />
+            <Route path="/admin/image-gallery" element={<ImageGallery />} />
+            <Route path="/admin/enrollments" element={<AdminEnrollments />} />
+            
+            {/* Payment Admin Routes */}
+            <Route path="/admin/payments" element={<PaymentsList />} />
+            <Route path="/admin/payments/:id" element={<PaymentDetails />} />
+            
+            {/* Blog Admin Routes */}
+            <Route path="/admin/blog" element={<BlogPostList />} />
+            <Route path="/admin/blog/new" element={<BlogPostForm />} />
+            <Route path="/admin/blog/edit/:id" element={<BlogPostForm />} />
+            
+            {/* Send Brochure Route */}
+            <Route path="/admin/send-brochure" element={<SendBrochure />} />
+            
+            <Route path="*" element={<Navigate to="dashboard" replace />} />
+          </Route>
 
-        {/* Status pages */}
-        <Route path="/inactive-account" element={
-          <MainLayout>
-            <InactiveAccount />
-          </MainLayout>
-        } />
-        
-        <Route path="/pending-approval" element={
-          <MainLayout>
-            <PendingApproval />
-          </MainLayout>
-        } />
-        
-        <Route element={<PrivateRoute allowedRoles={['admin']}><AdminLayout /></PrivateRoute>}>
-          <Route path="/admin" element={<Navigate to="dashboard" replace />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/categories" element={<CategoriesList />} />
-          <Route path="/admin/categories/new" element={<CategoryForm />} />
-          <Route path="/admin/categories/:id/edit" element={<CategoryForm />} />
-          <Route path="/admin/courses" element={<CoursesList />} />
-          <Route path="/admin/courses/new" element={<CourseForm isEdit={false} />} />
-          <Route path="/admin/courses/:id/edit" element={<CourseForm isEdit={true} />} />
-          <Route path="/admin/course/:id" element={<CourseDetail />} />
-          <Route path="/admin/users" element={<Users />} />
-          <Route path="/admin/contacts" element={<ContactsList />} />
-          <Route path="/admin/faqs" element={<ManageFAQs />} />
-          <Route path="/admin/media" element={<MediaGallery />} />
-          <Route path="/admin/image-upload" element={<ImageUploadDemo />} />
-          <Route path="/admin/image-gallery" element={<ImageGallery />} />
-          <Route path="/admin/enrollments" element={<AdminEnrollments />} />
-          
-          {/* Payment Admin Routes */}
-          <Route path="/admin/payments" element={<PaymentsList />} />
-          <Route path="/admin/payments/:id" element={<PaymentDetails />} />
-          
-          {/* Blog Admin Routes */}
-          <Route path="/admin/blog" element={<BlogPostList />} />
-          <Route path="/admin/blog/new" element={<BlogPostForm />} />
-          <Route path="/admin/blog/edit/:id" element={<BlogPostForm />} />
-          
-          {/* Send Brochure Route */}
-          <Route path="/admin/send-brochure" element={<SendBrochure />} />
-          
-          <Route path="*" element={<Navigate to="dashboard" replace />} />
-        </Route>
+          {/* LMS Routes */}
+          <Route path="/register" element={
+            <MainLayout>
+              <RegisterPage />
+            </MainLayout>
+          } />
 
-        {/* LMS Routes */}
-        <Route path="/register" element={
-          <MainLayout>
-            <RegisterPage />
-          </MainLayout>
-        } />
-
-        {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-      {/* <Cart /> */}
-    </CartProvider>
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        {/* <Cart /> */}
+      </CartProvider>
+    </HelmetProvider>
   );
 }
 
