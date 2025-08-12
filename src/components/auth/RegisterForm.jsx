@@ -52,14 +52,14 @@ const RegisterForm = ({ onSuccess }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <p className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+        <p className="text-center text-3xl font-extrabold text-gray-900 ">
           Create your account
         </p>
       </div>
       <div>
         <label
           htmlFor="fullname"
-          className="block text-sm font-medium text-black dark:text-gray-300"
+          className="block text-sm font-medium text-black "
         >
           Full Name
         </label>
@@ -70,8 +70,8 @@ const RegisterForm = ({ onSuccess }) => {
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.fullname
               ? "border-red-500"
-              : "border-gray-300 dark:border-gray-600"
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
+              : "border-gray-300 "
+          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.fullname && (
           <p className="text-sm text-red-600">{errors.fullname.message}</p>
@@ -81,7 +81,7 @@ const RegisterForm = ({ onSuccess }) => {
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-black dark:text-gray-300"
+          className="block text-sm font-medium text-black "
         >
           Email address
         </label>
@@ -98,8 +98,8 @@ const RegisterForm = ({ onSuccess }) => {
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.email
               ? "border-red-500"
-              : "border-gray-300 dark:border-gray-600"
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
+              : "border-gray-300 "
+          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.email && (
           <p className="text-sm text-red-600">{errors.email.message}</p>
@@ -109,7 +109,7 @@ const RegisterForm = ({ onSuccess }) => {
       <div>
         <label
           htmlFor="phone"
-          className="block text-sm font-medium text-black dark:text-gray-300"
+          className="block text-sm font-medium text-black "
         >
           Phone Number
         </label>
@@ -126,8 +126,8 @@ const RegisterForm = ({ onSuccess }) => {
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.phone
               ? "border-red-500"
-              : "border-gray-300 dark:border-gray-600"
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
+              : "border-gray-300 "
+          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.phone && (
           <p className="text-sm text-red-600">{errors.phone.message}</p>
@@ -137,7 +137,7 @@ const RegisterForm = ({ onSuccess }) => {
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-black dark:text-gray-300"
+          className="block text-sm font-medium text-black "
         >
           Password
         </label>
@@ -154,8 +154,8 @@ const RegisterForm = ({ onSuccess }) => {
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.password
               ? "border-red-500"
-              : "border-gray-300 dark:border-gray-600"
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
+              : "border-gray-300 "
+          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.password && (
           <p className="text-sm text-red-600">{errors.password.message}</p>
@@ -165,7 +165,7 @@ const RegisterForm = ({ onSuccess }) => {
       <div>
         <label
           htmlFor="confirmPassword"
-          className="block text-sm font-medium text-black dark:text-gray-300"
+          className="block text-sm font-medium text-black "
         >
           Confirm Password
         </label>
@@ -179,8 +179,8 @@ const RegisterForm = ({ onSuccess }) => {
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.confirmPassword
               ? "border-red-500"
-              : "border-gray-300 dark:border-gray-600"
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
+              : "border-gray-300 "
+          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.confirmPassword && (
           <p className="text-sm text-red-600">
@@ -192,19 +192,16 @@ const RegisterForm = ({ onSuccess }) => {
       <div>
         <label
           htmlFor="role"
-          className="block text-sm font-medium text-black dark:text-gray-300"
+          className="block text-sm font-medium  text-black "
         >
           I am a
-        </label>
+        </label> 
         <select
           id="role"
           {...register("role", { required: "Please select a role" })}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-800 dark:border-gray-600 focus:outline-none focus:ring-blue-500 sm:text-sm rounded-md dark:text-white bg-gray-50 border-gray-800 text-black"
-          defaultValue=""
+          className="mt-1 w-full border-gray-800 py-2 sm:text-sm rounded-md  bg-gray-50 text-black"
+          defaultValue="student"
         >
-          <option value="" disabled>
-            Select role
-          </option>
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
         </select>
@@ -216,7 +213,7 @@ const RegisterForm = ({ onSuccess }) => {
       <div>
         <label
           htmlFor="department"
-          className="block text-sm font-medium text-black dark:text-gray-300"
+          className="block text-sm font-medium text-black "
         >
           Department
         </label>
@@ -227,8 +224,8 @@ const RegisterForm = ({ onSuccess }) => {
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
             errors.department
               ? "border-red-500"
-              : "border-gray-300 dark:border-gray-600"
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white`}
+              : "border-gray-300 "
+          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.department && (
           <p className="text-sm text-red-600">{errors.department.message}</p>
@@ -246,13 +243,13 @@ const RegisterForm = ({ onSuccess }) => {
       </div>
 
       <div className="text-sm text-center">
-        <span className="text-black dark:text-gray-400">
+        <span className="text-black ">
           Already have an account?{" "}
         </span>
         <button
           type="button"
           onClick={() => navigate("/login")}
-          className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+          className="font-medium text-blue-600 hover:text-blue-500 "
         >
           Sign in
         </button>
