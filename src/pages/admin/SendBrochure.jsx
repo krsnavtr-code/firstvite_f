@@ -30,6 +30,10 @@ const SendBrochure = () => {
   const [activeTab, setActiveTab] = useState("generated");
   const navigate = useNavigate();
 
+
+
+  // const duration = "2.5 to 3 Months";
+
   useEffect(() => {
     const fetchPdfs = async () => {
       try {
@@ -80,12 +84,14 @@ const SendBrochure = () => {
     try {
       setSending(true);
 
-      // Use our new endpoint for sending brochures
+      // Use our new endpoint for sending brochures with increased timeout
       await api.post("/pdfs/send-brochure", {
         pdfPath: selectedPdf,
         email: email.trim(),
         subject: subject.trim() || "Course Brochure",
         message: message.trim(),
+      }, {
+        timeout: 60000 // 60 seconds timeout
       });
 
       toast.success("Brochure sent successfully!", {
@@ -114,45 +120,46 @@ const SendBrochure = () => {
 
   // Format file size to human readable format
   // Message template for uploaded brochures
-  const messageTemplate = useMemo(() => {
-    return `Dear {{studentName}}
+ const messageTemplate = useMemo(() => {
+   return `
+<p>Dear {{studentName}},</p>
 
-Greetings from FirstVite E-Learning!
+<p>Greetings from <strong>FirstVITE E-Learning!</strong></p>
 
-Are you looking to build a strong career in the domain of {{courseName}}? We are excited to introduce our {{courseName}} online training program, designed for both beginners and professionals.
+<p>
+Are you looking to build a strong career in the domain of <strong>{{courseName}}</strong>?  
+We are excited to introduce our <strong>{{courseName}}</strong> online training program,  
+designed for both beginners and professionals.
+</p>
 
-🌟 Course Highlights – {{courseName}}
+<h3>🌟 Course Highlights – {{courseName}}</h3>
+<ul>
+  <li>✅ 100% Online | Live + Recorded Classes</li>
+  <li>✅ Taught by Certified Professionals</li>
+  <li>✅ Real-time Case Studies & Projects</li>
+  <li>✅ Access to Server for Practical Training</li>
+  <li>✅ Resume Building + Interview Preparation</li>
+  <li>✅ Certificate from FirstVITE upon Completion</li>
+</ul>
 
-✅ 100% Online | Live + Recorded Classes
-✅ Taught by Certified Professionals
-✅ Real-time Case Studies & Projects
-✅ Access to Server for Practical Training
-✅ Resume Building + Interview Preparation
-✅ Certificate from FirstVite upon Completion
+<h3>📅 Course Duration & Timings:</h3>
+<ul>
+  <li><strong>Mode:</strong> Online Recorded & Live Classes</li>
+  <li><strong>Schedule:</strong> Flexible (Weekdays/Weekends Available)</li>
+  <li><strong>Language:</strong> Hindi + English</li>
+</ul>
 
-📅 Course Duration & Timings:
+<h3>💼 Career Scope after {{courseName}}:</h3>
 
-Duration: 2.5 to 3 Months
-Mode: Online Live Classes
-Schedule: Flexible (Weekdays/Weekends Available)
-Language: Hindi + English (Bilingual)
+<h3>💰 Course Fee & Offers:</h3>
+<p>Special discounts available for early enrollment!</p>
 
-💼 Career Scope after {{courseName}}:
-
-Salary Range: ₹7.5 – ₹9 LPA (Fresher) | ₹10– ₹27 LPA (Experienced)
-
-💰 Course Fee & Offers:
-
-Special discounts available for early enrollment!
-
+<p>
 Looking forward to helping you take the next step in your career!
+</p>
+  `;
+ }, []);
 
-Warm Regards,
-Akansh Tyagi
-Career Advisor – FirstVite E-Learning
-📧 info@firstvite.com
-📱 +91-9582244812`;
-  }, []);
 
   // Update message when template variables change
   useEffect(() => {
@@ -170,7 +177,7 @@ Career Advisor – FirstVite E-Learning
 
       // Update subject if it's the default
       if (subject === "Course Brochure" && courseName) {
-        setSubject(`About ${courseName} - FirstVite E-Learning`);
+        setSubject(`About ${courseName} - FirstVITE E-Learning`);
       }
     }
   }, [activeTab, studentName, courseName, messageTemplate]);
