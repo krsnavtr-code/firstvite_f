@@ -142,7 +142,7 @@ designed for both beginners and professionals.
   <li>✅ Certificate from FirstVITE upon Completion</li>
 </ul>
 
-<h3>📅 Course Duration & Timings:</h3>
+<h3>📅 Course Duration & Timings: 3 to 4 Months, Weekdays/Weekends Available</h3>
 <ul>
   <li><strong>Mode:</strong> Online Recorded & Live Classes</li>
   <li><strong>Schedule:</strong> Flexible (Weekdays/Weekends Available)</li>
