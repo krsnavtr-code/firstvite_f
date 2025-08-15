@@ -145,12 +145,12 @@ const submitContactForm = async (formData) => {
       errors.phone = 'Please enter a valid phone number';
     }
     
-    if (!formData.message?.trim()) {
-      errors.message = 'Message is required';
-    } else if (formData.message.trim().length < 10) {
-      errors.message = 'Message must be at least 10 characters';
-    } else if (formData.message.trim().length > 2000) {
-      errors.message = 'Message cannot exceed 2000 characters';
+    if (formData.message?.trim()) {
+      if (formData.message.trim().length < 10) {
+        errors.message = 'Message must be at least 10 characters if provided';
+      } else if (formData.message.trim().length > 2000) {
+        errors.message = 'Message cannot exceed 2000 characters';
+      }
     }
     
     if (Object.keys(errors).length > 0) {
@@ -182,6 +182,7 @@ const submitContactForm = async (formData) => {
     const maxRetries = 2;
     let lastError;
     let lastResponse;
+    let retryAfter = 5; // Default retry after 5 seconds
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
@@ -208,24 +209,27 @@ const submitContactForm = async (formData) => {
         
         // If this is a 429 error, provide more specific feedback
         if (error.response?.status === 429) {
-          const retryAfter = error.response?.headers?.['retry-after'] || 60; // Default to 60 seconds
-          const retryTime = typeof retryAfter === 'string' ? parseInt(retryAfter, 10) : retryAfter;
+          retryAfter = error.response?.headers?.['retry-after'] || 60; // Default to 60 seconds
+          retryAfter = typeof retryAfter === 'string' ? parseInt(retryAfter, 10) : retryAfter;
           
-          console.warn(`Rate limited. Retry after ${retryTime} seconds. Attempt ${attempt + 1}/${maxRetries + 1}`);
+          console.warn(`Rate limited. Retry after ${retryAfter} seconds. Attempt ${attempt + 1}/${maxRetries + 1}`);
           
           // If this is the last attempt, return a user-friendly error
           if (attempt === maxRetries) {
+            const minutes = Math.ceil(retryAfter / 60);
+            const timeMessage = minutes > 1 ? `${minutes} minutes` : `${retryAfter} seconds`;
+            
             return {
               success: false,
-              message: `Too many requests. Please wait ${retryTime} seconds before trying again.`,
+              message: `Too many requests. Please wait ${timeMessage} before trying again.`,
               error: 'RATE_LIMIT_EXCEEDED',
-              retryAfter: retryTime,
+              retryAfter: retryAfter,
               status: 429
             };
           }
           
           // Wait for the retry-after period before the next attempt
-          await new Promise(resolve => setTimeout(resolve, (retryTime * 1000) + 1000));
+          await new Promise(resolve => setTimeout(resolve, (retryAfter * 1000) + 1000));
           continue;
         }
         
@@ -254,11 +258,20 @@ const submitContactForm = async (formData) => {
         status: lastResponse.status,
         error: lastResponse.data?.error || 'REQUEST_FAILED'
       };
-                         lastError.message || 
-                         'An error occurred while submitting the form. Please try again.';
-      throw new Error(errorMessage);
     }
     
+    // If we have a rate limit error, provide a user-friendly message
+    if (lastError?.response?.status === 429) {
+      const retryAfter = lastError.response?.headers?.['retry-after'] || 60;
+      const minutes = Math.ceil(retryAfter / 60);
+      const timeMessage = minutes > 1 ? `${minutes} minutes` : `${retryAfter} seconds`;
+      
+      throw new Error(`Too many requests. Please wait ${timeMessage} before trying again.`);
+    }
+    
+    // For other errors, provide a generic message
+    const errorMessage = lastError?.message || 'An error occurred while submitting the form. Please try again later.';
+    throw new Error(errorMessage);
   } catch (error) {
     console.error('Error in submitContactForm:', {
       message: error.message,
@@ -267,22 +280,24 @@ const submitContactForm = async (formData) => {
     });
 
     // Handle validation errors
-    if (error.response?.status === 422 && error.response?.data?.errors) {
-      // Format validation errors into a single message
-      const errorMessages = Object.values(error.response.data.errors).join(' ');
-      throw new Error(`Validation failed: ${errorMessages}`);
+    if (error.response?.status === 400 && error.response.data?.errors) {
+      const validationErrors = error.response.data.errors;
+      const errorMessage = Object.values(validationErrors)
+        .map(err => Array.isArray(err) ? err.join(' ') : err)
+        .join('\n');
+      throw new Error(errorMessage || 'Validation failed. Please check your input.');
     }
-    
-    // Handle other types of errors
-    if (error.response?.status === 401) {
-      throw new Error('Your session has expired. Please log in again.');
+
+    // Handle rate limiting
+    if (error.response?.status === 429) {
+      const retryAfter = error.response?.headers?.['retry-after'] || 60;
+      const minutes = Math.ceil(retryAfter / 60);
+      const timeMessage = minutes > 1 ? `${minutes} minutes` : `${retryAfter} seconds`;
+      throw new Error(`Too many requests. Please wait ${timeMessage} before trying again.`);
     }
-    
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    
-    throw new Error(error.message || 'Failed to submit the contact form. Please try again later.');
+
+    // Handle other errors
+    throw new Error(error.response?.data?.message || 'Failed to submit the contact form. Please try again later.');
   }
 };
 

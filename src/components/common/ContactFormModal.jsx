@@ -18,6 +18,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [courses, setCourses] = useState([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
 
   // Load courses
   useEffect(() => {
@@ -49,10 +50,19 @@ const ContactFormModal = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prevent rapid submissions (5 second cooldown)
+    const now = Date.now();
+    if (now - lastSubmitTime < 5000) {
+      toast.warning('Please wait a few seconds before submitting again');
+      return;
+    }
+
     if (!formData.agreedToTerms) {
       toast.error("Please accept the terms & conditions and privacy policy");
       return;
     }
+    
+    setLastSubmitTime(now);
 
     setIsSubmitting(true);
 
@@ -286,12 +296,12 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                   )}
                 </div>
 
-                <div>
+                {/* <div>
                   <label
                     htmlFor="message"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Your Message <span className="text-red-500">*</span>
+                    Write Something
                   </label>
                   <textarea
                     id="message"
@@ -299,11 +309,11 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                     rows="2"
                     value={formData.message}
                     onChange={handleChange}
-                    required
+                    // required
                     className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 border-gray-800 text-black"
                     placeholder="How can we help you?"
                   ></textarea>
-                </div>
+                </div> */}
 
                 <div className="flex items-start space-x-2">
                   <input
