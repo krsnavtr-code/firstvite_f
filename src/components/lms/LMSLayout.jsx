@@ -2,8 +2,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Layout } from 'antd';
 import LMSNavbar from './LMSNavbar';
-import LMSFooter from './LMSFooter';
-import './LMSLayout.css';
 
 const { Content } = Layout;
 
@@ -17,7 +15,6 @@ const LMSLayout = () => {
             <Outlet />
           </div>
         </Content>
-        <LMSFooter />
       </Layout>
     </Layout>
   );

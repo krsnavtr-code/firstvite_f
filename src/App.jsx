@@ -42,7 +42,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import useContactFormPopup from './hooks/useContactFormPopup.jsx';
 import SuspendedAccount from './pages/SuspendedAccount';
 import PendingApproval from './pages/PendingApproval';
-import LMSLayout from './components/LMSLayout';
 import ChatButton from './components/common/ChatButton';
 import PaymentTAndC from './pages/PaymentTAndC';
 import PaymentsList from './pages/admin/PaymentsList';
@@ -51,6 +50,7 @@ import SendBrochure from './pages/admin/SendBrochure';
 import ThankYouPage from './pages/ThankYouPage';
 
 // LMS Components
+import LMSLayout from './components/lms/LMSLayout';
 import RegisterPage from './pages/auth/RegisterPage';
 import LMS from './pages/lms';
 import InactiveAccount from './pages/auth/InactiveAccount';

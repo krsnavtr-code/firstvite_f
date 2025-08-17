@@ -4,7 +4,6 @@ import { Layout } from 'antd';
 import { useAuth } from '../../contexts/AuthContext';
 import Dashboard from './Dashboard';
 import CoursePlayer from './CoursePlayer';
-import './lms.css';
 
 const { Content } = Layout;
 
@@ -20,8 +19,11 @@ const LMS = () => {
     <Layout className="lms-layout">
       <Content className="lms-content">
         <Routes>
+          {/* Dashboard */}
           <Route index element={<Dashboard />} />
           <Route path="courses/:courseId" element={<CoursePlayer />} />
+
+          {/* Any other route */}
           <Route path="*" element={<Navigate to="/lms" replace />} />
         </Routes>
       </Content>
