@@ -201,6 +201,17 @@ const userApi = {
       console.error(`Error updating status for user ${userId}:`, error);
       throw error;
     }
+  },
+
+  // Update user LMS approval status
+  updateLMSStatus: async (userId, isApproved) => {
+    try {
+      const response = await api.put(`/users/${userId}/lms-status`, { isApproved });
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating LMS status for user ${userId}:`, error);
+      throw error;
+    }
   }
 };
 

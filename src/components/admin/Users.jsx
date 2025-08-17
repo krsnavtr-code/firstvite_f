@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import userApi from "../../api/userApi";
+import { FaEdit, FaKey, FaTrash } from "react-icons/fa";
+
 
 // Modal components
 const UserModal = ({ user, onClose, onSave, isOpen }) => {
@@ -329,6 +331,20 @@ const Users = () => {
       );
     }
   };
+  const handleToggleLMSStatus = async (userId, currentStatus) => {
+    try {
+      await userApi.updateLMSStatus(userId, !currentStatus);
+      toast.success(
+        `User ${currentStatus ? "deactivated" : "activated"} successfully`
+      );
+      await fetchUsers();
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update user status"
+      );
+    }
+  };
 
   const handleEditClick = (user) => {
     setCurrentUser(user);
@@ -354,8 +370,8 @@ const Users = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Users Management</h2>
-        <button
+        <h2 className="text-2xl font-bold text-gray-900">Users Management</h2>
+        {/* <button
           onClick={handleAddUser}
           className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center"
         >
@@ -374,7 +390,7 @@ const Users = () => {
             />
           </svg>
           Add New User
-        </button>
+        </button> */}
       </div>
 
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -382,6 +398,9 @@ const Users = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  S.No
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Name
                 </th>
@@ -394,6 +413,9 @@ const Users = () => {
                 {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  LMS Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -413,16 +435,12 @@ const Users = () => {
               ) : (
                 users.map((user) => (
                   <tr key={user._id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {users.indexOf(user) + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                          <span className="text-indigo-800 font-medium">
-                            {user.fullname
-                              ? user.fullname.charAt(0).toUpperCase()
-                              : "U"}
-                          </span>
-                        </div>
-                        <div className="ml-4">
+                        <div className="">
                           <div className="text-sm font-medium text-gray-900">
                             {user.fullname || "N/A"}
                           </div>
@@ -449,24 +467,6 @@ const Users = () => {
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                     </td>
-                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.role === 'student' && (
-                        <div>
-                          <div>ID: {user.studentId}</div>
-                          <div>{user.course} (Sem {user.semester})</div>
-                        </div>
-                      )}
-                      {user.role === 'teacher' && (
-                        <div>
-                          <div>ID: {user.employeeId}</div>
-                          <div>{user.department}</div>
-                          <div className="text-xs text-gray-400">
-                            {user.subjects?.join(', ')}
-                          </div>
-                        </div>
-                      )}
-                      {user.role === 'admin' && 'System Administrator'}
-                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col space-y-1">
                         <span
@@ -487,13 +487,29 @@ const Users = () => {
                         </span>
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col space-y-1">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer ${
+                            user.isApproved
+                              ? "bg-green-100 text-green-800 hover:bg-green-200"
+                              : "bg-red-100 text-red-800 hover:bg-red-200"
+                          }`}
+                          onClick={() =>
+                            handleToggleLMSStatus(user._id, user.isApproved)
+                          }
+                        >
+                          {user.isApproved ? "Approved" : "Not Approved"}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex flex-col">
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleEditClick(user)}
                           className="text-indigo-600 hover:text-indigo-900"
                         >
-                          Edit
+                          <FaEdit />
                         </button>
                         <button
                           onClick={() => {
@@ -502,13 +518,13 @@ const Users = () => {
                           }}
                           className="text-blue-600 hover:text-blue-900"
                         >
-                          Change Password
+                          <FaKey />
                         </button>
                         <button
                           onClick={() => handleDeleteUser(user._id)}
                           className="text-red-600 hover:text-red-900"
                         >
-                          Delete
+                          <FaTrash />
                         </button>
                       </div>
                     </td>
