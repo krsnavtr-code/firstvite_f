@@ -42,7 +42,7 @@ const userApi = {
   // Create a new user
   create: async (userData) => {
     try {
-      const response = await api.post(API_BASE, userData);
+      const response = await api.post('/users', userData);
       return response.data;
     } catch (error) {
       console.error('Error creating user:', error);
@@ -53,7 +53,7 @@ const userApi = {
   // Update an existing user
   update: async (userId, userData) => {
     try {
-      const response = await api.put(`${API_BASE}/${userId}`, userData);
+      const response = await api.put(`/users/${userId}`, userData);
       return response.data;
     } catch (error) {
       console.error(`Error updating user ${userId}:`, error);
@@ -97,7 +97,7 @@ const userApi = {
   // Delete a user
   delete: async (userId) => {
     try {
-      await api.delete(`${API_BASE}/${userId}`);
+      await api.delete(`/users/${userId}`);
     } catch (error) {
       console.error(`Error deleting user ${userId}:`, error);
       throw error;
@@ -107,40 +107,95 @@ const userApi = {
   // Change user password
   changePassword: async (userId, currentPassword, newPassword) => {
     try {
-      // Get token from localStorage
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-      
       const response = await api.put(
-        `${API_BASE}/${userId}/change-password`,
+        '/auth/change-password',
         { currentPassword, newPassword },
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          withCredentials: true  // Important for sending cookies if using them
         }
       );
       
+      // Update the token in localStorage if a new one was returned
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+      
+      return {
+        success: true,
+        message: response.data?.message || 'Password changed successfully',
+        data: response.data?.data
+      };
+      
+    } catch (error) {
+      console.error('Error changing password:', error);
+      
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        const { status, data } = error.response;
+        
+        if (status === 401) {
+          // Clear invalid token and redirect to login
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+          return {
+            success: false,
+            message: 'Session expired. Please log in again.',
+            error: 'Authentication required'
+          };
+        }
+        
+        return {
+          success: false,
+          message: data?.message || 'Failed to change password',
+          error: data?.error || 'Unknown error occurred'
+        };
+      } else if (error.request) {
+        // The request was made but no response was received
+        return {
+          success: false,
+          message: 'No response from server. Please check your connection.',
+          error: 'Network error'
+        };
+      } else {
+        // Something happened in setting up the request
+        return {
+          success: false,
+          message: 'Error setting up the request',
+          error: error.message
+        };
+      }
+    }
+  },
+
+  // Change another user's password (Admin only)
+  changePasswordAdmin: async (userId, newPassword) => {
+    try {
+      const response = await api.put(
+        `/users/${userId}/password`,
+        { newPassword },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
       return response.data;
     } catch (error) {
-      console.error(`Error changing password for user ${userId}:`, error);
-      if (error.response?.status === 401) {
-        // Clear invalid token and redirect to login
-        localStorage.removeItem('token');
-        localStorage.removeItem('Users');
-        window.location.href = '/login';
-      }
-      throw error;
+      console.error('Error changing user password (admin):', error);
+      throw error.response?.data || error;
     }
   },
 
   // Update user status (active/inactive)
   updateStatus: async (userId, isActive) => {
     try {
-      const response = await api.put(`${API_BASE}/${userId}/status`, { isActive });
+      const response = await api.put(`/users/${userId}/status`, { isActive });
       return response.data;
     } catch (error) {
       console.error(`Error updating status for user ${userId}:`, error);

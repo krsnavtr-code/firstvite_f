@@ -6,6 +6,7 @@ import api from "../../api/axios";
 
 const RegisterForm = ({ onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [conflictMsg, setConflictMsg] = useState("");
   const navigate = useNavigate();
   const {
     register,
@@ -17,7 +18,7 @@ const RegisterForm = ({ onSuccess }) => {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-
+      setConflictMsg("");
       // Prepare user data
       const userData = {
         fullname: data.fullname, // Changed from name to fullname to match backend
@@ -40,10 +41,23 @@ const RegisterForm = ({ onSuccess }) => {
       }
     } catch (error) {
       console.error("Registration error:", error);
+      const status = error.response?.status;
       const errorMessage =
         error.response?.data?.message ||
         "Registration failed. Please try again.";
-      toast.error(errorMessage);
+
+      if (status === 409) {
+        // Duplicate email
+        setConflictMsg(
+          errorMessage || "Email already registered. Go to Login page"
+        );
+        // Optional toast for additional visibility
+        toast.error(
+          errorMessage || "Email already registered. Go to Login page"
+        );
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -56,6 +70,32 @@ const RegisterForm = ({ onSuccess }) => {
           Create your account
         </p>
       </div>
+      {conflictMsg && (
+        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-red-800 flex items-start gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mt-0.5 flex-shrink-0"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M18 10A8 8 0 11.001 10 8 8 0 0118 10zm-8-4a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 6zm0 8a1 1 0 100-2 1 1 0 000 2z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div className="flex-1">
+            <p className="font-semibold">{conflictMsg}</p>
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="mt-2 inline-flex items-center rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      )}
       <div>
         <label
           htmlFor="fullname"
@@ -68,9 +108,7 @@ const RegisterForm = ({ onSuccess }) => {
           type="text"
           {...register("fullname", { required: "Full name is required" })}
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
-            errors.fullname
-              ? "border-red-500"
-              : "border-gray-300 "
+            errors.fullname ? "border-red-500" : "border-gray-300 "
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.fullname && (
@@ -96,9 +134,7 @@ const RegisterForm = ({ onSuccess }) => {
             },
           })}
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
-            errors.email
-              ? "border-red-500"
-              : "border-gray-300 "
+            errors.email ? "border-red-500" : "border-gray-300 "
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.email && (
@@ -124,9 +160,7 @@ const RegisterForm = ({ onSuccess }) => {
             },
           })}
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
-            errors.phone
-              ? "border-red-500"
-              : "border-gray-300 "
+            errors.phone ? "border-red-500" : "border-gray-300 "
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.phone && (
@@ -152,9 +186,7 @@ const RegisterForm = ({ onSuccess }) => {
             },
           })}
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
-            errors.password
-              ? "border-red-500"
-              : "border-gray-300 "
+            errors.password ? "border-red-500" : "border-gray-300 "
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.password && (
@@ -177,9 +209,7 @@ const RegisterForm = ({ onSuccess }) => {
               value === watch("password") || "Passwords do not match",
           })}
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
-            errors.confirmPassword
-              ? "border-red-500"
-              : "border-gray-300 "
+            errors.confirmPassword ? "border-red-500" : "border-gray-300 "
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.confirmPassword && (
@@ -195,7 +225,7 @@ const RegisterForm = ({ onSuccess }) => {
           className="block text-sm font-medium  text-black "
         >
           I am a
-        </label> 
+        </label>
         <select
           id="role"
           {...register("role", { required: "Please select a role" })}
@@ -222,9 +252,7 @@ const RegisterForm = ({ onSuccess }) => {
           type="text"
           {...register("department", { required: "Department is required" })}
           className={`block w-full px-3 py-1 border bg-gray-50 border-gray-800 text-black ${
-            errors.department
-              ? "border-red-500"
-              : "border-gray-300 "
+            errors.department ? "border-red-500" : "border-gray-300 "
           } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm  `}
         />
         {errors.department && (
@@ -243,9 +271,7 @@ const RegisterForm = ({ onSuccess }) => {
       </div>
 
       <div className="text-sm text-center">
-        <span className="text-black ">
-          Already have an account?{" "}
-        </span>
+        <span className="text-black ">Already have an account? </span>
         <button
           type="button"
           onClick={() => navigate("/login")}
