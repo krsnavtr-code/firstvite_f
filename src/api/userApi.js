@@ -209,8 +209,23 @@ const userApi = {
       const response = await api.put(`/users/${userId}/lms-status`, { isApproved });
       return response.data;
     } catch (error) {
-      console.error(`Error updating LMS status for user ${userId}:`, error);
+      console.error('Error updating user LMS status:', error);
       throw error;
+    }
+  },
+  
+  // Admin enrolls a user in a course
+  adminEnrollUser: async (userId, courseId, status = 'active') => {
+    try {
+      const response = await api.post('/enrollments/admin-enroll', {
+        userId,
+        courseId,
+        status
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error enrolling user in course:', error);
+      throw error.response?.data || error;
     }
   }
 };

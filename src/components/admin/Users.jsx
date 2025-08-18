@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import userApi from "../../api/userApi";
-import { FaEdit, FaKey, FaTrash } from "react-icons/fa";
+import { FaEdit, FaKey, FaTrash, FaBook } from "react-icons/fa";
+import EnrollUserModal from "./EnrollUserModal";
 
 
 // Modal components
@@ -234,6 +235,7 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   // Fetch users on component mount
@@ -346,6 +348,21 @@ const Users = () => {
     }
   };
 
+  const handleEnrollUser = async (userId, courseId, status) => {
+    try {
+      await userApi.adminEnrollUser(userId, courseId, status);
+      return true;
+    } catch (error) {
+      console.error('Error enrolling user in course:', error);
+      throw error;
+    }
+  };
+
+  const handleEnrollClick = (user) => {
+    setCurrentUser(user);
+    setIsEnrollModalOpen(true);
+  };
+
   const handleEditClick = (user) => {
     setCurrentUser(user);
     setEditingUserId(user._id);
@@ -444,6 +461,10 @@ const Users = () => {
                           <div className="text-sm font-medium text-gray-900">
                             {user.fullname || "N/A"}
                           </div>
+                          {/* Enrolled Course name */}
+                          
+                          
+                          
                         </div>
                       </div>
                     </td>
@@ -523,8 +544,16 @@ const Users = () => {
                         <button
                           onClick={() => handleDeleteUser(user._id)}
                           className="text-red-600 hover:text-red-900"
+                          title="Delete User"
                         >
                           <FaTrash />
+                        </button>
+                        <button
+                          onClick={() => handleEnrollClick(user)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Enroll in Course"
+                        >
+                          <FaBook />
                         </button>
                       </div>
                     </td>
@@ -557,6 +586,16 @@ const Users = () => {
           setCurrentUser(null);
         }}
         onSave={handleChangePassword}
+      />
+
+      <EnrollUserModal
+        visible={isEnrollModalOpen}
+        userId={currentUser?._id}
+        onCancel={() => {
+          setIsEnrollModalOpen(false);
+          setCurrentUser(null);
+        }}
+        onEnroll={handleEnrollUser}
       />
     </div>
   );

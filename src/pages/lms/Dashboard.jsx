@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useLMS } from '../../contexts/LMSContext';
 import { Card, Button, Progress, message, Empty, Skeleton } from 'antd';
 import { BookOutlined, ArrowRightOutlined, TrophyOutlined } from '@ant-design/icons';
-import './lms.css';
 
 const { Meta } = Card;
 

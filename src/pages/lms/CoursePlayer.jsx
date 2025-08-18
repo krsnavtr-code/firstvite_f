@@ -15,7 +15,6 @@ import {
   FileTextOutlined,
   ClockCircleOutlined
 } from '@ant-design/icons';
-import './lms.css';
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
