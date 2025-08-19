@@ -17,8 +17,19 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('Dashboard mounted, loading enrollments...');
     loadEnrollments();
   }, []);
+
+  // Log when enrollments change
+  useEffect(() => {
+    console.log('Enrollments updated:', {
+      loading,
+      error,
+      count: enrollments?.length || 0,
+      enrollments
+    });
+  }, [enrollments, loading, error]);
 
   const handleCourseClick = (courseId) => {
     navigate(`/lms/courses/${courseId}`);

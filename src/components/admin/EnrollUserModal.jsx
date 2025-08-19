@@ -24,7 +24,7 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
         setCourses(coursesResponse.data || []);
         
         // Then fetch enrollments for the user
-        const enrollmentsResponse = await api.get('/enrollments/me', {
+        const enrollmentsResponse = await api.get('/enrollments/my-enrollments', {
           params: { 
             userId,
             status: 'active', // Only get active enrollments
@@ -129,7 +129,9 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
     <Modal
       title={
         currentEnrollment 
-          ? `User's Current Enrollment` 
+          ? currentEnrollment.course 
+            ? `Enrolled in: ${currentEnrollment.course.title}`
+            : `User's Current Enrollment`
           : 'Enroll User in Course'
       }
       open={visible}

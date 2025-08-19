@@ -17,6 +17,17 @@ export const LMSProvider = ({ children }) => {
   const [currentCourse, setCurrentCourse] = useState(null);
   const [progress, setProgress] = useState({});
 
+  // Reload enrollments when user changes
+  useEffect(() => {
+    if (user) {
+      console.log('User changed, reloading enrollments...');
+      loadEnrollments();
+    } else {
+      // Clear enrollments when user logs out
+      setEnrollments([]);
+    }
+  }, [user]);
+
   // Load user's enrollments
   const loadEnrollments = async () => {
     if (!user) return;
@@ -25,14 +36,28 @@ export const LMSProvider = ({ children }) => {
     setError(null);
     
     try {
+      console.log('Loading enrollments for user:', user._id);
       const response = await getMyEnrollments();
-      // The response should be an array of enrollments
-      const enrollmentsData = Array.isArray(response) ? response : (response.data || []);
-      console.log('Fetched enrollments:', enrollmentsData);
+      
+      // Log the raw response for debugging
+      console.log('Raw enrollments response:', response);
+      
+      // Handle different response formats
+      let enrollmentsData = [];
+      
+      if (Array.isArray(response)) {
+        // If response is already an array
+        enrollmentsData = response;
+      } else if (response && response.data) {
+        // If response has a data property
+        enrollmentsData = Array.isArray(response.data) ? response.data : [];
+      }
+      
+      console.log('Processed enrollments:', enrollmentsData);
       setEnrollments(enrollmentsData);
     } catch (err) {
       console.error('Error loading enrollments:', err);
-      setError(err.message || 'Failed to load enrollments');
+      setError(err.response?.data?.message || err.message || 'Failed to load enrollments');
     } finally {
       setLoading(false);
     }

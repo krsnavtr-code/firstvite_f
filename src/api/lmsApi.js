@@ -21,17 +21,28 @@ export const enrollInCourse = async (courseId) => {
  */
 export const getMyEnrollments = async () => {
   try {
-    // Use the correct endpoint that matches the backend
-    const response = await axios.get('/enrollments/me', {
+    console.log('Fetching enrollments from /enrollments/my-enrollments');
+    const response = await axios.get('/enrollments/my-enrollments', {
       params: {
         status: undefined // Get all enrollments regardless of status
       }
     });
     
+    console.log('Enrollments API Response:', {
+      status: response.status,
+      data: response.data,
+      hasData: !!response.data,
+      hasSuccess: response.data?.success,
+      enrollmentsCount: response.data?.data?.length || 0
+    });
+    
     // The backend returns { success, data, message } format
     if (response.data && response.data.success) {
+      console.log('Returning enrollments:', response.data.data || []);
       return response.data.data || [];
     }
+    
+    console.warn('No enrollments found or error in response');
     return [];
   } catch (error) {
     console.error('Error fetching enrollments:', error);
