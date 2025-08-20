@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import LMSLayout from '../../components/lms/LMSLayout';
 
 const LMS = () => {
   const { user } = useAuth();
@@ -11,11 +10,7 @@ const LMS = () => {
     return <Navigate to="/login" state={{ from: '/lms' }} replace />;
   }
 
-  return (
-    <LMSLayout>
-      <Outlet />
-    </LMSLayout>
-  );
+  return <Outlet />;
 };
 
 export default LMS;

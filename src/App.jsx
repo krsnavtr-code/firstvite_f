@@ -48,6 +48,7 @@ import PaymentsList from './pages/admin/PaymentsList';
 import PaymentDetails from './pages/admin/PaymentDetails';
 import SendBrochure from './pages/admin/SendBrochure';
 import ThankYouPage from './pages/ThankYouPage';
+import lmsRoutes from './routes/lmsRoutes';
 
 // Blog Components
 import BlogListPage from './pages/blog/BlogListPage';
@@ -301,8 +302,10 @@ function App() {
               </LMSLayout>
             </PrivateRoute>
           }>
-            <Route index element={<Dashboard />} />
-            {/* Add other LMS sub-routes here */}
+            <Route index element={<Navigate to="dashboard" replace />} />
+            {lmsRoutes.map((route, index) => (
+              <Route key={index} path={route.path} element={route.element} />
+            ))}
           </Route>
 
           {/* Status pages */}
