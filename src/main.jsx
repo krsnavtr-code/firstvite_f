@@ -7,6 +7,7 @@ import App from "./App.jsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { LMSProvider } from "./contexts/LMSContext";
 
 // A loading component to show while translations are being loaded
 const LoadingFallback = () => (
@@ -23,7 +24,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <HelmetProvider>
             <AuthProvider>
               <div className="dark:bg-slate-900 dark:text-white">
-                <App />
+                <LMSProvider>
+                  <App />
+                </LMSProvider>
               </div>
             </AuthProvider>
           </HelmetProvider>

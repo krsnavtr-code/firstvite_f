@@ -7,6 +7,8 @@ import { BookOutlined, ArrowRightOutlined, TrophyOutlined } from '@ant-design/ic
 const { Meta } = Card;
 
 const Dashboard = () => {
+  console.log('Dashboard component mounted');
+  console.log('Dashboard component mounted');
   const { 
     enrollments, 
     loading, 
@@ -18,6 +20,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     console.log('Dashboard mounted, loading enrollments...');
+    console.log('Current LMS context:', { loading, error, enrollments });
     loadEnrollments();
   }, []);
 

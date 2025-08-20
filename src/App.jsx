@@ -49,17 +49,18 @@ import PaymentDetails from './pages/admin/PaymentDetails';
 import SendBrochure from './pages/admin/SendBrochure';
 import ThankYouPage from './pages/ThankYouPage';
 
-// LMS Components
-import LMSLayout from './components/lms/LMSLayout';
-import RegisterPage from './pages/auth/RegisterPage';
-import LMS from './pages/lms';
-import InactiveAccount from './pages/auth/InactiveAccount';
-
 // Blog Components
 import BlogListPage from './pages/blog/BlogListPage';
 import BlogDetailPage from './pages/blog/BlogDetailPage';
 import BlogPostList from './pages/admin/BlogListPage';
 import BlogPostForm from './pages/admin/BlogPostForm';
+
+// LMS Components
+import LMSLayout from './components/lms/LMSLayout';
+import RegisterPage from './pages/auth/RegisterPage';
+import LMS from './pages/lms';
+import InactiveAccount from './pages/auth/InactiveAccount';
+import Dashboard from "./pages/lms/Dashboard.jsx";
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -293,13 +294,16 @@ function App() {
             </PrivateRoute>
           } />
           
-          <Route path="/lms/*" element={
+          <Route path="/lms" element={
             <PrivateRoute requireLMS={true} allowedRoles={['student', 'admin']}>
               <LMSLayout>
                 <LMS />
               </LMSLayout>
             </PrivateRoute>
-          } />
+          }>
+            <Route index element={<Dashboard />} />
+            {/* Add other LMS sub-routes here */}
+          </Route>
 
           {/* Status pages */}
           <Route path="/inactive-account" element={

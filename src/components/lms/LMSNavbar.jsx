@@ -3,7 +3,6 @@ import { Layout, Menu, Dropdown, Avatar, Badge } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { BellOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
-import "./LMSNavbar.css";
 import { FaUser } from "react-icons/fa";
 
 const { Header } = Layout;
