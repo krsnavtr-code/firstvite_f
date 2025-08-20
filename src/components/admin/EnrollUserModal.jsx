@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Form, Select, message, Spin, Tag } from 'antd';
-import api from '../../api/axios';
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Select, message, Spin, Tag } from "antd";
+import api from "../../api/axios";
 
 const { Option } = Select;
 
@@ -15,69 +15,75 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!visible || !userId) return;
-      
+
       try {
         setLoading(true);
-        
+
         // Fetch courses first
-        const coursesResponse = await api.get('/courses');
+        const coursesResponse = await api.get("/courses");
         setCourses(coursesResponse.data || []);
-        
+
         // Then fetch enrollments for the user
-        const enrollmentsResponse = await api.get('/enrollments/my-enrollments', {
-          params: { 
-            userId,
-            status: 'active', // Only get active enrollments
-            limit: 10,       // Limit the number of enrollments
-            page: 1          // First page
+        const enrollmentsResponse = await api.get(
+          "/enrollments/my-enrollments",
+          {
+            params: {
+              userId,
+              status: "active", // Only get active enrollments
+              limit: 10, // Limit the number of enrollments
+              page: 1, // First page
+            },
           }
-        });
-        
-        console.log('Enrollments API Response:', enrollmentsResponse);
-        
+        );
+
+        console.log("Enrollments API Response:", enrollmentsResponse);
+
         // Handle the response based on the API structure
         let enrollments = [];
-        if (enrollmentsResponse.data?.success && Array.isArray(enrollmentsResponse.data.data)) {
+        if (
+          enrollmentsResponse.data?.success &&
+          Array.isArray(enrollmentsResponse.data.data)
+        ) {
           enrollments = enrollmentsResponse.data.data;
         } else if (Array.isArray(enrollmentsResponse.data)) {
           // Fallback in case the response is just an array
           enrollments = enrollmentsResponse.data;
         }
-        
-        console.log('Processed Enrollments:', enrollments);
-        
+
+        console.log("Processed Enrollments:", enrollments);
+
         // Find the most relevant enrollment
         let activeEnrollment = null;
         if (enrollments.length > 0) {
           // Try to find an active enrollment, or just take the first one
           activeEnrollment = enrollments[0];
-          
+
           // Log the selected enrollment details for debugging
-          console.log('Selected enrollment details:', {
+          console.log("Selected enrollment details:", {
             id: activeEnrollment._id,
             status: activeEnrollment.status,
             hasCourse: !!activeEnrollment.course,
             courseTitle: activeEnrollment.course?.title,
-            enrollmentDate: activeEnrollment.enrollmentDate || activeEnrollment.createdAt
+            enrollmentDate:
+              activeEnrollment.enrollmentDate || activeEnrollment.createdAt,
           });
         }
-        
+
         if (activeEnrollment) {
-          console.log('Active enrollment with course:', activeEnrollment);
+          console.log("Active enrollment with course:", activeEnrollment);
           // The course data is already populated in the enrollment.course object
           // We'll keep the original structure but ensure we can access the course data
           setCurrentEnrollment({
             ...activeEnrollment,
             // Make sure we have the course details from the nested course object
-            course: activeEnrollment.course || null
+            course: activeEnrollment.course || null,
           });
         } else {
           setCurrentEnrollment(null);
         }
-        
       } catch (error) {
-        console.error('Error fetching data:', error);
-        message.error('Failed to load enrollment data');
+        console.error("Error fetching data:", error);
+        message.error("Failed to load enrollment data");
       } finally {
         setLoading(false);
       }
@@ -97,11 +103,11 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
       const values = await form.validateFields();
       setEnrolling(true);
       await onEnroll(userId, values.courseId, values.status);
-      message.success('User enrolled in course successfully');
+      message.success("User enrolled in course successfully");
       onCancel();
     } catch (error) {
-      console.error('Error enrolling user:', error);
-      message.error(error.message || 'Failed to enroll user in course');
+      console.error("Error enrolling user:", error);
+      message.error(error.message || "Failed to enroll user in course");
     } finally {
       setEnrolling(false);
     }
@@ -109,13 +115,13 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
 
   const getStatusTag = (status) => {
     const statusMap = {
-      active: { color: 'green', text: 'Active' },
-      pending: { color: 'orange', text: 'Pending' },
-      completed: { color: 'blue', text: 'Completed' },
-      rejected: { color: 'red', text: 'Rejected' }
+      active: { color: "green", text: "Active" },
+      pending: { color: "orange", text: "Pending" },
+      completed: { color: "blue", text: "Completed" },
+      rejected: { color: "red", text: "Rejected" },
     };
-    
-    const statusInfo = statusMap[status] || { color: 'default', text: status };
+
+    const statusInfo = statusMap[status] || { color: "default", text: status };
     return (
       <Tag color={statusInfo.color} style={{ marginLeft: 8 }}>
         {statusInfo.text}
@@ -123,22 +129,22 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
     );
   };
 
-  console.log('Rendering with currentEnrollment:', currentEnrollment);
-  
+  console.log("Rendering with currentEnrollment:", currentEnrollment);
+
   return (
     <Modal
       title={
-        currentEnrollment 
-          ? currentEnrollment.course 
+        currentEnrollment
+          ? currentEnrollment.course
             ? `Enrolled in: ${currentEnrollment.course.title}`
             : `User's Current Enrollment`
-          : 'Enroll User in Course'
+          : "Enroll User in Course"
       }
       open={visible}
       onCancel={onCancel}
       onOk={currentEnrollment ? onCancel : handleSubmit}
       confirmLoading={enrolling}
-      okText={currentEnrollment ? 'Close' : 'Enroll'}
+      okText={currentEnrollment ? "Close" : "Enroll"}
       cancelText="Cancel"
     >
       <Spin spinning={loading}>
@@ -146,24 +152,29 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
           <div>
             <div className="space-y-2">
               <p className="text-lg font-medium">
-                <span className="text-gray-700">Course:</span> {currentEnrollment.course?.title || 'N/A'}
-                {getStatusTag(currentEnrollment.status || 'active')}
+                <span className="text-gray-700">Course:</span>{" "}
+                {currentEnrollment.course?.title || "N/A"}
+                {getStatusTag(currentEnrollment.status || "active")}
               </p>
               <p className="text-gray-600">
-                <span className="font-medium">Enrolled on:</span> {new Date(currentEnrollment.enrollmentDate || currentEnrollment.createdAt).toLocaleDateString()}
+                <span className="font-medium">Enrolled on:</span>{" "}
+                {new Date(
+                  currentEnrollment.enrollmentDate ||
+                    currentEnrollment.createdAt
+                ).toLocaleDateString()}
               </p>
               <p className="text-gray-600">
-                <span className="font-medium">Progress:</span> {currentEnrollment.progress || 0}%
+                <span className="font-medium">Progress:</span>{" "}
+                {currentEnrollment.progress || 0}%
               </p>
               {currentEnrollment.completedAt && (
                 <p className="text-gray-600">
-                  <span className="font-medium">Completed on:</span> {new Date(currentEnrollment.completedAt).toLocaleDateString()}
+                  <span className="font-medium">Completed on:</span>{" "}
+                  {new Date(currentEnrollment.completedAt).toLocaleDateString()}
                 </p>
               )}
               {currentEnrollment.certificateIssued && (
-                <p className="text-green-600 font-medium">
-                  Certificate Issued
-                </p>
+                <p className="text-green-600 font-medium">Certificate Issued</p>
               )}
             </div>
           </div>
@@ -179,7 +190,8 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
                 showSearch
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
                 }
               >
                 {courses
