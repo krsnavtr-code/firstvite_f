@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// LMSContext.jsx
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import api from '../api/axios';
 import {
   getMyEnrollments,
   getCourseContent,
@@ -7,61 +9,152 @@ import {
   generateCertificate as generateCertificateApi
 } from '../api/lmsApi';
 
+// Create a context for LMS
 const LMSContext = createContext();
 
+export const useLMS = () => {
+  const context = useContext(LMSContext);
+  if (!context) {
+    throw new Error('useLMS must be used within an LMSProvider');
+  }
+  return context;
+};
+
 export const LMSProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [enrollments, setEnrollments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentCourse, setCurrentCourse] = useState(null);
   const [progress, setProgress] = useState({});
+  
+  console.log('LMSProvider - User state:', { 
+    user, 
+    isAuthenticated,
+    hasUser: !!user,
+    userId: user?._id 
+  });
 
-  // Reload enrollments when user changes
-  useEffect(() => {
-    if (user) {
-      console.log('User changed, reloading enrollments...');
-      loadEnrollments();
-    } else {
-      // Clear enrollments when user logs out
-      setEnrollments([]);
-    }
-  }, [user]);
-
-  // Load user's enrollments
-  const loadEnrollments = async () => {
-    if (!user) return;
+  // Load enrollments when user changes
+  const loadEnrollments = useCallback(async () => {
+    console.group('Loading Enrollments');
+    console.log('Current auth state:', { user, isAuthenticated });
     
+    const token = localStorage.getItem('token');
+    if ((!user && !token) || !isAuthenticated) {
+      console.log('No authenticated user or token, skipping enrollments load');
+      setLoading(false);
+      setEnrollments([]);
+      console.groupEnd();
+      return;
+    }
+    
+    // If we have a token but no user, try to get the user from localStorage
+    let currentUser = user;
+    if (!currentUser && token) {
+      try {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          currentUser = JSON.parse(userData);
+          console.log('Retrieved user from localStorage:', currentUser);
+        }
+      } catch (e) {
+        console.error('Error parsing user from localStorage:', e);
+      }
+    }
+    
+    const userId = currentUser?._id || user?._id;
+    if (!userId) {
+      console.error('No user ID available for fetching enrollments');
+      setLoading(false);
+      setEnrollments([]);
+      console.groupEnd();
+      return;
+    }
+
+    console.log('Loading enrollments for user:', userId);
     setLoading(true);
     setError(null);
     
     try {
-      console.log('Loading enrollments for user:', user._id);
+      console.log('Fetching enrollments...');
+      // Ensure token is set in headers
+      const token = localStorage.getItem('token');
+      if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await getMyEnrollments();
+      console.log('Enrollments API response:', response);
       
-      // Log the raw response for debugging
-      console.log('Raw enrollments response:', response);
-      
-      // Handle different response formats
+      // Process the response based on its format
       let enrollmentsData = [];
       
       if (Array.isArray(response)) {
-        // If response is already an array
         enrollmentsData = response;
-      } else if (response && response.data) {
-        // If response has a data property
+      } else if (response?.data) {
         enrollmentsData = Array.isArray(response.data) ? response.data : [];
       }
       
-      console.log('Processed enrollments:', enrollmentsData);
-      setEnrollments(enrollmentsData);
+      // Filter out guest enrollments and ensure the course exists
+      enrollmentsData = enrollmentsData.filter(enrollment => {
+        const isValid = enrollment.user && 
+                       enrollment.course && 
+                       !enrollment.isGuestEnrollment;
+        
+        if (!isValid) {
+          console.log('Filtering out invalid enrollment:', {
+            id: enrollment._id,
+            hasUser: !!enrollment.user,
+            hasCourse: !!enrollment.course,
+            isGuest: enrollment.isGuestEnrollment
+          });
+        }
+        
+        return isValid;
+      });
+      
+      console.log('Filtered enrollments:', enrollmentsData);
+      
+      console.log(`Found ${enrollmentsData.length} enrollments`);
+      
+      // Process each enrollment to ensure consistent structure
+      const processedEnrollments = enrollmentsData.map(enrollment => {
+        // Handle case where course might be a string ID or an object
+        const course = typeof enrollment.course === 'string' 
+          ? { _id: enrollment.course }
+          : enrollment.course || {};
+          
+        return {
+          ...enrollment,
+          course: {
+            _id: course._id || enrollment.courseId || 'unknown-course',
+            title: course.title || 'Untitled Course',
+            description: course.description || '',
+            image: course.image || null,
+            ...course
+          },
+          progress: Math.min(100, Math.max(0, Number(enrollment.progress) || 0)),
+          completionStatus: enrollment.completionStatus || 'in_progress'
+        };
+      });
+      
+      console.log('Processed enrollments:', processedEnrollments);
+      setEnrollments(processedEnrollments);
+      
     } catch (err) {
       console.error('Error loading enrollments:', err);
       setError(err.response?.data?.message || err.message || 'Failed to load enrollments');
     } finally {
       setLoading(false);
+      console.groupEnd();
     }
-  };
+  }, [user, isAuthenticated]);
+  
+  // Load enrollments when user changes
+  useEffect(() => {
+    loadEnrollments();
+  }, [loadEnrollments]);
 
   // Load course content
   const loadCourseContent = async (courseId) => {
@@ -145,16 +238,6 @@ export const LMSProvider = ({ children }) => {
     }
   };
 
-  // Load enrollments when user changes
-  useEffect(() => {
-    if (user) {
-      loadEnrollments();
-    } else {
-      setEnrollments([]);
-      setCurrentCourse(null);
-    }
-  }, [user]);
-
   const value = {
     enrollments,
     currentCourse,
@@ -171,10 +254,4 @@ export const LMSProvider = ({ children }) => {
   return <LMSContext.Provider value={value}>{children}</LMSContext.Provider>;
 };
 
-export const useLMS = () => {
-  const context = useContext(LMSContext);
-  if (!context) {
-    throw new Error('useLMS must be used within an LMSProvider');
-  }
-  return context;
-};
+

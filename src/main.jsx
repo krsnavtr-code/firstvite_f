@@ -1,8 +1,8 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
-import { I18nextProvider } from 'react-i18next';
-import i18n from './i18n';
+import { I18nextProvider } from "react-i18next";
+import i18n from "./i18n";
 import App from "./App.jsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
@@ -23,11 +23,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <HelmetProvider>
             <AuthProvider>
-              <div className="dark:bg-slate-900 dark:text-white">
-                <LMSProvider>
+              <LMSProvider>
+                <div className="dark:bg-slate-900 dark:text-white">
                   <App />
-                </LMSProvider>
-              </div>
+                </div>
+              </LMSProvider>
             </AuthProvider>
           </HelmetProvider>
         </BrowserRouter>

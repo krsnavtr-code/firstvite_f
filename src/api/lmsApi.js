@@ -24,25 +24,34 @@ export const getMyEnrollments = async () => {
     console.log('Fetching enrollments from /enrollments/my-enrollments');
     const response = await axios.get('/enrollments/my-enrollments', {
       params: {
-        status: undefined // Get all enrollments regardless of status
+        status: undefined, // Get all enrollments regardless of status
+        populate: 'course' // Ensure course data is populated
       }
     });
     
-    console.log('Enrollments API Response:', {
-      status: response.status,
-      data: response.data,
-      hasData: !!response.data,
-      hasSuccess: response.data?.success,
-      enrollmentsCount: response.data?.data?.length || 0
-    });
+    // Log the full response for debugging
+    console.group('Enrollments API Response');
+    console.log('Status:', response.status);
+    console.log('Response data:', response.data);
+    console.log('Response headers:', response.headers);
+    console.log('Has data:', !!response.data);
+    console.log('Success:', response.data?.success);
+    console.log('Data type:', Array.isArray(response.data?.data) ? 'array' : typeof response.data?.data);
+    console.log('Data length:', Array.isArray(response.data?.data) ? response.data.data.length : 'N/A');
+    console.groupEnd();
     
-    // The backend returns { success, data, message } format
-    if (response.data && response.data.success) {
-      console.log('Returning enrollments:', response.data.data || []);
-      return response.data.data || [];
+    // Handle different response formats
+    if (response.data) {
+      if (response.data.success && Array.isArray(response.data.data)) {
+        console.log('Returning enrollments:', response.data.data);
+        return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        console.log('Returning direct array response:', response.data);
+        return response.data;
+      }
     }
     
-    console.warn('No enrollments found or error in response');
+    console.warn('No valid enrollments data found in response');
     return [];
   } catch (error) {
     console.error('Error fetching enrollments:', error);
