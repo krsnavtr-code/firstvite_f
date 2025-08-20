@@ -50,10 +50,10 @@ const LMSNavbar = () => {
   );
 
   return (
-    <header className="flex items-center justify-between px-6 py-1 bg-white shadow-sm border-b border-gray-100">
+    <header className="flex items-center justify-between px-6 bg-white shadow-sm border-b border-gray-100">
       {/* Left: Logo */}
-      <Link to="/lms" className="flex items-center space-x-2 group">
-        <div className="w-12 h-12 rounded-sm overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
+      <Link to="/lms" className="flex items-center group">
+        <div className="w-10 h-10 p-1 overflow-hidden group-hover:scale-105 transition-transform">
           <img
             src="http://firstvite.com/api/upload/file/img-1753961989896-7541613.png"
             alt="Logo"
@@ -63,36 +63,36 @@ const LMSNavbar = () => {
       </Link>
 
       {/* Right: Notifications + User */}
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-2">
         {/* Live Chat */}
-        <Link className="text-gray-600 hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 py-1 rounded-lg">
+        <Link className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg">
           Live Chat
         </Link>
         {/* Request a CallBack */}
-        <Link className="text-gray-600 hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 py-1 rounded-lg">
+        <Link className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg">
           Request a CallBack
         </Link>
         {/* Portfolio */}
-        <Link className="flex items-center text-gray-600 hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 py-1 rounded-lg">
+        <Link className="flex items-center text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-1 rounded-lg">
           <FaUser /> Portfolio
         </Link>
 
         {/* Notification */}
-        <Badge count={5} size="small" offset={[0, 5]}>
-          <BellOutlined className="text-xl text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+        <Badge count={1} size="small" offset={[0, 0]} style={{ fontSize: "12px" }}>
+          <BellOutlined className="text-md text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
         </Badge>
 
         {/* User Menu */}
         <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
-          <div className="flex items-center cursor-pointer space-x-2 hover:bg-gray-50 px-3 py-1 rounded-lg transition">
+          <div className="flex items-center cursor-pointer space-x-2 hover:bg-gray-50 px-3 transition">
             <Avatar
-              size={36}
+              size={26}
               icon={<UserOutlined />}
               src={currentUser?.avatar}
             />
             <span className="font-medium text-gray-700">
               Hi, {currentUser?.fullname || "User"}
-              <p className="text-gray-500" style={{ fontSize: "8px" }}>Be The First With Us</p>
+              <p className="text-gray-500" style={{ fontSize: "8px" }}>Become <span className="text-blue-600">Be The First</span> With Us</p>
             </span>
           </div>
         </Dropdown>
