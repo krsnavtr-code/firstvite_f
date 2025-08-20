@@ -34,7 +34,7 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
       key: "courses",
       icon: <BookOutlined />,
       label: "My Courses",
-      onClick: () => navigate("/lms/courses"),
+      onClick: () => navigate("/lms/learning"),
     },
     {
       key: "assignments",
@@ -42,18 +42,18 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
       label: "Assignments",
       onClick: () => navigate("/lms/assignments"),
     },
-    {
-      key: "calendar",
-      icon: <CalendarOutlined />,
-      label: "Calendar",
-      onClick: () => navigate("/lms/calendar"),
-    },
-    {
-      key: "messages",
-      icon: <MessageOutlined />,
-      label: "Messages",
-      onClick: () => navigate("/lms/messages"),
-    },
+    // {
+    //   key: "calendar",
+    //   icon: <CalendarOutlined />,
+    //   label: "Calendar",
+    //   onClick: () => navigate("/lms/calendar"),
+    // },
+    // {
+    //   key: "messages",
+    //   icon: <MessageOutlined />,
+    //   label: "Messages",
+    //   onClick: () => navigate("/lms/messages"),
+    // },
     {
       key: "discussions",
       icon: <TeamOutlined />,
