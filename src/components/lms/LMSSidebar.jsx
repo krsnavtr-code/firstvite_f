@@ -61,12 +61,6 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
       onClick: () => navigate("/lms/discussions"),
     },
     {
-      key: "profile",
-      icon: <UserOutlined />,
-      label: "Profile",
-      onClick: () => navigate("/lms/profile"),
-    },
-    {
       key: "settings",
       icon: <SettingOutlined />,
       label: "Settings",

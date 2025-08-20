@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import Dashboard from '../pages/lms/Dashboard';
 import Settings from '../pages/lms/Settings';
+import Discussions from '../pages/lms/Discussions';
 
 const lmsRoutes = [
   {
@@ -10,6 +11,10 @@ const lmsRoutes = [
   {
     path: 'settings',
     element: <Settings />,
+  },
+  {
+    path: 'discussions',
+    element: <Discussions />,
   },
   {
     path: '*',
