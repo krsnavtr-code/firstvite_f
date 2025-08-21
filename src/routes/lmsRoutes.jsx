@@ -4,6 +4,7 @@ import Settings from '../pages/lms/Settings';
 import Discussions from '../pages/lms/Discussions';
 import Assignments from '../pages/lms/Assignments';
 import CourseDetails from '../pages/lms/CourseDetails';
+import SprintDetails from '../pages/lms/SprintDetails';
 
 const lmsRoutes = [
   {
@@ -25,6 +26,10 @@ const lmsRoutes = [
   {
     path: 'courses/:courseId',
     element: <CourseDetails />,
+  },
+  {
+    path: 'courses/:courseId/sprints/:sprintId',
+    element: <SprintDetails />,
   },
   {
     path: '*',

@@ -291,9 +291,9 @@ const Sessions = ({ sprintId, onClose }) => {
           
           <Form.Item
             name="videoUrl"
-            label="Video URL"
+            label="Meeting Link! If you want to add it later, leave it blank."
           >
-            <Input placeholder="Enter video URL (optional)" />
+            <Input placeholder="Enter meeting link" />
           </Form.Item>
           
           <Form.Item

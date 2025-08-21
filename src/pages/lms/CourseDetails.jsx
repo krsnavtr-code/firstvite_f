@@ -58,8 +58,10 @@ const CourseDetails = () => {
     }
   }, [courseId, enrollments, navigate]);
 
-  const handleSprintClick = (sprintId) => {
-    navigate(`/lms/courses/${courseId}/sprints/${sprintId}`);
+  const handleSprintClick = (sprint, e) => {
+    // Prevent the card click from interfering with button click
+    if (e && e.stopPropagation) e.stopPropagation();
+    navigate(`/lms/courses/${courseId}/sprints/${sprint._id}`);
   };
 
   if (loading) {
@@ -153,8 +155,7 @@ const CourseDetails = () => {
             {sprints.map((sprint) => (
               <Card 
                 key={sprint._id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => handleSprintClick(sprint._id)}
+                className="hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-center">
                   <div>
@@ -172,6 +173,7 @@ const CourseDetails = () => {
                     type="text" 
                     icon={sprint.completed ? <CheckCircleOutlined /> : <PlayCircleOutlined />}
                     className="text-gray-700"
+                    onClick={(e) => handleSprintClick(sprint, e)}
                   >
                     {sprint.completed ? 'Completed' : 'Start'}
                   </Button>
