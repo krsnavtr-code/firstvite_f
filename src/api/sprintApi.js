@@ -1,6 +1,20 @@
 import api from './axios';
 
 /**
+ * Get all sprints
+ * @returns {Promise<Array>} - List of all sprints
+ */
+export const getAllSprints = async () => {
+  try {
+    const response = await api.get('/v1/sprints');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all sprints:', error);
+    throw error;
+  }
+};
+
+/**
  * Create a new sprint
  * @param {Object} sprintData - Sprint data including courseId, name, and other fields
  * @returns {Promise<Object>} - Created sprint data
