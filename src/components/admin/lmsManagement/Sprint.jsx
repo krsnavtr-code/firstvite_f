@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Table, Space, Modal, message, DatePicker, Switch } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Select, Table, Space, Modal, message, DatePicker, Switch, Popconfirm, Tag, Tabs } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import Sessions from './Sessions';
 import { getCourses } from '../../../api/courseApi';
 import { 
   createSprint, 
@@ -21,6 +22,7 @@ const Sprint = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingSprint, setEditingSprint] = useState(null);
+  const [viewingSprints, setViewingSprints] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Fetch courses on component mount
@@ -269,27 +271,68 @@ const Sprint = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
-      fixed: 'right',
+      width: 200,
       render: (_, record) => (
-        <Space size="small">
+        <Space size="middle">
           <Button 
-            type="link" 
-            icon={<EditOutlined className="text-blue-500" />} 
-            onClick={() => showModal(record)}
-            title="Edit"
+            type="text" 
+            icon={<UnorderedListOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              setViewingSprints(record._id);
+            }}
+            title="Manage Sessions"
           />
           <Button 
-            type="link" 
-            danger 
-            icon={<DeleteOutlined />} 
-            onClick={() => handleDelete(record._id)}
-            title="Delete"
+            type="text" 
+            icon={<EditOutlined />} 
+            onClick={(e) => {
+              e.stopPropagation();
+              showModal(record);
+            }}
+            title="Edit Sprint"
           />
+          <Popconfirm
+            title="Are you sure you want to delete this sprint?"
+            onConfirm={(e) => {
+              e?.stopPropagation();
+              handleDelete(record._id);
+            }}
+            onCancel={(e) => e?.stopPropagation()}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button 
+              type="text" 
+              danger 
+              icon={<DeleteOutlined />} 
+              onClick={(e) => e.stopPropagation()}
+              title="Delete Sprint"
+            />
+          </Popconfirm>
         </Space>
       ),
     },
   ];
+
+  if (viewingSprints) {
+    return (
+      <div className="p-6">
+        <Button 
+          type="text" 
+          icon={<ArrowLeftOutlined />} 
+          onClick={() => setViewingSprints(null)}
+          className="mb-4"
+        >
+          Back to Sprints
+        </Button>
+        <Sessions 
+          sprintId={viewingSprints} 
+          onClose={() => setViewingSprints(null)} 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
