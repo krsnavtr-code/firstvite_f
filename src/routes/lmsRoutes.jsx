@@ -3,6 +3,7 @@ import Dashboard from '../pages/lms/Dashboard';
 import Settings from '../pages/lms/Settings';
 import Discussions from '../pages/lms/Discussions';
 import Assignments from '../pages/lms/Assignments';
+import CourseDetails from '../pages/lms/CourseDetails';
 
 const lmsRoutes = [
   {
@@ -20,6 +21,10 @@ const lmsRoutes = [
   {
     path: 'assignments',
     element: <Assignments />,
+  },
+  {
+    path: 'courses/:courseId',
+    element: <CourseDetails />,
   },
   {
     path: '*',
