@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Modal, Form, Input, InputNumber, message, Popconfirm, Select } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
-import { createSession, getSessionsBySprint, updateSession, deleteSession, reorderSessions } from '../../../api/sessionApi';
+import { 
+  Table, Button, Space, Modal, Form, Input, InputNumber, message, 
+  Popconfirm, Select, Card, Tag, Divider 
+} from 'antd';
+import { 
+  PlusOutlined, EditOutlined, DeleteOutlined, 
+  ArrowUpOutlined, ArrowDownOutlined, UnorderedListOutlined 
+} from '@ant-design/icons';
+import { 
+  createSession, getSessionsBySprint, updateSession, 
+  deleteSession, reorderSessions 
+} from '../../../api/sessionApi';
+import { 
+  createTask, getTasksBySession, updateTask, deleteTask 
+} from '../../../api/taskApi';
+import TaskForm from './TaskForm';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -9,9 +22,14 @@ const { Option } = Select;
 const Sessions = ({ sprintId, onClose }) => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSessionModalVisible, setIsSessionModalVisible] = useState(false);
+  const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const [editingSession, setEditingSession] = useState(null);
+  const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
   const [form] = Form.useForm();
+  const [taskForm] = Form.useForm();
 
   useEffect(() => {
     if (sprintId) {
@@ -34,7 +52,7 @@ const Sessions = ({ sprintId, onClose }) => {
     }
   };
 
-  const showModal = (session = null) => {
+  const showSessionModal = (session = null) => {
     setEditingSession(session);
     form.setFieldsValue({
       name: session?.name || '',
@@ -44,7 +62,51 @@ const Sessions = ({ sprintId, onClose }) => {
       videoUrl: session?.videoUrl || '',
       isActive: session?.isActive ?? true
     });
-    setIsModalVisible(true);
+    setIsSessionModalVisible(true);
+  };
+
+  const showTaskModal = (sessionId) => {
+    setCurrentSessionId(sessionId);
+    fetchTasks(sessionId);
+    setIsTaskModalVisible(true);
+  };
+
+  const fetchTasks = async (sessionId) => {
+    try {
+      setTasksLoading(true);
+      const response = await getTasksBySession(sessionId);
+      if (response && response.data && response.data.tasks) {
+        setTasks(response.data.tasks);
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      message.error('Failed to load tasks');
+    } finally {
+      setTasksLoading(false);
+    }
+  };
+
+  const handleTaskSubmit = async (taskData) => {
+    try {
+      setTasksLoading(true);
+      if (taskData._id) {
+        await updateTask(taskData._id, taskData);
+        message.success('Task updated successfully');
+      } else {
+        await createTask({
+          ...taskData,
+          sessionId: currentSessionId
+        });
+        message.success('Task created successfully');
+      }
+      await fetchTasks(currentSessionId);
+      taskForm.resetFields();
+    } catch (error) {
+      console.error('Error saving task:', error);
+      message.error(error.response?.data?.message || 'Failed to save task');
+    } finally {
+      setTasksLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -66,7 +128,7 @@ const Sessions = ({ sprintId, onClose }) => {
         message.success('Session created successfully');
       }
 
-      setIsModalVisible(false);
+      setIsSessionModalVisible(false);
       fetchSessions();
     } catch (error) {
       console.error('Error saving session:', error);
@@ -119,89 +181,81 @@ const Sessions = ({ sprintId, onClose }) => {
     }
   };
 
+  const handleSessionCancel = () => {
+    setIsSessionModalVisible(false);
+    setEditingSession(null);
+    form.resetFields();
+  };
+
+  const handleTaskCancel = () => {
+    setIsTaskModalVisible(false);
+    setCurrentSessionId(null);
+  };
+
   const columns = [
-    {
-      title: 'Order',
-      key: 'order',
-      width: 100,
-      render: (_, record, index) => (
-        <div className="flex items-center space-x-1">
-          <Button 
-            icon={<ArrowUpOutlined />} 
-            size="small" 
-            disabled={index === 0}
-            onClick={(e) => {
-              e.stopPropagation();
-              moveSession(record._id, 'up');
-            }}
-          />
-          <span className="mx-1">{index + 1}</span>
-          <Button 
-            icon={<ArrowDownOutlined />} 
-            size="small" 
-            disabled={index === sessions.length - 1}
-            onClick={(e) => {
-              e.stopPropagation();
-              moveSession(record._id, 'down');
-            }}
-          />
-        </div>
-      ),
-    },
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record) => (
-        <div>
-          <div className="font-medium">{text}</div>
-          <div className="text-xs text-gray-500">{record.duration} minutes</div>
-        </div>
+      sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: 'Duration (min)',
+      dataIndex: 'duration',
+      key: 'duration',
+      width: 120,
+      sorter: (a, b) => a.duration - b.duration,
+    },
+    {
+      title: 'Tasks',
+      key: 'tasks',
+      width: 100,
+      render: (_, record) => (
+        <Button 
+          type="link" 
+          icon={<UnorderedListOutlined />}
+          onClick={() => showTaskModal(record._id)}
+        >
+          Tasks ({record.taskCount || 0})
+        </Button>
       ),
     },
     {
       title: 'Status',
       dataIndex: 'isActive',
-      key: 'status',
+      key: 'isActive',
       width: 100,
       render: (isActive) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${
-          isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-        }`}>
+        <Tag color={isActive ? 'green' : 'red'}>
           {isActive ? 'Active' : 'Inactive'}
-        </span>
+        </Tag>
       ),
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
+      width: 250,
       render: (_, record) => (
         <Space size="middle">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
-            onClick={(e) => {
-              e.stopPropagation();
-              showModal(record);
-            }}
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => showSessionModal(record)}
           />
+          <Button
+            type="text"
+            icon={<UnorderedListOutlined />}
+            onClick={() => showTaskModal(record._id)}
+          >
+            Tasks
+          </Button>
           <Popconfirm
             title="Are you sure you want to delete this session?"
-            onConfirm={(e) => {
-              e?.stopPropagation();
-              handleDelete(record._id);
-            }}
-            onCancel={(e) => e?.stopPropagation()}
+            onConfirm={() => handleDelete(record._id)}
             okText="Yes"
             cancelText="No"
           >
-            <Button 
-              type="text" 
-              danger 
-              icon={<DeleteOutlined />} 
-              onClick={(e) => e.stopPropagation()}
-            />
+            <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
@@ -219,7 +273,7 @@ const Sessions = ({ sprintId, onClose }) => {
           <Button 
             type="primary" 
             icon={<PlusOutlined />}
-            onClick={() => showModal()}
+            onClick={() => showSessionModal()}
           >
             Add Session
           </Button>
@@ -228,23 +282,21 @@ const Sessions = ({ sprintId, onClose }) => {
 
       <Table 
         columns={columns} 
-        dataSource={sessions} 
+        dataSource={sessions.map(session => ({
+          ...session,
+          taskCount: session.tasks?.length || 0
+        }))}
         rowKey="_id"
         loading={loading}
         pagination={false}
-        rowClassName="cursor-pointer hover:bg-gray-50"
-        onRow={(record) => ({
-          onClick: () => showModal(record),
-        })}
       />
 
       <Modal
-        title={`${editingSession ? 'Edit' : 'Create'} Session`}
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        title={editingSession ? 'Edit Session' : 'Add New Session'}
+        open={isSessionModalVisible}
         onOk={handleSubmit}
-        confirmLoading={loading}
-        width={700}
+        onCancel={handleSessionCancel}
+        width={800}
       >
         <Form
           form={form}
@@ -304,6 +356,13 @@ const Sessions = ({ sprintId, onClose }) => {
           </Form.Item>
         </Form>
       </Modal>
+
+      <TaskForm
+        visible={isTaskModalVisible}
+        sessionId={currentSessionId}
+        onSave={handleTaskSubmit}
+        onCancel={handleTaskCancel}
+      />
     </div>
   );
 };
