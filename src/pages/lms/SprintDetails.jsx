@@ -8,7 +8,9 @@ import {
   DownOutlined, 
   RightOutlined,
   FileTextOutlined,
-  CloseCircleOutlined
+  CloseCircleOutlined,
+  LockOutlined,
+  CheckOutlined
 } from '@ant-design/icons';
 import { getSessionsBySprint } from '../../api/sessionApi';
 import { getTasksBySession } from '../../api/taskApi';
@@ -39,8 +41,16 @@ const SprintDetails = () => {
   // Get user ID safely
   const getUserId = () => {
     const userId = currentUser?._id || localStorage.getItem('userId');
-    console.log('Current User ID:', userId);
     return userId;
+  };
+
+  // Check if task has been attempted by user (locked if any submission exists)
+  const isTaskCompleted = (task) => {
+    if (!task?.submissions?.length) return false;
+    const userId = getUserId();
+    return task.submissions.some(
+      sub => sub.user?._id === userId || sub.user === userId
+    );
   };
 
   useEffect(() => {
@@ -247,13 +257,31 @@ const SprintDetails = () => {
                       {sessionTasks[session._id]?.map((task) => (
                         <div 
                           key={task._id} 
-                          className="p-3 bg-white rounded border border-gray-100 hover:border-blue-100 transition-colors cursor-pointer"
-                          onClick={(e) => {
+                          className={`p-3 rounded border transition-colors ${
+                            isTaskCompleted(task) 
+                              ? 'bg-green-50 border-green-200' 
+                              : 'bg-white border-gray-100 hover:border-blue-100 cursor-pointer'
+                          }`}
+                          onClick={!isTaskCompleted(task) ? (e) => {
                             e.stopPropagation();
                             navigate(`/lms/courses/${courseId}/sprints/${sprintId}/sessions/${session._id}/tasks/${task._id}`);
-                          }}
+                          } : undefined}
                         >
-                          <div className="font-medium">{task.title}</div>
+                          <div className="flex justify-between items-start">
+                            <div className="font-medium">
+                              {task.title}
+                              {isTaskCompleted(task) && (
+                                <span className="ml-2 text-green-600 text-sm">
+                                  <CheckOutlined /> Completed
+                                </span>
+                              )}
+                            </div>
+                            {isTaskCompleted(task) && (
+                              <Tag color="green" className="flex items-center">
+                                <LockOutlined className="mr-1" /> Locked
+                              </Tag>
+                            )}
+                          </div>
                           {task.description && (
                             <div className="text-gray-600 text-sm mt-1">
                               {task.description}
@@ -261,11 +289,13 @@ const SprintDetails = () => {
                           )}
                           <div className="mt-2 flex items-center space-x-2">
                             {task.questions?.length > 0 && (
-                              <Tag color="blue">
+                              <Tag color={isTaskCompleted(task) ? 'green' : 'blue'}>
                                 {task.questions.length} question{task.questions.length !== 1 ? 's' : ''}
                               </Tag>
                             )}
-                            <span className="text-xs text-gray-500">Click to start</span>
+                            {!isTaskCompleted(task) && (
+                              <span className="text-xs text-gray-500">Click to start</span>
+                            )}
                           </div>
                         </div>
                       ))}
