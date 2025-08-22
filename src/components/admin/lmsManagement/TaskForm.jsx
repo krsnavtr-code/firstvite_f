@@ -63,27 +63,24 @@ const TaskForm = ({ visible, onCancel, onSave, sessionId }) => {
   };
 
   const addQuestion = () => {
-    const newQuestionIndex = questions.length > 0 ? Math.max(...questions) + 1 : 0;
-    setQuestions([...questions, newQuestionIndex]);
+    const newQuestion = {
+      question: '',
+      questionType: 'multiple_choice',
+      points: 1,
+      options: [{ text: '', isCorrect: false }],
+      explanation: ''
+    };
+
+    // Get current questions from form
+    const currentQuestions = form.getFieldValue('questions') || [];
     
-    form.setFields((prevFields) => {
-      const questionsField = prevFields.find(field => field.name[0] === 'questions');
-      const currentQuestions = questionsField?.value || [];
-      
-      return {
-        ...prevFields,
-        questions: [
-          ...currentQuestions,
-          {
-            question: '',
-            questionType: 'multiple_choice',
-            points: 1,
-            options: [{ text: '', isCorrect: false }],
-            explanation: ''
-          }
-        ]
-      };
+    // Update form with new question
+    form.setFieldsValue({
+      questions: [...currentQuestions, newQuestion]
     });
+    
+    // Update local state
+    setQuestions(prev => [...prev, prev.length]);
   };
 
   const removeQuestion = (index) => {
@@ -92,18 +89,16 @@ const TaskForm = ({ visible, onCancel, onSave, sessionId }) => {
       return;
     }
     
-    const newQuestions = questions.filter((_, i) => i !== index);
-    setQuestions(newQuestions);
+    // Get current questions from form
+    const currentQuestions = form.getFieldValue('questions') || [];
     
-    form.setFields((prevFields) => {
-      const questionsField = prevFields.find(field => field.name[0] === 'questions');
-      const currentQuestions = questionsField?.value || [];
-      
-      return {
-        ...prevFields,
-        questions: currentQuestions.filter((_, i) => i !== index)
-      };
+    // Update form with filtered questions
+    form.setFieldsValue({
+      questions: currentQuestions.filter((_, i) => i !== index)
     });
+    
+    // Update local state
+    setQuestions(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
