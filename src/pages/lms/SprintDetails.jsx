@@ -53,6 +53,18 @@ const SprintDetails = () => {
     );
   };
 
+  // Check if a task should be unlocked
+  const isTaskUnlocked = (taskIndex, tasks) => {
+    // First task is always unlocked
+    if (taskIndex === 0) return true;
+    
+    // If no previous task, it's locked
+    if (taskIndex < 0 || !tasks[taskIndex - 1]) return false;
+    
+    // Check if previous task is completed
+    return isTaskCompleted(tasks[taskIndex - 1]);
+  };
+
   useEffect(() => {
     const fetchSessions = async () => {
       try {
@@ -254,15 +266,21 @@ const SprintDetails = () => {
                     </div>
                   ) : sessionTasks[session._id]?.length > 0 ? (
                     <div className="space-y-2">
-                      {sessionTasks[session._id]?.map((task) => (
+                      {sessionTasks[session._id]?.map((task, taskIndex, tasks) => {
+                        const isUnlocked = isTaskUnlocked(taskIndex, tasks);
+                        const isCompleted = isTaskCompleted(task);
+                        
+                        return (
                         <div 
                           key={task._id} 
                           className={`p-3 rounded border transition-colors ${
-                            isTaskCompleted(task) 
+                            isCompleted 
                               ? 'bg-green-50 border-green-200' 
-                              : 'bg-white border-gray-100 hover:border-blue-100 cursor-pointer'
+                              : !isUnlocked 
+                                ? 'bg-gray-50 border-gray-200' 
+                                : 'bg-white border-gray-100 hover:border-blue-100 cursor-pointer'
                           }`}
-                          onClick={!isTaskCompleted(task) ? (e) => {
+                          onClick={isUnlocked && !isCompleted ? (e) => {
                             e.stopPropagation();
                             navigate(`/lms/courses/${courseId}/sprints/${sprintId}/sessions/${session._id}/tasks/${task._id}`);
                           } : undefined}
@@ -293,12 +311,18 @@ const SprintDetails = () => {
                                 {task.questions.length} question{task.questions.length !== 1 ? 's' : ''}
                               </Tag>
                             )}
-                            {!isTaskCompleted(task) && (
+                            {!isUnlocked && !isTaskCompleted(task) && (
+                              <Tag color="orange" className="text-xs">
+                                <LockOutlined className="mr-1" /> Complete previous task
+                              </Tag>
+                            )}
+                            {isUnlocked && !isTaskCompleted(task) && (
                               <span className="text-xs text-gray-500">Click to start</span>
                             )}
                           </div>
                         </div>
-                      ))}
+                      );
+                    })}
                     </div>
                   ) : (
                     <Empty 
