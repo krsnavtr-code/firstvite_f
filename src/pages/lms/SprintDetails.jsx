@@ -53,33 +53,116 @@ const SprintDetails = () => {
     );
   };
 
+  // Check if all tasks in a session are completed
+  const areAllTasksCompleted = (tasks) => {
+    if (!tasks || !tasks.length) return false;
+    return tasks.every(task => isTaskCompleted(task));
+  };
+
+  // Calculate overall sprint completion status
+  const getSprintStatus = () => {
+    let totalTasks = 0;
+    let completedTasks = 0;
+    
+    // Count all tasks and completed tasks across all sessions
+    Object.values(sessionTasks).forEach(tasks => {
+      if (!tasks || !Array.isArray(tasks)) return;
+      
+      tasks.forEach(task => {
+        totalTasks++;
+        if (isTaskCompleted(task)) {
+          completedTasks++;
+        }
+      });
+    });
+    
+    if (totalTasks === 0) return { status: 'not_started', progress: 0 };
+    
+    const progress = Math.round((completedTasks / totalTasks) * 100);
+    
+    if (completedTasks === 0) return { status: 'not_started', progress };
+    if (completedTasks === totalTasks) return { status: 'completed', progress };
+    return { status: 'in_progress', progress };
+  };
+
   // Check if a task should be unlocked
-  const isTaskUnlocked = (taskIndex, tasks) => {
-    // First task is always unlocked
-    if (taskIndex === 0) return true;
+  const isTaskUnlocked = (taskIndex, tasks, sessionIndex, allSessions) => {
+    // First task of the first session is always unlocked
+    if (sessionIndex === 0 && taskIndex === 0) return true;
     
-    // If no previous task, it's locked
-    if (taskIndex < 0 || !tasks[taskIndex - 1]) return false;
+    // If no previous task in the same session, check previous session
+    if (taskIndex === 0) {
+      const prevSession = allSessions[sessionIndex - 1];
+      const prevSessionTasks = sessionTasks[prevSession?._id] || [];
+      return areAllTasksCompleted(prevSessionTasks);
+    }
     
-    // Check if previous task is completed
+    // Check if previous task in the same session is completed
     return isTaskCompleted(tasks[taskIndex - 1]);
   };
 
+  // Check if a session is unlocked
+  const isSessionUnlocked = (sessionIndex, allSessions) => {
+    // First session is always unlocked
+    if (sessionIndex === 0) return true;
+    
+    // Check if all tasks in previous session are completed
+    const prevSession = allSessions[sessionIndex - 1];
+    const prevSessionTasks = sessionTasks[prevSession?._id] || [];
+    return areAllTasksCompleted(prevSessionTasks);
+  };
+
   useEffect(() => {
-    const fetchSessions = async () => {
+    const fetchAllData = async () => {
       try {
         setLoading(true);
-        const response = await getSessionsBySprint(sprintId);
-        if (response?.data?.sessions) {
-          setSessions(response.data.sessions);
+        // Fetch all sessions first
+        const sessionsResponse = await getSessionsBySprint(sprintId);
+        if (!sessionsResponse?.data?.sessions) {
+          setLoading(false);
+          return;
         }
+        
+        const sessionsData = sessionsResponse.data.sessions;
+        setSessions(sessionsData);
+        
+        // Then fetch all tasks for all sessions in parallel
+        const tasksPromises = sessionsData.map(session => 
+          getTasksBySession(session._id)
+            .then(response => ({
+              sessionId: session._id,
+              tasks: response?.data?.tasks || []
+            }))
+            .catch(error => {
+              console.error(`Error fetching tasks for session ${session._id}:`, error);
+              return { sessionId: session._id, tasks: [] };
+            })
+        );
+        
+        const tasksResults = await Promise.all(tasksPromises);
+        
+        // Update session tasks state
+        const newSessionTasks = {};
+        tasksResults.forEach(({ sessionId, tasks }) => {
+          if (tasks && tasks.length > 0) {
+            newSessionTasks[sessionId] = tasks;
+          }
+        });
+        
+        setSessionTasks(prev => ({
+          ...prev,
+          ...newSessionTasks
+        }));
+        
       } catch (error) {
-        message.error('Failed to load sessions');
+        console.error('Error loading data:', error);
+        message.error('Failed to load course data');
       } finally {
         setLoading(false);
       }
     };
-    fetchSessions();
+    
+    fetchAllData();
   }, [sprintId]);
 
   const toggleSession = async (sessionId) => {
@@ -121,7 +204,25 @@ const SprintDetails = () => {
         Back to Course
       </Button>
 
-      <Title level={3} className="mb-6">Sprint Sessions</Title>
+      <div className="flex justify-between items-center mb-6">
+        <Title level={3} className="mb-0">Sprint Sessions</Title>
+        {sessions.length > 0 && (
+          <div className="flex items-center">
+            <span className="mr-2 text-sm text-gray-600">
+              {getSprintStatus().status === 'completed' ? 'Completed' : 'In Progress'}
+            </span>
+            <Progress 
+              type="circle" 
+              percent={getSprintStatus().progress} 
+              width={36}
+              strokeWidth={12}
+              format={percent => `${percent}%`}
+              status={getSprintStatus().status === 'completed' ? 'success' : 'active'}
+              className="ml-2"
+            />
+          </div>
+        )}
+      </div>
       
       {sessions.length === 0 ? (
         <Empty description="No sessions available" />
@@ -133,17 +234,74 @@ const SprintDetails = () => {
               className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
             >
               <div 
-                className="p-4 cursor-pointer flex justify-between items-center bg-white hover:bg-gray-50"
-                onClick={() => toggleSession(session._id)}
+                className={`p-4 flex justify-between items-center transition-colors ${
+                  isSessionUnlocked(
+                    sessions.findIndex(s => s._id === session._id), 
+                    sessions
+                  ) ? 'bg-white hover:bg-blue-50 cursor-pointer border-l-4 border-blue-500' 
+                    : 'bg-gray-50 cursor-not-allowed border-l-4 border-gray-300'
+                }`}
+                onClick={() => {
+                  if (isSessionUnlocked(
+                    sessions.findIndex(s => s._id === session._id), 
+                    sessions
+                  )) {
+                    toggleSession(session._id);
+                  }
+                }}
               >
                 <div className="flex items-center">
-                  <PlayCircleOutlined className="text-blue-500 text-xl mr-3" />
-                  <div>
-                    <div className="font-medium">{session.name}</div>
-                    <div className="text-gray-500 text-sm">
-                      {session.description || 'No description'}
-                    </div>
-                  </div>
+                  {(() => {
+                    const sessionTasksList = sessionTasks[session._id] || [];
+                    const completedTasks = sessionTasksList.filter(task => isTaskCompleted(task));
+                    const completionPercentage = sessionTasksList.length > 0 
+                      ? Math.round((completedTasks.length / sessionTasksList.length) * 100) 
+                      : 0;
+                    const isCompleted = areAllTasksCompleted(sessionTasksList);
+                    const inProgress = completedTasks.length > 0 && !isCompleted;
+
+                    // Determine icon to show
+                    let icon = (
+                      <PlayCircleOutlined className="text-blue-500 text-xl mr-3" />
+                    );
+                    
+                    if (isCompleted) {
+                      icon = <CheckCircleOutlined className="text-green-500 text-xl mr-3" />;
+                    } else if (inProgress) {
+                      icon = (
+                        <div className="relative mr-3">
+                          <PlayCircleOutlined className="text-blue-500 text-xl" />
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">{completionPercentage}%</span>
+                          </div>
+                        </div>
+                      );
+                    } else if (!isSessionUnlocked(sessions.findIndex(s => s._id === session._id), sessions)) {
+                      icon = <LockOutlined className="text-gray-400 text-xl mr-3" />;
+                    }
+
+                    return (
+                      <>
+                        {icon}
+                        <div>
+                          <div className="font-medium flex items-center">
+                            {session.name}
+                            {sessionTasksList.length > 0 && (
+                              <Tag 
+                                color={isCompleted ? 'success' : inProgress ? 'processing' : 'default'}
+                                className="ml-2 text-xs"
+                              >
+                                {isCompleted ? 'Completed' : inProgress ? 'In Progress' : 'Not Started'}
+                              </Tag>
+                            )}
+                          </div>
+                          <div className="text-gray-500 text-sm">
+                            {session.description || 'No description'}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
                 <div className="flex items-center">
                   {session.completed && (
@@ -158,6 +316,10 @@ const SprintDetails = () => {
               </div>
 
               {expandedSessions[session._id] && (
+                <div className={!isSessionUnlocked(
+                  sessions.findIndex(s => s._id === session._id), 
+                  sessions
+                ) ? 'opacity-50 pointer-events-none' : ''}>
                 <div className="border-t border-gray-100 bg-gray-50 p-4">
                   <div className="flex justify-between items-center mb-3">
                     <h4 className="font-medium text-gray-700">
@@ -266,19 +428,24 @@ const SprintDetails = () => {
                     </div>
                   ) : sessionTasks[session._id]?.length > 0 ? (
                     <div className="space-y-2">
-                      {sessionTasks[session._id]?.map((task, taskIndex, tasks) => {
-                        const isUnlocked = isTaskUnlocked(taskIndex, tasks);
+                      {sessionTasks[session._id]?.map((task, taskIndex) => {
+                        const isUnlocked = isTaskUnlocked(
+                          taskIndex, 
+                          sessionTasks[session._id],
+                          sessions.findIndex(s => s._id === session._id),
+                          sessions
+                        );
                         const isCompleted = isTaskCompleted(task);
                         
                         return (
                         <div 
                           key={task._id} 
-                          className={`p-3 rounded border transition-colors ${
+                          className={`p-4 rounded-lg transition-all duration-200 ${
                             isCompleted 
-                              ? 'bg-green-50 border-green-200' 
+                              ? 'bg-green-50 border-l-4 border-green-500' 
                               : !isUnlocked 
-                                ? 'bg-gray-50 border-gray-200' 
-                                : 'bg-white border-gray-100 hover:border-blue-100 cursor-pointer'
+                                ? 'bg-gray-50 border-l-4 border-gray-300 opacity-75' 
+                                : 'bg-white border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer shadow-sm hover:shadow-md'
                           }`}
                           onClick={isUnlocked && !isCompleted ? (e) => {
                             e.stopPropagation();
@@ -311,8 +478,8 @@ const SprintDetails = () => {
                                 {task.questions.length} question{task.questions.length !== 1 ? 's' : ''}
                               </Tag>
                             )}
-                            {!isUnlocked && !isTaskCompleted(task) && (
-                              <Tag color="orange" className="text-xs">
+                              {!isUnlocked && !isTaskCompleted(task) && (
+                              <Tag color="default" className="text-xs bg-gray-100 text-gray-600">
                                 <LockOutlined className="mr-1" /> Complete previous task
                               </Tag>
                             )}
@@ -331,6 +498,7 @@ const SprintDetails = () => {
                       className="py-4"
                     />
                   )}
+                  </div>
                 </div>
               )}
             </div>
