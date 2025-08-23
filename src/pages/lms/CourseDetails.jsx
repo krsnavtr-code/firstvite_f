@@ -3,7 +3,10 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, Button, Progress, Tag, message, Skeleton, Empty, Divider } from 'antd';
 import { ArrowLeftOutlined, PlayCircleOutlined, CheckCircleOutlined, BookOutlined } from '@ant-design/icons';
 import { getSprintsByCourse } from '../../api/sprintApi';
+import { getSessionsBySprint } from '../../api/sessionApi';
+import { getTasksBySession } from '../../api/taskApi';
 import { useLMS } from '../../contexts/LMSContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const { Meta } = Card;
 
@@ -11,23 +14,34 @@ const CourseDetails = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { enrollments } = useLMS();
+  const { currentUser } = useAuth();
   const [sprints, setSprints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState(null);
   const [enrollment, setEnrollment] = useState(null);
   const [sprintProgress, setSprintProgress] = useState({});
 
+  // Check if task has been completed by user
+  const isTaskCompleted = (task) => {
+    if (!task?.submissions?.length) return false;
+    const userId = currentUser?._id;
+    if (!userId) return false;
+    return task.submissions.some(
+      sub => sub.user?._id === userId || sub.user === userId
+    );
+  };
+
+  // Check if all tasks in a sprint are completed
+  const areAllTasksCompleted = (tasks) => {
+    if (!tasks || !tasks.length) return false;
+    return tasks.every(task => isTaskCompleted(task));
+  };
+
   // Calculate completion percentage for a sprint
   const calculateSprintProgress = (sprint) => {
-    if (!sprint.tasks || sprint.tasks.length === 0) return 0;
+    if (!sprint.tasks || !sprint.tasks.length) return 0;
     
-    const completedTasks = sprint.tasks.filter(task => {
-      return task.submissions?.some(sub => 
-        (sub.user?._id === currentUser?._id || sub.user === currentUser?._id) &&
-        sub.status === 'completed'
-      );
-    });
-    
+    const completedTasks = sprint.tasks.filter(task => isTaskCompleted(task));
     return Math.round((completedTasks.length / sprint.tasks.length) * 100);
   };
 
@@ -60,14 +74,42 @@ const CourseDetails = () => {
           console.warn('Unexpected sprints data format:', response);
         }
         
-        // Calculate progress for each sprint
+        // Calculate progress for each sprint and ensure tasks are properly loaded
         const progressData = {};
-        sprintsData.forEach(sprint => {
-          progressData[sprint._id] = calculateSprintProgress(sprint);
-        });
+        const updatedSprints = [];
+        
+        for (const sprint of sprintsData) {
+          // Make sure we have tasks for this sprint
+          let sprintWithTasks = sprint;
+          if (!sprint.tasks || !sprint.tasks.length) {
+            try {
+              // Get all sessions for this sprint first
+              const sessionsResponse = await getSessionsBySprint(sprint._id);
+              const sessions = sessionsResponse?.data?.sessions || [];
+              
+              // Get all tasks from all sessions
+              const allTasks = [];
+              for (const session of sessions) {
+                const tasksResponse = await getTasksBySession(session._id);
+                if (tasksResponse?.data?.tasks) {
+                  allTasks.push(...tasksResponse.data.tasks);
+                }
+              }
+              sprintWithTasks = {
+                ...sprint,
+                tasks: allTasks
+              };
+            } catch (error) {
+              console.error(`Error loading tasks for sprint ${sprint._id}:`, error);
+            }
+          }
+          
+          progressData[sprint._id] = calculateSprintProgress(sprintWithTasks);
+          updatedSprints.push(sprintWithTasks);
+        }
         
         setSprintProgress(progressData);
-        setSprints(sprintsData);
+        setSprints(updatedSprints);
       } catch (error) {
         console.error('Error loading course details:', error);
         message.error('Failed to load course details');
@@ -76,10 +118,10 @@ const CourseDetails = () => {
       }
     };
 
-    if (enrollments.length > 0) {
+    if (enrollments.length > 0 && currentUser) {
       fetchCourseAndSprints();
     }
-  }, [courseId, enrollments, navigate]);
+  }, [courseId, enrollments, navigate, currentUser]);
 
   const handleSprintClick = (sprint, e) => {
     // Prevent the card click from interfering with button click
@@ -88,17 +130,25 @@ const CourseDetails = () => {
   };
 
   const getSprintStatus = (sprint) => {
-    const progress = sprintProgress[sprint._id] || 0;
-    if (progress === 0) return 'Not Started';
-    if (progress === 100) return 'Completed';
-    return 'In Progress';
+    if (!sprint.tasks || !sprint.tasks.length) return "Not Started";
+    
+    const hasCompletedTasks = sprint.tasks.some(task => isTaskCompleted(task));
+    const allTasksCompleted = areAllTasksCompleted(sprint.tasks);
+    
+    if (allTasksCompleted) return "Completed";
+    if (hasCompletedTasks) return "In Progress";
+    return "Not Started";
   };
-  
+
   const getStatusColor = (sprint) => {
-    const progress = sprintProgress[sprint._id] || 0;
-    if (progress === 0) return 'default';
-    if (progress === 100) return 'success';
-    return 'processing';
+    if (!sprint.tasks || !sprint.tasks.length) return "default";
+    
+    const hasCompletedTasks = sprint.tasks.some(task => isTaskCompleted(task));
+    const allTasksCompleted = areAllTasksCompleted(sprint.tasks);
+    
+    if (allTasksCompleted) return "success";
+    if (hasCompletedTasks) return "processing";
+    return "default";
   };
 
   if (loading) {
