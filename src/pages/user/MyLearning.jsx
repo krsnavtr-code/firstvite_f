@@ -155,7 +155,7 @@ const MyLearning = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
             My Learning
@@ -201,7 +201,7 @@ const MyLearning = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
             <h3 className="text-lg font-medium text-red-800 dark:text-red-200">
@@ -237,7 +237,7 @@ const MyLearning = () => {
     console.log("Token in localStorage:", localStorage.getItem("token"));
     console.log("No user found, showing sign-in prompt");
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pt-24 pb-16 px-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -268,7 +268,7 @@ const MyLearning = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pt-24 pb-16 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-16 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">

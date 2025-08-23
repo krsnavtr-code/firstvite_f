@@ -163,9 +163,9 @@ export const getUserEnrollments = async (userId, options = {}) => {
       page
     };
 
-    console.log('Sending request to /enrollments/me with data:', requestData);
+    console.log('Sending request to /enrollments/my-enrollments with data:', requestData);
 
-    const response = await axios.get('/enrollments/me', {
+    const response = await axios.get('/enrollments/my-enrollments', {
       params: requestData,
       headers: {
         'Authorization': `Bearer ${token}`,

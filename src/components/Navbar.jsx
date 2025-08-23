@@ -13,6 +13,8 @@ import {
   FaCreditCard,
   FaCopy,
   FaCheck,
+  FaExclamationCircle,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import CourseMenu from "./CourseMenu";
 import { toast } from "react-hot-toast";
@@ -354,14 +356,8 @@ function Navbar() {
     // { to: "/", label: "Home" },
     { to: "/free-courses", label: "Free Courses" },
     { to: "/lms", lmscolors: true },
-
-    // Removed individual course links as they'll be in the course menu
-    ...(isAuthenticated && isApproved
-      ? [
-          { to: "/my-learning", label: "My Learning" },
-          ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
-        ]
-      : []),
+    ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
+    ...(isAdmin ? [{ to: "/admin/lms/create-sprint", label: "Admin LMS" }] : []),
   ];
 
   const renderNavItems = (className = "") => (
@@ -719,9 +715,6 @@ function Navbar() {
                     <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
                       <FaUser className="text-gray-600 dark:text-gray-300" />
                     </div>
-                    {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {authUser?.fullname || authUser?.name || "Profile"}
-                  </span> */}
                   </button>
 
                   {isProfileMenuOpen && (
@@ -740,9 +733,6 @@ function Navbar() {
                       >
                         My Learning
                       </Link>
-                      {/* <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                      Dashboard
-                    </Link> */}
                       <Link
                         to="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
@@ -751,9 +741,17 @@ function Navbar() {
                       >
                         My Profile
                       </Link>
+                      {/* LMS Approved or Not */}
                       {!isApproved && (
-                        <div className="px-4 py-2 text-sm text-yellow-600 dark:text-yellow-400">
-                          Pending Approval
+                        <div className="px-4 py-2 flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
+                          <FaExclamationCircle />
+                          LMS Not Approved
+                        </div>
+                      )}
+                      {isApproved && (
+                        <div className="px-4 py-2 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                          <FaCheck />
+                          LMS Approved
                         </div>
                       )}
                       <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
@@ -761,7 +759,6 @@ function Navbar() {
                         onClick={() => {
                           logout();
                           setIsProfileMenuOpen(false);
-                          // toast.success("Logged out successfully");
                           navigate("/");
                         }}
                         className="w-full text-left px-2 py-1 text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"

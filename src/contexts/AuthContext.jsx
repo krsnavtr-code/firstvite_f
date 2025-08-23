@@ -38,6 +38,7 @@ export function AuthProvider({ children }) {
         try {
           // Get fresh user data
           const response = await api.get("/auth/profile");
+          console.log("User profile data:", response.data);
 
           if (response.data && isMounted) {
             // Store the updated user data
@@ -51,6 +52,8 @@ export function AuthProvider({ children }) {
               phone: response.data.phone || "",
               address: response.data.address || "",
             };
+
+            console.log("Setting user data with isApproved:", userData.isApproved);
 
             localStorage.setItem("user", JSON.stringify(userData));
             setCurrentUser(userData);
@@ -218,7 +221,10 @@ export function AuthProvider({ children }) {
           fullname: user.fullname || "",
           email: user.email || "",
           role: user.role || "user",
-          isApproved: user.isApproved || false,
+          isApproved: user.isApproved, // Use the value directly from the server
+          isActive: user.isActive !== false, // Default to true if not specified
+          phone: user.phone || "",
+          address: user.address || "",
         };
 
         localStorage.setItem("user", JSON.stringify(userData));
@@ -333,6 +339,8 @@ export function AuthProvider({ children }) {
   const value = {
     currentUser,
     isAuthenticated: !!currentUser,
+    isApproved: currentUser?.isApproved || false,
+    isAdmin: currentUser?.role === 'admin',
     loading,
     login,
     register,

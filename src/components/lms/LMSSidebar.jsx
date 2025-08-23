@@ -11,6 +11,7 @@ import {
   CalendarOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  RocketOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -29,6 +30,12 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
       icon: <DashboardOutlined />,
       label: "Dashboard",
       onClick: () => navigate("/lms/dashboard"),
+    },
+    {
+      key: "my-learning",
+      icon: <RocketOutlined />,
+      label: "My Learning",
+      onClick: () => navigate("/my-learning"),
     },
     {
       key: "courses",
