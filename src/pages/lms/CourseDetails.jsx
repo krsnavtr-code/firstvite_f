@@ -167,8 +167,19 @@ const CourseDetails = () => {
     );
   }
 
-  const progress = Math.round(enrollment?.progress || 0);
-  const isCompleted = enrollment?.completionStatus === 'completed';
+  // Calculate overall course progress based on sprint progress
+  const calculateCourseProgress = () => {
+    if (sprints.length === 0) return 0;
+    
+    const totalProgress = Object.values(sprintProgress).reduce(
+      (sum, progress) => sum + progress, 0
+    );
+    
+    return Math.round(totalProgress / sprints.length);
+  };
+
+  const progress = calculateCourseProgress();
+  const isCompleted = progress === 100;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -214,14 +225,24 @@ const CourseDetails = () => {
             <div className="mt-4">
               <div className="flex justify-between text-sm text-gray-600 mb-1">
                 <span>Your Progress</span>
-                <span className="font-medium">{progress}%</span>
+                <span className="font-medium">
+                  {progress}% • {sprints.filter(s => sprintProgress[s._id] === 100).length}/{sprints.length} Sprints
+                </span>
               </div>
-              <Progress 
-                percent={progress} 
-                status={isCompleted ? 'success' : 'active'} 
-                showInfo={false}
-                className="mb-2"
-              />
+              <div className="relative">
+                <div className="flex items-center mb-1">
+                  <Progress 
+                    percent={progress} 
+                    status={isCompleted ? 'success' : 'active'} 
+                    showInfo={false}
+                    strokeWidth={8}
+                    className="flex-1"
+                  />
+                </div>
+                <div className="text-xs text-gray-500 text-right">
+                  {sprints.filter(s => sprintProgress[s._id] === 100).length} of {sprints.length} sprints completed
+                </div>
+              </div>
             </div>
           </div>
         </div>
