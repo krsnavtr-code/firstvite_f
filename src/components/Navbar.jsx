@@ -657,13 +657,15 @@ function Navbar() {
                         <div className="space-y-2">
                           {[
                             {
-                              label: "Bank Name",
+                              label: "Branch",
+                              value: "ICICI Bank, Noida Sector 61",
+                            },
+                            {
+                              label: "Account  Name",
                               value: "FirstVITE e learning Pvt Ltd.",
                             },
                             { label: "Account Number", value: "025305010216" },
                             { label: "IFSC Code", value: "ICIC0000253" },
-                            { label: "Branch", value: "ICICI Bank" },
-                            { label: "Branch Name", value: "Noida Sector 61" },
                           ].map((item, index) => (
                             <div key={index} className="group relative">
                               <div className="flex flex-col justify-between">
@@ -679,7 +681,7 @@ function Navbar() {
                                         setCopiedIndex(null);
                                       }, 2000);
                                     }}
-                                    className="pe-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                    className="pe-1 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                                     title={`Copy ${item.label}`}
                                   >
                                     {copiedIndex === index ? (
@@ -688,7 +690,7 @@ function Navbar() {
                                       <FaCopy />
                                     )}
                                   </button>
-                                  <span className="text-sm text-black font-mono">
+                                  <span className="text-xs text-black font-mono">
                                     {item.value}
                                   </span>
                                 </div>

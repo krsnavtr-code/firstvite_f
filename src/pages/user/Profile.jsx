@@ -3,6 +3,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import userApi from '../../api/userApi';
 import { useNavigate } from 'react-router-dom';
+import { Card, Progress, Button, message } from 'antd';
+import { BookOutlined, ArrowRightOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { useLMS } from '../../contexts/LMSContext';
+
+const { Meta } = Card;
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -110,56 +115,27 @@ const Profile = () => {
     }
   };
   
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!authUser?._id) {
-      toast.error('User not authenticated');
-      return;
-    }
-    
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
+  const { enrollments, loading, loadEnrollments, error } = useLMS();
+    ;
+  
+    useEffect(() => {
+      const fetchEnrollments = async () => {
+        try {
+          console.log('Fetching enrollments...');
+          await loadEnrollments();
+          console.log('Enrollments loaded successfully');
+        } catch (err) {
+          console.error('Error loading enrollments:', err);
+          message.error(error || 'Failed to load your courses');
+        }
+      };
       
-      const response = await userApi.changePassword(
-        authUser._id, 
-        passwordData.currentPassword, 
-        passwordData.newPassword
-      );
-      
-      if (response && response.success) {
-        toast.success('Password updated successfully');
-        setPasswordData({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        });
-      } else {
-        throw new Error(response?.message || 'Failed to update password');
-      }
-    } catch (error) {
-      console.error('Error updating password:', error);
-      if (error.response?.status === 401) {
-        // Clear invalid auth data and redirect to login
-        localStorage.removeItem('token');
-        localStorage.removeItem('Users');
-        navigate('/login', { state: { from: '/profile' } });
-      }
-      toast.error(error.response?.data?.message || error.message || 'Failed to update password');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      fetchEnrollments();
+    }, [loadEnrollments, error]);
+  
+    const handleCourseClick = (courseId) => {
+      navigate(`/lms/courses/${courseId}`);
+    };
   
   if (!authUser) {
     navigate('/login', { state: { from: '/profile' } });
@@ -264,83 +240,91 @@ const Profile = () => {
           )}
         </form>
       </div>
-      
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+
+      {/* My Learning */}
+      <div className="mt-8">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Change Password
+          My Learning
         </h2>
-        
-        <form onSubmit={handlePasswordSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Current Password
-            </label>
-            <input
-              type="password"
-              name="currentPassword"
-              value={passwordData.currentPassword}
-              onChange={handlePasswordChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              required
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                New Password
-              </label>
-              <input
-                type="password"
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={handlePasswordChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                required
-                minLength="6"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Confirm New Password
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                required
-                minLength="6"
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {isLoading ? 'Updating...' : 'Update Password'}
-            </button>
-          </div>
-        </form>
       </div>
+
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {enrollments.map((enrollment) => {
+                const course = enrollment.course;
+                const progress = Math.round(enrollment.progress || 0);
+                const isCompleted = enrollment.completionStatus === 'completed';
+                const lastAccessed = enrollment.updatedAt 
+                  ? new Date(enrollment.updatedAt).toLocaleDateString() 
+                  : 'Never';
+                
+                return (
+                  <Card
+                    key={enrollment._id}
+                    className="h-full flex flex-col group hover:shadow-lg transition-all duration-200 border border-gray-900"
+                    hoverable
+                    onClick={() => handleCourseClick(course._id)}
+                    cover={
+                      <div className="h-48 bg-gray-50 flex items-center border border-gray-900 border-b-0 justify-center overflow-hidden relative">
+                        {course.thumbnail ? (
+                          <img
+                            alt={course.title}
+                            src={course.thumbnail}
+                            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src =
+                                "https://via.placeholder.com/300x200?text=Course";
+                            }}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-gray-400">
+                            <BookOutlined className="text-5xl mb-2" />
+                            <span>No Preview Available</span>
+                          </div>
+                        )}
+                        {isCompleted && (
+                          <div className="absolute top-3 right-3 bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                            <CheckCircleOutlined className="mr-1" /> Completed
+                          </div>
+                        )}
+                      </div>
+                    }
+                  >
+                    <Meta
+                      title={
+                        <div className="flex justify-between items-start">
+                          <span className="text-lg font-semibold text-gray-900 line-clamp-2">
+                            {course?.title || "Untitled Course"}
+                          </span>
+                        </div>
+                      }
+                    />
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <Button
+                        type={isCompleted ? "default" : "primary"}
+                        className="bg-gray-900 hover:bg-gray-800"
+                        block
+                        icon={
+                          isCompleted ? (
+                            <CheckCircleOutlined />
+                          ) : (
+                            <ArrowRightOutlined />
+                          )
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCourseClick(course._id);
+                        }}
+                      >
+                        {isCompleted ? "View Course" : "Continue Learning"}
+                      </Button>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
       
-      {/* Order History Section */}
-      {/* <div className="mt-8">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Order History
-        </h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <p className="text-gray-600 dark:text-gray-400">
-            Your order history will appear here.
-          </p>
-          Order history list will be implemented later
-        </div>
-      </div> */}
+      
     </div>
   );
 };
