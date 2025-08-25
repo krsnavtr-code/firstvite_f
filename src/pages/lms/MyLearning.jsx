@@ -151,28 +151,6 @@ const Dashboard = () => {
                     </span>
                   </div>
                 }
-                description={
-                  <div className="mt-3 space-y-3">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
-                      <span>Progress</span>
-                      <span className="font-medium">{progress}%</span>
-                    </div>
-                    <Progress
-                      percent={progress}
-                      size="small"
-                      status={isCompleted ? "success" : "active"}
-                      className="mb-2"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Last accessed: {lastAccessed}</span>
-                      {isCompleted && (
-                        <span className="text-gray-600 font-medium">
-                          <CheckCircleOutlined className="mr-1" /> Completed
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                }
               />
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <Button

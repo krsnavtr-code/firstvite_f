@@ -38,12 +38,6 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
       onClick: () => navigate("/lms/my-learning"),
     },
     {
-      key: "courses",
-      icon: <BookOutlined />,
-      label: "My Courses",
-      onClick: () => navigate("/lms/learning"),
-    },
-    {
       key: "assignments",
       icon: <FileDoneOutlined />,
       label: "Assignments",
