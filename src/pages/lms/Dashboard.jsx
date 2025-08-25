@@ -1,205 +1,320 @@
-import React, { useEffect } from 'react';
-import { Card, Progress, Button, Empty, Skeleton, message, Tag } from 'antd';
-import { BookOutlined, ArrowRightOutlined, TrophyOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { useLMS } from '../../contexts/LMSContext';
+import React from 'react';
+import { Card, Row, Col, Progress, Button, Tabs, Badge, Empty } from 'antd';
+import { 
+  PlayCircleOutlined, 
+  ClockCircleOutlined, 
+  CheckCircleOutlined,
+  BookOutlined,
+  TrophyOutlined,
+  StarOutlined
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
-const { Meta } = Card;
+const { TabPane } = Tabs;
 
-const Dashboard = () => {
-  const { enrollments, loading, loadEnrollments, error } = useLMS();
+const MyLearning = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchEnrollments = async () => {
-      try {
-        console.log('Fetching enrollments...');
-        await loadEnrollments();
-        console.log('Enrollments loaded successfully');
-      } catch (err) {
-        console.error('Error loading enrollments:', err);
-        message.error(error || 'Failed to load your courses');
-      }
-    };
-    
-    fetchEnrollments();
-  }, [loadEnrollments, error]);
+  // Mock data - replace with actual API calls
+  const enrolledCourses = [
+    {
+      id: 1,
+      title: 'Advanced React Development',
+      instructor: 'Jane Smith',
+      progress: 65,
+      thumbnail: 'https://via.placeholder.com/300x150',
+      lastAccessed: '2 days ago',
+      totalLessons: 24,
+      completedLessons: 15
+    },
+    {
+      id: 2,
+      title: 'Node.js Fundamentals',
+      instructor: 'John Doe',
+      progress: 30,
+      thumbnail: 'https://via.placeholder.com/300x150',
+      lastAccessed: '5 days ago',
+      totalLessons: 18,
+      completedLessons: 5
+    },
+  ];
 
-  const handleCourseClick = (courseId) => {
-    navigate(`/lms/courses/${courseId}`);
+  const recommendedCourses = [
+    {
+      id: 3,
+      title: 'Modern JavaScript',
+      instructor: 'Alex Johnson',
+      rating: 4.7,
+      students: 1250,
+      thumbnail: 'https://via.placeholder.com/300x150',
+      price: 49.99
+    },
+    {
+      id: 4,
+      title: 'UI/UX Design Principles',
+      instructor: 'Sarah Williams',
+      rating: 4.8,
+      students: 980,
+      thumbnail: 'https://via.placeholder.com/300x150',
+      price: 39.99
+    },
+  ];
+
+  const learningStats = {
+    totalCourses: enrolledCourses.length,
+    inProgress: enrolledCourses.filter(course => course.progress > 0 && course.progress < 100).length,
+    completed: enrolledCourses.filter(course => course.progress === 100).length,
+    totalHours: 42,
+    weeklyGoal: 10,
+    currentWeekHours: 6
   };
 
-  if (loading && enrollments.length === 0) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">My Learning</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="h-80 shadow-sm hover:shadow-md transition-shadow">
-              <Skeleton active avatar paragraph={{ rows: 3 }} />
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (enrollments.length === 0) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">My Learning</h1>
-        <div className="bg-white rounded-lg p-8 shadow-sm">
-          <Empty 
-            description={
-              <div className="flex flex-col items-center">
-                <p className="text-lg text-gray-700 mb-4">You haven't enrolled in any courses yet</p>
-                <p className="text-gray-500 mb-6">Browse our course catalog to start learning!</p>
-              </div>
-            }
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          >
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                type="primary" 
-                size="large"
-                onClick={() => navigate('/courses')}
-                icon={<BookOutlined />}
-                className="mb-2 sm:mb-0"
-              >
-                Browse All Courses
-              </Button>
-              <Button 
-                size="large"
-                onClick={() => navigate('/courses?popular=true')}
-                icon={<TrophyOutlined />}
-              >
-                Popular Courses
-              </Button>
+  const renderCourseCard = (course, isEnrolled = true) => (
+    <Card 
+      key={course.id}
+      hoverable
+      style={{ width: '100%', marginBottom: 16 }}
+      cover={
+        <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden' }}>
+          <img 
+            alt={course.title} 
+            src={course.thumbnail} 
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover' 
+            }} 
+          />
+          {isEnrolled && (
+            <div style={{ 
+              position: 'absolute', 
+              bottom: 0, 
+              left: 0, 
+              right: 0, 
+              background: 'rgba(0,0,0,0.7)', 
+              color: 'white',
+              padding: '8px 16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span><ClockCircleOutlined /> {course.lastAccessed}</span>
+              <span><CheckCircleOutlined /> {course.completedLessons}/{course.totalLessons} Lessons</span>
             </div>
-          </Empty>
+          )}
         </div>
+      }
+    >
+      <div style={{ marginBottom: 12 }}>
+        <h3 style={{ marginBottom: 4 }}>{course.title}</h3>
+        <p style={{ color: '#666', marginBottom: 8 }}>By {course.instructor}</p>
+        
+        {isEnrolled ? (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span>Progress</span>
+              <span>{course.progress}%</span>
+            </div>
+            <Progress percent={course.progress} showInfo={false} />
+            <Button 
+              type="primary" 
+              block 
+              style={{ marginTop: 16 }}
+              onClick={() => navigate(`/lms/courses/${course.id}`)}
+            >
+              {course.progress === 0 ? 'Start Learning' : 'Continue Learning'}
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+              <StarOutlined style={{ color: '#ffc107', marginRight: 4 }} />
+              <span style={{ marginRight: 16 }}>{course.rating}</span>
+              <span>{course.students.toLocaleString()} students</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '1.2em', fontWeight: 'bold' }}>${course.price}</span>
+              <Button type="primary">Enroll Now</Button>
+            </div>
+          </div>
+        )}
       </div>
-    );
-  }
+    </Card>
+  );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">My Learning</h1>
-          <p className="text-gray-600 mt-1">
-            {enrollments.length} {enrollments.length === 1 ? 'course' : 'courses'} in progress
-          </p>
-        </div>
-        <Button 
-          type="primary" 
-          icon={<BookOutlined />}
-          onClick={() => navigate('/courses')}
-          className="bg-gray-900 hover:bg-gray-800"
-        >
-          Browse More Courses
-        </Button>
-      </div>
+    <div style={{ padding: '24px' }}>
+      <h1 style={{ marginBottom: 24 }}>My Learning</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {enrollments.map((enrollment) => {
-          const course = enrollment.course;
-          const progress = Math.round(enrollment.progress || 0);
-          const isCompleted = enrollment.completionStatus === 'completed';
-          const lastAccessed = enrollment.updatedAt 
-            ? new Date(enrollment.updatedAt).toLocaleDateString() 
-            : 'Never';
-          
-          return (
-            <Card
-              key={enrollment._id}
-              className="h-full flex flex-col group hover:shadow-lg transition-all duration-200 border border-gray-900"
-              hoverable
-              onClick={() => handleCourseClick(course._id)}
-              cover={
-                <div className="h-48 bg-gray-50 flex items-center border border-gray-900 border-b-0 justify-center overflow-hidden relative">
-                  {course.thumbnail ? (
-                    <img
-                      alt={course.title}
-                      src={course.thumbnail}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src =
-                          "https://via.placeholder.com/300x200?text=Course";
-                      }}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <BookOutlined className="text-5xl mb-2" />
-                      <span>No Preview Available</span>
-                    </div>
-                  )}
-                  {isCompleted && (
-                    <div className="absolute top-3 right-3 bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium flex items-center">
-                      <CheckCircleOutlined className="mr-1" /> Completed
-                    </div>
-                  )}
-                </div>
-              }
-            >
-              <Meta
-                title={
-                  <div className="flex justify-between items-start">
-                    <span className="text-lg font-semibold text-gray-900 line-clamp-2">
-                      {course?.title || "Untitled Course"}
-                    </span>
-                  </div>
-                }
-                description={
-                  <div className="mt-3 space-y-3">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
-                      <span>Progress</span>
-                      <span className="font-medium">{progress}%</span>
-                    </div>
-                    <Progress
-                      percent={progress}
-                      size="small"
-                      status={isCompleted ? "success" : "active"}
-                      className="mb-2"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Last accessed: {lastAccessed}</span>
-                      {isCompleted && (
-                        <span className="text-gray-600 font-medium">
-                          <CheckCircleOutlined className="mr-1" /> Completed
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                }
-              />
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <Button
-                  type={isCompleted ? "default" : "primary"}
-                  className="bg-gray-900 hover:bg-gray-800"
-                  block
-                  icon={
-                    isCompleted ? (
-                      <CheckCircleOutlined />
-                    ) : (
-                      <ArrowRightOutlined />
-                    )
-                  }
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCourseClick(course._id);
-                  }}
-                >
-                  {isCompleted ? "View Course" : "Continue Learning"}
-                </Button>
+      {/* Learning Stats */}
+      <Card style={{ marginBottom: 24 }}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={6}>
+            <Card>
+              <div style={{ textAlign: 'center' }}>
+                <BookOutlined style={{ fontSize: 24, color: '#1890ff' }} />
+                <h3>Total Courses</h3>
+                <p style={{ fontSize: 24, fontWeight: 'bold' }}>{learningStats.totalCourses}</p>
               </div>
             </Card>
-          );
-        })}
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Card>
+              <div style={{ textAlign: 'center' }}>
+                <PlayCircleOutlined style={{ fontSize: 24, color: '#52c41a' }} />
+                <h3>In Progress</h3>
+                <p style={{ fontSize: 24, fontWeight: 'bold' }}>{learningStats.inProgress}</p>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Card>
+              <div style={{ textAlign: 'center' }}>
+                <CheckCircleOutlined style={{ fontSize: 24, color: '#722ed1' }} />
+                <h3>Completed</h3>
+                <p style={{ fontSize: 24, fontWeight: 'bold' }}>{learningStats.completed}</p>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Card>
+              <div style={{ textAlign: 'center' }}>
+                <TrophyOutlined style={{ fontSize: 24, color: '#faad14' }} />
+                <h3>Learning Hours</h3>
+                <p style={{ fontSize: 24, fontWeight: 'bold' }}>{learningStats.totalHours}h</p>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+        
+        <div style={{ marginTop: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span>Weekly Learning Goal</span>
+            <span>{learningStats.currentWeekHours}h / {learningStats.weeklyGoal}h</span>
+          </div>
+          <Progress 
+            percent={(learningStats.currentWeekHours / learningStats.weeklyGoal) * 100} 
+            showInfo={false}
+            strokeColor={learningStats.currentWeekHours >= learningStats.weeklyGoal ? '#52c41a' : '#1890ff'}
+          />
+        </div>
+      </Card>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultActiveKey="1">
+        <TabPane 
+          tab={
+            <span>
+              <BookOutlined />
+              My Courses
+              {enrolledCourses.length > 0 && (
+                <Badge 
+                  count={enrolledCourses.length} 
+                  style={{ marginLeft: 8 }} 
+                />
+              )}
+            </span>
+          } 
+          key="1"
+        >
+          {enrolledCourses.length > 0 ? (
+            <Row gutter={[16, 16]}>
+              {enrolledCourses.map(course => (
+                <Col key={course.id} xs={24} sm={24} md={12} lg={8} xl={6}>
+                  {renderCourseCard(course, true)}
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <Empty 
+              description={
+                <span>You haven't enrolled in any courses yet</span>
+              }
+            >
+              <Button type="primary" onClick={() => navigate('/lms/courses')}>
+                Browse Courses
+              </Button>
+            </Empty>
+          )}
+        </TabPane>
+
+        <TabPane 
+          tab={
+            <span>
+              <PlayCircleOutlined />
+              Continue Learning
+            </span>
+          } 
+          key="2"
+        >
+          {enrolledCourses.filter(c => c.progress > 0 && c.progress < 100).length > 0 ? (
+            <Row gutter={[16, 16]}>
+              {enrolledCourses
+                .filter(course => course.progress > 0 && course.progress < 100)
+                .map(course => (
+                  <Col key={course.id} xs={24} sm={24} md={12} lg={8} xl={6}>
+                    {renderCourseCard(course, true)}
+                  </Col>
+                ))}
+            </Row>
+          ) : (
+            <Empty 
+              description={
+                <span>You don't have any courses in progress</span>
+              }
+            >
+              <Button type="primary" onClick={() => navigate('/lms/courses')}>
+                Browse Courses
+              </Button>
+            </Empty>
+          )}
+        </TabPane>
+
+        <TabPane 
+          tab={
+            <span>
+              <CheckCircleOutlined />
+              Completed
+            </span>
+          } 
+          key="3"
+        >
+          {enrolledCourses.filter(c => c.progress === 100).length > 0 ? (
+            <Row gutter={[16, 16]}>
+              {enrolledCourses
+                .filter(course => course.progress === 100)
+                .map(course => (
+                  <Col key={course.id} xs={24} sm={24} md={12} lg={8} xl={6}>
+                    {renderCourseCard(course, true)}
+                  </Col>
+                ))}
+            </Row>
+          ) : (
+            <Empty 
+              description={
+                <span>You haven't completed any courses yet</span>
+              }
+            />
+          )}
+        </TabPane>
+      </Tabs>
+
+      {/* Recommended Courses */}
+      <div style={{ marginTop: 48 }}>
+        <h2>Recommended For You</h2>
+        <Row gutter={[16, 16]}>
+          {recommendedCourses.map(course => (
+            <Col key={course.id} xs={24} sm={12} md={8} lg={6}>
+              {renderCourseCard(course, false)}
+            </Col>
+          ))}
+        </Row>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default MyLearning;

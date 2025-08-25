@@ -69,16 +69,20 @@ const LMSNavbar = () => {
           Live Chat
         </Link>
         {/* Request a CallBack */}
-        <Link className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg">
+        <Link
+          className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg"
+          onClick={() => navigate("/lms/callback")}
+        >
           Request a CallBack
         </Link>
         {/* Portfolio */}
-        <Link className="flex items-center text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-1 rounded-lg">
+        {/* <Link className="flex items-center text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-1 rounded-lg">
           <FaUser /> Portfolio
-        </Link>
+        </Link> */}
 
         {/* Notification */}
-        <Badge count={1} size="small" offset={[0, 0]} style={{ fontSize: "12px" }}>
+        <Badge count={1} size="small" offset={[0, 0]} style={{ fontSize: "12px" }}
+        onClick={() => navigate("/lms/notifications")}>
           <BellOutlined className="text-md text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
         </Badge>
 

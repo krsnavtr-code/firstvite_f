@@ -6,11 +6,16 @@ import Assignments from '../pages/lms/Assignments';
 import CourseDetails from '../pages/lms/CourseDetails';
 import SprintDetails from '../pages/lms/SprintDetails';
 import TaskTest from '../pages/lms/TaskTest';
+import MyLearning from '../pages/lms/MyLearning';
 
 const lmsRoutes = [
   {
     path: 'dashboard',
     element: <Dashboard />,
+  },
+  {
+    path: 'my-learning',
+    element: <MyLearning />,
   },
   {
     path: 'settings',
