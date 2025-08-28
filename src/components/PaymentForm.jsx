@@ -175,7 +175,7 @@ const PaymentForm = ({ onClose }) => {
           };
 
           // Verify payment on the server
-          const verifyResponse = await api.post("/payments/verify", paymentData);
+          const verifyResponse = await api.post("/v1/payments/verify", paymentData);
 
           if (verifyResponse.data.success) {
             toast.success("Payment successful!");
@@ -249,7 +249,7 @@ const PaymentForm = ({ onClose }) => {
 
     try {
       // Create a Razorpay order
-      const response = await api.post("/payments/create-order", {
+      const response = await api.post("/v1/payments/create-order", {
         amount: parseFloat(formData.paymentAmount) * 100, // Convert to paise
         currency: "INR",
         receipt: `rcpt_${Date.now()}`,
