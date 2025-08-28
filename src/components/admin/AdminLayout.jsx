@@ -77,7 +77,7 @@ const AdminLayout = () => {
                 </svg>
                 Dashboard
               </Link>
-              <Link to="/admin/lms" className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700">
+              <Link to="/admin/lms-management" className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700">
                 <svg
                   className="h-5 w-5 mr-3"
                   fill="none"

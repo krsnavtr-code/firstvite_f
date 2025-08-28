@@ -64,6 +64,7 @@ import InactiveAccount from "./pages/auth/InactiveAccount";
 
 // LMS Management Components for Admin Panel
 import Sprint from "./components/admin/lmsManagement/Sprint.jsx";
+import LmsManagement from "./components/admin/lmsManagement/LmsManagement.jsx";
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -453,6 +454,7 @@ function App() {
             <Route path="/admin/send-brochure" element={<SendBrochure />} />
 
             {/* LMS Routes */}
+            <Route path="/admin/lms-management" element={<LmsManagement />} />
             <Route
               path="/admin/lms"
               element={<Navigate to="create-sprint" replace />}

@@ -76,7 +76,7 @@ const Settings = () => {
               layout="vertical"
               onFinish={onFinish}
               initialValues={{
-                name: currentUser?.displayName || '',
+                name: currentUser?.fullname || '',
                 email: currentUser?.email || '',
                 bio: 'I am a passionate learner!',
               }}
@@ -84,7 +84,7 @@ const Settings = () => {
               <Form.Item
                 name="name"
                 label="Full Name"
-                rules={[{ required: true, message: 'Please input your name!' }]}
+                rules={[{ message: 'Please input your name!' }]}
               >
                 <Input prefix={<UserOutlined />} placeholder="Your name" />
               </Form.Item>
@@ -92,7 +92,7 @@ const Settings = () => {
               <Form.Item
                 name="email"
                 label="Email"
-                rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}
+                rules={[{ type: 'email', message: 'Please input a valid email!' }]}
               >
                 <Input prefix={<MailOutlined />} disabled />
               </Form.Item>
@@ -112,63 +112,6 @@ const Settings = () => {
             </Form>
           </div>
         </div>
-      ),
-    },
-    {
-      key: '2',
-      label: (
-        <span>
-          <LockOutlined />
-          Security
-        </span>
-      ),
-      children: (
-        <Form
-          layout="vertical"
-          onFinish={handlePasswordChange}
-          className="max-w-lg"
-        >
-          <Form.Item
-            name="currentPassword"
-            label="Current Password"
-            rules={[{ required: true, message: 'Please input your current password!' }]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="Current password" />
-          </Form.Item>
-          
-          <Form.Item
-            name="newPassword"
-            label="New Password"
-            rules={[{ required: true, message: 'Please input your new password!' }]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="New password" />
-          </Form.Item>
-          
-          <Form.Item
-            name="confirmPassword"
-            label="Confirm New Password"
-            dependencies={['newPassword']}
-            rules={[
-              { required: true, message: 'Please confirm your new password!' },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('newPassword') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('The two passwords do not match!'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="Confirm new password" />
-          </Form.Item>
-          
-          <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              Update Password
-            </Button>
-          </Form.Item>
-        </Form>
       ),
     },
     {
