@@ -1,15 +1,17 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Layout, Menu, Dropdown, Avatar, Badge } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { BellOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
 import { FaUser } from "react-icons/fa";
+import LiveChatWidget from "./LiveChatWidget";
 
 const { Header } = Layout;
 
 const LMSNavbar = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [chatOpen, setChatOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -50,6 +52,7 @@ const LMSNavbar = () => {
   );
 
   return (
+    <>
     <header className="flex items-center justify-between px-6 bg-white shadow-sm border-b border-gray-100">
       {/* Left: Logo */}
       <Link to="/lms" className="flex items-center group">
@@ -65,7 +68,7 @@ const LMSNavbar = () => {
       {/* Right: Notifications + User */}
       <div className="flex items-center space-x-2">
         {/* Live Chat */}
-        <Link className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg">
+        <Link className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg" onClick={() => setChatOpen(true)}>
           Live Chat
         </Link>
         {/* Request a CallBack */}
@@ -102,6 +105,8 @@ const LMSNavbar = () => {
         </Dropdown>
       </div>
     </header>
+    <LiveChatWidget open={chatOpen} onClose={() => setChatOpen(false)} />
+    </>
   );
 };
 
