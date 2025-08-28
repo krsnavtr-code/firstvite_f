@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import Dashboard from '../pages/lms/Dashboard';
 import Settings from '../pages/lms/Settings';
-import Discussions from '../pages/lms/Discussions';
+import FirstviteCommunity from '../pages/lms/FirstviteCommunity';
 import Assignments from '../pages/lms/Assignments';
 import CourseDetails from '../pages/lms/CourseDetails';
 import SprintDetails from '../pages/lms/SprintDetails';
@@ -10,39 +10,39 @@ import MyLearning from '../pages/lms/MyLearning';
 
 const lmsRoutes = [
   {
-    path: 'dashboard',
+    path: "dashboard",
     element: <Dashboard />,
   },
   {
-    path: 'my-learning',
+    path: "my-learning",
     element: <MyLearning />,
   },
   {
-    path: 'settings',
+    path: "settings",
     element: <Settings />,
   },
   {
-    path: 'discussions',
-    element: <Discussions />,
+    path: "firstvite-community",
+    element: <FirstviteCommunity />,
   },
   {
-    path: 'assignments',
+    path: "assignments",
     element: <Assignments />,
   },
   {
-    path: 'courses/:courseId',
+    path: "courses/:courseId",
     element: <CourseDetails />,
   },
   {
-    path: 'courses/:courseId/sprints/:sprintId',
+    path: "courses/:courseId/sprints/:sprintId",
     element: <SprintDetails />,
   },
   {
-    path: 'courses/:courseId/sprints/:sprintId/sessions/:sessionId/tasks/:taskId',
+    path: "courses/:courseId/sprints/:sprintId/sessions/:sessionId/tasks/:taskId",
     element: <TaskTest />,
   },
   {
-    path: '*',
+    path: "*",
     element: <Navigate to="dashboard" replace />,
   },
 ];

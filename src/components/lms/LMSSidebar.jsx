@@ -56,10 +56,10 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
     //   onClick: () => navigate("/lms/messages"),
     // },
     {
-      key: "discussions",
+      key: "firstvite-community",
       icon: <TeamOutlined />,
-      label: "Discussions",
-      onClick: () => navigate("/lms/discussions"),
+      label: "Community",
+      onClick: () => navigate("/lms/firstvite-community"),
     },
     {
       key: "settings",
