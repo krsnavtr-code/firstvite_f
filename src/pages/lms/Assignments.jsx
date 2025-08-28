@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Card, Table, Tag, Space, Button, Modal, Form, Input, DatePicker, Select, message } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Card, Table, Tag, Space, Button, Modal, Form, Input, DatePicker, Select, message, Skeleton, Empty, Upload, Divider } from 'antd';
 import { 
   FileDoneOutlined, 
-  PlusOutlined, 
   SearchOutlined, 
   CheckCircleOutlined, 
   ClockCircleOutlined,
@@ -10,8 +9,14 @@ import {
   FilePdfOutlined,
   FileWordOutlined,
   FileImageOutlined,
-  FileOutlined
+  FileOutlined,
+  InboxOutlined,
 } from '@ant-design/icons';
+import { useAuth } from '../../contexts/AuthContext';
+import { getMyEnrollments } from '../../api/lmsApi';
+import { getSprintsByCourse } from '../../api/sprintApi';
+import { getSessionsBySprint } from '../../api/sessionApi';
+import { getTasksBySession } from '../../api/taskApi';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -21,50 +26,9 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const Assignments = () => {
-  const [assignments, setAssignments] = useState([
-    {
-      id: 1,
-      title: 'React Hooks Implementation',
-      course: 'Advanced React',
-      dueDate: dayjs().add(3, 'day'),
-      status: 'pending', // pending, submitted, late, graded
-      submittedDate: null,
-      grade: null,
-      totalPoints: 100,
-      description: 'Create a custom hook that fetches data from an API and handles loading and error states.',
-      attachments: [
-        { name: 'assignment_requirements.pdf', type: 'pdf' },
-        { name: 'example_code.zip', type: 'zip' }
-      ]
-    },
-    {
-      id: 2,
-      title: 'Redux Store Design',
-      course: 'State Management',
-      dueDate: dayjs().subtract(1, 'day'),
-      status: 'late',
-      submittedDate: null,
-      grade: null,
-      totalPoints: 100,
-      description: 'Design a Redux store for an e-commerce application.',
-      attachments: []
-    },
-    {
-      id: 3,
-      title: 'Responsive Layout',
-      course: 'CSS & Styling',
-      dueDate: dayjs().subtract(5, 'day'),
-      status: 'graded',
-      submittedDate: dayjs().subtract(6, 'day'),
-      grade: 92,
-      totalPoints: 100,
-      description: 'Create a responsive layout using CSS Grid and Flexbox.',
-      attachments: [
-        { name: 'layout_design.pdf', type: 'pdf' },
-        { name: 'screenshot.png', type: 'image' }
-      ]
-    },
-  ]);
+  const { currentUser } = useAuth();
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
@@ -72,6 +36,105 @@ const Assignments = () => {
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState([]);
   const [form] = Form.useForm();
+
+  // Resolve user id used in submissions
+  const userId = useMemo(() => currentUser?._id || localStorage.getItem('userId') || JSON.parse(localStorage.getItem('user') || '{}')?._id, [currentUser]);
+
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        setLoading(true);
+        // 1) Get enrollments (courses the user is in)
+        const enrollments = await getMyEnrollments();
+        const courses = Array.isArray(enrollments)
+          ? enrollments
+              .map(e => e.course || e?.data?.course || e)
+              .filter(Boolean)
+          : [];
+
+        // 2) For each course, load sprints -> sessions -> tasks
+        const allTasks = [];
+
+        for (const course of courses) {
+          const courseId = course?._id || course?.id;
+          if (!courseId) continue;
+
+          const sprintsRaw = await getSprintsByCourse(courseId);
+          const sprints = Array.isArray(sprintsRaw)
+            ? sprintsRaw
+            : Array.isArray(sprintsRaw?.data) ? sprintsRaw.data
+            : Array.isArray(sprintsRaw?.sprints) ? sprintsRaw.sprints
+            : Array.isArray(sprintsRaw?.data?.sprints) ? sprintsRaw.data.sprints
+            : [];
+
+          for (const sprint of sprints) {
+            const sprintId = sprint?._id || sprint?.id;
+            if (!sprintId) continue;
+
+            const sessionsRaw = await getSessionsBySprint(sprintId);
+            const sessions = Array.isArray(sessionsRaw)
+              ? sessionsRaw
+              : Array.isArray(sessionsRaw?.data) ? sessionsRaw.data
+              : Array.isArray(sessionsRaw?.sessions) ? sessionsRaw.sessions
+              : Array.isArray(sessionsRaw?.data?.sessions) ? sessionsRaw.data.sessions
+              : [];
+
+            for (const session of sessions) {
+              const sessionId = session?._id || session?.id;
+              if (!sessionId) continue;
+
+              try {
+                const tasksRaw = await getTasksBySession(sessionId);
+                const tasks = Array.isArray(tasksRaw)
+                  ? tasksRaw
+                  : Array.isArray(tasksRaw?.data) ? tasksRaw.data
+                  : Array.isArray(tasksRaw?.tasks) ? tasksRaw.tasks
+                  : Array.isArray(tasksRaw?.data?.tasks) ? tasksRaw.data.tasks
+                  : [];
+
+                for (const task of tasks) {
+                  // Determine user's submission & status
+                  const submissions = Array.isArray(task?.submissions) ? task.submissions : [];
+                  const mySubmission = submissions.find(
+                    s => (s?.user?._id || s?.user) === userId
+                  );
+                  const status = mySubmission
+                    ? (typeof mySubmission.score === 'number' ? 'graded' : 'submitted')
+                    : 'pending';
+
+                  allTasks.push({
+                    id: task?._id || task?.id,
+                    title: task?.title || 'Untitled Task',
+                    course: course?.title || course?.name || 'Course',
+                    // Task model may not have dueDate; fallback to createdAt
+                    dueDate: task?.dueDate ? dayjs(task.dueDate) : (task?.createdAt ? dayjs(task.createdAt) : null),
+                    status,
+                    submittedDate: mySubmission?.submittedAt ? dayjs(mySubmission.submittedAt) : null,
+                    grade: typeof mySubmission?.score === 'number' ? mySubmission.score : null,
+                    totalPoints: 100,
+                    description: task?.description || '',
+                    attachments: [],
+                  });
+                }
+              } catch (err) {
+                // If a session has no tasks or fails, continue
+                console.warn('Failed to load tasks for session', sessionId, err);
+              }
+            }
+          }
+        }
+
+        setAssignments(allTasks);
+      } catch (error) {
+        console.error('Error loading assignments:', error);
+        message.error(error?.message || 'Failed to load assignments');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAssignments();
+  }, [userId]);
 
   const getStatusTag = (status) => {
     const statusMap = {
@@ -124,9 +187,11 @@ const Assignments = () => {
     const matchesStatus = filterStatus === 'all' || assignment.status === filterStatus;
     const matchesSearch = assignment.title.toLowerCase().includes(searchText.toLowerCase()) ||
                          assignment.course.toLowerCase().includes(searchText.toLowerCase());
-    const matchesDate = dateRange.length === 0 || 
-                       (assignment.dueDate.isAfter(dateRange[0]) && 
-                        assignment.dueDate.isBefore(dateRange[1]));
+    const matchesDate = dateRange.length === 0 || (
+      assignment.dueDate &&
+      assignment.dueDate.isAfter(dateRange[0]) &&
+      assignment.dueDate.isBefore(dateRange[1])
+    );
     
     return matchesStatus && matchesSearch && matchesDate;
   });
@@ -150,12 +215,18 @@ const Assignments = () => {
       dataIndex: 'dueDate',
       key: 'dueDate',
       render: (date) => (
-        <div>
-          <div>{date.format('MMM D, YYYY')}</div>
-          <div className="text-xs text-gray-500">{dayjs().to(date)}</div>
-        </div>
+        date ? (
+          <div>
+            <div>{date.format('MMM D, YYYY')}</div>
+            <div className="text-xs text-gray-500">{dayjs().to(date)}</div>
+          </div>
+        ) : <span className="text-gray-400">-</span>
       ),
-      sorter: (a, b) => a.dueDate - b.dueDate,
+      sorter: (a, b) => {
+        const ad = a.dueDate ? a.dueDate.valueOf() : 0;
+        const bd = b.dueDate ? b.dueDate.valueOf() : 0;
+        return ad - bd;
+      },
     },
     {
       title: 'Status',
@@ -197,13 +268,13 @@ const Assignments = () => {
     },
   ];
 
+  if (loading) return <div className="p-6 max-w-7xl mx-auto"><Skeleton active /></div>;
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Assignments</h1>
-        <Button type="primary" icon={<PlusOutlined />}>
-          New Assignment
-        </Button>
+        {/* Learners shouldn't create assignments */}
       </div>
 
       <Card className="mb-6">
@@ -229,22 +300,26 @@ const Assignments = () => {
           </Select>
           <RangePicker 
             className="w-full md:w-80"
-            onChange={(dates) => setDateRange(dates)}
+            onChange={(dates) => setDateRange(dates || [])}
           />
         </div>
 
-        <Table 
-          columns={columns} 
-          dataSource={filteredAssignments} 
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-          className="overflow-x-auto"
-        />
+        {filteredAssignments.length > 0 ? (
+          <Table 
+            columns={columns} 
+            dataSource={filteredAssignments} 
+            rowKey="id"
+            pagination={{ pageSize: 10 }}
+            className="overflow-x-auto"
+          />
+        ) : (
+          <Empty description="No assignments found" />
+        )}
       </Card>
 
       <Modal
         title={selectedAssignment?.title || 'Assignment'}
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={[
           <Button key="back" onClick={() => setIsModalVisible(false)}>
@@ -272,10 +347,17 @@ const Assignments = () => {
               <div>
                 <div className="text-sm text-gray-500">Due Date</div>
                 <div className="font-medium">
-                  {selectedAssignment.dueDate.format('dddd, MMMM D, YYYY')}
-                  <span className="ml-2 text-sm text-gray-500">
-                    ({dayjs().to(selectedAssignment.dueDate, true)} left)
-                  </span>
+                  {selectedAssignment.dueDate
+                    ? (
+                        <>
+                          {selectedAssignment.dueDate.format('dddd, MMMM D, YYYY')}
+                          <span className="ml-2 text-sm text-gray-500">
+                            ({dayjs().to(selectedAssignment.dueDate, true)} left)
+                          </span>
+                        </>
+                      )
+                    : <span className="text-gray-400">-</span>
+                  }
                 </div>
               </div>
               <div>
@@ -294,73 +376,6 @@ const Assignments = () => {
                 </div>
               )}
             </div>
-
-            <Divider orientation="left">Description</Divider>
-            <div className="bg-gray-50 p-4 rounded">
-              {selectedAssignment.description}
-            </div>
-
-            {selectedAssignment.attachments && selectedAssignment.attachments.length > 0 && (
-              <>
-                <Divider orientation="left">Attachments</Divider>
-                <div className="space-y-2">
-                  {selectedAssignment.attachments.map((file, index) => {
-                    const fileType = file.name.split('.').pop().toLowerCase();
-                    return (
-                      <div key={index} className="flex items-center p-2 border rounded hover:bg-gray-50">
-                        <span className="mr-2">{getFileIcon(fileType)}</span>
-                        <span className="flex-1">{file.name}</span>
-                        <Button type="link" size="small">Download</Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-
-            {(selectedAssignment.status === 'pending' || selectedAssignment.status === 'late') && (
-              <>
-                <Divider orientation="left">Submit Your Work</Divider>
-                <Form form={form} layout="vertical">
-                  <Form.Item
-                    name="submission"
-                    label="Upload your work"
-                    rules={[{ required: true, message: 'Please upload your assignment' }]}
-                  >
-                    <Upload.Dragger>
-                      <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                      </p>
-                      <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                      <p className="ant-upload-hint">
-                        Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-                        band files
-                      </p>
-                    </Upload.Dragger>
-                  </Form.Item>
-                  <Form.Item
-                    name="comments"
-                    label="Comments (Optional)"
-                  >
-                    <Input.TextArea rows={4} placeholder="Add any comments for your instructor" />
-                  </Form.Item>
-                </Form>
-              </>
-            )}
-
-            {selectedAssignment.status === 'graded' && (
-              <>
-                <Divider orientation="left">Feedback</Divider>
-                <div className="bg-blue-50 p-4 rounded">
-                  <div className="font-medium mb-2">Instructor's Feedback:</div>
-                  <p>Great work! Your implementation of the custom hook is clean and efficient. 
-                  You've handled all the edge cases we discussed in class. Keep it up!</p>
-                  <div className="mt-4 text-sm text-gray-500">
-                    Graded on: {dayjs().subtract(2, 'day').format('MMMM D, YYYY')}
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         )}
       </Modal>
