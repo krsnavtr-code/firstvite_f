@@ -7,6 +7,7 @@ import CourseDetails from '../pages/lms/CourseDetails';
 import SprintDetails from '../pages/lms/SprintDetails';
 import TaskTest from '../pages/lms/TaskTest';
 import MyLearning from '../pages/lms/MyLearning';
+import ReferAndEarn from '../pages/lms/ReferAndEarn';
 
 const lmsRoutes = [
   {
@@ -28,6 +29,10 @@ const lmsRoutes = [
   {
     path: "assignments",
     element: <Assignments />,
+  },
+  {
+    path: "refer-and-earn",
+    element: <ReferAndEarn />,
   },
   {
     path: "courses/:courseId",

@@ -12,6 +12,8 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   RocketOutlined,
+  ExclamationOutlined,
+  TrophyOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -43,22 +45,22 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
       label: "Assignments",
       onClick: () => navigate("/lms/assignments"),
     },
-    // {
-    //   key: "calendar",
-    //   icon: <CalendarOutlined />,
-    //   label: "Calendar",
-    //   onClick: () => navigate("/lms/calendar"),
-    // },
-    // {
-    //   key: "messages",
-    //   icon: <MessageOutlined />,
-    //   label: "Messages",
-    //   onClick: () => navigate("/lms/messages"),
-    // },
+    {
+      key: "career",
+      icon: <TrophyOutlined />,
+      label: "Career",
+      onClick: () => navigate("/lms/career"),
+    },
+    {
+      key: "refer-and-earn",
+      icon: <ExclamationOutlined />,
+      label: "Refer & Earn",
+      onClick: () => navigate("/lms/refer-and-earn"),
+    },
     {
       key: "firstvite-community",
       icon: <TeamOutlined />,
-      label: "Community",
+      label: "FV Community",
       onClick: () => navigate("/lms/firstvite-community"),
     },
     {
