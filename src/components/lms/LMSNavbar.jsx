@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Layout, Menu, Dropdown, Avatar, Badge } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -12,6 +12,20 @@ const LMSNavbar = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
+  const [unread, setUnread] = useState(() => Number(localStorage.getItem('lms_chat_unread') || 0));
+
+  useEffect(() => {
+    const onUnread = (e) => setUnread(Number(e?.detail?.count ?? localStorage.getItem('lms_chat_unread') ?? 0));
+    const onStorage = (e) => {
+      if (e.key === 'lms_chat_unread') setUnread(Number(e.newValue || 0));
+    };
+    window.addEventListener('lms-chat-unread', onUnread);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('lms-chat-unread', onUnread);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -68,16 +82,15 @@ const LMSNavbar = () => {
       {/* Right: Notifications + User */}
       <div className="flex items-center space-x-2">
         {/* Live Chat */}
-        <Link className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg" onClick={() => setChatOpen(true)}>
-          Live Chat
-        </Link>
-        {/* Request a CallBack */}
-        <Link
-          className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg"
-          onClick={() => navigate("/lms/callback")}
-        >
-          Request a CallBack
-        </Link>
+        <Badge count={unread} size="small" offset={[0, 0]} style={{ fontSize: "12px" }}>
+          <Link className="text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-2 rounded-lg" onClick={() => {
+            localStorage.setItem('lms_chat_unread', '0');
+            setUnread(0);
+            setChatOpen(true);
+          }}>
+            Live Chat
+          </Link>
+        </Badge>
         {/* Portfolio */}
         {/* <Link className="flex items-center text-gray-600 text-sm hover:text-blue-600 cursor-pointer transition-colors border border-gray-200 px-1 rounded-lg">
           <FaUser /> Portfolio

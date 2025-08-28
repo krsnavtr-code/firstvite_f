@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import chatApi from "../../api/chatApi";
 
 const defaultWelcome = [
   {
@@ -159,14 +160,30 @@ export default function LiveChatWidget({ open, onClose }) {
   const [isMin, setIsMin] = usePersistentState("lms_chat_min", false);
   const [userId, setUserId] = usePersistentState("lms_chat_user_id", "");
   const [isTyping, setIsTyping] = useState(false);
+  const [sessionId, setSessionId] = usePersistentState("lms_chat_session_id", "");
   const listRef = useRef(null);
   const navigate = useNavigate();
+
+  const getUnread = () => Number(localStorage.getItem('lms_chat_unread') || 0);
+  const setUnread = (val) => {
+    localStorage.setItem('lms_chat_unread', String(val));
+    try { window.dispatchEvent(new CustomEvent('lms-chat-unread', { detail: { count: val } })); } catch {}
+  };
+  const incUnreadIfClosed = () => {
+    if (!open) setUnread(getUnread() + 1);
+  };
 
   useEffect(() => {
     if (open && listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
   }, [open, messages]);
+
+  // Reset unread when chat opens
+  useEffect(() => {
+    if (open) setUnread(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   // Ensure a stable userId exists for tracking call flow state
   useEffect(() => {
@@ -176,19 +193,62 @@ export default function LiveChatWidget({ open, onClose }) {
     }
   }, [userId, setUserId]);
 
-  const endChat = (close = true) => {
+  // Ensure a sessionId for persistence
+  useEffect(() => {
+    if (!sessionId) {
+      const sid = `sess-${Math.random().toString(36).slice(2, 8)}-${Date.now()}`;
+      setSessionId(sid);
+    }
+  }, [sessionId, setSessionId]);
+
+  // Load history when widget opens and sessionId exists
+  useEffect(() => {
+    const load = async () => {
+      if (open && sessionId) {
+        try {
+          const data = await chatApi.getMessages(sessionId, 200);
+          if (Array.isArray(data) && data.length) {
+            const mapped = data.map(d => ({ id: d._id || `${d.role}-${d.ts}`, role: d.role, text: d.text, ts: new Date(d.ts).getTime() }));
+            setMessages(mapped);
+            // viewing history clears unread locally too
+            setUnread(0);
+          } else if (!messages.length) {
+            // seed welcome if empty
+            setMessages(defaultWelcome);
+          }
+        } catch (e) {
+          // keep local messages if API fails
+          // console.error('Failed to load chat history', e);
+        }
+      }
+    };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, sessionId]);
+
+  const endChat = async (close = true) => {
+    try { if (sessionId) await chatApi.endSession(sessionId); } catch {}
     setMessages(defaultWelcome);
     // also reset call flow for this user if exists
     if (userId && callRequest[userId]) callRequest[userId] = { step: 0, language: null, number: null };
+    // rotate session id for a fresh conversation
+    const sid = `sess-${Math.random().toString(36).slice(2, 8)}-${Date.now()}`;
+    setSessionId(sid);
     if (close) onClose?.();
   };
 
   const handleCallNavigate = () => {
     // Add a short bot message before navigating
+    const botMsg = { id: `b-${Date.now()}`, role: "bot", text: "Opening callback request page...", ts: Date.now() };
     setMessages(prev => [
       ...prev,
-      { id: `b-${Date.now()}`, role: "bot", text: "Opening callback request page...", ts: Date.now() },
+      botMsg,
     ]);
+    // persist bot message
+    chatApi.saveMessage({ sessionId, userId, role: 'bot', text: botMsg.text, ts: botMsg.ts }).catch(() => {});
+    incUnreadIfClosed();
+    // create a handoff record
+    chatApi.createHandoff(sessionId, 'User requested callback via quick action').catch(() => {});
     setTimeout(() => navigate("/lms/callback"), 300);
   };
 
@@ -199,7 +259,10 @@ export default function LiveChatWidget({ open, onClose }) {
     // Commands to end/close chat
     if (/^(end|close|quit) chat$/i.test(text) || /^(end|close|quit)$/i.test(text)) {
       const userMsg = { id: `u-${Date.now()}`, role: "user", text, ts: Date.now() };
-      setMessages(prev => [...prev, userMsg, { id: `b-${Date.now()+1}`, role: "bot", text: "Chat ended. Have a great day!", ts: Date.now()+1 }]);
+      const botEnd = { id: `b-${Date.now()+1}`, role: "bot", text: "Chat ended. Have a great day!", ts: Date.now()+1 };
+      setMessages(prev => [...prev, userMsg, botEnd]);
+      chatApi.saveMessage({ sessionId, userId, role: 'user', text: userMsg.text, ts: userMsg.ts }).catch(() => {});
+      chatApi.saveMessage({ sessionId, userId, role: 'bot', text: botEnd.text, ts: botEnd.ts }).catch(() => {});
       setInput("");
       setTimeout(() => endChat(true), 400);
       return;
@@ -207,14 +270,22 @@ export default function LiveChatWidget({ open, onClose }) {
 
     const userMsg = { id: `u-${Date.now()}`, role: "user", text, ts: Date.now() };
     setMessages(prev => [...prev, userMsg]);
+    chatApi.saveMessage({ sessionId, userId, role: 'user', text, ts: userMsg.ts }).catch(() => {});
     setInput("");
     setTimeout(() => {
       setIsTyping(true);
       const reply = getBotReply(text, userId || "anon");
+      const botMsg = { id: `b-${Date.now()}`, role: "bot", text: reply, ts: Date.now() };
       setMessages(prev => [
         ...prev,
-        { id: `b-${Date.now()}`, role: "bot", text: reply, ts: Date.now() },
+        botMsg,
       ]);
+      chatApi.saveMessage({ sessionId, userId, role: 'bot', text: reply, ts: botMsg.ts }).catch(() => {});
+      // If bot suggests human agent, create a handoff
+      if (/human agent|talk to (an )?agent|connect you to a human/i.test(reply)) {
+        chatApi.createHandoff(sessionId, 'Bot suggested human agent').catch(() => {});
+      }
+      incUnreadIfClosed();
       setIsTyping(false);
     }, 600);
   };

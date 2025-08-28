@@ -9,6 +9,7 @@ import TaskTest from '../pages/lms/TaskTest';
 import MyLearning from '../pages/lms/MyLearning';
 import ReferAndEarn from '../pages/lms/ReferAndEarn';
 import Career from '../pages/lms/Career';
+import CallbackRequest from '../pages/lms/CallbackRequest';
 
 const lmsRoutes = [
   {
@@ -50,6 +51,10 @@ const lmsRoutes = [
   {
     path: "courses/:courseId/sprints/:sprintId/sessions/:sessionId/tasks/:taskId",
     element: <TaskTest />,
+  },
+  {
+    path: "callback",
+    element: <CallbackRequest />,
   },
   {
     path: "*",
