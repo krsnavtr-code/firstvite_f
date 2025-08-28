@@ -80,10 +80,10 @@ export const addComment = async (discussionId, commentData) => {
 };
 
 // Toggle like/dislike
-export const toggleReaction = async (discussionId, type, commentId = null) => {
-  const response = await api.post(
+export const toggleReaction = async (discussionId, reaction, commentId = null) => {
+  const response = await api.put(
     `${API_URL}/${discussionId}/reaction`,
-    { type, commentId }
+    { reaction, commentId }
   );
   return response.data;
 };

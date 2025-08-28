@@ -166,28 +166,41 @@ const FirstviteCommunity = () => {
 
   // Handle adding a comment
   const handleAddComment = async (discussionId) => {
-    if (!currentUser || !newComment.trim()) return;
+    if (!newComment.trim() || !currentUser) return;
 
     try {
       const commentData = {
-        content: newComment,
-        userId: currentUser.uid,
-        userName: currentUser.displayName || "Anonymous",
-        userPhoto: currentUser.photoURL || "",
+        content: newComment
       };
 
-      const updatedDiscussion = await addComment(
-        discussionId,
-        commentData
-      );
-
-      safeSetDiscussions(
-        discussions.map((discussion) =>
-          discussion._id === updatedDiscussion._id
-            ? updatedDiscussion
-            : discussion
-        )
-      );
+      const response = await addComment(discussionId, commentData);
+      
+      setDiscussions(prevDiscussions => {
+        if (!Array.isArray(prevDiscussions)) return [];
+        
+        return prevDiscussions.map(discussion => {
+          if (discussion._id !== discussionId) return discussion;
+          
+          // Create updated discussion with the new comment
+          return {
+            ...discussion,
+            comments: [
+              ...(discussion.comments || []),
+              {
+                ...response.data,
+                user: {
+                  _id: currentUser.uid,
+                  name: currentUser.displayName || "Anonymous",
+                  avatar: currentUser.photoURL || ""
+                },
+                likes: [],
+                dislikes: []
+              }
+            ],
+            commentsCount: (discussion.commentsCount || 0) + 1
+          };
+        });
+      });
 
       setNewComment("");
       setReplyingTo(null);
@@ -202,15 +215,39 @@ const FirstviteCommunity = () => {
     if (!currentUser) return;
 
     try {
-      const updatedDiscussion = await toggleReaction(discussionId, type, commentId);
-
-      safeSetDiscussions(
-        discussions.map((discussion) =>
-          discussion._id === updatedDiscussion._id
-            ? updatedDiscussion
-            : discussion
-        )
-      );
+      const response = await toggleReaction(discussionId, type, commentId);
+      
+      setDiscussions(prevDiscussions => {
+        if (!Array.isArray(prevDiscussions)) return [];
+        
+        return prevDiscussions.map(discussion => {
+          if (discussion._id !== discussionId) return discussion;
+          
+          // If it's a comment reaction
+          if (commentId) {
+            const updatedComments = (discussion.comments || []).map(comment => {
+              if (comment._id !== commentId) return comment;
+              return {
+                ...comment,
+                likes: response.data?.likes?.map(like => like.user?._id || like.user) || [],
+                dislikes: response.data?.dislikes?.map(dislike => dislike.user?._id || dislike.user) || [],
+                likesCount: response.data?.likes?.length || 0,
+                dislikesCount: response.data?.dislikes?.length || 0
+              };
+            });
+            return { ...discussion, comments: updatedComments };
+          }
+          
+          // If it's a discussion reaction
+          return {
+            ...discussion,
+            likes: response.data?.likes?.map(like => like.user?._id || like.user) || [],
+            dislikes: response.data?.dislikes?.map(dislike => dislike.user?._id || dislike.user) || [],
+            likesCount: response.data?.likes?.length || 0,
+            dislikesCount: response.data?.dislikes?.length || 0
+          };
+        });
+      });
     } catch (err) {
       console.error("Error updating reaction:", err);
       setError("Failed to update reaction. Please try again.");
@@ -578,9 +615,10 @@ const FirstviteCommunity = () => {
                           <h3 className="text-lg font-medium mb-2">
                             {discussion.title}
                           </h3>
-                          <div className="prose max-w-none text-gray-800">
-                            {discussion.content}
-                          </div>
+                          <div 
+                            className="prose max-w-none text-gray-800"
+                            dangerouslySetInnerHTML={{ __html: discussion.content }}
+                          />
                         </div>
 
                         <div className="mt-3 flex flex-wrap gap-2">
@@ -596,41 +634,33 @@ const FirstviteCommunity = () => {
                               icon={
                                 <LikeOutlined
                                   className={
-                                    discussion.likedBy?.includes(
-                                      currentUser?.uid
-                                    )
+                                    discussion.likes?.includes(currentUser?.uid)
                                       ? "text-blue-500"
                                       : ""
                                   }
                                 />
                               }
-                              text={discussion.likes}
+                              text={discussion.likes?.length || 0}
                               onClick={() =>
                                 handleReaction(discussion._id, "like")
                               }
-                              active={discussion.likedBy?.includes(
-                                currentUser?.uid
-                              )}
+                              active={discussion.likes?.includes(currentUser?.uid)}
                             />
                             <IconText
                               icon={
                                 <DislikeOutlined
                                   className={
-                                    discussion.dislikedBy?.includes(
-                                      currentUser?.uid
-                                    )
+                                    discussion.dislikes?.includes(currentUser?.uid)
                                       ? "text-red-500"
                                       : ""
                                   }
                                 />
                               }
-                              text={discussion.dislikes}
+                              text={discussion.dislikes?.length || 0}
                               onClick={() =>
                                 handleReaction(discussion._id, "dislike")
                               }
-                              active={discussion.dislikedBy?.includes(
-                                currentUser?.uid
-                              )}
+                              active={discussion.dislikes?.includes(currentUser?.uid)}
                             />
                             <IconText
                               icon={<MessageOutlined />}
@@ -736,25 +766,21 @@ const FirstviteCommunity = () => {
                                         )}
                                     </div>
                                     <div
-                                      className="mt-2 text-gray-800"
-                                      dangerouslySetInnerHTML={{
-                                        __html: comment.content,
-                                      }}
+                                      className="mt-2 text-gray-800 prose prose-sm max-w-none"
+                                      dangerouslySetInnerHTML={{ __html: comment.content }}
                                     />
                                     <div className="mt-2 flex items-center space-x-4 text-sm">
                                       <IconText
                                         icon={
                                           <LikeOutlined
                                             className={
-                                              comment.likedBy?.includes(
-                                                currentUser?.uid
-                                              )
+                                              comment.likes?.includes(currentUser?.uid)
                                                 ? "text-blue-500"
                                                 : ""
                                             }
                                           />
                                         }
-                                        text={comment.likes}
+                                        text={comment.likes?.length || 0}
                                         onClick={() =>
                                           handleReaction(
                                             discussion._id,
@@ -762,23 +788,19 @@ const FirstviteCommunity = () => {
                                             comment._id
                                           )
                                         }
-                                        active={comment.likedBy?.includes(
-                                          currentUser?.uid
-                                        )}
+                                        active={comment.likes?.includes(currentUser?.uid)}
                                       />
                                       <IconText
                                         icon={
                                           <DislikeOutlined
                                             className={
-                                              comment.dislikedBy?.includes(
-                                                currentUser?.uid
-                                              )
+                                              comment.dislikes?.includes(currentUser?.uid)
                                                 ? "text-red-500"
                                                 : ""
                                             }
                                           />
                                         }
-                                        text={comment.dislikes}
+                                        text={comment.dislikes?.length || 0}
                                         onClick={() =>
                                           handleReaction(
                                             discussion._id,
@@ -786,9 +808,7 @@ const FirstviteCommunity = () => {
                                             comment._id
                                           )
                                         }
-                                        active={comment.dislikedBy?.includes(
-                                          currentUser?.uid
-                                        )}
+                                        active={comment.dislikes?.includes(currentUser?.uid)}
                                       />
                                     </div>
                                   </div>
