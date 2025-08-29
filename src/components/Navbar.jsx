@@ -357,7 +357,6 @@ function Navbar() {
     { to: "/free-courses", label: "Free Courses" },
     { to: "/lms", lmscolors: true },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
-    ...(isAdmin ? [{ to: "/admin/lms/create-sprint", label: "Admin LMS" }] : []),
   ];
 
   const renderNavItems = (className = "") => (
