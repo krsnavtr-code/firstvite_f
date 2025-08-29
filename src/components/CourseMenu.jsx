@@ -279,10 +279,10 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
         aria-labelledby="course-menu-button"
       >
         {isMobile && (
-          <div className="sticky top-0 bg-white dark:bg-gray-800 px-2 py-2 border-b border-gray-200 dark:border-gray-700">
+          <div className="sticky top-0 z-40 bg-white dark:bg-gray-800 px-2 py-2 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Browse Categories
+              <h3 className="text-md font-semibold text-gray-800 dark:text-white">
+                Browse Categories & Courses
               </h3>
               <button
                 onClick={(e) => {
@@ -311,7 +311,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
           </div>
         )}
 
-        <div className={isMobile ? "p-2" : "p-2"}>
+        <div className={isMobile ? "p-2 relative z-10" : "p-2"}>
           {isLoading ? (
             <div className="flex justify-center p-2">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>

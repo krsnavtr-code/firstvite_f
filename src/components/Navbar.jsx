@@ -38,9 +38,9 @@ function Navbar() {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -389,7 +389,7 @@ function Navbar() {
         >
           {item.lmscolors && (
             <span className="px-1 py-1 font-bold text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded hover:bg-blue-300 dark:hover:bg-blue-900/30">
-              Smart <span className=" text-orange-500">Board</span>
+              SMART <span className=" text-orange-500">Board</span>
             </span>
           )}
           {item.label}
@@ -809,6 +809,148 @@ function Navbar() {
                 Home
               </Link>
 
+              {/* Bottom Action Buttons */}
+              <div className="pt-1 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                {/* SMART Board */}
+                <Link
+                  to="/lms"
+                  className={`block px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
+                    location.pathname === "/"
+                      ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                  }`}
+                  onClick={toggleMobileMenu}
+                >
+                  SMART <span className=" text-orange-500">Board</span>
+                </Link>
+
+                {/* Movile Payment menu */}
+                <button
+                  className={`block px-4 flex items-center w-full py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
+                    location.pathname === "/"
+                      ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                  }`}
+                  onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                >
+                  Pay Now
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {showPaymentDropdown && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute  left-0 z-50 w-64 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                  >
+                    <div className="px-3 py-2 border-b border-gray-100">
+                      <button
+                        onClick={handlePaymentClick}
+                        className="flex items-center justify-between w-full px-4 py-2.5 text-sm font-medium text-indigo-700 transition-colors bg-indigo-50 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                        role="menuitem"
+                      >
+                        <span>
+                          Pay Using{" "}
+                          <span className="text-orange-600">RazorPay</span>
+                        </span>
+                        <svg
+                          className="w-4 h-4 ml-2 text-indigo-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                    >
+                      <div className="space-y-2 p-4">
+                        <h3 className="font-medium text-blue-600 mb-3">
+                          Pay Using{" "}
+                          <span className="text-orange-600">Bank Transfer</span>
+                        </h3>
+                        <div className="space-y-2">
+                          {[
+                            {
+                              label: "Branch",
+                              value: "ICICI Bank, Noida Sector 61",
+                            },
+                            {
+                              label: "Account  Name",
+                              value: "FirstVITE e learning Pvt Ltd.",
+                            },
+                            { label: "Account Number", value: "025305010216" },
+                            { label: "IFSC Code", value: "ICIC0000253" },
+                          ].map((item, index) => (
+                            <div key={index} className="group relative">
+                              <div className="flex flex-col justify-between">
+                                <span className="text-sm font-medium text-black w-full">
+                                  {item.label}:
+                                </span>
+                                <div className="flex items-center">
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(item.value);
+                                      setCopiedIndex(index);
+                                      setTimeout(() => {
+                                        setCopiedIndex(null);
+                                      }, 2000);
+                                    }}
+                                    className="pe-1 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                    title={`Copy ${item.label}`}
+                                  >
+                                    {copiedIndex === index ? (
+                                      <FaCheck className="text-green-500" />
+                                    ) : (
+                                      <FaCopy />
+                                    )}
+                                  </button>
+                                  <span className="text-xs text-black font-mono">
+                                    {item.value}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Genlead Agent Register */}
+                <a
+                  href="https://genlead.in/agent/register"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-full px-4 py-1.5 text-base font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
+                  onClick={toggleMobileMenu}
+                >
+                  Agent Register
+                </a>
+              </div>
+
               {/* Course Menu - Mobile Version */}
               <div className="mobile-course-menu">
                 <CourseMenu isMobile={true} onItemClick={toggleMobileMenu} />
@@ -830,53 +972,6 @@ function Navbar() {
                 </Link>
               ))}
             </div>
-
-            {/* Bottom Action Buttons */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-              <Link
-                to="/lms"
-                className="flex items-center justify-center w-full px-4 py-2.5 text-base font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 transition-colors duration-200"
-                onClick={toggleMobileMenu}
-              >
-                Smart Board
-              </Link>
-
-              <a
-                href="https://genlead.in/agent/register"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-full px-4 py-2.5 text-base font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
-                onClick={toggleMobileMenu}
-              >
-                Agent Register
-              </a>
-
-              <button
-                onClick={() => {
-                  handlePaymentClick();
-                  toggleMobileMenu();
-                }}
-                className="flex items-center justify-center w-full px-4 py-2.5 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <FaCreditCard className="mr-2" />
-                Pay Now
-              </button>
-
-              {/* Theme Toggle - Mobile */}
-              <div className="flex items-center justify-center pt-2">
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors duration-200"
-                  aria-label="Toggle theme"
-                >
-                  {theme === "dark" ? (
-                    <FaSun className="w-5 h-5" />
-                  ) : (
-                    <FaMoon className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -887,20 +982,6 @@ function Navbar() {
           </div>
         )}
       </div>
-
-      {/*  */}
-      {/* <div className="w-fit">
-        <div className="hidden md:flex md:items-center xl:ml-8 lg:ml-6 w-50 space-x-2 px-2">
-          <a
-            href="https://genlead.in/agent/register"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block px-4 py-2 text-base font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-          >
-            Agent Register
-          </a>
-        </div>
-      </div> */}
     </>
   );
 }
