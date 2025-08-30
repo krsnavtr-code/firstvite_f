@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Button, List, Tag, Space, Typography, message } from 'antd';
 import { RocketOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 
@@ -63,96 +63,121 @@ const Career = () => {
   };
 
   return (
-    <div className="page-container">
-      <div style={{ marginBottom: 24 }}>
-        <Typography.Title level={3} style={{ marginBottom: 0 }}>
+    <div className="p-6 max-w-7xl mx-auto min-h-screen">
+      <div style={{ marginBottom: 24 }} className='text-black'>
+        <Typography.Title level={3} style={{ marginBottom: 0, color: 'inherit' }}>
           <Space>
             <RocketOutlined />
             Career Opportunities
           </Space>
         </Typography.Title>
-        <Typography.Text type="secondary">
+        <Typography.Text>
           Find your dream job through FirstVite's referral network
         </Typography.Text>
       </div>
 
-      <Card className="main-card">
-        <Tabs defaultActiveKey="1">
-          <TabPane tab="Available Jobs" key="1">
+      <Card className="main-card bg-gray-200 dark:bg-[#001525] shadow-sm">
+        <Tabs defaultActiveKey="1" className="dark:text-white">
+          <TabPane tab={<span className="dark:text-white">Available Jobs</span>} key="1">
             <List
               itemLayout="vertical"
               dataSource={jobListings}
               renderItem={(job) => (
                 <List.Item
                   key={job.id}
+                  className="bg-gray-100 dark:bg-[#001525] hover:bg-gray-50 dark:hover:bg-[#001a33] rounded-lg transition-colors"
                   actions={[
-                    <Space size="middle">
-                      <Tag color="blue">{job.type}</Tag>
-                      <Text type="secondary">{job.location}</Text>
-                      <Text type="secondary">Experience: {job.experience}</Text>
-                      <Text strong>₹{job.salary}</Text>
+                    <Space size="middle" className="dark:text-gray-300">
+                      <Tag color="blue" className="dark:border-blue-400">{job.type}</Tag>
+                      <Text className="dark:text-gray-300">{job.location}</Text>
+                      <Text className="dark:text-gray-400">Experience: {job.experience}</Text>
+                      <Text strong className="dark:text-white">₹{job.salary}</Text>
                     </Space>,
                   ]}
                   extra={[
-                    <Button 
-                      type="primary" 
+                    <Button
                       onClick={() => handleApply(job.id)}
                       disabled={isApplied(job.id)}
                       icon={isApplied(job.id) ? <CheckCircleOutlined /> : null}
+                      className={`${isApplied(job.id) 
+                        ? 'bg-green-600 hover:bg-green-700' 
+                        : 'bg-blue-600 hover:bg-blue-700'} text-white`}
                     >
-                      {isApplied(job.id) ? 'Applied' : 'Apply Now'}
+                      {isApplied(job.id) ? "Applied" : "Apply Now"}
                     </Button>,
                   ]}
                 >
                   <List.Item.Meta
+                    className="p-2"
                     title={
                       <Space direction="vertical" size={4}>
-                        <Title level={5} style={{ margin: 0 }}>{job.title}</Title>
-                        <Text type="secondary">{job.company}</Text>
+                        <Title level={5} style={{ margin: 0 }} className="dark:text-white">
+                          {job.title}
+                        </Title>
+                        <Text className="dark:text-gray-400">{job.company}</Text>
                       </Space>
                     }
                     description={
                       <Space size={[4, 8]} wrap>
                         {job.skills.map((skill, index) => (
-                          <Tag key={index}>{skill}</Tag>
+                          <Tag 
+                            key={index}
+                            className="dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                          >
+                            {skill}
+                          </Tag>
                         ))}
                       </Space>
                     }
                   />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
+                  <Text className="dark:text-gray-400 text-xs p-2">
                     Posted {job.posted}
                   </Text>
                 </List.Item>
               )}
             />
           </TabPane>
-          <TabPane tab="My Applications" key="2">
+          <TabPane tab={<span className="dark:text-white active:text-blue-600">My Applications</span>} key="2">
             {appliedJobs.length > 0 ? (
               <List
                 itemLayout="horizontal"
                 dataSource={appliedJobs}
                 renderItem={(job) => (
                   <List.Item
+                    className="bg-white dark:bg-[#001525] hover:bg-gray-50 dark:hover:bg-[#001a33] p-4 rounded-lg mb-2 transition-colors"
                     actions={[
-                      <Tag color="processing" icon={<ClockCircleOutlined />}>
+                      <Tag 
+                        color="processing" 
+                        icon={<ClockCircleOutlined />}
+                        className="dark:border-blue-400"
+                      >
                         In Review
-                      </Tag>
+                      </Tag>,
                     ]}
                   >
                     <List.Item.Meta
-                      title={job.title}
-                      description={`${job.company} • ${job.location}`}
+                      className="p-2"
+                      title={<span className="dark:text-white">{job.title}</span>}
+                      description={
+                        <span className="dark:text-gray-400">
+                          {job.company} • {job.location}
+                        </span>
+                      }
                     />
-                    <div style={{ textAlign: 'right' }}>
-                      <div>Applied on {new Date().toLocaleDateString()}</div>
-                      <Text type="secondary">Status: Under Review</Text>
+                    <div className="text-right">
+                      <div className="dark:text-gray-300">
+                        Applied on {new Date().toLocaleDateString()}
+                      </div>
+                      <Text className="dark:text-gray-400">Status: Under Review</Text>
                     </div>
                   </List.Item>
                 )}
               />
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <Text type="secondary">You haven't applied to any jobs yet.</Text>
+              <div className="text-center py-10">
+                <Text className="dark:text-gray-400">
+                  You haven't applied to any jobs yet.
+                </Text>
               </div>
             )}
           </TabPane>

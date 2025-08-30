@@ -25,12 +25,14 @@ const QuestionCard = ({
   return (
     <Card
       key={index}
-      title={`Question ${index + 1} (${question.points || 1} point${
-        (question.points || 1) > 1 ? "s" : ""
-      })`}
-      className="mb-6"
+      title={
+        <span className="text-black dark:text-white">{`Question ${index + 1} (${
+          question.points || 1
+        } point${(question.points || 1) > 1 ? "s" : ""})`}</span>
+      }
+      className="mb-6 bg-gray-200 dark:bg-[#001525] text-black dark:text-white"
     >
-      <p className="text-lg mb-4">{question.question}</p>
+      <p className="text-lg mb-4 dark:text-white">{question.question}</p>
 
       <div className="space-y-2">
         {question.options.map((option, optIndex) => {
@@ -44,7 +46,7 @@ const QuestionCard = ({
               key={optIndex}
               className={`p-3 border rounded-md cursor-pointer transition-colors ${
                 isSelected
-                  ? "border-blue-500 bg-blue-50"
+                  ? "border-blue-500 bg-blue-50 text-black"
                   : "border-gray-200 hover:border-blue-300"
               }`}
               onClick={() =>
@@ -64,7 +66,7 @@ const QuestionCard = ({
                   }`}
                 >
                   {isSelected && (
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div className="w-2 h-2 rounded-full"></div>
                   )}
                 </div>
                 <span>{option.text}</span>
@@ -75,7 +77,7 @@ const QuestionCard = ({
       </div>
 
       {showResults && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-md">
+        <div className="mt-4 p-3 bg-gray-200 rounded-md dark:bg-[#001525]">
           <p className="font-medium mb-2">
             {isCorrect ? (
               <span className="text-green-600 flex items-center">
@@ -118,13 +120,13 @@ const TaskTest = () => {
   /** Fetch Task */
   useEffect(() => {
     const fetchData = async () => {
-      console.log('Fetching task data...');
+      console.log("Fetching task data...");
       try {
         const res = await getTask(taskId);
-        console.log('Task API response:', res);
-        
+        console.log("Task API response:", res);
+
         if (res && res.data && res.data.task) {
-          console.log('Task data received:', res.data.task);
+          console.log("Task data received:", res.data.task);
           const taskData = res.data.task;
           setTask(taskData);
 
@@ -135,18 +137,20 @@ const TaskTest = () => {
               initAns[i] = q.questionType === "true_false" ? null : [];
             });
           }
-          console.log('Initialized answers:', initAns);
+          console.log("Initialized answers:", initAns);
           setAnswers(initAns);
           setStartTime(new Date());
         } else {
-          console.error('No task data found in response:', res);
+          console.error("No task data found in response:", res);
           message.error("No task data found");
         }
       } catch (error) {
-        console.error('Error fetching task:', error);
-        message.error("Failed to load task: " + (error.message || 'Unknown error'));
+        console.error("Error fetching task:", error);
+        message.error(
+          "Failed to load task: " + (error.message || "Unknown error")
+        );
       } finally {
-        console.log('Finished loading task');
+        console.log("Finished loading task");
         setLoading(false);
       }
     };
@@ -155,7 +159,7 @@ const TaskTest = () => {
 
     const timer = setInterval(() => setTimeSpent((t) => t + 1), 1000);
     return () => {
-      console.log('Cleaning up task timer');
+      console.log("Cleaning up task timer");
       clearInterval(timer);
     };
   }, [taskId]);
@@ -243,7 +247,7 @@ const TaskTest = () => {
             width={120}
             strokeColor={pass ? "#52c41a" : "#ff4d4f"}
           />
-          <h1 className="text-2xl font-bold mt-4">
+          <h1 className="text-2xl text-black font-bold mt-4">
             {pass ? "🎉 Congratulations!" : "💪 Keep Practicing!"}
           </h1>
           <p className="text-gray-600 mb-8">
@@ -253,22 +257,23 @@ const TaskTest = () => {
           </p>
 
           <div className="flex justify-center gap-4">
-            <Button onClick={() => window.location.reload()} type="primary">
+            {/* <Button onClick={() => window.location.reload()} className="text-blue-600 font-bold border-2 border-blue-600">
               Try Again
-            </Button>
+            </Button> */}
             <Button
               onClick={() =>
                 navigate(
                   `/lms/courses/${courseId}/sprints/${sprintId}/sessions/${sessionId}`
                 )
               }
+              className="text-blue-600 font-bold border-2 border-blue-600"
             >
               Back to Session
             </Button>
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold mt-10 mb-4">Review</h2>
+        <h2 className="text-xl font-semibold text-black mt-10 mb-4">Review Your Answers</h2>
         {task.questions.map((q, i) => (
           <QuestionCard
             key={i}
@@ -296,7 +301,7 @@ const TaskTest = () => {
   const progress = ((currentIndex + 1) / task.questions.length) * 100;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-5xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <Button
           type="text"
@@ -309,14 +314,14 @@ const TaskTest = () => {
         >
           Back
         </Button>
-        <span className="text-gray-600">
+        <span className="text-red-600">
           ⏱ {Math.floor(timeSpent / 60)}:
           {(timeSpent % 60).toString().padStart(2, "0")}
         </span>
       </div>
 
       <div className="mb-4">
-        <div className="flex justify-between mb-1 text-sm font-medium text-gray-700">
+        <div className="flex justify-between mb-1 text-sm font-medium text-black">
           <span>
             Question {currentIndex + 1} of {task.questions.length}
           </span>
@@ -325,7 +330,7 @@ const TaskTest = () => {
         <Progress percent={progress} showInfo={false} />
       </div>
 
-      <h1 className="text-2xl font-bold mb-6">{task.title}</h1>
+      <h1 className="text-2xl font-bold mb-6 text-black">{task.title}</h1>
 
       <QuestionCard
         question={currentQ}
@@ -339,25 +344,35 @@ const TaskTest = () => {
         <Button
           disabled={currentIndex === 0}
           onClick={() => setCurrentIndex((i) => i - 1)}
+          className="text-red-600 font-bold border-2 border-red-600"
         >
           Previous
         </Button>
         {currentIndex === task.questions.length - 1 ? (
           <Button
-            type="primary"
             loading={submitting}
             onClick={() =>
               Modal.confirm({
-                title: "Submit Test?",
-                content: "Once submitted, you cannot change answers.",
+                title: 'Submit Test?',
+                content: 'Once submitted, you cannot change answers.',
                 onOk: handleSubmit,
+                okButtonProps: {
+                  className: 'text-white bg-green-600 hover:bg-green-700'
+                },
+                okText: 'Submit',
+                cancelText: 'Cancel',
+                okType: 'success'
               })
             }
+            className="text-green-600 font-bold border-2 border-green-600"
           >
             Submit
           </Button>
         ) : (
-          <Button type="primary" onClick={() => setCurrentIndex((i) => i + 1)}>
+          <Button
+            onClick={() => setCurrentIndex((i) => i + 1)}
+            className="text-blue-600 font-bold border-2 border-blue-600"
+          >
             Next
           </Button>
         )}

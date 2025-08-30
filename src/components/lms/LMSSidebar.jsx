@@ -1,16 +1,10 @@
 import React, { useState } from "react";
-import { Layout, Menu, theme } from "antd";
+import { Layout, Menu } from "antd";
 import {
   DashboardOutlined,
-  BookOutlined,
-  UserOutlined,
   FileDoneOutlined,
-  MessageOutlined,
   SettingOutlined,
   TeamOutlined,
-  CalendarOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   RocketOutlined,
   ExclamationOutlined,
   TrophyOutlined,
@@ -19,12 +13,9 @@ import { useNavigate } from "react-router-dom";
 
 const { Sider } = Layout;
 
-const LMSSidebar = ({ collapsed, onCollapse }) => {
+const LMSSidebar = ({ collapsed, theme: themeProp }) => {
   const navigate = useNavigate();
   const [selectedKey, setSelectedKey] = useState("dashboard");
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
 
   const menuItems = [
     {
@@ -76,36 +67,37 @@ const LMSSidebar = ({ collapsed, onCollapse }) => {
       trigger={null}
       collapsible
       collapsed={collapsed}
-      width={170}
-      collapsedWidth={50}
+      width={180}
+      collapsedWidth={60}
       style={{
-        background: colorBgContainer,
         height: "100%",
         overflow: "hidden",
         position: "relative",
+        color: themeProp === "dark" ? "black" : "white",
+        background: themeProp === "dark" ? "#001529" : "#fff",
+        borderRight: themeProp === "light" ? "1px solid #f0f0f0" : "none",
       }}
     >
       <Menu
         mode="inline"
+        theme={themeProp === 'dark' ? 'dark' : 'light'}
         selectedKeys={[selectedKey]}
         style={{
-          borderRight: 0,
-          // padding: "8px 0",
+          background: 'transparent',
+          borderRight: 'none',
+          padding: '8px 4px',
+          color: themeProp === 'dark' ? 'black' : 'white'
         }}
         items={menuItems.map((item) => ({
           ...item,
           style: {
             margin: "4px 0",
-            padding: "0 8px",
-            width: "100%",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
+            borderRadius: "6px",
           },
           title: collapsed ? item.label : "",
         }))}
         onSelect={({ key }) => setSelectedKey(key)}
         inlineCollapsed={collapsed}
-        inlineIndent={8}
       />
     </Sider>
   );

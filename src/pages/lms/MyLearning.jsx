@@ -31,7 +31,7 @@ const Dashboard = () => {
 
   if (loading && enrollments.length === 0) {
     return (
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-6 max-w-7xl mx-auto text-black">
         <h1 className="text-3xl font-bold mb-8">My Learning</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
@@ -46,7 +46,7 @@ const Dashboard = () => {
 
   if (enrollments.length === 0) {
     return (
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-6 max-w-7xl mx-auto text-black">
         <h1 className="text-3xl font-bold mb-8">My Learning</h1>
         <div className="bg-white rounded-lg p-8 shadow-sm">
           <Empty 
@@ -83,37 +83,37 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto text-black">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">My Learning</h1>
           <p className="text-gray-600 mt-1">
-            {enrollments.length} {enrollments.length === 1 ? 'course' : 'courses'} in progress
+            {enrollments.length}{" "}
+            {enrollments.length === 1 ? "course" : "courses"} in progress
           </p>
         </div>
-        <Button 
-          type="primary" 
+        <Button
           icon={<BookOutlined />}
-          onClick={() => navigate('/courses')}
-          className="bg-gray-900 hover:bg-gray-800"
+          onClick={() => navigate("/courses")}
+          className="text-white bg-[#1677ff] hover:bg-[#1677ff]"
         >
           Browse More Courses
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {enrollments.map((enrollment) => {
           const course = enrollment.course;
           const progress = Math.round(enrollment.progress || 0);
-          const isCompleted = enrollment.completionStatus === 'completed';
-          const lastAccessed = enrollment.updatedAt 
-            ? new Date(enrollment.updatedAt).toLocaleDateString() 
-            : 'Never';
-          
+          const isCompleted = enrollment.completionStatus === "completed";
+          const lastAccessed = enrollment.updatedAt
+            ? new Date(enrollment.updatedAt).toLocaleDateString()
+            : "Never";
+
           return (
             <Card
               key={enrollment._id}
-              className="h-full flex flex-col group hover:shadow-lg transition-all duration-200 border border-gray-900"
+              className="h-full flex flex-col group hover:shadow-lg transition-all duration-200 border border-gray-900 bg-gray-200 dark:bg-[#001525] dark:text-white"
               hoverable
               onClick={() => handleCourseClick(course._id)}
               cover={
@@ -136,7 +136,7 @@ const Dashboard = () => {
                     </div>
                   )}
                   {isCompleted && (
-                    <div className="absolute top-3 right-3 bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                    <div className="absolute top-3 right-3 bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium flex items-center dark:bg-[#001525] dark:text-white">
                       <CheckCircleOutlined className="mr-1" /> Completed
                     </div>
                   )}
@@ -146,7 +146,7 @@ const Dashboard = () => {
               <Meta
                 title={
                   <div className="flex justify-between items-start">
-                    <span className="text-lg font-semibold text-gray-900 line-clamp-2">
+                    <span className="text-lg font-semibold text-black dark:text-white line-clamp-2">
                       {course?.title || "Untitled Course"}
                     </span>
                   </div>
@@ -155,7 +155,7 @@ const Dashboard = () => {
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <Button
                   type={isCompleted ? "default" : "primary"}
-                  className="bg-gray-900 hover:bg-gray-800"
+                  className="text-white bg-[#1677ff] hover:bg-[#1677ff]"
                   block
                   icon={
                     isCompleted ? (

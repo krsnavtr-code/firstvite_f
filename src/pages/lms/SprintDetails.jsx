@@ -194,58 +194,67 @@ const SprintDetails = () => {
   if (loading) return <Skeleton active />;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <Button 
-        type="text" 
-        icon={<ArrowLeftOutlined />} 
+    <div className="max-w-5xl mx-auto">
+      <Button
+        type="text"
+        icon={<ArrowLeftOutlined />}
         onClick={() => navigate(`/lms/courses/${courseId}`)}
-        className="mb-4"
+        className="mb-4 text-black dark:text-black"
       >
         Back to Course
       </Button>
 
       <div className="flex justify-between items-center mb-6">
-        <Title level={3} className="mb-0">Sprint Sessions</Title>
+        <Title level={3} className="mb-0 text-black dark:text-black">
+          Sprint Sessions
+        </Title>
         {sessions.length > 0 && (
           <div className="flex items-center">
-            <span className="mr-2 text-sm text-gray-600">
-              {getSprintStatus().status === 'completed' ? 'Completed' : 'In Progress'}
+            <span className="mr-2 text-sm text-black">
+              {getSprintStatus().status === "completed"
+                ? "Completed"
+                : "In Progress"}
             </span>
-            <Progress 
-              type="circle" 
-              percent={getSprintStatus().progress} 
+            <Progress
+              type="circle"
+              percent={getSprintStatus().progress}
               width={36}
               strokeWidth={12}
-              format={percent => `${percent}%`}
-              status={getSprintStatus().status === 'completed' ? 'success' : 'active'}
+              format={(percent) => `${percent}%`}
+              status={
+                getSprintStatus().status === "completed" ? "success" : "active"
+              }
               className="ml-2"
             />
           </div>
         )}
       </div>
-      
+
       {sessions.length === 0 ? (
         <Empty description="No sessions available" />
       ) : (
         <div className="space-y-4">
           {sessions.map((session) => (
-            <div 
-              key={session._id} 
-              className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+            <div
+              key={session._id}
+              className="border border-[#001529] dark:border-gray-600 bg-[#001529] rounded-lg overflow-hidden hover:shadow-md transition-shadow"
             >
-              <div 
+              <div
                 className={`p-4 flex justify-between items-center transition-colors ${
                   isSessionUnlocked(
-                    sessions.findIndex(s => s._id === session._id), 
+                    sessions.findIndex((s) => s._id === session._id),
                     sessions
-                  ) ? 'bg-white hover:bg-blue-50 cursor-pointer border-l-4 border-blue-500' 
-                    : 'bg-gray-50 cursor-not-allowed border-l-4 border-gray-300'
+                  )
+                    ? "bg-gray-200 dark:bg-[#001529] text-black dark:text-white hover:bg-blue-50 dark:hover:bg-[#001550] cursor-pointer border-l-4 border-blue-500"
+                    : "bg-gray-200 dark:bg-[#001529] text-black dark:text-white cursor-not-allowed border-l-4 border-gray-300"
                 }`}
                 onClick={() => {
-                  if (isSessionUnlocked(
-                    sessions.findIndex(s => s._id === session._id), 
-                    sessions
-                  )) {
+                  if (
+                    isSessionUnlocked(
+                      sessions.findIndex((s) => s._id === session._id),
+                      sessions
+                    )
+                  ) {
                     toggleSession(session._id);
                   }
                 }}
@@ -253,50 +262,78 @@ const SprintDetails = () => {
                 <div className="flex items-center">
                   {(() => {
                     const sessionTasksList = sessionTasks[session._id] || [];
-                    const completedTasks = sessionTasksList.filter(task => isTaskCompleted(task));
-                    const completionPercentage = sessionTasksList.length > 0 
-                      ? Math.round((completedTasks.length / sessionTasksList.length) * 100) 
-                      : 0;
+                    const completedTasks = sessionTasksList.filter((task) =>
+                      isTaskCompleted(task)
+                    );
+                    const completionPercentage =
+                      sessionTasksList.length > 0
+                        ? Math.round(
+                            (completedTasks.length / sessionTasksList.length) *
+                              100
+                          )
+                        : 0;
                     const isCompleted = areAllTasksCompleted(sessionTasksList);
-                    const inProgress = completedTasks.length > 0 && !isCompleted;
+                    const inProgress =
+                      completedTasks.length > 0 && !isCompleted;
 
                     // Determine icon to show
                     let icon = (
                       <PlayCircleOutlined className="text-blue-500 text-xl mr-3" />
                     );
-                    
+
                     if (isCompleted) {
-                      icon = <CheckCircleOutlined className="text-green-500 text-xl mr-3" />;
+                      icon = (
+                        <CheckCircleOutlined className="text-green-500 text-xl mr-3" />
+                      );
                     } else if (inProgress) {
                       icon = (
                         <div className="relative mr-3">
                           <PlayCircleOutlined className="text-blue-500 text-xl" />
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs">{completionPercentage}%</span>
+                            <span className="text-white text-xs">
+                              {completionPercentage}%
+                            </span>
                           </div>
                         </div>
                       );
-                    } else if (!isSessionUnlocked(sessions.findIndex(s => s._id === session._id), sessions)) {
-                      icon = <LockOutlined className="text-gray-400 text-xl mr-3" />;
+                    } else if (
+                      !isSessionUnlocked(
+                        sessions.findIndex((s) => s._id === session._id),
+                        sessions
+                      )
+                    ) {
+                      icon = (
+                        <LockOutlined className="text-gray-400 text-xl mr-3" />
+                      );
                     }
 
                     return (
                       <>
                         {icon}
                         <div>
-                          <div className="font-medium flex items-center">
+                          <div className="font-medium flex items-center ">
                             {session.name}
                             {sessionTasksList.length > 0 && (
-                              <Tag 
-                                color={isCompleted ? 'success' : inProgress ? 'processing' : 'default'}
+                              <Tag
+                                color={
+                                  isCompleted
+                                    ? "success"
+                                    : inProgress
+                                    ? "processing"
+                                    : "default"
+                                }
                                 className="ml-2 text-xs"
                               >
-                                {isCompleted ? 'Completed' : inProgress ? 'In Progress' : 'Not Started'}
+                                {isCompleted
+                                  ? "Completed"
+                                  : inProgress
+                                  ? "In Progress"
+                                  : "Not Started"}
                               </Tag>
                             )}
                           </div>
-                          <div className="text-gray-500 text-sm">
-                            {session.description || 'No description'}
+                          <div className="text-black dark:text-white text-sm">
+                            {session.description || "No description"}
                           </div>
                         </div>
                       </>
@@ -308,196 +345,245 @@ const SprintDetails = () => {
                     <CheckCircleOutlined className="text-green-500 mr-3" />
                   )}
                   {expandedSessions[session._id] ? (
-                    <DownOutlined className="text-gray-400" />
+                    <DownOutlined className="text-black dark:text-white" />
                   ) : (
-                    <RightOutlined className="text-gray-400" />
+                    <RightOutlined className="text-black dark:text-white" />
                   )}
                 </div>
               </div>
 
               {expandedSessions[session._id] && (
-                <div className={!isSessionUnlocked(
-                  sessions.findIndex(s => s._id === session._id), 
-                  sessions
-                ) ? 'opacity-50 pointer-events-none' : ''}>
-                <div className="border-t border-gray-100 bg-gray-50 p-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-medium text-gray-700">
-                      <FileTextOutlined className="mr-2" />
-                      Tasks
-                    </h4>
-                    <Button 
-                      type="link" 
-                      size="small"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          const userId = getUserId();
-                          if (!userId) {
-                            console.error('User not authenticated. Auth state:', { 
-                              isAuthenticated, 
-                              hasUser: !!currentUser, 
-                              userId: currentUser?._id,
-                              localStorageUser: localStorage.getItem('user')
-                            });
-                            message.error('Please log in to view test results.');
-                            return;
-                          }
-                          
-                          console.log('Fetching results for user:', userId);
-                          const tasks = sessionTasks[session._id] || [];
-                          console.log('Tasks in session:', tasks.length);
-                          
-                          const results = [];
-                          
-                          // Get submissions for each task
-                          for (const task of tasks) {
-                            try {
-                              console.log('Fetching task:', task._id);
-                              const response = await getTask(task._id);
-                              console.log('Task API response:', response);
-                              
-                              // Handle different response structures
-                              const taskData = response?.data?.task || response?.task;
-                              console.log('Task data:', taskData);
-                              
-                              const submissions = taskData?.submissions || [];
-                              console.log('Submissions found:', submissions.length);
-                              
-                              if (submissions.length > 0) {
-                                console.log('All submissions:', submissions);
-                                const userSubmission = submissions.find(
-                                  sub => sub.user?._id === userId || sub.user === userId
-                                );
-                                
-                                console.log('User submission for task:', {
-                                  taskId: task._id,
-                                  taskTitle: task.title,
-                                  userId,
-                                  foundSubmission: !!userSubmission,
-                                  submission: userSubmission
-                                });
-                                
-                                if (userSubmission) {
-                                  results.push({
-                                    taskId: task._id,
-                                    title: task.title,
-                                    score: userSubmission.score,
-                                    submittedAt: new Date(userSubmission.submittedAt).toLocaleDateString(),
-                                    passed: userSubmission.score >= 80
-                                  });
+                <div
+                  className={
+                    !isSessionUnlocked(
+                      sessions.findIndex((s) => s._id === session._id),
+                      sessions
+                    )
+                      ? "opacity-50 pointer-events-none"
+                      : ""
+                  }
+                >
+                  <div className="border-t border-gray-100 bg-gray-50 p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-medium text-black">
+                        <FileTextOutlined className="mr-2" />
+                        Tasks
+                      </h4>
+                      <Button
+                        type="link"
+                        size="small"
+                        className="text-blue font-bold"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            const userId = getUserId();
+                            if (!userId) {
+                              console.error(
+                                "User not authenticated. Auth state:",
+                                {
+                                  isAuthenticated,
+                                  hasUser: !!currentUser,
+                                  userId: currentUser?._id,
+                                  localStorageUser:
+                                    localStorage.getItem("user"),
                                 }
-                              }
-                            } catch (taskError) {
-                              console.error(`Error processing task ${task._id}:`, taskError);
-                            }
-                          }
-                          
-                          console.log('Final results:', results);
-                          
-                          if (results.length === 0) {
-                            // Log more details about why no results were found
-                            console.warn('No submissions found. Checking task data...');
-                            const tasks = sessionTasks[session._id] || [];
-                            tasks.forEach(task => {
-                              console.log(`Task ${task._id} (${task.title}):`, 
-                                'Has submissions:', !!task.submissions?.length,
-                                'Submissions:', task.submissions
                               );
+                              message.error(
+                                "Please log in to view test results."
+                              );
+                              return;
+                            }
+
+                            console.log("Fetching results for user:", userId);
+                            const tasks = sessionTasks[session._id] || [];
+                            console.log("Tasks in session:", tasks.length);
+
+                            const results = [];
+
+                            // Get submissions for each task
+                            for (const task of tasks) {
+                              try {
+                                console.log("Fetching task:", task._id);
+                                const response = await getTask(task._id);
+                                console.log("Task API response:", response);
+
+                                // Handle different response structures
+                                const taskData =
+                                  response?.data?.task || response?.task;
+                                console.log("Task data:", taskData);
+
+                                const submissions = taskData?.submissions || [];
+                                console.log(
+                                  "Submissions found:",
+                                  submissions.length
+                                );
+
+                                if (submissions.length > 0) {
+                                  console.log("All submissions:", submissions);
+                                  const userSubmission = submissions.find(
+                                    (sub) =>
+                                      sub.user?._id === userId ||
+                                      sub.user === userId
+                                  );
+
+                                  console.log("User submission for task:", {
+                                    taskId: task._id,
+                                    taskTitle: task.title,
+                                    userId,
+                                    foundSubmission: !!userSubmission,
+                                    submission: userSubmission,
+                                  });
+
+                                  if (userSubmission) {
+                                    results.push({
+                                      taskId: task._id,
+                                      title: task.title,
+                                      score: userSubmission.score,
+                                      submittedAt: new Date(
+                                        userSubmission.submittedAt
+                                      ).toLocaleDateString(),
+                                      passed: userSubmission.score >= 80,
+                                    });
+                                  }
+                                }
+                              } catch (taskError) {
+                                console.error(
+                                  `Error processing task ${task._id}:`,
+                                  taskError
+                                );
+                              }
+                            }
+
+                            console.log("Final results:", results);
+
+                            if (results.length === 0) {
+                              // Log more details about why no results were found
+                              console.warn(
+                                "No submissions found. Checking task data..."
+                              );
+                              const tasks = sessionTasks[session._id] || [];
+                              tasks.forEach((task) => {
+                                console.log(
+                                  `Task ${task._id} (${task.title}):`,
+                                  "Has submissions:",
+                                  !!task.submissions?.length,
+                                  "Submissions:",
+                                  task.submissions
+                                );
+                              });
+                            }
+
+                            setCurrentResults({
+                              sessionTitle: session.title,
+                              results,
                             });
+                            setResultsModalVisible(true);
+                          } catch (error) {
+                            console.error("Error fetching results:", error);
+                            message.error("Failed to load test results");
                           }
-                          
-                          setCurrentResults({
-                            sessionTitle: session.title,
-                            results
-                          });
-                          setResultsModalVisible(true);
-                        } catch (error) {
-                          console.error('Error fetching results:', error);
-                          message.error('Failed to load test results');
-                        }
-                      }}
-                    >
-                      View Results
-                    </Button>
-                  </div>
-                  
-                  {loadingTasks[session._id] ? (
-                    <div className="p-4 text-center">
-                      <Skeleton active paragraph={{ rows: 1 }} />
+                        }}
+                      >
+                        View Results
+                      </Button>
                     </div>
-                  ) : sessionTasks[session._id]?.length > 0 ? (
-                    <div className="space-y-2">
-                      {sessionTasks[session._id]?.map((task, taskIndex) => {
-                        const isUnlocked = isTaskUnlocked(
-                          taskIndex, 
-                          sessionTasks[session._id],
-                          sessions.findIndex(s => s._id === session._id),
-                          sessions
-                        );
-                        const isCompleted = isTaskCompleted(task);
-                        
-                        return (
-                        <div 
-                          key={task._id} 
-                          className={`p-4 rounded-lg transition-all duration-200 ${
-                            isCompleted 
-                              ? 'bg-green-50 border-l-4 border-green-500' 
-                              : !isUnlocked 
-                                ? 'bg-gray-50 border-l-4 border-gray-300 opacity-75' 
-                                : 'bg-white border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer shadow-sm hover:shadow-md'
-                          }`}
-                          onClick={isUnlocked && !isCompleted ? (e) => {
-                            e.stopPropagation();
-                            navigate(`/lms/courses/${courseId}/sprints/${sprintId}/sessions/${session._id}/tasks/${task._id}`);
-                          } : undefined}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div className="font-medium">
-                              {task.title}
-                              {isTaskCompleted(task) && (
-                                <span className="ml-2 text-green-600 text-sm">
-                                  <CheckOutlined /> Completed
-                                </span>
+
+                    {loadingTasks[session._id] ? (
+                      <div className="p-4 text-center">
+                        <Skeleton active paragraph={{ rows: 1 }} />
+                      </div>
+                    ) : sessionTasks[session._id]?.length > 0 ? (
+                      <div className="space-y-2">
+                        {sessionTasks[session._id]?.map((task, taskIndex) => {
+                          const isUnlocked = isTaskUnlocked(
+                            taskIndex,
+                            sessionTasks[session._id],
+                            sessions.findIndex((s) => s._id === session._id),
+                            sessions
+                          );
+                          const isCompleted = isTaskCompleted(task);
+
+                          return (
+                            <div
+                              key={task._id}
+                              className={`p-4 rounded-lg transition-all duration-200 ${
+                                isCompleted
+                                  ? "bg-gray-200 dark:bg-[#001529] border-l-4 border-green-500"
+                                  : !isUnlocked
+                                  ? "bg-gray-200 dark:bg-[#001529] border-l-4 border-gray-300 opacity-75"
+                                  : "bg-gray-200 dark:bg-[#001529] border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer shadow-sm hover:shadow-md"
+                              }`}
+                              onClick={
+                                isUnlocked && !isCompleted
+                                  ? (e) => {
+                                      e.stopPropagation();
+                                      navigate(
+                                        `/lms/courses/${courseId}/sprints/${sprintId}/sessions/${session._id}/tasks/${task._id}`
+                                      );
+                                    }
+                                  : undefined
+                              }
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="font-medium text-black dark:text-white">
+                                  {task.title}
+                                  {isTaskCompleted(task) && (
+                                    <span className="ml-2 text-green-600 text-sm">
+                                      <CheckOutlined /> Completed
+                                    </span>
+                                  )}
+                                </div>
+                                {isTaskCompleted(task) && (
+                                  <Tag
+                                    color="green"
+                                    className="flex items-center"
+                                  >
+                                    <LockOutlined className="mr-1" /> Locked
+                                  </Tag>
+                                )}
+                              </div>
+                              {task.description && (
+                                <div className="text-black dark:text-white text-sm mt-1">
+                                  {task.description}
+                                </div>
                               )}
+                              <div className="mt-2 flex items-center space-x-2">
+                                {task.questions?.length > 0 && (
+                                  <Tag
+                                    color={
+                                      isTaskCompleted(task) ? "green" : "blue"
+                                    }
+                                  >
+                                    {task.questions.length} question
+                                    {task.questions.length !== 1 ? "s" : ""}
+                                  </Tag>
+                                )}
+                                {!isUnlocked && !isTaskCompleted(task) && (
+                                  <Tag
+                                    color="default"
+                                    className="text-xs bg-gray-100 text-gray-600"
+                                  >
+                                    <LockOutlined className="mr-1" /> Complete
+                                    previous task
+                                  </Tag>
+                                )}
+                                {isUnlocked && !isTaskCompleted(task) && (
+                                  <span className="text-xs text-gray-500">
+                                    Click to start
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            {isTaskCompleted(task) && (
-                              <Tag color="green" className="flex items-center">
-                                <LockOutlined className="mr-1" /> Locked
-                              </Tag>
-                            )}
-                          </div>
-                          {task.description && (
-                            <div className="text-gray-600 text-sm mt-1">
-                              {task.description}
-                            </div>
-                          )}
-                          <div className="mt-2 flex items-center space-x-2">
-                            {task.questions?.length > 0 && (
-                              <Tag color={isTaskCompleted(task) ? 'green' : 'blue'}>
-                                {task.questions.length} question{task.questions.length !== 1 ? 's' : ''}
-                              </Tag>
-                            )}
-                              {!isUnlocked && !isTaskCompleted(task) && (
-                              <Tag color="default" className="text-xs bg-gray-100 text-gray-600">
-                                <LockOutlined className="mr-1" /> Complete previous task
-                              </Tag>
-                            )}
-                            {isUnlocked && !isTaskCompleted(task) && (
-                              <span className="text-xs text-gray-500">Click to start</span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                    </div>
-                  ) : (
-                    <Empty 
-                      description="No tasks available" 
-                      image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      className="py-4"
-                    />
-                  )}
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <Empty
+                        description="No tasks available"
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        className="py-4"
+                      />
+                    )}
                   </div>
                 </div>
               )}
@@ -507,13 +593,13 @@ const SprintDetails = () => {
       )}
       {/* Results Modal */}
       <Modal
-        title={`Test Results - ${currentResults?.sessionTitle || ''}`}
+        title={`Test Results - ${currentResults?.sessionTitle || ""}`}
         open={resultsModalVisible}
         onCancel={() => setResultsModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setResultsModalVisible(false)}>
             Close
-          </Button>
+          </Button>,
         ]}
         width={600}
       >
@@ -524,9 +610,16 @@ const SprintDetails = () => {
             renderItem={(item) => (
               <List.Item
                 actions={[
-                  <span key="score" className={item.passed ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+                  <span
+                    key="score"
+                    className={
+                      item.passed
+                        ? "text-green-600 font-medium"
+                        : "text-red-600 font-medium"
+                    }
+                  >
                     {item.score}%
-                  </span>
+                  </span>,
                 ]}
               >
                 <List.Item.Meta
@@ -545,7 +638,7 @@ const SprintDetails = () => {
                 <div className="w-32">
                   <Progress
                     percent={item.score}
-                    status={item.passed ? 'success' : 'exception'}
+                    status={item.passed ? "success" : "exception"}
                     showInfo={false}
                     strokeWidth={8}
                   />

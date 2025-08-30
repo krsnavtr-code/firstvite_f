@@ -491,16 +491,16 @@ const FirstviteCommunity = () => {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Sidebar */}
           <div className="w-full md:w-64 flex-shrink-0">
-            <Card className="mb-4">
+            <Card className="mb-4 bg-gray-200 dark:bg-[#001525] text-black dark:text-white">
               <div className="space-y-2">
                 <h3 className="font-semibold text-lg mb-3">Categories</h3>
                 {categories.map((category) => (
                   <div
                     key={category}
-                    className={`p-2 rounded cursor-pointer transition-colors ${
+                    className={`p-2 rounded cursor-pointer transition-colors dark:text-white dark:hover:bg-blue-50 ${
                       selectedCategory === category
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
+                        ? "bg-blue-50 dark:bg-blue-50 text-blue-600 dark:text-blue-600 font-medium"
+                        : "text-gray-700 dark:text-gray-400 hover:bg-blue-400 dark:hover:bg-blue-400"
                     }`}
                     onClick={() => setSelectedCategory(category)}
                   >
@@ -513,7 +513,7 @@ const FirstviteCommunity = () => {
 
           {/* Main content */}
           <div className="flex-1">
-            <Card className="mb-6">
+            <Card className="mb-6 bg-gray-200 dark:bg-[#001525]">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div className="flex-1">
                   <Input
@@ -526,7 +526,15 @@ const FirstviteCommunity = () => {
                 <Tabs
                   activeKey={activeTab}
                   onChange={setActiveTab}
-                  className="flex-shrink-0"
+                  className="
+    flex-shrink-0 
+
+    [&_.ant-tabs-tab-btn]:text-black 
+    dark:[&_.ant-tabs-tab-btn]:text-white
+
+    [&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:text-[#722ed1] 
+    dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:text-[#722ed1]
+  "
                 >
                   <TabPane tab="Recent" key="recent" />
                   <TabPane tab="Popular" key="popular" />
@@ -615,9 +623,11 @@ const FirstviteCommunity = () => {
                           <h3 className="text-lg font-medium mb-2">
                             {discussion.title}
                           </h3>
-                          <div 
+                          <div
                             className="prose max-w-none text-gray-800"
-                            dangerouslySetInnerHTML={{ __html: discussion.content }}
+                            dangerouslySetInnerHTML={{
+                              __html: discussion.content,
+                            }}
                           />
                         </div>
 
@@ -644,13 +654,17 @@ const FirstviteCommunity = () => {
                               onClick={() =>
                                 handleReaction(discussion._id, "like")
                               }
-                              active={discussion.likes?.includes(currentUser?.uid)}
+                              active={discussion.likes?.includes(
+                                currentUser?.uid
+                              )}
                             />
                             <IconText
                               icon={
                                 <DislikeOutlined
                                   className={
-                                    discussion.dislikes?.includes(currentUser?.uid)
+                                    discussion.dislikes?.includes(
+                                      currentUser?.uid
+                                    )
                                       ? "text-red-500"
                                       : ""
                                   }
@@ -660,7 +674,9 @@ const FirstviteCommunity = () => {
                               onClick={() =>
                                 handleReaction(discussion._id, "dislike")
                               }
-                              active={discussion.dislikes?.includes(currentUser?.uid)}
+                              active={discussion.dislikes?.includes(
+                                currentUser?.uid
+                              )}
                             />
                             <IconText
                               icon={<MessageOutlined />}
@@ -767,14 +783,18 @@ const FirstviteCommunity = () => {
                                     </div>
                                     <div
                                       className="mt-2 text-gray-800 prose prose-sm max-w-none"
-                                      dangerouslySetInnerHTML={{ __html: comment.content }}
+                                      dangerouslySetInnerHTML={{
+                                        __html: comment.content,
+                                      }}
                                     />
                                     <div className="mt-2 flex items-center space-x-4 text-sm">
                                       <IconText
                                         icon={
                                           <LikeOutlined
                                             className={
-                                              comment.likes?.includes(currentUser?.uid)
+                                              comment.likes?.includes(
+                                                currentUser?.uid
+                                              )
                                                 ? "text-blue-500"
                                                 : ""
                                             }
@@ -788,13 +808,17 @@ const FirstviteCommunity = () => {
                                             comment._id
                                           )
                                         }
-                                        active={comment.likes?.includes(currentUser?.uid)}
+                                        active={comment.likes?.includes(
+                                          currentUser?.uid
+                                        )}
                                       />
                                       <IconText
                                         icon={
                                           <DislikeOutlined
                                             className={
-                                              comment.dislikes?.includes(currentUser?.uid)
+                                              comment.dislikes?.includes(
+                                                currentUser?.uid
+                                              )
                                                 ? "text-red-500"
                                                 : ""
                                             }
@@ -808,7 +832,9 @@ const FirstviteCommunity = () => {
                                             comment._id
                                           )
                                         }
-                                        active={comment.dislikes?.includes(currentUser?.uid)}
+                                        active={comment.dislikes?.includes(
+                                          currentUser?.uid
+                                        )}
                                       />
                                     </div>
                                   </div>

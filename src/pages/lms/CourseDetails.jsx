@@ -182,65 +182,82 @@ const CourseDetails = () => {
   const isCompleted = progress === 100;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <Button 
-        type="text" 
-        icon={<ArrowLeftOutlined />} 
-        onClick={() => navigate('/lms/dashboard')}
-        className="mb-4"
+    <div className="p-6 max-w-5xl mx-auto">
+      <Button
+        type="text"
+        icon={<ArrowLeftOutlined />}
+        onClick={() => navigate("/lms/dashboard")}
+        className="mb-4 text-black dark:text-black"
       >
         Back to Dashboard
       </Button>
 
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+      {/* Course Card */}
+      <div className="bg-gray-200 dark:bg-[#001529] rounded-lg shadow-sm p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-full md:w-1/3">
-            <img 
-              src={course.thumbnail || 'https://via.placeholder.com/300x200?text=Course'} 
+            <img
+              src={
+                course.thumbnail ||
+                "https://via.placeholder.com/300x200?text=Course"
+              }
               alt={course.title}
               className="w-full h-48 object-cover rounded-lg"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/300x200?text=Course';
+                e.target.src =
+                  "https://via.placeholder.com/300x200?text=Course";
               }}
             />
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{course.title}</h1>
-                <p className="text-gray-600 mb-4">{course.description || 'No description available'}</p>
-                
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  {course.title}
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  {course.description || "No description available"}
+                </p>
+
                 <div className="flex items-center gap-4 mb-4">
-                  <Tag color={isCompleted ? 'success' : 'processing'} className="text-sm">
-                    {isCompleted ? 'Completed' : 'In Progress'}
+                  <Tag
+                    color={isCompleted ? "success" : "processing"}
+                    className="text-sm"
+                  >
+                    {isCompleted ? "Completed" : "In Progress"}
                   </Tag>
-                  <span className="text-sm text-gray-500">
-                    {sprints.length} {sprints.length === 1 ? 'Sprint' : 'Sprints'}
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {sprints.length}{" "}
+                    {sprints.length === 1 ? "Sprint" : "Sprints"}
                   </span>
                 </div>
               </div>
             </div>
 
+            {/* Progress */}
             <div className="mt-4">
-              <div className="flex justify-between text-sm text-gray-600 mb-1">
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
                 <span>Your Progress</span>
-                <span className="font-medium">
-                  {progress}% • {sprints.filter(s => sprintProgress[s._id] === 100).length}/{sprints.length} Sprints
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  {progress}% •{" "}
+                  {sprints.filter((s) => sprintProgress[s._id] === 100).length}/
+                  {sprints.length} Sprints
                 </span>
               </div>
               <div className="relative">
                 <div className="flex items-center mb-1">
-                  <Progress 
-                    percent={progress} 
-                    status={isCompleted ? 'success' : 'active'} 
+                  <Progress
+                    percent={progress}
+                    status={isCompleted ? "success" : "active"}
                     showInfo={false}
                     strokeWidth={8}
                     className="flex-1"
                   />
                 </div>
-                <div className="text-xs text-gray-500 text-right">
-                  {sprints.filter(s => sprintProgress[s._id] === 100).length} of {sprints.length} sprints completed
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
+                  {sprints.filter((s) => sprintProgress[s._id] === 100).length}{" "}
+                  of {sprints.length} sprints completed
                 </div>
               </div>
             </div>
@@ -248,68 +265,85 @@ const CourseDetails = () => {
         </div>
       </div>
 
+      {/* Sprints Section */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center">
+        <h2 className="text-xl font-semibold mb-4 flex items-center text-black dark:text-black">
           <BookOutlined className="mr-2" /> Course Sprints
         </h2>
-        
+
         {sprints.length === 0 ? (
-          <Empty 
-            description="No sprints available for this course" 
+          <Empty
+            description={
+              <span className="text-gray-600 dark:text-gray-400">
+                No sprints available for this course
+              </span>
+            }
             className="py-8"
           />
         ) : (
           <div className="space-y-4">
             {sprints.map((sprint) => (
-              <Card 
+              <Card
                 key={sprint._id}
-                className="hover:shadow-md transition-shadow"
+                className="hover:shadow-md transition-shadow bg-gray-200 dark:bg-[#001529] text-black dark:text-white"
                 onClick={(e) => handleSprintClick(sprint, e)}
               >
                 <div className="flex flex-col">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                      <h3 className="text-lg font-medium text-black dark:text-white flex items-center">
                         {sprint.name}
-                        <Tag 
+                        <Tag
                           color={getStatusColor(sprint)}
                           className="ml-2 text-xs"
                         >
                           {getSprintStatus(sprint)}
                         </Tag>
                       </h3>
-                      <p className="text-gray-600 text-sm mt-1">
-                        {sprint.description || 'No description available'}
+                      <p className="text-black dark:text-white text-sm mt-1">
+                        {sprint.description || "No description available"}
                       </p>
                       {sprint.duration && (
-                        <div className="flex items-center text-xs text-gray-500 mt-2">
+                        <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-2">
                           <span>Duration: {sprint.duration} days</span>
                           <span className="mx-2">•</span>
                           <span>{sprint.tasks?.length || 0} tasks</span>
                         </div>
                       )}
                     </div>
-                    <Button 
-                      type="text" 
-                      icon={sprintProgress[sprint._id] === 100 ? 
-                        <CheckCircleOutlined className="text-green-500" /> : 
-                        <PlayCircleOutlined className="text-blue-500" />}
-                      className="text-gray-700"
+                    <Button
+                      type="text"
+                      icon={
+                        sprintProgress[sprint._id] === 100 ? (
+                          <CheckCircleOutlined className="text-green-500" />
+                        ) : (
+                          <PlayCircleOutlined className="text-blue-500" />
+                        )
+                      }
+                      className="text-black dark:text-white font-bold"
                       onClick={(e) => handleSprintClick(sprint, e)}
                     >
-                      {sprintProgress[sprint._id] === 100 ? 'Review' : 'Continue'}
+                      {sprintProgress[sprint._id] === 100
+                        ? "Review"
+                        : "Continue"}
                     </Button>
                   </div>
-                  
+
                   {sprintProgress[sprint._id] > 0 && (
                     <div className="mt-3">
-                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                      <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
                         <span>Progress</span>
-                        <span className="font-medium">{sprintProgress[sprint._id] || 0}%</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">
+                          {sprintProgress[sprint._id] || 0}%
+                        </span>
                       </div>
-                      <Progress 
-                        percent={sprintProgress[sprint._id] || 0} 
-                        status={sprintProgress[sprint._id] === 100 ? 'success' : 'active'}
+                      <Progress
+                        percent={sprintProgress[sprint._id] || 0}
+                        status={
+                          sprintProgress[sprint._id] === 100
+                            ? "success"
+                            : "active"
+                        }
                         showInfo={false}
                         strokeWidth={6}
                         className="mb-0"
