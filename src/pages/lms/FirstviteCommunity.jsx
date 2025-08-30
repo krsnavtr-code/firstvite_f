@@ -442,46 +442,12 @@ const FirstviteCommunity = () => {
             </div>
             <div className="flex items-center space-x-4">
               <Button
-                type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => setIsModalVisible(true)}
-                className="flex items-center"
+                className="text-white bg-[#1677ff] hover:bg-[#1677ff]"
               >
                 New Post
               </Button>
-              <Badge count={3} className="cursor-pointer">
-                <BellOutlined className="text-xl text-gray-600" />
-              </Badge>
-              {currentUser ? (
-                <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item key="profile" icon={<UserOutlined />}>
-                        Profile
-                      </Menu.Item>
-                      <Menu.Item key="settings" icon={<SettingOutlined />}>
-                        Settings
-                      </Menu.Item>
-                      <Menu.Divider />
-                      <Menu.Item key="logout" icon={<LogoutOutlined />}>
-                        Sign Out
-                      </Menu.Item>
-                    </Menu>
-                  }
-                  trigger={["click"]}
-                  placement="bottomRight"
-                >
-                  <Avatar
-                    src={currentUser.photoURL}
-                    icon={!currentUser.photoURL && <UserOutlined />}
-                    className="cursor-pointer"
-                  />
-                </Dropdown>
-              ) : (
-                <Button type="text" icon={<LoginOutlined />}>
-                  Sign In
-                </Button>
-              )}
             </div>
           </div>
         </div>
@@ -497,10 +463,10 @@ const FirstviteCommunity = () => {
                 {categories.map((category) => (
                   <div
                     key={category}
-                    className={`p-2 rounded cursor-pointer transition-colors dark:text-white dark:hover:bg-blue-50 ${
+                    className={`p-2 rounded cursor-pointer transition-colors dark:text-blue-500 dark:hover:bg-blue-50 dark:hover:text-black ${
                       selectedCategory === category
-                        ? "bg-blue-50 dark:bg-blue-50 text-blue-600 dark:text-blue-600 font-medium"
-                        : "text-gray-700 dark:text-gray-400 hover:bg-blue-400 dark:hover:bg-blue-400"
+                        ? "bg-blue-50 dark:text-black dark:bg-blue-50 font-medium"
+                        : "hover:bg-blue-400 dark:text-black dark:hover:bg-blue-400"
                     }`}
                     onClick={() => setSelectedCategory(category)}
                   >
@@ -556,16 +522,15 @@ const FirstviteCommunity = () => {
                 </div>
               ) : filteredDiscussions.length === 0 ? (
                 <div className="text-center py-12">
-                  <MessageOutlined className="text-4xl text-gray-300 mb-3" />
-                  <h3 className="text-lg font-medium text-gray-700">
+                  <MessageOutlined className="text-4xl text-black dark:text-white mb-3" />
+                  <h3 className="text-lg font-medium text-black dark:text-white">
                     No discussions found
                   </h3>
-                  <p className="text-gray-500 mt-1">
+                  <p className="text-black dark:text-white mt-1">
                     Be the first to start a discussion!
                   </p>
                   <Button
-                    type="primary"
-                    className="mt-4"
+                    className="text-white bg-[#1677ff] hover:bg-[#1677ff]"
                     icon={<PlusOutlined />}
                     onClick={() => setIsModalVisible(true)}
                   >
@@ -591,10 +556,10 @@ const FirstviteCommunity = () => {
                               className="bg-blue-100 text-blue-600"
                             />
                             <div className="ml-3">
-                              <div className="font-medium">
+                              <div className="font-medium ">
                                 {discussion.userName}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-black">
                                 {formatTimeAgo(discussion.timestamp)}
                               </div>
                             </div>
@@ -690,9 +655,9 @@ const FirstviteCommunity = () => {
                               }
                             />
                           </div>
-                          <div className="text-sm text-gray-500">
+                          {/* <div className="text-sm text-gray-500">
                             {discussion.views} views
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Comment form */}
@@ -712,10 +677,10 @@ const FirstviteCommunity = () => {
                                 Cancel
                               </Button>
                               <Button
-                                type="primary"
                                 onClick={() => handleAddComment(discussion._id)}
                                 icon={<SendOutlined />}
                                 disabled={!newComment.trim()}
+                                className="text-white bg-[#1677ff] hover:bg-[#1677ff]"
                               >
                                 Post Comment
                               </Button>
@@ -727,6 +692,7 @@ const FirstviteCommunity = () => {
                         {discussion.comments?.length > 0 && (
                           <div className="mt-4 pl-4 border-l-2 border-gray-100">
                             <List
+                              className="rounded bg-gray-200 dark:bg-[#001525] dark:text-white"
                               dataSource={discussion.comments}
                               renderItem={(comment) => (
                                 <List.Item
@@ -739,7 +705,7 @@ const FirstviteCommunity = () => {
                                 >
                                   <div className="w-full">
                                     <div className="flex justify-between items-start">
-                                      <div className="flex items-center">
+                                      <div className="flex items-center mb-2">
                                         <Avatar
                                           src={comment.userPhoto}
                                           icon={
@@ -748,13 +714,13 @@ const FirstviteCommunity = () => {
                                             )
                                           }
                                           size="small"
-                                          className="bg-gray-100 mr-2"
+                                          className="bg-gray-100 border-gray-200 mr-2 dark:bg-[#001525] dark:border-gray-700 dark:text-white"
                                         />
                                         <div>
-                                          <div className="font-medium">
+                                          <div className="font-medium text-black dark:text-white">
                                             {comment.userName}
                                           </div>
-                                          <div className="text-xs text-gray-500">
+                                          <div className="text-xs text-black dark:text-white ">
                                             {formatTimeAgo(comment.timestamp)}
                                             {comment.isSolution && (
                                               <span className="ml-2 text-green-600 font-medium">
@@ -764,25 +730,9 @@ const FirstviteCommunity = () => {
                                           </div>
                                         </div>
                                       </div>
-                                      {currentUser?.uid === discussion.userId &&
-                                        !comment.isSolution && (
-                                          <Button
-                                            type="text"
-                                            size="small"
-                                            onClick={() =>
-                                              handleMarkAsSolution(
-                                                discussion._id,
-                                                comment._id
-                                              )
-                                            }
-                                            icon={<CheckOutlined />}
-                                          >
-                                            Mark as solution
-                                          </Button>
-                                        )}
                                     </div>
                                     <div
-                                      className="mt-2 text-gray-800 prose prose-sm max-w-none"
+                                      className="mt-2 text-gray-800 prose prose-sm max-w-none dark:text-white"
                                       dangerouslySetInnerHTML={{
                                         __html: comment.content,
                                       }}
@@ -862,7 +812,7 @@ const FirstviteCommunity = () => {
         okText="Post"
         okButtonProps={{
           disabled: !newPost.title.trim() || !newPost.content.trim(),
-          className: "bg-blue-600 hover:bg-blue-700",
+          className: "text-white bg-[#1677ff] hover:bg-[#1677ff]",
         }}
         width={700}
       >

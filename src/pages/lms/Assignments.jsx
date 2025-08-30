@@ -343,7 +343,7 @@ const Assignments = () => {
     <div className="p-6 max-w-7xl mx-auto min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-black dark:text-whit">
-          Take Assignments
+          Take & Review Assignments
         </h1>
         {/* Learners shouldn't create assignments */}
       </div>
