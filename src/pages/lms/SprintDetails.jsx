@@ -10,7 +10,8 @@ import {
   FileTextOutlined,
   CloseCircleOutlined,
   LockOutlined,
-  CheckOutlined
+  CheckOutlined,
+  VideoCameraOutlined,
 } from '@ant-design/icons';
 import { getSessionsBySprint } from '../../api/sessionApi';
 import { getTasksBySession } from '../../api/taskApi';
@@ -308,35 +309,64 @@ const SprintDetails = () => {
                     }
 
                     return (
-                      <>
-                        {icon}
-                        <div>
-                          <div className="font-medium flex items-center ">
-                            {session.name}
-                            {sessionTasksList.length > 0 && (
-                              <Tag
-                                color={
-                                  isCompleted
-                                    ? "success"
+                      <div className="flex items-start justify-between w-full">
+                        <div className="flex items-start gap-3 flex-1">
+                          {icon}
+                          <div className="flex-1">
+                            <div className="font-medium flex items-center">
+                              {session.name}
+                              {sessionTasksList.length > 0 && (
+                                <Tag
+                                  color={
+                                    isCompleted
+                                      ? "success"
+                                      : inProgress
+                                      ? "processing"
+                                      : "default"
+                                  }
+                                  className="ml-2 text-xs"
+                                >
+                                  {isCompleted
+                                    ? "Completed"
                                     : inProgress
-                                    ? "processing"
-                                    : "default"
-                                }
-                                className="ml-2 text-xs"
-                              >
-                                {isCompleted
-                                  ? "Completed"
-                                  : inProgress
-                                  ? "In Progress"
-                                  : "Not Started"}
-                              </Tag>
-                            )}
-                          </div>
-                          <div className="text-black dark:text-white text-sm">
-                            {session.description || "No description"}
+                                    ? "In Progress"
+                                    : "Not Started"}
+                                </Tag>
+                              )}
+                            </div>
+                            <div className="text-black dark:text-white text-sm">
+                              {session.description || "No description"}
+                            </div>
                           </div>
                         </div>
-                      </>
+                        <div className="flex items-center gap-2 ml-4">
+                          {session.zoomMeetingLink && (
+                            <a
+                              href={session.zoomMeetingLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-xl shadow hover:bg-blue-700 transition whitespace-nowrap"
+                            >
+                              <VideoCameraOutlined />
+                              Join Meeting
+                            </a>
+                          )}
+
+                          {session.videoUrl && (
+                            <a
+                              href={session.videoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-xl shadow hover:bg-blue-100 transition whitespace-nowrap"
+                            >
+                              <PlayCircleOutlined />
+                              Watch
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     );
                   })()}
                 </div>

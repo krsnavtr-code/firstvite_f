@@ -54,14 +54,20 @@ const Sessions = ({ sprintId, onClose }) => {
 
   const showSessionModal = (session = null) => {
     setEditingSession(session);
-    form.setFieldsValue({
-      name: session?.name || '',
-      description: session?.description || '',
-      duration: session?.duration || 60,
-      content: session?.content || '',
-      videoUrl: session?.videoUrl || '',
-      isActive: session?.isActive ?? true
-    });
+    if (session) {
+      form.setFieldsValue({
+        name: session.name,
+        description: session.description,
+        duration: session.duration,
+        content: session.content,
+        videoUrl: session.videoUrl,
+        zoomMeetingLink: session.zoomMeetingLink || '',
+        resources: session.resources || [],
+        isActive: session.isActive
+      });
+    } else {
+      form.resetFields();
+    }
     setIsSessionModalVisible(true);
   };
 
@@ -113,26 +119,42 @@ const Sessions = ({ sprintId, onClose }) => {
     try {
       const values = await form.validateFields();
       setLoading(true);
+      
+      // Create a clean session data object with only the fields we need
+      const sessionData = {
+        name: values.name,
+        description: values.description,
+        duration: values.duration,
+        content: values.content,
+        videoUrl: values.videoUrl || '',
+        zoomMeetingLink: values.zoomMeetingLink || '',
+        isActive: values.isActive,
+        resources: values.resources || [],
+        sprintId
+      };
 
       if (editingSession) {
-        await updateSession(editingSession._id, {
-          ...values,
-          sprintId
-        });
+        await updateSession(editingSession._id, sessionData);
         message.success('Session updated successfully');
       } else {
-        await createSession({
-          ...values,
-          sprintId
-        });
+        await createSession(sessionData);
         message.success('Session created successfully');
       }
 
       setIsSessionModalVisible(false);
+      form.resetFields();
       fetchSessions();
     } catch (error) {
-      console.error('Error saving session:', error);
-      message.error(error.response?.data?.message || 'Failed to save session');
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        message.error(error.response.data.message || 'Failed to save session');
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+        message.error('No response from server. Please try again.');
+      } else {
+        console.error('Error:', error.message);
+        message.error(error.message || 'An error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -296,6 +318,7 @@ const Sessions = ({ sprintId, onClose }) => {
         open={isSessionModalVisible}
         onOk={handleSubmit}
         onCancel={handleSessionCancel}
+        confirmLoading={loading}
         width={800}
       >
         <Form
@@ -343,9 +366,31 @@ const Sessions = ({ sprintId, onClose }) => {
           
           <Form.Item
             name="videoUrl"
-            label="Meeting Link! If you want to add it later, leave it blank."
+            label="Recorded Video Link"
+            extra="If you want to add it later, leave it blank."
           >
-            <Input placeholder="Enter meeting link" />
+            <Input placeholder="Enter recorded video link" />
+          </Form.Item>
+
+          <Form.Item
+            name="zoomMeetingLink"
+            label="Zoom Meeting Link"
+            extra="Paste the full Zoom meeting URL. If you want to add it later, leave it blank."
+            rules={[
+              {
+                type: 'url',
+                message: 'Please enter a valid URL',
+              },
+            ]}
+          >
+            <Input 
+              placeholder="https://zoom.us/j/meeting-id" 
+              addonBefore={
+                <span style={{ color: '#1890ff' }}>
+                  <i className="fab fa-zoom" style={{ marginRight: 5 }} /> Zoom
+                </span>
+              }
+            />
           </Form.Item>
           
           <Form.Item
