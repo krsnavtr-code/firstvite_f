@@ -159,7 +159,7 @@ function Footer() {
             <ul className="mt-4 space-y-2">
               <li className="flex items-center">
                 <svg
-                  className="h-5 w-5 text-black dark:text-white mr-2"
+                  className="h-12 w-12 text-black dark:text-white mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -168,13 +168,18 @@ function Footer() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
                 <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="mailto:info@firstvite.com">
-                    Email: info@firstvite.com
-                  </a>
+                  H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar
+                  Uttar Pradesh 201301
                 </span>
               </li>
               <li className="flex items-center">
@@ -210,14 +215,14 @@ function Footer() {
                   />
                 </svg>
                 <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="mailto:anand@firstvite.com">
-                    Email: anand@firstvite.com
+                  <a href="mailto:info@firstvite.com">
+                    Email: info@firstvite.com
                   </a>
                 </span>
               </li>
               <li className="flex items-center">
                 <svg
-                  className="h-12 w-12 text-black dark:text-white mr-2"
+                  className="h-5 w-5 text-black dark:text-white mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -226,18 +231,13 @@ function Footer() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
                 <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar
-                  Uttar Pradesh 201301
+                  <a href="mailto:anand@firstvite.com">
+                    Email: anand@firstvite.com
+                  </a>
                 </span>
               </li>
             </ul>

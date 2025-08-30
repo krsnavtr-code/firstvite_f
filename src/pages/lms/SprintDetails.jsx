@@ -1,22 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button, List, Typography, Skeleton, Empty, message, Tag, Collapse, Modal, Progress } from 'antd';
-import { 
-  ArrowLeftOutlined, 
-  PlayCircleOutlined, 
-  CheckCircleOutlined, 
-  DownOutlined, 
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Button,
+  List,
+  Typography,
+  Skeleton,
+  Empty,
+  message,
+  Tag,
+  Collapse,
+  Modal,
+  Progress,
+} from "antd";
+import {
+  ArrowLeftOutlined,
+  PlayCircleOutlined,
+  CheckCircleOutlined,
+  DownOutlined,
   RightOutlined,
   FileTextOutlined,
   CloseCircleOutlined,
   LockOutlined,
   CheckOutlined,
   VideoCameraOutlined,
-} from '@ant-design/icons';
-import { getSessionsBySprint } from '../../api/sessionApi';
-import { getTasksBySession } from '../../api/taskApi';
-import { getTask } from '../../api/taskApi';
-import { useAuth } from '../../contexts/AuthContext';
+} from "@ant-design/icons";
+import { getSessionsBySprint } from "../../api/sessionApi";
+import { getTasksBySession } from "../../api/taskApi";
+import { getTask } from "../../api/taskApi";
+import { useAuth } from "../../contexts/AuthContext";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -31,17 +42,21 @@ const SprintDetails = () => {
   const [loadingTasks, setLoadingTasks] = useState({});
   const [resultsModalVisible, setResultsModalVisible] = useState(false);
   const [currentResults, setCurrentResults] = useState(null);
+  const [videoModalVisible, setVideoModalVisible] = useState(false);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState("");
+  const [questionsModalVisible, setQuestionsModalVisible] = useState(false);
+  const [currentQuestions, setCurrentQuestions] = useState([]);
   const { currentUser, isAuthenticated } = useAuth();
-  
+
   // Debug: Log auth state
   useEffect(() => {
-    console.log('Auth State - isAuthenticated:', isAuthenticated);
-    console.log('Auth State - Current User:', currentUser);
+    console.log("Auth State - isAuthenticated:", isAuthenticated);
+    console.log("Auth State - Current User:", currentUser);
   }, [isAuthenticated, currentUser]);
-  
+
   // Get user ID safely
   const getUserId = () => {
-    const userId = currentUser?._id || localStorage.getItem('userId');
+    const userId = currentUser?._id || localStorage.getItem("userId");
     return userId;
   };
 
@@ -50,54 +65,54 @@ const SprintDetails = () => {
     if (!task?.submissions?.length) return false;
     const userId = getUserId();
     return task.submissions.some(
-      sub => sub.user?._id === userId || sub.user === userId
+      (sub) => sub.user?._id === userId || sub.user === userId
     );
   };
 
   // Check if all tasks in a session are completed
   const areAllTasksCompleted = (tasks) => {
     if (!tasks || !tasks.length) return false;
-    return tasks.every(task => isTaskCompleted(task));
+    return tasks.every((task) => isTaskCompleted(task));
   };
 
   // Calculate overall sprint completion status
   const getSprintStatus = () => {
     let totalTasks = 0;
     let completedTasks = 0;
-    
+
     // Count all tasks and completed tasks across all sessions
-    Object.values(sessionTasks).forEach(tasks => {
+    Object.values(sessionTasks).forEach((tasks) => {
       if (!tasks || !Array.isArray(tasks)) return;
-      
-      tasks.forEach(task => {
+
+      tasks.forEach((task) => {
         totalTasks++;
         if (isTaskCompleted(task)) {
           completedTasks++;
         }
       });
     });
-    
-    if (totalTasks === 0) return { status: 'not_started', progress: 0 };
-    
+
+    if (totalTasks === 0) return { status: "not_started", progress: 0 };
+
     const progress = Math.round((completedTasks / totalTasks) * 100);
-    
-    if (completedTasks === 0) return { status: 'not_started', progress };
-    if (completedTasks === totalTasks) return { status: 'completed', progress };
-    return { status: 'in_progress', progress };
+
+    if (completedTasks === 0) return { status: "not_started", progress };
+    if (completedTasks === totalTasks) return { status: "completed", progress };
+    return { status: "in_progress", progress };
   };
 
   // Check if a task should be unlocked
   const isTaskUnlocked = (taskIndex, tasks, sessionIndex, allSessions) => {
     // First task of the first session is always unlocked
     if (sessionIndex === 0 && taskIndex === 0) return true;
-    
+
     // If no previous task in the same session, check previous session
     if (taskIndex === 0) {
       const prevSession = allSessions[sessionIndex - 1];
       const prevSessionTasks = sessionTasks[prevSession?._id] || [];
       return areAllTasksCompleted(prevSessionTasks);
     }
-    
+
     // Check if previous task in the same session is completed
     return isTaskCompleted(tasks[taskIndex - 1]);
   };
@@ -106,7 +121,7 @@ const SprintDetails = () => {
   const isSessionUnlocked = (sessionIndex, allSessions) => {
     // First session is always unlocked
     if (sessionIndex === 0) return true;
-    
+
     // Check if all tasks in previous session are completed
     const prevSession = allSessions[sessionIndex - 1];
     const prevSessionTasks = sessionTasks[prevSession?._id] || [];
@@ -123,25 +138,28 @@ const SprintDetails = () => {
           setLoading(false);
           return;
         }
-        
+
         const sessionsData = sessionsResponse.data.sessions;
         setSessions(sessionsData);
-        
+
         // Then fetch all tasks for all sessions in parallel
-        const tasksPromises = sessionsData.map(session => 
+        const tasksPromises = sessionsData.map((session) =>
           getTasksBySession(session._id)
-            .then(response => ({
+            .then((response) => ({
               sessionId: session._id,
-              tasks: response?.data?.tasks || []
+              tasks: response?.data?.tasks || [],
             }))
-            .catch(error => {
-              console.error(`Error fetching tasks for session ${session._id}:`, error);
+            .catch((error) => {
+              console.error(
+                `Error fetching tasks for session ${session._id}:`,
+                error
+              );
               return { sessionId: session._id, tasks: [] };
             })
         );
-        
+
         const tasksResults = await Promise.all(tasksPromises);
-        
+
         // Update session tasks state
         const newSessionTasks = {};
         tasksResults.forEach(({ sessionId, tasks }) => {
@@ -149,45 +167,44 @@ const SprintDetails = () => {
             newSessionTasks[sessionId] = tasks;
           }
         });
-        
-        setSessionTasks(prev => ({
+
+        setSessionTasks((prev) => ({
           ...prev,
-          ...newSessionTasks
+          ...newSessionTasks,
         }));
-        
       } catch (error) {
-        console.error('Error loading data:', error);
-        message.error('Failed to load course data');
+        console.error("Error loading data:", error);
+        message.error("Failed to load course data");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchAllData();
   }, [sprintId]);
 
   const toggleSession = async (sessionId) => {
-    setExpandedSessions(prev => ({
+    setExpandedSessions((prev) => ({
       ...prev,
-      [sessionId]: !prev[sessionId]
+      [sessionId]: !prev[sessionId],
     }));
 
     // Only fetch tasks if we haven't already
     if (!sessionTasks[sessionId] && !loadingTasks[sessionId]) {
       try {
-        setLoadingTasks(prev => ({ ...prev, [sessionId]: true }));
+        setLoadingTasks((prev) => ({ ...prev, [sessionId]: true }));
         const response = await getTasksBySession(sessionId);
         if (response?.data?.tasks) {
-          setSessionTasks(prev => ({
+          setSessionTasks((prev) => ({
             ...prev,
-            [sessionId]: response.data.tasks
+            [sessionId]: response.data.tasks,
           }));
         }
       } catch (error) {
-        console.error('Error fetching tasks:', error);
-        message.error('Failed to load tasks');
+        console.error("Error fetching tasks:", error);
+        message.error("Failed to load tasks");
       } finally {
-        setLoadingTasks(prev => ({ ...prev, [sessionId]: false }));
+        setLoadingTasks((prev) => ({ ...prev, [sessionId]: false }));
       }
     }
   };
@@ -354,17 +371,88 @@ const SprintDetails = () => {
                           )}
 
                           {session.videoUrl && (
-                            <a
-                              href={session.videoUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentVideoUrl(session.videoUrl);
+                                setVideoModalVisible(true);
+                              }}
                               className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-xl shadow hover:bg-blue-100 transition whitespace-nowrap"
                             >
                               <PlayCircleOutlined />
                               Watch
-                            </a>
+                            </button>
                           )}
+
+                          {/* Video Modal */}
+                          <Modal
+                            title="Video Player"
+                            open={videoModalVisible}
+                            onCancel={() => setVideoModalVisible(false)}
+                            footer={null}
+                            width={800}
+                            destroyOnClose
+                          >
+                            <div className="w-full aspect-video">
+                              <iframe
+                                src={currentVideoUrl.replace(
+                                  "/view?usp=sharing",
+                                  "/preview"
+                                )}
+                                width="100%"
+                                height="100%"
+                                allow="autoplay"
+                                frameBorder="0"
+                                allowFullScreen
+                              />
+                            </div>
+                          </Modal>
+
+                          {/* Questions Modal */}
+                          <Modal
+                            title="Questions & Answers"
+                            open={questionsModalVisible}
+                            onCancel={() => setQuestionsModalVisible(false)}
+                            footer={null}
+                            width={700}
+                          >
+                            <div className="space-y-4">
+                              {currentQuestions.map((question, index) => (
+                                <div key={index} className="p-4 border rounded-lg">
+                                  <div className="font-medium mb-2">
+                                    {index + 1}. {question.question}
+                                  </div>
+                                  <div className="space-y-2">
+                                    {question.options?.map((option, optIndex) => {
+                                      // Handle both string and object options
+                                      const optionText = typeof option === 'object' ? option.text : option;
+                                      const isCorrect = typeof option === 'object' 
+                                        ? option.isCorrect 
+                                        : question.correctAnswer === optIndex;
+                                      
+                                      return (
+                                        <div 
+                                          key={optIndex}
+                                          className={`p-2 rounded ${
+                                            isCorrect
+                                              ? 'bg-green-50 text-green-700 border border-green-200' 
+                                              : 'bg-gray-50'
+                                          }`}
+                                        >
+                                          {String.fromCharCode(65 + optIndex)}. {optionText}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  {question.explanation && (
+                                    <div className="mt-2 p-2 bg-blue-50 text-blue-700 rounded text-sm">
+                                      <strong>Explanation:</strong> {question.explanation}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </Modal>
                         </div>
                       </div>
                     );
@@ -583,6 +671,12 @@ const SprintDetails = () => {
                                     color={
                                       isTaskCompleted(task) ? "green" : "blue"
                                     }
+                                    className="cursor-pointer hover:opacity-80 transition"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setCurrentQuestions(task.questions);
+                                      setQuestionsModalVisible(true);
+                                    }}
                                   >
                                     {task.questions.length} question
                                     {task.questions.length !== 1 ? "s" : ""}
