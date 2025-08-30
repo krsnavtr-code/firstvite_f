@@ -157,24 +157,7 @@ function Footer() {
               Contact Us
             </h3>
             <ul className="mt-4 space-y-2">
-              <li className="flex items-center">
-                <svg
-                  className="h-5 w-5 text-black dark:text-white mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="mailto:info@FirstVite.com">info@FirstVite.com</a>
-                </span>
-              </li>
+              
               <li className="flex items-center">
                 <svg
                   className="h-5 w-5 text-black dark:text-white mr-2"
@@ -190,7 +173,25 @@ function Footer() {
                   />
                 </svg>
                 <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="tel:+919990056799">+91 9990056799</a>
+                  <a href="tel:+919990056799">Phone: +91 9990056799</a>
+                </span>
+              </li>
+              <li className="flex items-center">
+                <svg
+                  className="h-5 w-5 text-black dark:text-white mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
+                  <a href="mailto:info@firstvite.com">Email: info@firstvite.com</a>
                 </span>
               </li>
               <li className="flex items-center">
