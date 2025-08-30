@@ -48,6 +48,7 @@ import PaymentsList from "./pages/admin/PaymentsList";
 import PaymentDetails from "./pages/admin/PaymentDetails";
 import SendBrochure from "./pages/admin/SendBrochure";
 import ThankYouPage from "./pages/ThankYouPage";
+import CareerManagement from "./pages/admin/career/CareerManagement";
 import lmsRoutes from "./routes/lmsRoutes";
 
 // Blog Components
@@ -451,6 +452,8 @@ function App() {
             <Route path="/admin/blog/new" element={<BlogPostForm />} />
             <Route path="/admin/blog/edit/:id" element={<BlogPostForm />} />
 
+            {/* Career Management */}
+
             {/* Send Brochure Route */}
             <Route path="/admin/send-brochure" element={<SendBrochure />} />
 
@@ -462,6 +465,7 @@ function App() {
             />
             <Route path="/admin/lms/create-sprint" element={<Sprint />} />
             <Route path="/admin/lms/assessment" element={<Assessment />} />
+            <Route path="/admin/lms/career" element={<CareerManagement />} />
 
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Route>

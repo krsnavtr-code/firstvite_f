@@ -155,6 +155,14 @@ const LmsManagement = () => {
             icon={Icon.Course}
             color="emerald"
           />
+          {/* Career  */}
+          <Card
+            to="/admin/lms/career"
+            title="Career Management"
+            desc="Manage career opportunities and job listings for your courses."
+            icon={Icon.Users}
+            color="blue"
+          />
         </div>
       </section>
     </div>
