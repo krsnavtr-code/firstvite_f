@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, Table, Space, Modal, message, DatePicker, Switch, Popconfirm, Tag, Tabs } from 'antd';
+import dayjs from 'dayjs';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import Sessions from './Sessions';
 import { getCourses } from '../../../api/courseApi';
@@ -99,12 +100,16 @@ const Sprint = () => {
   const showModal = (sprint = null) => {
     setEditingSprint(sprint);
     if (sprint) {
-      // Format dates for the form
+      // Format dates for the form using dayjs
       form.setFieldsValue({
-        ...sprint,
+        name: sprint.name,
+        description: sprint.description,
+        goal: sprint.goal,
+        whatsappGroupLink: sprint.whatsappGroupLink,
+        isActive: sprint.isActive,
         duration: [
-          sprint.startDate ? new Date(sprint.startDate) : null,
-          sprint.endDate ? new Date(sprint.endDate) : null
+          sprint.startDate ? dayjs(sprint.startDate) : null,
+          sprint.endDate ? dayjs(sprint.endDate) : null
         ]
       });
     } else {
@@ -120,13 +125,19 @@ const Sprint = () => {
         throw new Error('Please select a valid date range');
       }
 
+      // Ensure dates are in the correct order (startDate <= endDate)
+      const [startDate, endDate] = values.duration[0].isAfter(values.duration[1]) 
+        ? [values.duration[1], values.duration[0]] 
+        : [values.duration[0], values.duration[1]];
+
       const sprintData = {
         name: values.name,
         description: values.description,
         courseId: selectedCourse,
-        startDate: values.duration[0].toISOString(),
-        endDate: values.duration[1].toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         goal: values.goal,
+        whatsappGroupLink: values.whatsappGroupLink || '',
         isActive: values.isActive !== undefined ? values.isActive : true
       };
       
@@ -439,7 +450,25 @@ const Sprint = () => {
             label="Duration"
             rules={[{ required: true, message: 'Please select sprint duration' }]}
           >
-            <RangePicker style={{ width: '100%' }} showTime format="YYYY-MM-DD" />
+            <RangePicker 
+              style={{ width: '100%' }} 
+              showTime 
+              format="YYYY-MM-DD"
+              disabledDate={() => false} 
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="whatsappGroupLink"
+            label="WhatsApp Group Link"
+            rules={[
+              {
+                type: 'url',
+                message: 'Please enter a valid URL',
+              },
+            ]}
+          >
+            <Input placeholder="https://chat.whatsapp.com/yourgroupid" />
           </Form.Item>
 
           <Form.Item

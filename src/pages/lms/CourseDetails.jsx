@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, Button, Progress, Tag, message, Skeleton, Empty, Divider } from 'antd';
-import { ArrowLeftOutlined, PlayCircleOutlined, CheckCircleOutlined, BookOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, PlayCircleOutlined, CheckCircleOutlined, BookOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { getSprintsByCourse } from '../../api/sprintApi';
 import { getSessionsBySprint } from '../../api/sessionApi';
 import { getTasksBySession } from '../../api/taskApi';
@@ -289,8 +289,8 @@ const CourseDetails = () => {
                 onClick={(e) => handleSprintClick(sprint, e)}
               >
                 <div className="flex flex-col">
-                  <div className="flex justify-between items-start">
-                    <div>
+                  <div className="flex justify-between items-start w-full">
+                    <div className="flex-1">
                       <h3 className="text-lg font-medium text-black dark:text-white flex items-center">
                         {sprint.name}
                         <Tag
@@ -300,6 +300,20 @@ const CourseDetails = () => {
                           {getSprintStatus(sprint)}
                         </Tag>
                       </h3>
+                      {sprint.whatsappGroupLink && (
+                        <Button
+                          type="primary"
+                          icon={<WhatsAppOutlined />}
+                          size="small"
+                          className="mt-2 bg-green-600 hover:bg-green-700 border-none"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(sprint.whatsappGroupLink, '_blank', 'noopener,noreferrer');
+                          }}
+                        >
+                          Join WhatsApp Group
+                        </Button>
+                      )}
                       <p className="text-black dark:text-white text-sm mt-1">
                         {sprint.description || "No description available"}
                       </p>
