@@ -177,9 +177,41 @@ function Footer() {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
+                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400 text-xs">
                   H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar
                   Uttar Pradesh 201301
+                </span>
+              </li>
+              <li className="flex items-center">
+                <svg
+                  className="h-12 w-12 text-black dark:text-white mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 8h10M7 12h6m5 8l-5-5H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v12z"
+                  />
+                </svg>
+                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400 text-xs">
+                  I hereby agree to receive the promotional emails & messages
+                  through WhatApp/RCS/SMS{" "}
+                  <Link
+                    to="/terms-of-service"
+                    className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    T&C
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    to="/privacy-policy"
+                    className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    Privacy Policy
+                  </Link>
                 </span>
               </li>
               <li className="flex items-center">
