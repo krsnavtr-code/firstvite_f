@@ -153,9 +153,10 @@ export default function Contact() {
         description="Have questions? Contact the FirstVITE team today. We're here to help with any inquiries about our courses, enrollment process, or technical support."
         keywords="contact FirstVITE, support, help, inquiry, course information, customer service, email, phone, address"
         og={{
-          title: 'Contact FirstVITE - We\'re Here to Help',
-          description: 'Get in touch with our team for any questions about our courses, enrollment, or support. We look forward to hearing from you!',
-          type: 'website'
+          title: "Contact FirstVITE - We're Here to Help",
+          description:
+            "Get in touch with our team for any questions about our courses, enrollment, or support. We look forward to hearing from you!",
+          type: "website",
         }}
       />
       <div className="py-16 px-4 sm:px-6 lg:px-8">
@@ -167,8 +168,8 @@ export default function Contact() {
             </h1>
             <div className="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
             <p className="text-lg text-black dark:text-white max-w-3xl mx-auto">
-              Have questions or feedback? We'd love to hear from you. Fill out the
-              form below or reach out to us directly.
+              Have questions or feedback? We'd love to hear from you. Fill out
+              the form below or reach out to us directly.
             </p>
           </div>
           <div className="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
@@ -457,24 +458,21 @@ export default function Contact() {
                         htmlFor="agreedToTerms"
                         className="font-medium text-black dark:text-white"
                       >
-                        I agree to the{" "}
-                        <a
-                          href="/terms-of-service"
-                          // target="_blank"
-                          rel="noopener noreferrer"
+                        I hereby agree to receive the promotional emails &
+                        messages through WhatApp/RCS/SMS{" "}
+                        <Link
+                          to="/terms-of-service"
                           className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                         >
-                          Terms & Conditions
-                        </a>{" "}
+                          T&C
+                        </Link>{" "}
                         and{" "}
-                        <a
-                          href="/privacy-policy"
-                          // target="_blank"
-                          rel="noopener noreferrer"
+                        <Link
+                          to="/privacy-policy"
                           className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                         >
                           Privacy Policy
-                        </a>
+                        </Link>
                         <span className="text-red-500">*</span>
                       </label>
                     </div>
