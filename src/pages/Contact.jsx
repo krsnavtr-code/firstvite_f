@@ -14,6 +14,7 @@ import {
 import { toast } from "react-toastify";
 import { submitContactForm } from "../api/contactApi";
 import { getCourses } from "../api/courseApi";
+import { Link } from "react-router-dom";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
