@@ -33,14 +33,17 @@ function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      // Check if the click was outside the dropdown and not on the payment button
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+          !event.target.closest('[data-payment-button]')) {
         setShowPaymentDropdown(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    // Use 'click' instead of 'mousedown' for better reliability
+    document.addEventListener('click', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, []);
 
@@ -585,6 +588,7 @@ function Navbar() {
                 <button
                   className="flex items-center px-1 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                  data-payment-button="true"
                 >
                   Pay Now
                   <svg
@@ -643,6 +647,7 @@ function Navbar() {
                       </button>
                     </div> */}
 
+                    {/*    
                     <div
                       className="py-1"
                       role="menu"
@@ -699,6 +704,7 @@ function Navbar() {
                         </div>
                       </div>
                     </div>
+                    */}
                   </div>
                 )}
               </div>
@@ -832,6 +838,7 @@ function Navbar() {
                       : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
                   }`}
                   onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                  data-payment-button="true"
                 >
                   Pay Now
                   <svg
@@ -880,6 +887,8 @@ function Navbar() {
                         </svg>
                       </button>
                     </div>
+
+                    {/* 
                     <div
                       className="py-1"
                       role="menu"
@@ -936,6 +945,7 @@ function Navbar() {
                         </div>
                       </div>
                     </div>
+                    */}
                   </div>
                 )}
 
