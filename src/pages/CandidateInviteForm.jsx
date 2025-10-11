@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 const CandidateInviteForm = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +23,11 @@ const CandidateInviteForm = () => {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpCountdown, setOtpCountdown] = useState(0);
+  const [crop, setCrop] = useState();
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const [imgSrc, setImgSrc] = useState(null);
+  const imgRef = useRef(null);
+  const previewCanvasRef = useRef(null);
   const navigate = useNavigate();
   
   // Clean up object URL on component unmount
@@ -32,8 +39,88 @@ const CandidateInviteForm = () => {
     };
   }, [previewUrl]);
 
+  // Handle file selection and set up for cropping
+  const onSelectFile = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setCrop(undefined);
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setImgSrc(reader.result);
+      });
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  // Handle crop completion
+  const onImageLoad = (img) => {
+    imgRef.current = img;
+  };
+
+  // Apply the crop and create the cropped image
+  const applyCrop = () => {
+    if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
+      return;
+    }
+
+    const image = imgRef.current;
+    const canvas = previewCanvasRef.current;
+    const crop = completedCrop;
+
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    const ctx = canvas.getContext('2d');
+    const pixelRatio = window.devicePixelRatio;
+
+    canvas.width = crop.width * pixelRatio;
+    canvas.height = crop.height * pixelRatio;
+
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    ctx.imageSmoothingQuality = 'high';
+
+    ctx.drawImage(
+      image,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    );
+
+    // Convert canvas to blob and update form data
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        console.error('Canvas is empty');
+        return;
+      }
+      
+      // Create a file from the blob
+      const file = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' });
+      
+      // Update form data with the cropped image
+      setFormData(prev => ({
+        ...prev,
+        profilePhoto: file
+      }));
+      
+      // Set preview URL
+      setPreviewUrl(URL.createObjectURL(blob));
+      
+      // Close the crop dialog
+      setImgSrc(null);
+    }, 'image/jpeg', 0.9);
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+    
+    // Skip file handling for profile photo as we handle it separately
+    if (name === 'profilePhoto') {
+      return;
+    }
+    
     // Clear error for the field being edited
     if (errors[name]) {
       setErrors((prev) => ({
@@ -460,25 +547,83 @@ const CandidateInviteForm = () => {
               </label>
               
               {/* Image Preview */}
-              {(previewUrl || formData.profilePhoto) && (
+              {previewUrl && (
                 <div className="mt-2 mb-4">
                   <img 
-                    src={previewUrl || URL.createObjectURL(formData.profilePhoto)} 
+                    src={previewUrl} 
                     alt="Profile preview" 
                     className="h-32 w-32 rounded-full object-cover border-2 border-gray-300"
                   />
                 </div>
               )}
               
-              <div className="mt-1 flex items-center">
+              {/* Crop Modal */}
+              {imgSrc && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg p-4 max-w-lg w-full">
+                    <h3 className="text-lg font-medium mb-4">Crop your profile photo</h3>
+                    <div className="mb-4">
+                      <ReactCrop
+                        crop={crop}
+                        onChange={(c) => setCrop(c)}
+                        onComplete={(c) => setCompletedCrop(c)}
+                        aspect={1}
+                        circularCrop={true}
+                      >
+                        <img
+                          ref={onImageLoad}
+                          src={imgSrc}
+                          alt="Crop preview"
+                          style={{ maxHeight: '70vh', maxWidth: '100%' }}
+                        />
+                      </ReactCrop>
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setImgSrc(null)}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={applyCrop}
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Hidden canvas for image processing */}
+              <canvas
+                ref={previewCanvasRef}
+                style={{
+                  display: 'none',
+                }}
+              />
+              
+              <div className="mt-1">
                 <input
                   type="file"
                   name="profilePhoto"
                   id="profilePhoto"
                   accept="image/*"
-                  onChange={handleChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  onChange={onSelectFile}
+                  className="hidden"
                 />
+                <label
+                  htmlFor="profilePhoto"
+                  className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <svg className="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/20000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {previewUrl ? 'Change Photo' : 'Upload Photo'}
+                </label>
               </div>
               <p className="mt-1 text-xs text-gray-500">
                 {formData.profilePhoto
