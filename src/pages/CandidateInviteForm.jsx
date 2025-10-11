@@ -16,6 +16,11 @@ const CandidateInviteForm = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [otp, setOtp] = useState('');
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCountdown, setOtpCountdown] = useState(0);
   const navigate = useNavigate();
   
   // Clean up object URL on component unmount
@@ -56,6 +61,106 @@ const CandidateInviteForm = () => {
     }
   };
 
+  const handleOtpChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 6); // Only allow numbers and limit to 6 digits
+    setOtp(value);
+  };
+
+  const startOtpCountdown = () => {
+    setOtpCountdown(60); // 60 seconds countdown
+    const timer = setInterval(() => {
+      setOtpCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleSendOtp = async () => {
+    if (!formData.email) {
+      setErrors(prev => ({ ...prev, email: 'Email is required' }));
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4002';
+      const response = await axios.post(`${apiUrl}/api/candidates/send-otp`, {
+        email: formData.email
+      });
+
+      if (response.data.success) {
+        setOtpSent(true);
+        setShowOtpInput(true);
+        startOtpCountdown();
+        toast.success('OTP sent to your email');
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to send OTP. Please try again.';
+      setErrors(prev => ({ ...prev, email: errorMessage }));
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.length !== 6) {
+      toast.error('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4002';
+      const response = await axios.post(`${apiUrl}/api/candidates/verify-otp`, {
+        email: formData.email,
+        otp
+      });
+
+      if (response.data.success) {
+        setIsEmailVerified(true);
+        setShowOtpInput(false);
+        toast.success('Email verified successfully');
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to verify OTP. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (otpCountdown > 0) return;
+    
+    try {
+      setIsSubmitting(true);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4002';
+      const response = await axios.post(`${apiUrl}/api/candidates/send-otp`, {
+        email: formData.email
+      });
+
+      if (response.data.success) {
+        startOtpCountdown();
+        toast.success('New OTP sent to your email');
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to resend OTP. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Validate phone number format
   const validatePhoneNumber = (phone) => {
     // Supports international numbers with optional + and country code
@@ -67,12 +172,18 @@ const CandidateInviteForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if email is verified
+    if (!isEmailVerified) {
+      toast.error('Please verify your email before submitting the form');
+      return;
+    }
+
     // Validate phone number
     if (!validatePhoneNumber(formData.phone)) {
       setErrors((prev) => ({
         ...prev,
         phone:
-          "Please enter a valid phone number (10-20 digits, may include +, -, (, ), or spaces)",
+          "Please enter a valid phone number (10-20 digits, may include +, -, (, ), or spaces",
       }));
       return;
     }
@@ -178,22 +289,85 @@ const CandidateInviteForm = () => {
               >
                 Email Address *
               </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="e.g., example@gmail.com"
-                className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm p-2 border ${
-                  errors.email
-                    ? "border-red-500"
-                    : "border-gray-300 focus:border-indigo-500"
-                }`}
-              />
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    required
+                    placeholder="e.g., example@gmail.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={otpSent}
+                    className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm p-2 border ${
+                      errors.email
+                        ? "border-red-500"
+                        : "border-gray-300 focus:border-indigo-500"
+                    } ${otpSent ? 'bg-gray-100' : ''}`}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={isSubmitting || otpSent || !formData.email}
+                  className={`mt-1 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                    otpSent
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : 'bg-indigo-600 hover:bg-indigo-700'
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50`}
+                >
+                  {otpSent ? '✓ Sent' : 'Send OTP'}
+                </button>
+              </div>
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              )}
+
+              {/* OTP Verification Section */}
+              {showOtpInput && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={handleOtpChange}
+                      placeholder="Enter 6-digit OTP"
+                      maxLength={6}
+                      className="block w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2 border border-gray-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={isSubmitting || otp.length !== 6}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    >
+                      Verify
+                    </button>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-600">
+                    {otpCountdown > 0 ? (
+                      <span>Resend OTP in {otpCountdown}s</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleResendOtp}
+                        className="text-indigo-600 hover:text-indigo-800 font-medium"
+                      >
+                        Resend OTP
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {isEmailVerified && (
+                <div className="mt-2 flex items-center text-sm text-green-600">
+                  <svg className="h-5 w-5 text-green-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Email verified successfully
+                </div>
               )}
             </div>
 
