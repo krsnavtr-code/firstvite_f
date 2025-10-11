@@ -7,12 +7,37 @@ const SendProposal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState([]);
 
+  // Default form values
+  const defaultValues = {
+    subject: "Partnership Opportunity - FirstVITE x [College Name]",
+    message: `Dear [College Name] Team,
+
+I hope this message finds you well. I am reaching out on behalf of FirstVITE E-Learning to explore potential collaboration opportunities between our organizations.
+
+FirstVITE is a leading e-learning platform dedicated to providing high-quality technical education and skill development programs. We are currently seeking partnerships with esteemed educational institutions like yours to help bridge the gap between academia and industry requirements.
+
+Key Benefits of Partnership:
+- Access to our comprehensive e-learning platform
+- Industry-relevant curriculum designed by experts
+- Certification programs aligned with current market demands
+- Placement assistance for students
+- Faculty development programs
+
+We would be delighted to discuss how we can work together to enhance the learning experience for your students. Please let us know a convenient time for a meeting or call to explore this opportunity further.
+
+Looking forward to your positive response.
+
+Best regards,
+[Your Name]
+FirstVITE E-Learning Team`
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm({ defaultValues });
 
   const onSubmit = async (data) => {
     try {
