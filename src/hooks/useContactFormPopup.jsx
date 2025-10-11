@@ -26,7 +26,7 @@ const useContactFormPopup = () => {
         path.startsWith("/blog") ||
         path.startsWith("/contact") ||
         path.startsWith("/thank-you") ||
-        path.startsWith("/candidate-application")
+        path.startsWith("/job-fair")
       ) {
         return false;
       }
@@ -34,7 +34,7 @@ const useContactFormPopup = () => {
     };
 
     const currentPath = location.pathname;
-    
+
     // Close the form if it's open and shouldn't be shown on the current page
     if (!shouldShowForm(currentPath)) {
       setIsOpen(false);
