@@ -17,7 +17,6 @@ import AdminEnrollments from "./pages/admin/Enrollments";
 import PrivateRoute from "./components/PrivateRoute";
 import Unauthorized from "./pages/Unauthorized";
 import Navbar from "./components/Navbar";
-// import Navbar from './components/NewNavbar';
 import Footer from "./components/Footer";
 import CoursesByCategory from "./pages/user/CoursesByCategory";
 import AllCategories from "./pages/user/AllCategories";
@@ -48,6 +47,7 @@ import PaymentsList from "./pages/admin/PaymentsList";
 import PaymentDetails from "./pages/admin/PaymentDetails";
 import SendBrochure from "./pages/admin/SendBrochure";
 import ThankYouPage from "./pages/ThankYouPage";
+import CandidateInviteForm from "./pages/CandidateInviteForm";
 import CareerManagement from "./pages/admin/career/CareerManagement";
 import lmsRoutes from "./routes/lmsRoutes";
 
@@ -75,12 +75,13 @@ const MainLayout = ({ children }) => {
   const isAdminRoute = location.pathname.startsWith("/admin");
   // Check if the current route is an LMS route
   const isLMSRoute = location.pathname.startsWith("/lms");
-  // Check if the current route is login, register, forgot-password, reset-password,
+  // Check if the current route is login, register, forgot-password, reset-password, or candidate-application
   const isAuthRoute =
     location.pathname.startsWith("/login") ||
     location.pathname.startsWith("/register") ||
     location.pathname.startsWith("/forgot-password") ||
-    location.pathname.startsWith("/reset-password");
+    location.pathname.startsWith("/reset-password") ||
+    location.pathname.startsWith("/candidate-application");
 
   return (
     <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
@@ -396,12 +397,19 @@ function App() {
               </MainLayout>
             }
           />
-
           <Route
             path="/pending-approval"
             element={
               <MainLayout>
                 <PendingApproval />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/candidate-application"
+            element={
+              <MainLayout>
+                <CandidateInviteForm />
               </MainLayout>
             }
           />

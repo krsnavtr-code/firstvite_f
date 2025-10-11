@@ -12,8 +12,7 @@ const useContactFormPopup = () => {
 
   useEffect(() => {
     // Check if current path should show the contact form
-    const shouldShowForm = () => {
-      const path = location.pathname;
+    const shouldShowForm = (path) => {
       // Don't show on admin, LMS, auth, or thank you routes
       if (
         path.startsWith("/admin") ||
@@ -26,15 +25,24 @@ const useContactFormPopup = () => {
         path.startsWith("/my-learning") ||
         path.startsWith("/blog") ||
         path.startsWith("/contact") ||
-        path.startsWith("/thank-you")
+        path.startsWith("/thank-you") ||
+        path.startsWith("/candidate-application")
       ) {
         return false;
       }
       return true;
     };
 
+    const currentPath = location.pathname;
+    
+    // Close the form if it's open and shouldn't be shown on the current page
+    if (!shouldShowForm(currentPath)) {
+      setIsOpen(false);
+      return;
+    }
+
     // Only show the popup on allowed routes
-    if (shouldShowForm()) {
+    if (shouldShowForm(currentPath)) {
       const timer = setTimeout(() => {
         setIsOpen(true);
         setIsInitialized(true);
