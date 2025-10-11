@@ -46,6 +46,7 @@ import PaymentTAndC from "./pages/PaymentTAndC";
 import PaymentsList from "./pages/admin/PaymentsList";
 import PaymentDetails from "./pages/admin/PaymentDetails";
 import SendBrochure from "./pages/admin/SendBrochure";
+import SendProposal from "./pages/admin/SendProposal";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
 import CareerManagement from "./pages/admin/career/CareerManagement";
@@ -462,8 +463,9 @@ function App() {
 
             {/* Career Management */}
 
-            {/* Send Brochure Route */}
+            {/* Email Routes */}
             <Route path="/admin/send-brochure" element={<SendBrochure />} />
+            <Route path="/admin/send-proposal" element={<SendProposal />} />
 
             {/* LMS Routes */}
             <Route path="/admin/lms-management" element={<LmsManagement />} />
