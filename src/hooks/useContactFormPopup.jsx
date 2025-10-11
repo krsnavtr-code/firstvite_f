@@ -26,7 +26,7 @@ const useContactFormPopup = () => {
         path.startsWith("/blog") ||
         path.startsWith("/contact") ||
         path.startsWith("/thank-you") ||
-        path.startsWith("/job-fair")
+        path.startsWith("/jobfair")
       ) {
         return false;
       }

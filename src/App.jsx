@@ -76,13 +76,13 @@ const MainLayout = ({ children }) => {
   const isAdminRoute = location.pathname.startsWith("/admin");
   // Check if the current route is an LMS route
   const isLMSRoute = location.pathname.startsWith("/lms");
-  // Check if the current route is login, register, forgot-password, reset-password, or job-fair
+  // Check if the current route is login, register, forgot-password, reset-password, or jobfair
   const isAuthRoute =
     location.pathname.startsWith("/login") ||
     location.pathname.startsWith("/register") ||
     location.pathname.startsWith("/forgot-password") ||
     location.pathname.startsWith("/reset-password") ||
-    location.pathname.startsWith("/job-fair");
+    location.pathname.startsWith("/jobfair");
 
   return (
     <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
@@ -407,7 +407,7 @@ function App() {
             }
           />
           <Route
-            path="/job-fair"
+            path="/jobfair"
             element={
               <MainLayout>
                 <CandidateInviteForm />
