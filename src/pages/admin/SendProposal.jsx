@@ -100,9 +100,22 @@ FirstVITE E-Learning Team`,
 
       // Add files if any
       if (files && files.length > 0) {
-        Array.from(files).forEach((file) => {
-          formData.append("attachments", file);
-        });
+        console.log("Adding files to form data:", files);
+        for (let i = 0; i < files.length; i++) {
+          formData.append("attachments", files[i]);
+          console.log(`Added file ${i + 1}: ${files[i].name} (${(files[i].size / (1024 * 1024)).toFixed(2)}MB)`);
+        }
+      } else {
+        console.log("No files to attach");
+      }
+
+      // Log form data for debugging (without logging file content)
+      for (let pair of formData.entries()) {
+        if (pair[0] === 'attachments') {
+          console.log(`${pair[0]}: ${pair[1].name} (${(pair[1].size / (1024 * 1024)).toFixed(2)}MB)`);
+        } else {
+          console.log(pair[0] + ':', pair[1]);
+        }
       }
 
       // Get token from localStorage
@@ -111,17 +124,9 @@ FirstVITE E-Learning Team`,
         throw new Error("Authentication token not found");
       }
 
-      // Import the configured axios instance
-      const api = axios.create({
-        baseURL:
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api",
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Show loading toast
+      const toastId = toast.loading('Sending emails with attachments...');
 
-      // Send the request with the correct endpoint and increased timeout
       try {
         const response = await axios.post(
           `${
@@ -133,9 +138,16 @@ FirstVITE E-Learning Team`,
               "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${token}`,
             },
-            timeout: 30000, // 30 seconds timeout
+            timeout: 120000, // Increased to 2 minutes
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              toast.loading(`Uploading files: ${percentCompleted}%`, { id: toastId });
+            },
           }
         );
+
+        // Update toast to success
+        toast.success('Emails sent successfully!', { id: toastId });
 
         if (response.data && response.data.status === "success") {
           const messageType = watch("messageType");
@@ -199,7 +211,30 @@ FirstVITE E-Learning Team`,
   };
 
   const handleFileChange = (e) => {
-    setFiles(e.target.files);
+    if (e.target.files && e.target.files.length > 0) {
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+      const validFiles = [];
+      const invalidFiles = [];
+
+      Array.from(e.target.files).forEach(file => {
+        if (file.size > MAX_FILE_SIZE) {
+          invalidFiles.push(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`);
+        } else {
+          validFiles.push(file);
+        }
+      });
+
+      if (invalidFiles.length > 0) {
+        toast.error(`The following files exceed 10MB: ${invalidFiles.join(', ')}`);
+      }
+
+      if (validFiles.length > 0) {
+        console.log("Valid files selected:", validFiles);
+        setFiles(validFiles);
+      } else {
+        setFiles([]);
+      }
+    }
   };
 
   return (
