@@ -559,44 +559,108 @@ const CandidateInviteForm = () => {
               
               {/* Crop Modal */}
               {imgSrc && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-white rounded-lg p-4 max-w-lg w-full">
-                    <h3 className="text-lg font-medium mb-4">Crop your profile photo</h3>
-                    <div className="mb-4">
-                      <ReactCrop
-                        crop={crop}
-                        onChange={(c) => setCrop(c)}
-                        onComplete={(c) => setCompletedCrop(c)}
-                        aspect={1}
-                        circularCrop={true}
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-xl">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-semibold text-gray-800">Crop Your Profile Photo</h3>
+                      <button 
+                        onClick={() => setImgSrc(null)}
+                        className="text-gray-500 hover:text-gray-700"
+                        aria-label="Close"
                       >
-                        <img
-                          ref={onImageLoad}
-                          src={imgSrc}
-                          alt="Crop preview"
-                          style={{ maxHeight: '70vh', maxWidth: '100%' }}
-                        />
-                      </ReactCrop>
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
-                    <div className="flex justify-end space-x-2">
+                    
+                    <div className="mb-4 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-sm text-gray-600 mb-3">
+                        <span className="font-medium">How to crop:</span> Click and drag to select an area. 
+                        The selected area will be your profile picture.
+                      </p>
+                      <div className="relative">
+                        <ReactCrop
+                          crop={crop}
+                          onChange={(c) => setCrop(c)}
+                          onComplete={(c) => setCompletedCrop(c)}
+                          aspect={1}
+                          circularCrop={true}
+                          className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden"
+                        >
+                          <img
+                            ref={onImageLoad}
+                            src={imgSrc}
+                            alt="Crop preview"
+                            style={{ 
+                              maxHeight: '60vh', 
+                              maxWidth: '100%',
+                              display: 'block',
+                              margin: '0 auto'
+                            }}
+                            onLoad={(e) => {
+                              // Set initial crop to cover the center of the image
+                              const { width, height } = e.target;
+                              const size = Math.min(width, height) * 0.95; // 95% of the smaller dimension
+                              const x = (width - size) / 2;
+                              const y = (height - size) / 2;
+                              setCrop({
+                                unit: 'px',
+                                width: size,
+                                height: size,
+                                x,
+                                y
+                              });
+                            }}
+                          />
+                        </ReactCrop>
+                        {!crop && (
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="text-center p-4 bg-white/80 rounded-lg">
+                              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                              </svg>
+                              <p className="mt-2 text-sm text-gray-600">Drag to select an area</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center pt-4 border-t border-gray-200">
                       <button
                         type="button"
                         onClick={() => setImgSrc(null)}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                       >
                         Cancel
                       </button>
                       <button
                         type="button"
-                        onClick={applyCrop}
-                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        onClick={() => {
+                          if (crop) {
+                            applyCrop();
+                          } else {
+                            // If no crop is made, use the full image
+                            setCrop({
+                              unit: '%',
+                              width: 100,
+                              height: 100,
+                              x: 0,
+                              y: 0
+                            });
+                            setTimeout(applyCrop, 100);
+                          }
+                        }}
+                        className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                       >
-                        Save
+                        Save Photo
                       </button>
                     </div>
                   </div>
                 </div>
               )}
+              
               
               {/* Hidden canvas for image processing */}
               <canvas
