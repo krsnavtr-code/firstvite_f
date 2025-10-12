@@ -68,6 +68,7 @@ import InactiveAccount from "./pages/auth/InactiveAccount";
 import Sprint from "./components/admin/lmsManagement/Sprint.jsx";
 import LmsManagement from "./components/admin/lmsManagement/LmsManagement.jsx";
 import Assessment from "./components/admin/lmsManagement/Assessment.jsx";
+import CandidatesPage from "./pages/admin/CandidatesPage.jsx";
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -476,6 +477,9 @@ function App() {
             <Route path="/admin/lms/create-sprint" element={<Sprint />} />
             <Route path="/admin/lms/assessment" element={<Assessment />} />
             <Route path="/admin/lms/career" element={<CareerManagement />} />
+            
+            {/* Candidates Management */}
+            <Route path="/admin/candidates" element={<CandidatesPage />} />
           </Route>
 
           {/* LMS Routes */}
