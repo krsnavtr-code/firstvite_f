@@ -113,6 +113,10 @@ const CandidateInviteForm = () => {
     }, 'image/jpeg', 0.9);
   };
 
+  const capitalizeWords = (str) => {
+    return str.replace(/\b\w/g, char => char.toUpperCase());
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     
@@ -141,9 +145,15 @@ const CandidateInviteForm = () => {
         [name]: file,
       }));
     } else {
+      // Capitalize first letter of each word for specific fields
+      const fieldsToCapitalize = ['name', 'course', 'college', 'university'];
+      const processedValue = fieldsToCapitalize.includes(name) 
+        ? capitalizeWords(value.toLowerCase())
+        : value;
+
       setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: processedValue,
       }));
     }
   };
