@@ -6,11 +6,28 @@ import axios from "../../api/axios";
 const SendProposal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState([]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Default form values
   const defaultValues = {
     subject: "Partnership Opportunity - FirstVITE x [College Name]",
-    message: `Dear [College Name] Team,
+    studentMessage: `Dear [Student's Name],
+
+We are excited to inform you about an exclusive learning opportunity with FirstVITE E-Learning Platform. As part of our partnership with your institution, we are offering you access to our premium courses and certification programs.
+
+Benefits for You:
+- Access to industry-relevant courses
+- Learn at your own pace
+- Get certified in high-demand skills
+- Career guidance and placement support
+
+We encourage you to take advantage of this opportunity to enhance your skills and boost your career prospects.
+
+Best regards,
+[Your Name]
+FirstVITE E-Learning Team`,
+    collegeMessage: `Dear [College Name] Team,
 
 I hope this message finds you well. I am reaching out on behalf of FirstVITE E-Learning to explore potential collaboration opportunities between our organizations.
 
@@ -29,81 +46,153 @@ Looking forward to your positive response.
 
 Best regards,
 [Your Name]
-FirstVITE E-Learning Team`
+FirstVITE E-Learning Team`,
   };
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
     reset,
-  } = useForm({ defaultValues });
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      messageType: "student", // Set default message type
+      subject: defaultValues.subject,
+      studentMessage: defaultValues.studentMessage,
+      collegeMessage: defaultValues.collegeMessage,
+    },
+  });
 
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
+      setError("");
+      setSuccess("");
 
-      // Split emails by newline and filter out any empty strings
+      const formData = new FormData();
+
+      // Process emails from textarea (split by newline and filter out empty lines)
       const emailList = data.emails
         .split("\n")
         .map((email) => email.trim())
-        .filter((email) => email.length > 0);
+        .filter((email) => email);
 
-      // Get the token from localStorage
-      const token = localStorage.getItem('token');
-      
-      // Create form data for the request
-      const formDataToSend = new FormData();
-      
-      // Add the email list as a JSON string
-      formDataToSend.append('data', JSON.stringify({
+      // Get the selected message type
+      const selectedMessageType = watch("messageType");
+
+      // Prepare the data object that will be stringified
+      const emailData = {
         emails: emailList,
         subject: data.subject,
-        message: data.message
-      }));
-      
-      // Append files if any
+        message:
+          selectedMessageType === "student"
+            ? data.studentMessage
+            : data.collegeMessage,
+      };
+
+      // Debug log to check the selected message type and content
+      console.log("Selected message type:", selectedMessageType);
+      console.log("Using message:", emailData.message.substring(0, 50) + "...");
+
+      // Add the stringified data to formData
+      formData.append("data", JSON.stringify(emailData));
+
+      // Add files if any
       if (files && files.length > 0) {
         Array.from(files).forEach((file) => {
-          formDataToSend.append('attachments', file);
+          formData.append("attachments", file);
         });
       }
-      
-      // Log the data being sent for debugging
-      console.log('Sending form data:', {
-        emails: emailList,
-        subject: data.subject,
-        message: data.message,
-        fileCount: files?.length || 0
+
+      // Get token from localStorage
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
+
+      // Import the configured axios instance
+      const api = axios.create({
+        baseURL:
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      const response = await axios.post(
-        "/v1/admin/emails/send-proposal",
-        formDataToSend,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
-          },
+      // Send the request with the correct endpoint and increased timeout
+      try {
+        const response = await axios.post(
+          `${
+            import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api"
+          }/v1/admin/emails/send-proposal`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+            timeout: 30000, // 30 seconds timeout
+          }
+        );
+
+        if (response.data && response.data.status === "success") {
+          const messageType = watch("messageType");
+          const recipientType =
+            messageType === "student" ? "student" : "college/university";
+
+          setSuccess(`Proposal sent successfully to ${recipientType}!`);
+          toast.success(response.data.message || "Proposal sent successfully!");
+
+          // Reset form but keep the default messages and current message type
+          reset({
+            subject: defaultValues.subject,
+            messageType: messageType,
+            studentMessage: defaultValues.studentMessage,
+            collegeMessage: defaultValues.collegeMessage,
+            emails: "",
+          });
+          setFiles([]);
+        } else {
+          throw new Error(response.data?.message || "Failed to send proposal");
         }
-      );
+      } catch (error) {
+        console.error("Error sending proposal:", error);
 
-      // Log the response for debugging
-      console.log('Server response:', response.data);
+        // Check if it's a timeout error
+        if (
+          error.code === "ECONNABORTED" ||
+          error.message.includes("timeout")
+        ) {
+          // Show success message even on timeout since emails are processed in background
+          const messageType = watch("messageType");
+          const recipientType =
+            messageType === "student" ? "student" : "college/university";
 
-      // Check if the response indicates success
-      if (response.data && response.data.status === 'success') {
-        toast.success(response.data.message || "Proposal emails sent successfully!");
-        reset();
-        setFiles([]);
-      } else {
-        throw new Error(response.data?.message || 'Failed to send emails');
+          setSuccess(`Proposal is being sent to ${recipientType}!`);
+          toast.success(
+            "Your request is being processed. You'll receive a confirmation once completed."
+          );
+
+          // Still reset the form
+          reset({
+            subject: defaultValues.subject,
+            messageType: messageType,
+            studentMessage: defaultValues.studentMessage,
+            collegeMessage: defaultValues.collegeMessage,
+            emails: "",
+          });
+          setFiles([]);
+        } else {
+          // Handle other types of errors
+          const errorMessage =
+            error.response?.data?.message ||
+            "Failed to send proposal. Please try again.";
+          setError(errorMessage);
+          toast.error(errorMessage);
+        }
       }
-    } catch (error) {
-      console.error("Error sending proposal:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to send proposal emails"
-      );
     } finally {
       setIsSubmitting(false);
     }
@@ -165,23 +254,93 @@ college3@example.com"
           )}
         </div>
 
-        <div>
-          <label
-            htmlFor="message"
-            className="block text-sm font-medium text-gray-700 mb-1"
+        <div className="space-y-4">
+          {/* Student Message Card */}
+          <div
+            className={`border-2 rounded-lg p-4 transition-colors ${
+              watch("messageType") === "student"
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-gray-200 hover:border-indigo-300"
+            }`}
           >
-            Message
-          </label>
-          <textarea
-            id="message"
-            {...register("message", { required: "Message is required" })}
-            rows={8}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="Write your proposal message here..."
-          />
-          {errors.message && (
+            <label className="flex items-start space-x-3 cursor-pointer">
+              <input
+                type="radio"
+                {...register("messageType", {
+                  required: "Please select a message type",
+                })}
+                value="student"
+                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                defaultChecked
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="block text-sm font-medium text-gray-700">
+                    Message for Student
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <textarea
+                    {...register("studentMessage", {
+                      required: "Student message is required",
+                    })}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Write your message for the student here..."
+                  />
+                  {errors.studentMessage && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.studentMessage.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </label>
+          </div>
+
+          {/* College Message Card */}
+          <div
+            className={`border-2 rounded-lg p-4 transition-colors ${
+              watch("messageType") === "college"
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-gray-200 hover:border-indigo-300"
+            }`}
+          >
+            <label className="flex items-start space-x-3 cursor-pointer">
+              <input
+                type="radio"
+                {...register("messageType")}
+                value="college"
+                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="block text-sm font-medium text-gray-700">
+                    Message for College/University
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <textarea
+                    {...register("collegeMessage", {
+                      required: "College/University message is required",
+                    })}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Write your message for the college/university here..."
+                  />
+                  {errors.collegeMessage && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.collegeMessage.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </label>
+          </div>
+
+          {errors.messageType && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.message.message}
+              {errors.messageType.message}
             </p>
           )}
         </div>
