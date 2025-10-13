@@ -390,7 +390,7 @@ college3@example.com"
                       required: "Student message is required",
                     })}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="Write your message for the student here..."
                   />
                   {errors.studentMessage && (
@@ -433,7 +433,7 @@ college3@example.com"
                       required: "College/University message is required",
                     })}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="Write your message for the college/university here..."
                   />
                   {errors.collegeMessage && (
