@@ -36,7 +36,9 @@ const SendBrochure = () => {
       try {
         setLoading(true);
         const response = await api.get("/pdfs");
-        const generated = response.data.filter((pdf) => pdf.type === "generated");
+        const generated = response.data.filter(
+          (pdf) => pdf.type === "generated"
+        );
         const uploaded = response.data.filter((pdf) => pdf.type === "uploaded");
         setPdfs({ generated, uploaded });
       } catch (error) {
@@ -51,18 +53,23 @@ const SendBrochure = () => {
   }, [activeTab]);
 
   const handlePdfSelection = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
     setSelectedPdfs(selectedOptions);
   };
 
   const filteredPdfs = useMemo(() => {
-    const currentPdfs = activeTab === "generated" ? pdfs.generated : pdfs.uploaded;
+    const currentPdfs =
+      activeTab === "generated" ? pdfs.generated : pdfs.uploaded;
     if (!searchTerm.trim()) return currentPdfs;
-    
+
     const term = searchTerm.toLowerCase();
-    return currentPdfs.filter(pdf => 
-      pdf.name.toLowerCase().includes(term) || 
-      pdf.path.toLowerCase().includes(term)
+    return currentPdfs.filter(
+      (pdf) =>
+        pdf.name.toLowerCase().includes(term) ||
+        pdf.path.toLowerCase().includes(term)
     );
   }, [activeTab, pdfs, searchTerm]);
 
@@ -83,14 +90,18 @@ const SendBrochure = () => {
       setSending(true);
 
       // Send multiple PDFs in a single request
-      await api.post("/pdfs/send-brochure", {
-        pdfPaths: selectedPdfs,  // Changed to match backend's expected field name
-        email: email.trim(),
-        subject: subject.trim() || "Course Brochure",
-        message: message.trim(),
-      }, {
-        timeout: 60000 * selectedPdfs.length // Increase timeout based on number of PDFs
-      });
+      await api.post(
+        "/pdfs/send-brochure",
+        {
+          pdfPaths: selectedPdfs, // Changed to match backend's expected field name
+          email: email.trim(),
+          subject: subject.trim() || "Course Brochure",
+          message: message.trim(),
+        },
+        {
+          timeout: 60000 * selectedPdfs.length, // Increase timeout based on number of PDFs
+        }
+      );
 
       toast.success("Brochure sent successfully!", {
         duration: 4000,
@@ -116,14 +127,15 @@ const SendBrochure = () => {
     }
   };
 
-  // Format file size to human readable format
-  // Message template for uploaded brochures
- const messageTemplate = useMemo(() => {
-   return `
+  // Message templates for different scenarios
+  const messageTemplates = useMemo(
+    () => ({
+      courseEnquiry: {
+        name: "Course Enquiry",
+        subject: `About {{courseName}} - FirstVITE E-Learning`,
+        content: `
 <p>Dear {{studentName}},</p>
-
 <p>Greetings from <strong>FirstVITE E-Learning!</strong></p>
-
 <p>
 Are you looking to build a strong career in the domain of <strong>{{courseName}}</strong>?  
 We are excited to introduce our <strong>{{courseName}}</strong> online training program,  
@@ -141,44 +153,100 @@ designed for both beginners and professionals.
 </ul>
 
 <h3>📅 Course Duration & Timings: 3 to 4 Months, Weekdays/Weekends Available</h3>
-<ul>
-  <li><strong>Mode:</strong> Online Recorded & Live Classes</li>
-  <li><strong>Schedule:</strong> Flexible (Weekdays/Weekends Available)</li>
-  <li><strong>Language:</strong> Hindi + English</li>
-</ul>
-
-<h3>💼 Career Scope after {{courseName}}:</h3>
-
-<h3>💰 Course Fee & Offers:</h3>
 <p>Special discounts available for early enrollment!</p>
+<p>Looking forward to helping you take the next step in your career!</p>
 
-<p>
-Looking forward to helping you take the next step in your career!
-</p>
-  `;
- }, []);
+<p>Warm regards,</p>
+<p>Team – FirstVITE E-Learning Pvt. Ltd.</p>
+<p>📩 info@firstvite.com</p>
+<p>🌐 https://firstvite.com</p>
+      `,
+      },
+      webinarInvite: {
+        name: "Learning Approach Invitation",
+        subject: `Take the Next Step in Your Career with FirstVITE E-Learning`,
+        content: `
+<p>Dear {{studentName}},</p>
 
+<p>Greetings from FirstVITE E-Learning Pvt. Ltd.!</p>
 
-  // Update message when template variables change
+<p>We’re excited to invite you to enroll in one of our professional certification programs designed to help you enhance your skills and career growth.</p>
+
+<p>At FirstVITE, we offer a wide range of in-demand programs such as Java, Python, AI & Machine Learning, Cyber Security, Digital Marketing, SAP, Power BI, Cloud Computing (Azure), Salesforce, and more.</p>
+
+<p>Each program is structured to provide hands-on learning with real-world applications—helping you gain the expertise needed to stand out in today’s competitive job market.</p>
+
+<p>If you’re looking to upgrade your skills or switch to a high-growth career path, this is the perfect time to get started!</p>
+
+<p>Please feel free to reply to this email or contact us directly for more details about the courses, duration, and fee structure.</p>
+
+<p>Looking forward to helping you begin your learning journey with us.</p>
+
+<p>Warm regards,</p>
+<p>Team – FirstVITE E-Learning Pvt. Ltd.</p>
+<p>📩 info@firstvite.com</p>
+<p>🌐 https://firstvite.com</p>
+`,
+      },
+      custom: {
+        name: "Custom Message",
+        subject: "",
+        content: "",
+      },
+    }),
+    []
+  );
+
+  const [selectedTemplate, setSelectedTemplate] = useState("courseEnquiry");
+
+  // Update message when template or variables change
   useEffect(() => {
     if (activeTab === "uploaded") {
-      let updatedMessage = messageTemplate;
-      updatedMessage = updatedMessage.replace(
-        /\{\{studentName\}\}/g,
-        studentName || "Student"
-      );
-      updatedMessage = updatedMessage.replace(
-        /\{\{courseName\}\}/g,
-        courseName || "this course"
-      );
-      setMessage(updatedMessage);
+      const template = messageTemplates[selectedTemplate];
 
-      // Update subject if it's the default
-      if (subject === "Course Brochure" && courseName) {
-        setSubject(`About ${courseName} - FirstVITE E-Learning`);
+      // Replace variables in content
+      let updatedContent = template.content
+        .replace(/\{\{studentName\}\}/g, studentName || "Student")
+        .replace(/\{\{courseName\}\}/g, courseName || "this course");
+
+      // Replace variables in subject
+      let updatedSubject = template.subject
+        .replace(/\{\{studentName\}\}/g, studentName || "Student")
+        .replace(/\{\{courseName\}\}/g, courseName || "this course");
+
+      setMessage(updatedContent);
+
+      // Only update subject if it hasn't been manually modified or is empty
+      if (
+        subject === "" ||
+        subject === "Course Brochure" ||
+        subject.startsWith("About ") ||
+        subject.startsWith("Following up")
+      ) {
+        setSubject(updatedSubject);
       }
     }
-  }, [activeTab, studentName, courseName, messageTemplate]);
+  }, [
+    activeTab,
+    studentName,
+    courseName,
+    selectedTemplate,
+    messageTemplates,
+    subject,
+  ]);
+
+  // Handle template change
+  const handleTemplateChange = (e) => {
+    const templateKey = e.target.value;
+    setSelectedTemplate(templateKey);
+
+    // Only update message if not custom template
+    if (templateKey !== "custom") {
+      const template = messageTemplates[templateKey];
+      setMessage(template.content);
+      setSubject(template.subject);
+    }
+  };
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return "0 Bytes";
@@ -188,7 +256,8 @@ Looking forward to helping you take the next step in your career!
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const hasPdfs = (activeTab === "generated" ? pdfs.generated : pdfs.uploaded).length > 0;
+  const hasPdfs =
+    (activeTab === "generated" ? pdfs.generated : pdfs.uploaded).length > 0;
   const totalPdfs = pdfs.generated.length + pdfs.uploaded.length;
   const selectedCount = selectedPdfs.length;
 
@@ -279,8 +348,16 @@ Looking forward to helping you take the next step in your career!
               {/* Search Box */}
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
                 <input
@@ -406,6 +483,23 @@ Looking forward to helping you take the next step in your career!
               </div>
 
               <div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Template
+                  </label>
+                  <select
+                    value={selectedTemplate}
+                    onChange={handleTemplateChange}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  >
+                    {Object.entries(messageTemplates).map(([key, template]) => (
+                      <option key={key} value={key}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Message
                 </label>
@@ -413,7 +507,9 @@ Looking forward to helping you take the next step in your career!
                   Use {"{{studentName}}"} and {"{{courseName}}"} as placeholders
                   that will be replaced with actual values.
                 </div>
-                <p>You Can edit the mail content in this editer</p>
+                <p className="text-sm text-gray-500 mb-2">
+                  You can edit the email content in the editor below
+                </p>
                 <div className="h-64 mb-4">
                   <ReactQuill
                     theme="snow"
@@ -480,10 +576,10 @@ Looking forward to helping you take the next step in your career!
                 {sending ? "Sending..." : "Send Brochure"}
               </button>
             </div>
-            </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
+    </div>
     // </div>
   );
 };
