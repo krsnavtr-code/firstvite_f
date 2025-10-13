@@ -16,7 +16,7 @@ const SendProposal = () => {
     studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear Student,
 
-Greetings from <span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>!
+Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
 
 We are excited to invite you to participate in our upcoming Career Hiring Camp 2025, a unique platform where you can connect directly with leading companies that are hiring fresh graduates and final-year students.
 
@@ -36,13 +36,13 @@ Click the link below to secure your spot:
 👉 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com/jobfair</span>
 
 📅 Event Details will be sent to your email after registration.
-Organized by: <span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>
+Organized by: <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
 
 Don't miss this golden opportunity to get noticed by hiring companies and start your professional journey.
 We look forward to seeing you at the event!
 
 Warm regards,
-<strong style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</strong>
+<strong style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</strong>
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
@@ -51,7 +51,7 @@ Warm regards,
     collegeMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear [College Name],
 
-Greetings from <span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>!
+Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
 
 We are delighted to inform you that we are organizing a Career Hiring Camp in collaboration with several leading partner companies who are actively recruiting fresh graduates and final-year students.
 
@@ -70,7 +70,7 @@ Our team will get in touch with you for further coordination and provide detaile
 We look forward to having your institution join us in empowering the next generation of professionals.
 
 Warm regards,
-<span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>
+<span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
