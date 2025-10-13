@@ -8,7 +8,6 @@ const SendProposal = () => {
   const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [collegeName, setCollegeName] = useState("");
 
   // Default form values
   const defaultValues = {
@@ -58,7 +57,7 @@ FirstVITE E-Learning Pvt. Ltd.
 🌐 https://firstvite.com
 `,
     collegeMessage: `
-Dear ${collegeName},
+Dear [College Name],
 
 Greetings from FirstVITE E-Learning Pvt. Ltd.!
 
@@ -349,26 +348,6 @@ college3@example.com"
           {errors.emails && (
             <p className="mt-1 text-sm text-red-600">{errors.emails.message}</p>
           )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="collegeName"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            College/Institution Name
-          </label>
-          <input
-            type="text"
-            id="collegeName"
-            value={collegeName}
-            onChange={(e) => setCollegeName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 mb-4"
-            placeholder="Enter college or institution name"
-          />
-          <p className="mt-1 text-xs text-gray-500 mb-4">
-            This will be used to personalize the college message
-          </p>
         </div>
 
         <div>
