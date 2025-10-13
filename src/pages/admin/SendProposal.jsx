@@ -13,29 +13,21 @@ const SendProposal = () => {
   const defaultValues = {
     subject:
       "Invitation to Partner for Our Career Hiring Camp – Empower Students with Real Job Opportunities",
-    studentMessage: `
-Dear Student,
-
+    studentMessage:
+`Dear Student,
 Greetings from FirstVITE E-Learning Pvt. Ltd.!
 
 We are excited to invite you to participate in our upcoming Career Hiring Camp 2025, a unique platform where you can connect directly with leading companies that are hiring fresh graduates and final-year students.
 
 This event is designed to help you kickstart your career journey with opportunities for:
-
 On-the-spot interviews and job offers
-
 Internship and placement opportunities
-
 Skill-building sessions by industry experts
-
 Networking with recruiters from reputed organizations
 
 🎯 Why You Should Join:
-
 100% Free Registration
-
 Certificate of Participation
-
 Real Hiring Exposure
 
 📝 Register Now:
@@ -43,22 +35,18 @@ Click the link below to secure your spot:
 👉 https://firstvite.com/jobfair
 
 📅 Event Details will be send to your email after registration.
-
 Organized by: FirstVITE E-Learning Pvt. Ltd.
-
 Don’t miss this golden opportunity to get noticed by hiring companies and start your professional journey.
-
 We look forward to seeing you at the event!
 
 Warm regards,
-FirstVITE E-Learning Pvt. Ltd.
+<span style={{ fontWeight: "bold", color: "red" }}>FirstVITE E-Learning Pvt. Ltd.</span>
 📞 9990056799
 📧 info@firstvite.com
 🌐 https://firstvite.com
 `,
-    collegeMessage: `
-Dear [College Name],
-
+    collegeMessage:
+`Dear [College Name],
 Greetings from FirstVITE E-Learning Pvt. Ltd.!
 
 We are delighted to inform you that we are organizing a Career Hiring Camp in collaboration with several leading partner companies who are actively recruiting fresh graduates and final-year students.
@@ -66,24 +54,19 @@ We are delighted to inform you that we are organizing a Career Hiring Camp in co
 The objective of this initiative is to bridge the gap between education and employment by connecting talented students directly with hiring partners and offering them career guidance, interview exposure, and skill-building sessions — all under one platform.
 
 Your esteemed institution’s participation in this camp would provide your students with:
-
 Direct interaction with multiple hiring companies
-
 Access to real job and internship opportunities
-
 Free participation (no registration or hidden fees)
-
 Certificates and recognition for participants
 
 To confirm your institution’s participation, please fill out the short form below:
 👉 https://firstvite.com/jobfair
 
 Our team will get in touch with you for further coordination and provide detailed schedules.
-
 We look forward to having your institution join us in empowering the next generation of professionals.
 
 Warm regards,
-FirstVITE E-Learning Pvt. Ltd.
+<span style={{ fontWeight: "bold" }}>FirstVITE E-Learning Pvt. Ltd.</span>
 📞 9990056799
 📧 info@firstvite.com
 🌐 https://firstvite.com
@@ -433,7 +416,10 @@ college3@example.com"
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <span className="block text-sm font-medium text-gray-700">
-                    Message for College/University
+                    Message for College/University{" "}
+                    <span className="text-red-600">
+                      (Remember change the [College Name] before sending)
+                    </span>
                   </span>
                 </div>
                 <div className="mt-2">
