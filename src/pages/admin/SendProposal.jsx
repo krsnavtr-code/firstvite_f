@@ -8,45 +8,87 @@ const SendProposal = () => {
   const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [collegeName, setCollegeName] = useState("");
 
   // Default form values
   const defaultValues = {
-    subject: "Partnership Opportunity - FirstVITE x [College Name]",
-    studentMessage: `Dear [Student's Name],
+    subject:
+      "Invitation to Partner for Our Career Hiring Camp – Empower Students with Real Job Opportunities",
+    studentMessage: `
+Dear Student,
 
-We are excited to inform you about an exclusive learning opportunity with FirstVITE E-Learning Platform. As part of our partnership with your institution, we are offering you access to our premium courses and certification programs.
+Greetings from FirstVITE E-Learning Pvt. Ltd.!
 
-Benefits for You:
-- Access to industry-relevant courses
-- Learn at your own pace
-- Get certified in high-demand skills
-- Career guidance and placement support
+We are excited to invite you to participate in our upcoming Career Hiring Camp 2025, a unique platform where you can connect directly with leading companies that are hiring fresh graduates and final-year students.
 
-We encourage you to take advantage of this opportunity to enhance your skills and boost your career prospects.
+This event is designed to help you kickstart your career journey with opportunities for:
 
-Best regards,
-[Your Name]
-FirstVITE E-Learning Team`,
-    collegeMessage: `Dear [College Name] Team,
+On-the-spot interviews and job offers
 
-I hope this message finds you well. I am reaching out on behalf of FirstVITE E-Learning to explore potential collaboration opportunities between our organizations.
+Internship and placement opportunities
 
-FirstVITE is a leading e-learning platform dedicated to providing high-quality technical education and skill development programs. We are currently seeking partnerships with esteemed educational institutions like yours to help bridge the gap between academia and industry requirements.
+Skill-building sessions by industry experts
 
-Key Benefits of Partnership:
-- Access to our comprehensive e-learning platform
-- Industry-relevant curriculum designed by experts
-- Certification programs aligned with current market demands
-- Placement assistance for students
-- Faculty development programs
+Networking with recruiters from reputed organizations
 
-We would be delighted to discuss how we can work together to enhance the learning experience for your students. Please let us know a convenient time for a meeting or call to explore this opportunity further.
+🎯 Why You Should Join:
 
-Looking forward to your positive response.
+100% Free Registration
 
-Best regards,
-[Your Name]
-FirstVITE E-Learning Team`,
+Certificate of Participation
+
+Real Hiring Exposure
+
+📝 Register Now:
+Click the link below to secure your spot:
+👉 https://firstvite.com/jobfair
+
+📅 Event Details will be send to your email after registration.
+
+Organized by: FirstVITE E-Learning Pvt. Ltd.
+
+Don’t miss this golden opportunity to get noticed by hiring companies and start your professional journey.
+
+We look forward to seeing you at the event!
+
+Warm regards,
+FirstVITE E-Learning Pvt. Ltd.
+📞 9990056799
+📧 info@firstvite.com
+🌐 https://firstvite.com
+`,
+    collegeMessage: `
+Dear ${collegeName},
+
+Greetings from FirstVITE E-Learning Pvt. Ltd.!
+
+We are delighted to inform you that we are organizing a Career Hiring Camp in collaboration with several leading partner companies who are actively recruiting fresh graduates and final-year students.
+
+The objective of this initiative is to bridge the gap between education and employment by connecting talented students directly with hiring partners and offering them career guidance, interview exposure, and skill-building sessions — all under one platform.
+
+Your esteemed institution’s participation in this camp would provide your students with:
+
+Direct interaction with multiple hiring companies
+
+Access to real job and internship opportunities
+
+Free participation (no registration or hidden fees)
+
+Certificates and recognition for participants
+
+To confirm your institution’s participation, please fill out the short form below:
+👉 https://firstvite.com/jobfair
+
+Our team will get in touch with you for further coordination and provide detailed schedules.
+
+We look forward to having your institution join us in empowering the next generation of professionals.
+
+Warm regards,
+FirstVITE E-Learning Pvt. Ltd.
+📞 9990056799
+📧 info@firstvite.com
+🌐 https://firstvite.com
+`,
   };
 
   const {
@@ -95,26 +137,37 @@ FirstVITE E-Learning Team`,
       console.log("Selected message type:", selectedMessageType);
       console.log("Using message:", emailData.message.substring(0, 50) + "...");
 
-      // Add the stringified data to formData
-      formData.append("data", JSON.stringify(emailData));
-
-      // Add files if any
+      // Add files first (this is important for some servers)
       if (files && files.length > 0) {
         console.log("Adding files to form data:", files);
-        for (let i = 0; i < files.length; i++) {
-          formData.append("attachments", files[i]);
-          console.log(`Added file ${i + 1}: ${files[i].name} (${(files[i].size / (1024 * 1024)).toFixed(2)}MB)`);
-        }
+        files.forEach((file, index) => {
+          formData.append("attachments", file);
+          console.log(
+            `Added file ${index + 1}: ${file.name} (${(
+              file.size /
+              (1024 * 1024)
+            ).toFixed(2)}MB)`
+          );
+        });
       } else {
         console.log("No files to attach");
       }
 
+      // Add the stringified data to formData as the last item
+      formData.append("data", JSON.stringify(emailData));
+
       // Log form data for debugging (without logging file content)
+      console.log("FormData entries:");
       for (let pair of formData.entries()) {
-        if (pair[0] === 'attachments') {
-          console.log(`${pair[0]}: ${pair[1].name} (${(pair[1].size / (1024 * 1024)).toFixed(2)}MB)`);
+        if (pair[0] === "attachments") {
+          console.log(
+            `${pair[0]}: ${pair[1].name} (${(
+              pair[1].size /
+              (1024 * 1024)
+            ).toFixed(2)}MB)`
+          );
         } else {
-          console.log(pair[0] + ':', pair[1]);
+          console.log(pair[0] + ":", pair[1]);
         }
       }
 
@@ -125,29 +178,32 @@ FirstVITE E-Learning Team`,
       }
 
       // Show loading toast
-      const toastId = toast.loading('Sending emails with attachments...');
+      const toastId = toast.loading("Sending emails with attachments...");
 
       try {
-        const response = await axios.post(
-          `${
+        const response = await axios({
+          method: "post",
+          url: `${
             import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api"
           }/v1/admin/emails/send-proposal`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-            timeout: 120000, // Increased to 2 minutes
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              toast.loading(`Uploading files: ${percentCompleted}%`, { id: toastId });
-            },
-          }
-        );
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+          timeout: 120000, // 2 minutes
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            toast.loading(`Uploading files: ${percentCompleted}%`, {
+              id: toastId,
+            });
+          },
+        });
 
         // Update toast to success
-        toast.success('Emails sent successfully!', { id: toastId });
+        toast.success("Emails sent successfully!", { id: toastId });
 
         if (response.data && response.data.status === "success") {
           const messageType = watch("messageType");
@@ -213,28 +269,55 @@ FirstVITE E-Learning Team`,
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+      const ALLOWED_TYPES = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/plain",
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+      ];
+
       const validFiles = [];
       const invalidFiles = [];
+      const invalidTypeFiles = [];
 
-      Array.from(e.target.files).forEach(file => {
+      Array.from(e.target.files).forEach((file) => {
         if (file.size > MAX_FILE_SIZE) {
-          invalidFiles.push(`${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`);
+          invalidFiles.push(
+            `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`
+          );
+        } else if (!ALLOWED_TYPES.includes(file.type)) {
+          invalidTypeFiles.push(
+            `${file.name} (${file.type || "unknown type"})`
+          );
         } else {
           validFiles.push(file);
         }
       });
 
       if (invalidFiles.length > 0) {
-        toast.error(`The following files exceed 10MB: ${invalidFiles.join(', ')}`);
+        toast.error(
+          `The following files exceed 10MB: ${invalidFiles.join(", ")}`
+        );
+      }
+
+      if (invalidTypeFiles.length > 0) {
+        toast.error(`Unsupported file types: ${invalidTypeFiles.join(", ")}`);
       }
 
       if (validFiles.length > 0) {
         console.log("Valid files selected:", validFiles);
-        setFiles(validFiles);
-      } else {
-        setFiles([]);
+        setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       }
     }
+  };
+
+  const removeFile = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   return (
@@ -266,6 +349,26 @@ college3@example.com"
           {errors.emails && (
             <p className="mt-1 text-sm text-red-600">{errors.emails.message}</p>
           )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="collegeName"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            College/Institution Name
+          </label>
+          <input
+            type="text"
+            id="collegeName"
+            value={collegeName}
+            onChange={(e) => setCollegeName(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 mb-4"
+            placeholder="Enter college or institution name"
+          />
+          <p className="mt-1 text-xs text-gray-500 mb-4">
+            This will be used to personalize the college message
+          </p>
         </div>
 
         <div>
@@ -384,20 +487,87 @@ college3@example.com"
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Attachments (Optional)
           </label>
-          <input
-            type="file"
-            multiple
-            onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:text-sm file:font-semibold
-              file:bg-indigo-50 file:text-indigo-700
-              hover:file:bg-indigo-100"
-          />
-          <p className="mt-1 text-xs text-gray-500">
-            You can attach multiple files (e.g., PDFs, Word documents)
-          </p>
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+            <div className="space-y-1 text-center">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <div className="flex text-sm text-gray-600">
+                <label
+                  htmlFor="file-upload"
+                  className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                >
+                  <span>Upload files</span>
+                  <input
+                    id="file-upload"
+                    name="file-upload"
+                    type="file"
+                    className="sr-only"
+                    multiple
+                    onChange={handleFileChange}
+                  />
+                </label>
+                <p className="pl-1">or drag and drop</p>
+              </div>
+              <p className="text-xs text-gray-500">
+                PDF, DOC, DOCX, XLS, XLSX, TXT, JPG, PNG, GIF up to 10MB
+              </p>
+            </div>
+          </div>
+
+          {files.length > 0 && (
+            <div className="mt-2">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                Selected files:
+              </h4>
+              <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+                {files.map((file, index) => (
+                  <li
+                    key={index}
+                    className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+                  >
+                    <div className="w-0 flex-1 flex items-center">
+                      <svg
+                        className="flex-shrink-0 h-5 w-5 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="ml-2 flex-1 w-0 truncate">
+                        {file.name}
+                      </span>
+                    </div>
+                    <div className="ml-4 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => removeFile(index)}
+                        className="font-medium text-red-600 hover:text-red-500"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end">
