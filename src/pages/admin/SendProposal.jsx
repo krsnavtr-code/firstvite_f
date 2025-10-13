@@ -13,8 +13,7 @@ const SendProposal = () => {
   const defaultValues = {
     subject:
       "Invitation to Partner for Our Career Hiring Camp – Empower Students with Real Job Opportunities",
-    studentMessage:
-`<div style="color: #007BFF; font-size: 18px;">
+    studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear Student,
 
 Greetings from <span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>!
@@ -34,7 +33,7 @@ This event is designed to help you kickstart your career journey with opportunit
 
 📝 <span style="font-weight: 600;">Register Now:</span>
 Click the link below to secure your spot:
-👉 https://firstvite.com/jobfair
+👉 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com/jobfair</span>
 
 📅 Event Details will be sent to your email after registration.
 Organized by: <span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>
@@ -44,13 +43,12 @@ We look forward to seeing you at the event!
 
 Warm regards,
 <strong style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</strong>
-📞 9990056799 
-📧 info@firstvite.com
-🌐 https://firstvite.com
+📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
 </div>
 `,
-    collegeMessage:
-`<div style="color: #007BFF; font-size: 18px;">
+    collegeMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear [College Name],
 
 Greetings from <span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>!
@@ -66,16 +64,16 @@ Free participation (no registration or hidden fees)
 Certificates and recognition for participants
 
 To participation provide this to your students, please fill out the short form below:
-👉 https://firstvite.com/jobfair
+👉 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com/jobfair</span>
 
 Our team will get in touch with you for further coordination and provide detailed schedules.
 We look forward to having your institution join us in empowering the next generation of professionals.
 
 Warm regards,
 <span style="font-weight: 600;">FirstVITE E-Learning Pvt. Ltd.</span>
-📞 9990056799 
-📧 info@firstvite.com
-🌐 https://firstvite.com
+📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
 </div>
 `,
   };
