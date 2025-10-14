@@ -47,6 +47,7 @@ import PaymentsList from "./pages/admin/PaymentsList";
 import PaymentDetails from "./pages/admin/PaymentDetails";
 import SendBrochure from "./pages/admin/SendBrochure";
 import SendProposal from "./pages/admin/SendProposal";
+import EmailRecords from "./pages/admin/EmailRecords";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
 import CareerManagement from "./pages/admin/career/CareerManagement";
@@ -465,6 +466,7 @@ function App() {
             {/* Career Management */}
 
             {/* Email Routes */}
+            <Route path="/admin/email-records" element={<EmailRecords />} />
             <Route path="/admin/send-brochure" element={<SendBrochure />} />
             <Route path="/admin/send-proposal" element={<SendProposal />} />
 

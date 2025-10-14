@@ -1,5 +1,23 @@
 import axios from './axios';
 
+// Email Records
+
+export const getEmailRecords = async (filters = {}) => {
+  try {
+    const response = await axios.get('/emails', { 
+      params: { 
+        ...filters,
+        page: filters.page || 1,
+        limit: filters.limit || 10
+      } 
+    });
+    return response.data; // The backend returns { data: { records, total, ... } }
+  } catch (error) {
+    console.error('Error fetching email records:', error);
+    throw error;
+  }
+};
+
 // Get all pending enrollments
 export const getPendingEnrollments = async () => {
   try {
@@ -26,11 +44,11 @@ export const updateEnrollmentStatus = async (enrollmentId, status) => {
 // Get all enrollments with complete user details (Admin only)
 export const getAllEnrollments = async (filters = {}) => {
   try {
-    const response = await axios.get('/enrollments/all', { 
-      params: { 
+    const response = await axios.get('/enrollments/all', {
+      params: {
         ...filters,
-        language: localStorage.getItem('i18nextLng') || 'en' 
-      } 
+        language: localStorage.getItem('i18nextLng') || 'en'
+      }
     });
     return response.data;
   } catch (error) {
@@ -42,11 +60,11 @@ export const getAllEnrollments = async (filters = {}) => {
 // Get enrollments with filters (for admin dashboard)
 export const getEnrollments = async (filters = {}) => {
   try {
-    const response = await axios.get('/enrollments', { 
-      params: { 
+    const response = await axios.get('/enrollments', {
+      params: {
         ...filters,
-        language: localStorage.getItem('i18nextLng') || 'en' 
-      } 
+        language: localStorage.getItem('i18nextLng') || 'en'
+      }
     });
     return response.data;
   } catch (error) {

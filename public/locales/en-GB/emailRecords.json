@@ -1,0 +1,15 @@
+{
+  "title": "Email Records",
+  "recipient": "Recipient",
+  "subject": "Subject",
+  "status": "Status",
+  "sentAt": "Sent At",
+  "emailDetails": "Email Details",
+  "noRecords": "No email records found",
+  "loading": "Loading email records...",
+  "errorLoading": "Error loading email records",
+  "close": "Close",
+  "resend": "Resend",
+  "attachments": "Attachments",
+  "message": "Message"
+}

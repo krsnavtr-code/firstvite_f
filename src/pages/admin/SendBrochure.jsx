@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { Link } from "react-router-dom";
 import api from "../../api/axios";
 import {
   FiSend,
@@ -194,7 +195,7 @@ const SendBrochure = () => {
 
       toast.error(
         error.response?.data?.message ||
-          "Failed to send brochure. Please try again."
+          "Failed to send mail. Please try again."
       );
     } finally {
       setSending(false);
@@ -549,15 +550,22 @@ const SendBrochure = () => {
               <div>
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center">
                   <FiSend className="mr-2 text-indigo-600" />
-                  Send Brochure
+                  Send Mail To (Student, Colleges, University, etc)
                 </h1>
                 <p className="mt-1 text-sm text-gray-500">
                   Select a brochure and send it via email to potential students
                   or clients.
                 </p>
               </div>
-              <div className="mt-2 sm:mt-0 text-sm text-gray-500">
-                {totalPdfs} brochures available
+              <div>
+                <div className="mt-2 sm:mt-0 text-sm text-gray-500">
+                  {totalPdfs} brochures available
+                </div>
+                <div className="mt-2 sm:mt-0 text-sm text-gray-500">
+                  <Link to="/admin/email-records" className="flex items-center bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 transition-colors text-white">
+                    <FiSend className="mr-2" /> Sended To
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
