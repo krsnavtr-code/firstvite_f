@@ -159,9 +159,9 @@ const SendBrochure = () => {
       setEmail("");
       setStudentName("");
       setCourseName("");
-      setSubject("Course Brochure");
-      setMessage("Please find attached the course brochure you requested.");
-      setSelectedTemplate("courseEnquiry");
+      setSubject("");
+      setMessage("");
+      setSelectedTemplate("custom");
     } catch (error) {
       console.error("Error sending brochure:", error);
       // Try to save failed attempt to database
@@ -204,142 +204,267 @@ const SendBrochure = () => {
   // Message templates for different scenarios
   const messageTemplates = useMemo(
     () => ({
+      custom: {
+        name: "Custom",
+        subject: `Write Custom Email or Select The Email Template For send`,
+        content: `
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  Write Custom Email or Select The Email Template For send
+</div>
+      `,
+      },
       courseEnquiry: {
         name: "Course Enquiry",
         subject: `About {{courseName}} - <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
         content: `
-<p>Dear {{studentName}},</p>
-<p>Greetings from <strong><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning!</strong></p>
-<p>
-Are you looking to build a strong career in the domain of <strong>{{courseName}}</strong>?  
-We are excited to introduce our <strong>{{courseName}}</strong> online training program,  
-designed for both beginners and professionals.
-</p>
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
 
-<h3>🌟 Course Highlights – {{courseName}}</h3>
-<ul>
-  <li>✅ 100% Online | Live + Recorded Classes</li>
-  <li>✅ Taught by Certified Professionals</li>
-  <li>✅ Real-time Case Studies & Projects</li>
-  <li>✅ Access to Server for Practical Training</li>
-  <li>✅ Resume Building + Interview Preparation</li>
-  <li>✅ Certificate from FirstVITE upon Completion</li>
-</ul>
+  <p style="margin: 0 0 8px 0;">
+    Greetings from 
+    <strong>
+      <span style="color: rgb(244, 124, 38);">First</span>
+      <span style="color: rgb(30, 144, 255);">VITE</span> E-Learning!
+    </strong>
+  </p>
 
-<h3>📅 Course Duration & Timings: 3 to 4 Months, Weekdays/Weekends Available</h3>
-<p>Special discounts available for early enrollment!</p>
-<p>Looking forward to helping you take the next step in your career!</p>
+  <p style="margin: 0 0 8px 0;">
+    Are you looking to build a strong career in the domain of 
+    <strong>{{courseName}}</strong>?  
+    We are excited to introduce our <strong>{{courseName}}</strong> online training program,  
+    designed for both beginners and professionals.
+  </p>
 
-<p>Warm regards,</p>
-<p>Team – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
-<p>📩 info@firstvite.com</p>
-<p>🌐 https://firstvite.com</p>
+  <h3 style="margin: 12px 0 6px 0; color: #222; font-size: 16px;">
+    🌟 Course Highlights – {{courseName}}
+  </h3>
+  <ul style="margin: 0 0 12px 18px; padding: 0;">
+    <li style="margin-bottom: 4px;">✅ 100% Online | Live + Recorded Classes</li>
+    <li style="margin-bottom: 4px;">✅ Taught by Certified Professionals</li>
+    <li style="margin-bottom: 4px;">✅ Real-time Case Studies & Projects</li>
+    <li style="margin-bottom: 4px;">✅ Access to Server for Practical Training</li>
+    <li style="margin-bottom: 4px;">✅ Resume Building + Interview Preparation</li>
+    <li style="margin-bottom: 4px;">✅ Certificate from FirstVITE upon Completion</li>
+  </ul>
+
+  <h3 style="margin: 12px 0 6px 0; color: #222; font-size: 16px;">
+    📅 Course Duration & Timings: 3 to 4 Months | Weekdays / Weekends Available
+  </h3>
+
+  <p style="margin: 0 0 8px 0;">💰 Special discounts available for early enrollment!</p>
+
+  <p style="margin: 0 0 8px 0;">Looking forward to helping you take the next step in your career!</p>
+
+  <p style="margin: 0 0 4px 0;">Warm regards,</p>
+  <p style="margin: 0 0 4px 0;">
+    Team – 
+    <span style="color: rgb(244, 124, 38);">First</span>
+    <span style="color: rgb(30, 144, 255);">VITE</span> E-Learning Pvt. Ltd.
+  </p>
+  <p style="margin: 0 0 4px 0;">📩 info@firstvite.com</p>
+  <p style="margin: 0;">
+    🌐 
+    <a href="https://firstvite.com" style="color: rgb(30, 144, 255); text-decoration: none;">
+      www.firstvite.com
+    </a>
+  </p>
+</div>
       `,
       },
       webinarInvite: {
         name: "Learning Approach Invitation",
         subject: `Take the Next Step in Your Career with <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
         content: `
-<p>Dear {{studentName}},</p>
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
 
-<p>Greetings from <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.!</p>
+  <p style="margin: 0 0 8px 0;">
+    Greetings from 
+    <span style="color: rgb(244, 124, 38);">First</span>
+    <span style="color: rgb(30, 144, 255);">VITE</span> E-Learning Pvt. Ltd.!
+  </p>
 
-<p>We’re excited to invite you to enroll in one of our professional certification programs designed to help you enhance your skills and career growth.</p>
+  <p style="margin: 0 0 8px 0;">
+    We’re excited to invite you to enroll in one of our professional certification programs designed to help you enhance your skills and career growth.
+  </p>
 
-<p>At FirstVITE, we offer a wide range of in-demand programs such as Java, Python, AI & Machine Learning, Cyber Security, Digital Marketing, SAP, Power BI, Cloud Computing (Azure), Salesforce, and more.</p>
+  <p style="margin: 0 0 8px 0;">
+    At 
+    <span style="color: rgb(244, 124, 38);">First</span>
+    <span style="color: rgb(30, 144, 255);">VITE</span>, we offer a wide range of in-demand programs such as 
+    <strong>Java</strong>, <strong>Python</strong>, <strong>AI & Machine Learning</strong>, 
+    <strong>Cyber Security</strong>, <strong>Digital Marketing</strong>, <strong>SAP</strong>, 
+    <strong>Power BI</strong>, <strong>Cloud Computing (Azure)</strong>, <strong>Salesforce</strong>, and more.
+  </p>
 
-<p>Each program is structured to provide hands-on learning with real-world applications—helping you gain the expertise needed to stand out in today’s competitive job market.</p>
+  <p style="margin: 0 0 8px 0;">
+    Each program is structured to provide hands-on learning with real-world applications — helping you gain the expertise needed to stand out in today’s competitive job market.
+  </p>
 
-<p>If you’re looking to upgrade your skills or switch to a high-growth career path, this is the perfect time to get started!</p>
+  <p style="margin: 0 0 8px 0;">
+    If you’re looking to upgrade your skills or switch to a high-growth career path, this is the perfect time to get started!
+  </p>
 
-<p>Please feel free to reply to this email or contact us directly for more details about the courses, duration, and fee structure.</p>
+  <p style="margin: 0 0 8px 0;">
+    Please feel free to reply to this email or contact us directly for more details about the courses, duration, and fee structure.
+  </p>
 
-<p>Looking forward to helping you begin your learning journey with us.</p>
+  <p style="margin: 0 0 8px 0;">
+    Looking forward to helping you begin your learning journey with us.
+  </p>
 
-<p>Warm regards,</p>
-<p>Team – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
-<p>📩 info@firstvite.com</p>
-<p>🌐 https://firstvite.com</p>
+  <p style="margin: 0 0 4px 0;">Warm regards,</p>
+  <p style="margin: 0 0 4px 0;">
+    Team – 
+    <span style="color: rgb(244, 124, 38);">First</span>
+    <span style="color: rgb(30, 144, 255);">VITE</span> E-Learning Pvt. Ltd.
+  </p>
+  <p style="margin: 0 0 4px 0;">📩 info@firstvite.com</p>
+  <p style="margin: 0;">
+    🌐 
+    <a href="https://firstvite.com" style="color: rgb(30, 144, 255); text-decoration: none;">
+      www.firstvite.com
+    </a>
+  </p>
+</div>
 `,
       },
       videoSender: {
         name: "Video Sender",
         subject: `Take the Next Step in Your Career with <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
         content: `
-<p>Dear {{studentName}},</p>
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
 
-<p>Greetings from <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.!</p>
+  <p style="margin: 0 0 8px 0;">
+    Greetings from 
+    <span style="color: rgb(244, 124, 38)">First</span>
+    <span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.!
+  </p>
 
-<p>We’re excited to invite you to enroll in one of our professional certification programs designed to help you enhance your skills and career growth.</p>
+  <p style="margin: 0 0 8px 0;">
+    We’re excited to invite you to enroll in one of our professional certification programs designed to help you enhance your skills and career growth.
+  </p>
 
-<p>At <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span>, we offer a wide range of in-demand programs such as Java, Python, AI & Machine Learning, Cyber Security, Digital Marketing, SAP, Power BI, Cloud Computing (Azure), Salesforce, and more.</p>
+  <p style="margin: 0 0 8px 0;">
+    At 
+    <span style="color: rgb(244, 124, 38)">First</span>
+    <span style="color: rgb(30, 144, 255)">VITE</span>, we offer a wide range of in-demand programs such as 
+    <strong>Java</strong>, <strong>Python</strong>, <strong>AI & Machine Learning</strong>, 
+    <strong>Cyber Security</strong>, <strong>Digital Marketing</strong>, <strong>SAP</strong>, 
+    <strong>Power BI</strong>, <strong>Cloud Computing (Azure)</strong>, <strong>Salesforce</strong>, and more.
+  </p>
 
-<p>Each program is structured to provide hands-on learning with real-world applications—helping you gain the expertise needed to stand out in today’s competitive job market.</p>
+  <p style="margin: 0 0 8px 0;">
+    Each program is structured to provide hands-on learning with real-world applications — helping you gain the expertise needed to stand out in today’s competitive job market.
+  </p>
 
-<p>If you’re looking to upgrade your skills or switch to a high-growth career path, this is the perfect time to get started!</p>
+  <p style="margin: 0 0 8px 0;">
+    If you’re looking to upgrade your skills or switch to a high-growth career path, this is the perfect time to get started!
+  </p>
 
-<p>Please feel free to reply to this email or contact us directly for more details about the courses, duration, and fee structure.</p>
+  <p style="margin: 0 0 8px 0;">
+    Please feel free to reply to this email or contact us directly for more details about the courses, duration, and fee structure.
+  </p>
 
-<p>Looking forward to helping you begin your learning journey with us.</p>
+  <p style="margin: 0 0 8px 0;">
+    Looking forward to helping you begin your learning journey with us.
+  </p>
 
-<p>Warm regards,</p>
-<p>Team – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
-<p>📩 info@firstvite.com</p>
-<p>🌐 https://firstvite.com</p>
+  <p style="margin: 0 0 4px 0;">Warm regards,</p>
+  <p style="margin: 0 0 4px 0;">
+    Team – 
+    <span style="color: rgb(244, 124, 38)">First</span>
+    <span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.
+  </p>
+  <p style="margin: 0 0 4px 0;">📩 info@firstvite.com</p>
+  <p style="margin: 0;">🌐 <a href="https://firstvite.com" style="color: rgb(30, 144, 255); text-decoration: none;">www.firstvite.com</a></p>
+</div>
 `,
       },
       allCoursesProposal: {
         name: "All Courses Proposal",
         subject: `Proposal for Student Skill Development & Certification Programs – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd`,
-        content: `<p>
-Dear {{studentName}},</p>
+        content: `
+<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+  <p style="margin: 0 0 8px 0;">
+    Dear {{studentName}},
+  </p>
 
-<p>Warm greetings from <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
+  <p style="margin: 0 0 8px 0;">
+    Warm greetings from 
+    <span style="color: rgb(244, 124, 38)">First</span>
+    <span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.
+  </p>
 
-<p>We are pleased to introduce <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd., a leading online learning platform focused on delivering high-quality certification programs designed to enhance students’ employability and industry readiness.</p>
+  <p style="margin: 0 0 8px 0;">
+    We are pleased to introduce 
+    <span style="color: rgb(244, 124, 38)">First</span>
+    <span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd., a leading online learning platform focused on delivering high-quality certification programs designed to enhance students’ employability and industry readiness.
+  </p>
 
-<p>We would like to propose a collaboration (tie-up) with Royal Educational Institute, Ghaziabad, to offer a range of industry-relevant certification programs for your students. These programs are structured and delivered by our expert trainers who possess extensive experience in their respective domains.</p>
+  <p style="margin: 0 0 8px 0;">
+    We would like to propose a collaboration (tie-up) with <strong>{{courseName}}</strong>, to offer a range of industry-relevant certification programs for your students. These programs are structured and delivered by our expert trainers who possess extensive experience in their respective domains.
+  </p>
 
-<p><strong>Courses We Offer</strong></p>
-<p>We have a variety of professional and technical certification programs, including:</p>
-<p><strong>Java Programming</strong></p>
-<p><strong>Python Programming</strong></p>
-<p><strong>SAP (Enterprise Management System)</strong></p>
-<p><strong>Artificial Intelligence & Machine Learning</strong></p>
-<p><strong>Cyber Security</strong></p>
-<p><strong>Database Management</strong></p>
-<p><strong>Digital Marketing</strong></p>
-<p><strong>Game Development</strong></p>
-<p><strong>Microsoft Azure (Cloud Computing)</strong></p>
-<p><strong>Salesforce (CRM Platform)</strong></p>
-<p><strong>Android App Development</strong></p>
-<p><strong>Power BI (Business Analytics)</strong></p>
+  <p style="margin: 8px 0;"><strong>Courses We Offer</strong></p>
 
-<p>Additionally, we also provide free value-added short courses to help students strengthen their profiles and gain an edge in their career journey.</p>
+  <ul style="margin: 0 0 8px 20px; padding: 0;">
+    <li>Java Programming</li>
+    <li>Python Programming</li>
+    <li>SAP (Enterprise Management System)</li>
+    <li>Artificial Intelligence & Machine Learning</li>
+    <li>Cyber Security</li>
+    <li>Database Management</li>
+    <li>Digital Marketing</li>
+    <li>Game Development</li>
+    <li>Microsoft Azure (Cloud Computing)</li>
+    <li>Salesforce (CRM Platform)</li>
+    <li>Android App Development</li>
+    <li>Power BI (Business Analytics)</li>
+  </ul>
 
-<p><strong>Key Highlights of Our Programs</strong></p>
-<p>100% Online Learning (Live + Recorded Classes)</p>
-<p>Delivered by Industry Experts from FirstVite</p>
-<p>Practical, Project-Based Learning</p>
-<p>Certification from FirstVite E-Learning Pvt. Ltd.</p>
-<p>Placement Guidance and Career Support</p>
-<p>Internship Assistance (where applicable)</p>
+  <p style="margin: 0 0 8px 0;">
+    Additionally, we also provide free value-added short courses to help students strengthen their profiles and gain an edge in their career journey.
+  </p>
 
-<p><strong>Proposal for Tie-Up</strong></p>
-<p>We are looking forward to forming a strategic academic partnership with your institution. Through this collaboration, Royal Educational Institute students will gain access to our certified programs at special institutional pricing and benefit from joint skill enhancement initiatives like webinars, workshops, and hackathons.</p>
+  <p style="margin: 8px 0;"><strong>Key Highlights of Our Programs</strong></p>
 
-<p>We truly believe this partnership will help bridge the gap between academic learning and industry expectations, empowering your students with the skills needed to succeed in today’s competitive job market.</p>
+  <ul style="margin: 0 0 8px 20px; padding: 0;">
+    <li>100% Online Learning (Live + Recorded Classes)</li>
+    <li>Delivered by Industry Experts from FirstVite</li>
+    <li>Practical, Project-Based Learning</li>
+    <li>Certification from FirstVite E-Learning Pvt. Ltd.</li>
+    <li>Placement Guidance and Career Support</li>
+    <li>Internship Assistance (where applicable)</li>
+  </ul>
 
-<p>If this proposal aligns with your vision, we would be happy to schedule a meeting or presentation to discuss the details further.</p>
+  <p style="margin: 8px 0;"><strong>Proposal for Tie-Up</strong></p>
 
-<p>Looking forward to your positive response and a fruitful collaboration.</p>
+  <p style="margin: 0 0 8px 0;">
+    We are looking forward to forming a strategic academic partnership with your institution. Through this collaboration, Royal Educational Institute students will gain access to our certified programs at special institutional pricing and benefit from joint skill enhancement initiatives like webinars, workshops, and hackathons.
+  </p>
 
-<p>Warm regards,</p>
-<p>Team <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span></p>
-<p><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
-<p>📧 info@firstvite.com</p>
-<p>📞 +91-9990056799</p>
-<p>🌐 www.firstvite.com</p>
+  <p style="margin: 0 0 8px 0;">
+    We truly believe this partnership will help bridge the gap between academic learning and industry expectations, empowering your students with the skills needed to succeed in today’s competitive job market.
+  </p>
+
+  <p style="margin: 0 0 8px 0;">
+    If this proposal aligns with your vision, we would be happy to schedule a meeting or presentation to discuss the details further.
+  </p>
+
+  <p style="margin: 0 0 8px 0;">Looking forward to your positive response and a fruitful collaboration.</p>
+
+  <p style="margin: 0 0 4px 0;">Warm regards,</p>
+  <p style="margin: 0 0 4px 0;">
+    Team <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span>
+  </p>
+  <p style="margin: 0 0 4px 0;">
+    <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.
+  </p>
+  <p style="margin: 0 0 4px 0;">📧 info@firstvite.com</p>
+  <p style="margin: 0;">📞 +91-9990056799 | 🌐 www.firstvite.com</p>
+</div>
 `,
       },
       custom: {
@@ -351,7 +476,7 @@ Dear {{studentName}},</p>
     []
   );
 
-  const [selectedTemplate, setSelectedTemplate] = useState("courseEnquiry");
+  const [selectedTemplate, setSelectedTemplate] = useState("custom");
 
   // Update message when template or variables change
   useEffect(() => {
@@ -590,7 +715,7 @@ Dear {{studentName}},</p>
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                       value={studentName}
                       onChange={(e) => setStudentName(e.target.value)}
-                      placeholder="Enter student's name"
+                      placeholder="Pradeep Mishra / Manipal Placement Cell"
                       required={activeTab === "uploaded"}
                     />
                   </div>
@@ -604,7 +729,8 @@ Dear {{studentName}},</p>
                     className="block text-sm font-medium text-gray-700 flex items-center"
                   >
                     <FiBook className="mr-2" />
-                    Course Name
+                    Recipient (College / University / Organizations /
+                    Consultancy / Course) Name
                   </label>
                   <input
                     type="text"
@@ -612,7 +738,7 @@ Dear {{studentName}},</p>
                     className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                     value={courseName}
                     onChange={(e) => setCourseName(e.target.value)}
-                    placeholder="e.g., SAP SD (Sales & Distribution)"
+                    placeholder="e.g., Manipal University / Manipal College"
                   />
                 </div>
               )}
@@ -687,19 +813,48 @@ Dear {{studentName}},</p>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">
                     Email Preview:
                   </h4>
+
                   <div className="border-t border-gray-200 pt-3">
-                    <div className="prose max-w-none text-sm text-green-600">
+                    <div
+                      className="max-w-none text-sm bg-gray-50 p-4 rounded-md border border-gray-100 shadow-sm"
+                      style={{
+                        fontFamily: "Arial, sans-serif",
+                        lineHeight: "1.6",
+                        color: "#333",
+                        fontSize: "14px",
+                      }}
+                    >
                       {message ? (
                         <div
-                          className="whitespace-pre-wrap"
+                          className="email-preview"
                           style={{
-                            fontFamily: "sans-serif",
-                            lineHeight: "1.5",
-                            whiteSpace: "pre-wrap",
-                            wordWrap: "break-word",
+                            backgroundColor: "#fff",
+                            padding: "16px",
+                            borderRadius: "6px",
+                            boxShadow: "0 0 6px rgba(0,0,0,0.05)",
                           }}
                           dangerouslySetInnerHTML={{
-                            __html: message.replace(/\n/g, "<br>"),
+                            __html: message
+                              .replace(/\n/g, "<br>")
+                              // Make sure paragraph spacing looks natural
+                              .replace(
+                                /<p>/g,
+                                '<p style="margin: 0 0 8px 0; line-height: 1.6; font-size: 14px;">'
+                              )
+                              // Make lists look clean
+                              .replace(
+                                /<ul>/g,
+                                '<ul style="margin: 8px 0 8px 20px; padding: 0; font-size: 14px;">'
+                              )
+                              .replace(
+                                /<li>/g,
+                                '<li style="margin-bottom: 4px; line-height: 1.5;">'
+                              )
+                              // Adjust heading styling for better hierarchy
+                              .replace(
+                                /<h3>/g,
+                                '<h3 style="font-size:16px; margin:12px 0 6px 0; color:#222;">'
+                              ),
                           }}
                         />
                       ) : (
