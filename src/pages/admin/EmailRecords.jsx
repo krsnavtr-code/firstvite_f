@@ -2,7 +2,16 @@ import React, { useState, useEffect } from "react";
 import { getEmailRecords } from "../../api/adminApi";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { FiX, FiPaperclip, FiUser, FiMail, FiCalendar, FiFileText, FiAlertCircle } from "react-icons/fi";
+import {
+  FiX,
+  FiPaperclip,
+  FiUser,
+  FiMail,
+  FiCalendar,
+  FiFileText,
+  FiAlertCircle,
+  FiFilter,
+} from "react-icons/fi";
 
 const EmailRecords = () => {
   const [records, setRecords] = useState([]);
@@ -33,8 +42,7 @@ const EmailRecords = () => {
         limit: rowsPerPage,
         ...(searchTerm && { to: searchTerm }), // Add search filter if searchTerm exists
       });
-      
-      
+
       // Update to match the backend response structure
       setRecords(data.records || []);
       setTotalCount(data.total || 0);
@@ -129,13 +137,13 @@ const EmailRecords = () => {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {t("emailRecords.recipient", "Recipient")}
+                  {t("emailRecords.studentName", "Recipient Name")}
                 </th>
                 <th
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {t("emailRecords.subject", "Subject")}
+                  {t("emailRecords.recipient", "Recipient Email")}
                 </th>
                 <th
                   scope="col"
@@ -179,15 +187,24 @@ const EmailRecords = () => {
                 records.map((record) => (
                   <tr key={record._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {record.to}
-                    </td>
-                    <td className="px-6 py-4">
                       <div
-                        className="text-sm text-gray-900 max-w-xs truncate"
-                        title={record.subject}
+                        className={`px-3 py-2 rounded-md text-sm font-medium ${
+                          record.studentName &&
+                          record.studentName.trim() !== "" &&
+                          record.studentName.toLowerCase() !== "null"
+                            ? "bg-white text-gray-800" // Normal records
+                            : "bg-yellow-100 text-yellow-800" // Proposal / missing student name
+                        }`}
                       >
-                        {record.subject}
+                        {record.studentName &&
+                        record.studentName.trim() !== "" &&
+                        record.studentName.toLowerCase() !== "null"
+                          ? record.studentName
+                          : "Proposal"}
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {record.to}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -242,7 +259,7 @@ const EmailRecords = () => {
                   <FiX className="h-6 w-6" />
                 </button>
               </div>
-              
+
               <div className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-start">
@@ -251,21 +268,24 @@ const EmailRecords = () => {
                       <p className="text-sm text-gray-500">Recipient</p>
                       <p className="text-sm font-medium text-gray-900">
                         {selectedEmail.to}
-                        {selectedEmail.studentName && ` (${selectedEmail.studentName})`}
+                        {selectedEmail.studentName &&
+                          ` (${selectedEmail.studentName})`}
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <FiCalendar className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-500">Sent At</p>
                       <p className="text-sm font-medium text-gray-900">
-                        {selectedEmail.createdAt ? format(new Date(selectedEmail.createdAt), 'PPpp') : 'N/A'}
+                        {selectedEmail.createdAt
+                          ? format(new Date(selectedEmail.createdAt), "PPpp")
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
-                  
+
                   {selectedEmail.courseName && (
                     <div className="flex items-start">
                       <FiFileText className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
@@ -277,12 +297,16 @@ const EmailRecords = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex items-start">
                     <FiMail className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-500">Status</p>
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmail.status)}`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                          selectedEmail.status
+                        )}`}
+                      >
                         {selectedEmail.status}
                       </span>
                       {selectedEmail.error && (
@@ -294,41 +318,48 @@ const EmailRecords = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="border-t border-gray-200 pt-4">
-                  <p className="text-sm font-medium text-gray-500 mb-2">Subject</p>
+                  <p className="text-sm font-medium text-gray-500 mb-2">
+                    Subject
+                  </p>
                   <p className="text-base font-medium text-gray-900 mb-4">
                     {selectedEmail.subject}
                   </p>
-                  
-                  <p className="text-sm font-medium text-gray-500 mb-2">Message</p>
-                  <div 
+
+                  <p className="text-sm font-medium text-gray-500 mb-2">
+                    Message
+                  </p>
+                  <div
                     className="prose max-w-none text-sm text-gray-700 border rounded p-4 bg-gray-50"
                     dangerouslySetInnerHTML={{ __html: selectedEmail.message }}
                   />
                 </div>
-                
-                {selectedEmail.attachments && selectedEmail.attachments.length > 0 && (
-                  <div className="border-t border-gray-200 pt-4">
-                    <p className="text-sm font-medium text-gray-500 mb-2">Attachments</p>
-                    <div className="space-y-2">
-                      {selectedEmail.attachments.map((file, index) => (
-                        <a
-                          key={index}
-                          href={file.path}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center text-sm text-blue-600 hover:text-blue-800"
-                        >
-                          <FiPaperclip className="h-4 w-4 mr-2" />
-                          {file.name || `Attachment ${index + 1}`}
-                        </a>
-                      ))}
+
+                {selectedEmail.attachments &&
+                  selectedEmail.attachments.length > 0 && (
+                    <div className="border-t border-gray-200 pt-4">
+                      <p className="text-sm font-medium text-gray-500 mb-2">
+                        Attachments
+                      </p>
+                      <div className="space-y-2">
+                        {selectedEmail.attachments.map((file, index) => (
+                          <a
+                            key={index}
+                            href={file.path}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+                          >
+                            <FiPaperclip className="h-4 w-4 mr-2" />
+                            {file.name || `Attachment ${index + 1}`}
+                          </a>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
-              
+
               <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
                 <button
                   type="button"
@@ -337,12 +368,14 @@ const EmailRecords = () => {
                 >
                   Close
                 </button>
-                {selectedEmail.status === 'failed' && (
+                {selectedEmail.status === "failed" && (
                   <button
                     type="button"
                     onClick={() => {
                       // TODO: Implement resend functionality
-                      toast.success('Resend functionality will be implemented here');
+                      toast.success(
+                        "Resend functionality will be implemented here"
+                      );
                     }}
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
