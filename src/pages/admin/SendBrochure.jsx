@@ -16,6 +16,7 @@ import {
   FiList,
   FiUser,
   FiBook,
+  FiVideo,
 } from "react-icons/fi";
 
 const SendBrochure = () => {
@@ -30,7 +31,43 @@ const SendBrochure = () => {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [activeTab, setActiveTab] = useState("generated");
+  const [videos, setVideos] = useState([]);
+  const [selectedVideos, setSelectedVideos] = useState([]);
+  const [videoSearchTerm, setVideoSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  // Fetch videos from the server
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await api.get('/admin/videos');
+        setVideos(response.data);
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+        toast.error('Failed to load videos');
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
+  const handleVideoSelection = (e) => {
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
+    setSelectedVideos(selectedOptions);
+  };
+
+  const filteredVideos = useMemo(() => {
+    if (!videoSearchTerm.trim()) return videos;
+    const term = videoSearchTerm.toLowerCase();
+    return videos.filter(
+      (video) =>
+        video.name.toLowerCase().includes(term) ||
+        video.path.toLowerCase().includes(term)
+    );
+  }, [videos, videoSearchTerm]);
 
   useEffect(() => {
     const fetchPdfs = async () => {
@@ -77,8 +114,8 @@ const SendBrochure = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (selectedPdfs.length === 0) {
-      toast.error("Please select at least one PDF to send");
+    if (selectedPdfs.length === 0 && selectedVideos.length === 0) {
+      toast.error("Please select at least one PDF or video to send");
       return;
     }
 
@@ -86,6 +123,11 @@ const SendBrochure = () => {
       toast.error("Please enter a valid email address");
       return;
     }
+
+    // Get the selected video details
+    const selectedVideoDetails = videos.filter((video) =>
+      selectedVideos.includes(video.path)
+    );
 
     try {
       setSending(true);
@@ -96,26 +138,36 @@ const SendBrochure = () => {
         selectedPdfs.includes(pdf.path)
       );
 
-      // Send multiple PDFs in a single request
+      // Prepare request data with both PDFs and videos
+      const requestData = {
+        pdfPaths: selectedPdfs,
+        videoPaths: selectedVideos,
+        email: email.trim(),
+        subject: subject.trim() || "Course Brochure",
+        message: message.trim(),
+        studentName: studentName.trim(),
+        courseName: courseName.trim(),
+        templateUsed: selectedTemplate,
+        pdfDetails: selectedPdfDetails.map((pdf) => ({
+          name: pdf.name,
+          path: pdf.path,
+          type: pdf.type,
+          size: pdf.size,
+        })),
+        videoDetails: selectedVideoDetails.map((video) => ({
+          name: video.name,
+          path: video.path,
+          type: 'video',
+          size: video.size,
+        })),
+      };
+
+      // Send the request with both PDFs and videos
       const response = await api.post(
         "/pdfs/send-brochure",
+        requestData,
         {
-          pdfPaths: selectedPdfs,
-          email: email.trim(),
-          subject: subject.trim() || "Course Brochure",
-          message: message.trim(),
-          studentName: studentName.trim(),
-          courseName: courseName.trim(),
-          templateUsed: selectedTemplate,
-          pdfDetails: selectedPdfDetails.map((pdf) => ({
-            name: pdf.name,
-            path: pdf.path,
-            type: pdf.type,
-            size: pdf.size,
-          })),
-        },
-        {
-          timeout: 60000 * selectedPdfs.length,
+          timeout: 60000 * (selectedPdfs.length + selectedVideos.length),
         }
       );
 
@@ -129,12 +181,20 @@ const SendBrochure = () => {
             studentName: studentName.trim(),
             courseName: courseName.trim(),
             templateUsed: selectedTemplate,
-            attachments: selectedPdfDetails.map((pdf) => ({
-              name: pdf.name,
-              path: pdf.path,
-              type: pdf.type,
-              size: pdf.size,
-            })),
+            attachments: [
+              ...selectedPdfDetails.map((pdf) => ({
+                name: pdf.name,
+                path: pdf.path,
+                type: pdf.type || 'pdf',
+                size: pdf.size,
+              })),
+              ...selectedVideoDetails.map((video) => ({
+                name: video.name,
+                path: video.path,
+                type: 'video',
+                size: video.size,
+              })),
+            ],
             sentAt: new Date().toISOString(),
             status: "sent",
           });
@@ -156,13 +216,15 @@ const SendBrochure = () => {
         },
       });
 
-      // Reset form but keep the PDF selected for convenience
+      // Reset form but keep the PDF and video selected for convenience
       setEmail("");
       setStudentName("");
       setCourseName("");
       setSubject("");
       setMessage("");
       setSelectedTemplate("custom");
+      setSelectedVideos([]);
+      setVideoSearchTerm("");
     } catch (error) {
       console.error("Error sending brochure:", error);
       // Try to save failed attempt to database
@@ -216,7 +278,7 @@ const SendBrochure = () => {
       },
       courseEnquiry: {
         name: "Course Enquiry",
-        subject: `About {{courseName}} - <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
+        subject: `About {{courseName}} - FirstVITE E-Learning`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
   <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
@@ -274,7 +336,7 @@ const SendBrochure = () => {
       },
       webinarInvite: {
         name: "Learning Approach Invitation",
-        subject: `Take the Next Step in Your Career with <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
+        subject: `Take the Next Step in Your Career with FirstVITE E-Learning`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
   <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
@@ -332,7 +394,7 @@ const SendBrochure = () => {
       },
       videoSender: {
         name: "Video Sender",
-        subject: `Take the Next Step in Your Career with <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
+        subject: `Take the Next Step in Your Career with FirstVITE E-Learning`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
   <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
@@ -385,7 +447,7 @@ const SendBrochure = () => {
       },
       allCoursesProposal: {
         name: "All Courses Proposal",
-        subject: `Proposal for Student Skill Development & Certification Programs – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd`,
+        subject: `Proposal for Student Skill Development & Certification Programs – FirstVITE E-Learning Pvt. Ltd`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
   <p style="margin: 0 0 8px 0;">
@@ -631,6 +693,7 @@ const SendBrochure = () => {
                 : "Select Uploaded Brochure"}
             </label>
 
+            {/* Select Brochure */}
             <div className="space-y-4">
               {/* Search Box */}
               <div className="relative">
@@ -686,6 +749,70 @@ const SendBrochure = () => {
                   </p>
                 </div>
               )}
+            </div>
+
+            {/* Select Video */}
+            <div className="mt-6 space-y-2">
+              <label
+                htmlFor="video"
+                className="block text-sm font-medium text-gray-700 flex items-center"
+              >
+                <FiVideo className="mr-2" />
+                Select Video (Optional)
+              </label>
+              <div className="space-y-2">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-50 text-black placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Search videos..."
+                    value={videoSearchTerm}
+                    onChange={(e) => setVideoSearchTerm(e.target.value)}
+                  />
+                </div>
+
+                {videos.length > 0 ? (
+                  <select
+                    id="video"
+                    multiple
+                    size={Math.min(3, Math.max(1, filteredVideos.length))}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    value={selectedVideos}
+                    onChange={handleVideoSelection}
+                  >
+                    {filteredVideos.map((video) => (
+                      <option key={video.path} value={video.path}>
+                        {video.name.replace(/\.(mp4|mov|avi|mkv)$/i, '')} • 
+                        {formatFileSize(video.size)} • 
+                        {new Date(video.uploadedAt).toLocaleDateString()}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="text-center py-4 bg-gray-50 rounded-md border-2 border-dashed border-gray-300">
+                    <FiVideo className="mx-auto h-8 w-8 text-gray-400" />
+                    <p className="mt-1 text-sm text-gray-500">
+                      No videos found in the library.
+                    </p>
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {selectedVideos.length} video{selectedVideos.length !== 1 ? 's' : ''} selected
+                </p>
+              </div>
             </div>
 
             <div className="space-y-4">
