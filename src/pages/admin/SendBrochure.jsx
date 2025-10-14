@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ReactQuill from "react-quill";
@@ -17,6 +17,10 @@ import {
   FiUser,
   FiBook,
   FiVideo,
+  FiX,
+  FiPlus,
+  FiCheck,
+  FiAlertCircle,
 } from "react-icons/fi";
 
 const SendBrochure = () => {
@@ -34,17 +38,217 @@ const SendBrochure = () => {
   const [videos, setVideos] = useState([]);
   const [selectedVideos, setSelectedVideos] = useState([]);
   const [videoSearchTerm, setVideoSearchTerm] = useState("");
+  const [showVideoUpload, setShowVideoUpload] = useState(false);
   const navigate = useNavigate();
+
+  // Handle successful video upload
+  const handleVideoUploadSuccess = (newVideo) => {
+    setVideos((prevVideos) => [newVideo, ...prevVideos]);
+    setSelectedVideos((prev) => [...prev, newVideo.path]);
+  };
+
+  // Video Upload Component
+  const VideoUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
+    const [file, setFile] = useState(null);
+    const [name, setName] = useState("");
+    const [isUploading, setIsUploading] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = (e) => {
+      const selectedFile = e.target.files[0];
+      if (!selectedFile) return;
+
+      // Check file type
+      const allowedTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm'];
+      if (!allowedTypes.includes(selectedFile.type)) {
+        toast.error('Invalid file type. Please select a valid video file (MP4, MOV, AVI, MKV, or WebM).');
+        return;
+      }
+
+      // Check file size (500MB limit)
+      const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+      if (selectedFile.size > maxSize) {
+        toast.error('File is too large. Maximum size is 500MB.');
+        return;
+      }
+
+      setFile(selectedFile);
+      if (!name) {
+        // Set default name without extension
+        const fileName = selectedFile.name.replace(/\.[^/.]+$/, "");
+        setName(fileName);
+      }
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (!file) {
+        toast.error("Please select a video file");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("video", file);
+      if (name) {
+        formData.append("name", name);
+      }
+
+      try {
+        setIsUploading(true);
+        setProgress(0);
+
+        const response = await api.post("/admin/videos", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setProgress(percentCompleted);
+          },
+        });
+
+        toast.success("Video uploaded successfully");
+        onUploadSuccess(response.data.data);
+        onClose();
+      } catch (error) {
+        console.error("Error uploading video:", error);
+        toast.error(error.response?.data?.message || "Failed to upload video");
+      } finally {
+        setIsUploading(false);
+        setProgress(0);
+      }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="flex justify-between items-center p-4 border-b">
+            <h3 className="text-lg font-semibold">Upload Video</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+              disabled={isUploading}
+            >
+              <FiX size={24} />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-4 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Video File
+              </label>
+              <div
+                className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                onClick={() => !isUploading && fileInputRef.current?.click()}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+                {file ? (
+                  <div className="space-y-2">
+                    <FiCheck className="mx-auto h-12 w-12 text-green-500" />
+                    <p className="text-sm text-gray-600">{file.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {(file.size / (1024 * 1024)).toFixed(2)} MB
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <FiUpload className="mx-auto h-12 w-12 text-gray-400" />
+                    <p className="text-sm text-gray-600">
+                      Click to select a video file
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Supported formats: MP4, MOV, AVI, MKV, WebM (max 500MB)
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="video-name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Video Name (optional)
+              </label>
+              <input
+                type="text"
+                id="video-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                placeholder="Enter a name for the video"
+                disabled={isUploading}
+              />
+            </div>
+
+            {isUploading && (
+              <div className="pt-2">
+                <div className="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Uploading...</span>
+                  <span>{progress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isUploading}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!file || isUploading}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {isUploading ? (
+                  "Uploading..."
+                ) : (
+                  <>
+                    <FiUpload className="-ml-1 mr-2 h-4 w-4" />
+                    Upload Video
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
 
   // Fetch videos from the server
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await api.get('/admin/videos');
+        const response = await api.get("/admin/videos");
         setVideos(response.data);
       } catch (error) {
-        console.error('Error fetching videos:', error);
-        toast.error('Failed to load videos');
+        console.error("Error fetching videos:", error);
+        toast.error("Failed to load videos");
       }
     };
 
@@ -157,19 +361,15 @@ const SendBrochure = () => {
         videoDetails: selectedVideoDetails.map((video) => ({
           name: video.name,
           path: video.path,
-          type: 'video',
+          type: "video",
           size: video.size,
         })),
       };
 
       // Send the request with both PDFs and videos
-      const response = await api.post(
-        "/pdfs/send-brochure",
-        requestData,
-        {
-          timeout: 60000 * (selectedPdfs.length + selectedVideos.length),
-        }
-      );
+      const response = await api.post("/pdfs/send-brochure", requestData, {
+        timeout: 60000 * (selectedPdfs.length + selectedVideos.length),
+      });
 
       // Save email record to database
       if (response.data && response.data.success) {
@@ -185,13 +385,13 @@ const SendBrochure = () => {
               ...selectedPdfDetails.map((pdf) => ({
                 name: pdf.name,
                 path: pdf.path,
-                type: pdf.type || 'pdf',
+                type: pdf.type || "pdf",
                 size: pdf.size,
               })),
               ...selectedVideoDetails.map((video) => ({
                 name: video.name,
                 path: video.path,
-                type: 'video',
+                type: "video",
                 size: video.size,
               })),
             ],
@@ -624,7 +824,10 @@ const SendBrochure = () => {
                   {totalPdfs} brochures available
                 </div>
                 <div className="mt-2 sm:mt-0 text-sm text-gray-500">
-                  <Link to="/admin/email-records" className="flex items-center bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 transition-colors text-white">
+                  <Link
+                    to="/admin/email-records"
+                    className="flex items-center bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 transition-colors text-white"
+                  >
                     <FiSend className="mr-2" /> Sended To
                   </Link>
                 </div>
@@ -753,6 +956,16 @@ const SendBrochure = () => {
 
             {/* Select Video */}
             <div className="mt-6 space-y-2">
+              {/* Add Video */}
+              <button
+                type="button"
+                onClick={() => setShowVideoUpload(true)}
+                className="flex items-center justify-center w-full text-black p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+              >
+                <FiPlus className="mr-2" />
+                Add Video
+              </button>
+
               <label
                 htmlFor="video"
                 className="block text-sm font-medium text-gray-700 flex items-center"
@@ -795,8 +1008,8 @@ const SendBrochure = () => {
                   >
                     {filteredVideos.map((video) => (
                       <option key={video.path} value={video.path}>
-                        {video.name.replace(/\.(mp4|mov|avi|mkv)$/i, '')} • 
-                        {formatFileSize(video.size)} • 
+                        {video.name.replace(/\.(mp4|mov|avi|mkv)$/i, "")} •
+                        {formatFileSize(video.size)} •
                         {new Date(video.uploadedAt).toLocaleDateString()}
                       </option>
                     ))}
@@ -810,7 +1023,8 @@ const SendBrochure = () => {
                   </div>
                 )}
                 <p className="text-xs text-gray-500 mt-1">
-                  {selectedVideos.length} video{selectedVideos.length !== 1 ? 's' : ''} selected
+                  {selectedVideos.length} video
+                  {selectedVideos.length !== 1 ? "s" : ""} selected
                 </p>
               </div>
             </div>
@@ -1023,8 +1237,14 @@ const SendBrochure = () => {
           </div>
         </form>
       </div>
+      
+      {/* Video Upload Modal */}
+      <VideoUploadModal
+        isOpen={showVideoUpload}
+        onClose={() => setShowVideoUpload(false)}
+        onUploadSuccess={handleVideoUploadSuccess}
+      />
     </div>
-    // </div>
   );
 };
 
