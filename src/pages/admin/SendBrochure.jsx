@@ -89,21 +89,64 @@ const SendBrochure = () => {
     try {
       setSending(true);
 
+      // Get the selected PDF details
+      const allPdfs = [...pdfs.generated, ...pdfs.uploaded];
+      const selectedPdfDetails = allPdfs.filter((pdf) =>
+        selectedPdfs.includes(pdf.path)
+      );
+
       // Send multiple PDFs in a single request
-      await api.post(
+      const response = await api.post(
         "/pdfs/send-brochure",
         {
-          pdfPaths: selectedPdfs, // Changed to match backend's expected field name
+          pdfPaths: selectedPdfs,
           email: email.trim(),
           subject: subject.trim() || "Course Brochure",
           message: message.trim(),
+          studentName: studentName.trim(),
+          courseName: courseName.trim(),
+          templateUsed: selectedTemplate,
+          pdfDetails: selectedPdfDetails.map((pdf) => ({
+            name: pdf.name,
+            path: pdf.path,
+            type: pdf.type,
+            size: pdf.size,
+          })),
         },
         {
-          timeout: 60000 * selectedPdfs.length, // Increase timeout based on number of PDFs
+          timeout: 60000 * selectedPdfs.length,
         }
       );
 
-      toast.success("Brochure sent successfully!", {
+      // Save email record to database
+      if (response.data && response.data.success) {
+        try {
+          await api.post("/emails/save-email-record", {
+            to: email.trim(),
+            subject: subject.trim() || "Course Brochure",
+            message: message.trim(),
+            studentName: studentName.trim(),
+            courseName: courseName.trim(),
+            templateUsed: selectedTemplate,
+            attachments: selectedPdfDetails.map((pdf) => ({
+              name: pdf.name,
+              path: pdf.path,
+              type: pdf.type,
+              size: pdf.size,
+            })),
+            sentAt: new Date().toISOString(),
+            status: "sent",
+          });
+        } catch (dbError) {
+          console.error("Error saving email record:", dbError);
+          // Don't fail the entire operation if saving to DB fails
+          toast.error(
+            "Email sent but failed to save record. Please check console for details."
+          );
+        }
+      }
+
+      toast.success("Brochure sent and record saved successfully!", {
         duration: 4000,
         icon: "🎉",
         style: {
@@ -114,10 +157,41 @@ const SendBrochure = () => {
 
       // Reset form but keep the PDF selected for convenience
       setEmail("");
+      setStudentName("");
+      setCourseName("");
       setSubject("Course Brochure");
       setMessage("Please find attached the course brochure you requested.");
+      setSelectedTemplate("courseEnquiry");
     } catch (error) {
       console.error("Error sending brochure:", error);
+      // Try to save failed attempt to database
+      try {
+        const allPdfs = [...pdfs.generated, ...pdfs.uploaded];
+        const selectedPdfDetails = allPdfs.filter((pdf) =>
+          selectedPdfs.includes(pdf.path)
+        );
+
+        await api.post("/emails/save-email-record", {
+          to: email.trim(),
+          subject: subject.trim() || "Course Brochure",
+          message: message.trim(),
+          studentName: studentName.trim(),
+          courseName: courseName.trim(),
+          templateUsed: selectedTemplate,
+          attachments: selectedPdfDetails.map((pdf) => ({
+            name: pdf.name,
+            path: pdf.path,
+            type: pdf.type,
+            size: pdf.size,
+          })),
+          sentAt: new Date().toISOString(),
+          status: "failed",
+          error: error.response?.data?.message || error.message,
+        });
+      } catch (dbError) {
+        console.error("Error saving failed email record:", dbError);
+      }
+
       toast.error(
         error.response?.data?.message ||
           "Failed to send brochure. Please try again."
@@ -132,10 +206,10 @@ const SendBrochure = () => {
     () => ({
       courseEnquiry: {
         name: "Course Enquiry",
-        subject: `About {{courseName}} - FirstVITE E-Learning`,
+        subject: `About {{courseName}} - <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
         content: `
 <p>Dear {{studentName}},</p>
-<p>Greetings from <strong>FirstVITE E-Learning!</strong></p>
+<p>Greetings from <strong><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning!</strong></p>
 <p>
 Are you looking to build a strong career in the domain of <strong>{{courseName}}</strong>?  
 We are excited to introduce our <strong>{{courseName}}</strong> online training program,  
@@ -157,18 +231,18 @@ designed for both beginners and professionals.
 <p>Looking forward to helping you take the next step in your career!</p>
 
 <p>Warm regards,</p>
-<p>Team – FirstVITE E-Learning Pvt. Ltd.</p>
+<p>Team – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
 <p>📩 info@firstvite.com</p>
 <p>🌐 https://firstvite.com</p>
       `,
       },
       webinarInvite: {
         name: "Learning Approach Invitation",
-        subject: `Take the Next Step in Your Career with FirstVITE E-Learning`,
+        subject: `Take the Next Step in Your Career with <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
         content: `
 <p>Dear {{studentName}},</p>
 
-<p>Greetings from FirstVITE E-Learning Pvt. Ltd.!</p>
+<p>Greetings from <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.!</p>
 
 <p>We’re excited to invite you to enroll in one of our professional certification programs designed to help you enhance your skills and career growth.</p>
 
@@ -183,9 +257,89 @@ designed for both beginners and professionals.
 <p>Looking forward to helping you begin your learning journey with us.</p>
 
 <p>Warm regards,</p>
-<p>Team – FirstVITE E-Learning Pvt. Ltd.</p>
+<p>Team – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
 <p>📩 info@firstvite.com</p>
 <p>🌐 https://firstvite.com</p>
+`,
+      },
+      videoSender: {
+        name: "Video Sender",
+        subject: `Take the Next Step in Your Career with <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning`,
+        content: `
+<p>Dear {{studentName}},</p>
+
+<p>Greetings from <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.!</p>
+
+<p>We’re excited to invite you to enroll in one of our professional certification programs designed to help you enhance your skills and career growth.</p>
+
+<p>At <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span>, we offer a wide range of in-demand programs such as Java, Python, AI & Machine Learning, Cyber Security, Digital Marketing, SAP, Power BI, Cloud Computing (Azure), Salesforce, and more.</p>
+
+<p>Each program is structured to provide hands-on learning with real-world applications—helping you gain the expertise needed to stand out in today’s competitive job market.</p>
+
+<p>If you’re looking to upgrade your skills or switch to a high-growth career path, this is the perfect time to get started!</p>
+
+<p>Please feel free to reply to this email or contact us directly for more details about the courses, duration, and fee structure.</p>
+
+<p>Looking forward to helping you begin your learning journey with us.</p>
+
+<p>Warm regards,</p>
+<p>Team – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
+<p>📩 info@firstvite.com</p>
+<p>🌐 https://firstvite.com</p>
+`,
+      },
+      allCoursesProposal: {
+        name: "All Courses Proposal",
+        subject: `Proposal for Student Skill Development & Certification Programs – <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd`,
+        content: `<p>
+Dear {{studentName}},</p>
+
+<p>Warm greetings from <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
+
+<p>We are pleased to introduce <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd., a leading online learning platform focused on delivering high-quality certification programs designed to enhance students’ employability and industry readiness.</p>
+
+<p>We would like to propose a collaboration (tie-up) with Royal Educational Institute, Ghaziabad, to offer a range of industry-relevant certification programs for your students. These programs are structured and delivered by our expert trainers who possess extensive experience in their respective domains.</p>
+
+<p><strong>Courses We Offer</strong></p>
+<p>We have a variety of professional and technical certification programs, including:</p>
+<p><strong>Java Programming</strong></p>
+<p><strong>Python Programming</strong></p>
+<p><strong>SAP (Enterprise Management System)</strong></p>
+<p><strong>Artificial Intelligence & Machine Learning</strong></p>
+<p><strong>Cyber Security</strong></p>
+<p><strong>Database Management</strong></p>
+<p><strong>Digital Marketing</strong></p>
+<p><strong>Game Development</strong></p>
+<p><strong>Microsoft Azure (Cloud Computing)</strong></p>
+<p><strong>Salesforce (CRM Platform)</strong></p>
+<p><strong>Android App Development</strong></p>
+<p><strong>Power BI (Business Analytics)</strong></p>
+
+<p>Additionally, we also provide free value-added short courses to help students strengthen their profiles and gain an edge in their career journey.</p>
+
+<p><strong>Key Highlights of Our Programs</strong></p>
+<p>100% Online Learning (Live + Recorded Classes)</p>
+<p>Delivered by Industry Experts from FirstVite</p>
+<p>Practical, Project-Based Learning</p>
+<p>Certification from FirstVite E-Learning Pvt. Ltd.</p>
+<p>Placement Guidance and Career Support</p>
+<p>Internship Assistance (where applicable)</p>
+
+<p><strong>Proposal for Tie-Up</strong></p>
+<p>We are looking forward to forming a strategic academic partnership with your institution. Through this collaboration, Royal Educational Institute students will gain access to our certified programs at special institutional pricing and benefit from joint skill enhancement initiatives like webinars, workshops, and hackathons.</p>
+
+<p>We truly believe this partnership will help bridge the gap between academic learning and industry expectations, empowering your students with the skills needed to succeed in today’s competitive job market.</p>
+
+<p>If this proposal aligns with your vision, we would be happy to schedule a meeting or presentation to discuss the details further.</p>
+
+<p>Looking forward to your positive response and a fruitful collaboration.</p>
+
+<p>Warm regards,</p>
+<p>Team <span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span></p>
+<p><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</p>
+<p>📧 info@firstvite.com</p>
+<p>📞 +91-9990056799</p>
+<p>🌐 www.firstvite.com</p>
 `,
       },
       custom: {
@@ -428,7 +582,7 @@ designed for both beginners and professionals.
                       className="block text-sm font-medium text-gray-700 flex items-center"
                     >
                       <FiUser className="mr-2" />
-                      Student Name
+                      Recipient Name
                     </label>
                     <input
                       type="text"
@@ -466,26 +620,9 @@ designed for both beginners and professionals.
 
             <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="subject"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Template
+                    Select Email Template
                   </label>
                   <select
                     value={selectedTemplate}
@@ -500,8 +637,25 @@ designed for both beginners and professionals.
                   </select>
                 </div>
 
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Message
+                <div>
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Mail Subject
+                  </label>
+                  <input
+                    type="text"
+                    id="subject"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <label className="block text-sm font-medium text-gray-700 mb-1 mt-5">
+                  Mail Message
                 </label>
                 <div className="mb-2 text-xs text-red-600">
                   Use {"{{studentName}}"} and {"{{courseName}}"} as placeholders
