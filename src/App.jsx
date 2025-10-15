@@ -408,11 +408,25 @@ function App() {
               </MainLayout>
             }
           />
+
+          {/* JobFair Routes */}
           <Route
             path="/jobfair"
+            element={<Navigate to="/jobfair/apply/student" replace />}
+          />
+          <Route
+            path="/jobfair/apply/student"
             element={
               <MainLayout>
-                <CandidateInviteForm />
+                <CandidateInviteForm defaultType="student" />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/jobfair/apply/company"
+            element={
+              <MainLayout>
+                <CandidateInviteForm defaultType="company" />
               </MainLayout>
             }
           />
@@ -479,7 +493,7 @@ function App() {
             <Route path="/admin/lms/create-sprint" element={<Sprint />} />
             <Route path="/admin/lms/assessment" element={<Assessment />} />
             <Route path="/admin/lms/career" element={<CareerManagement />} />
-            
+
             {/* Candidates Management */}
             <Route path="/admin/candidates" element={<CandidatesPage />} />
           </Route>
