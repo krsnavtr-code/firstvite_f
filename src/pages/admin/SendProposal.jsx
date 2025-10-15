@@ -34,7 +34,7 @@ This event is designed to help you kickstart your career journey with opportunit
 
 📝 <span style="font-weight: 600;">Register Now:</span>
 Click the link below to secure your spot:
-👉 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com/jobfair</span>
+👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://firstvite.com/jobfair/apply/student">Register Now</a></span>
 
 📅 Event Details will be sent to your email after registration.
 Organized by: <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
@@ -65,7 +65,7 @@ Free participation (no registration or hidden fees)
 Certificates and recognition for participants
 
 To participation provide this to your students, please fill out the short form below:
-👉 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com/jobfair</span>
+👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://firstvite.com/jobfair/apply/student">Register Now</a></span>
 
 Our team will get in touch with you for further coordination and provide detailed schedules.
 We look forward to having your institution join us in empowering the next generation of professionals.
@@ -94,7 +94,8 @@ This event presents a unique opportunity for your company to:
 We would be honoured to have participate in this Job Fair and connect with some of the brightest emerging professionals. We are committed to providing a seamless experience for all participating companies, including dedicated space for your representatives, and structured interaction with students.
 
 🏫 For Registration kindly fill out this short form:
-👉 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com/jobfair</span>
+👉 <span style="font-weight: 600; color: #007BFF;">
+<a href="https://firstvite.com/jobfair/apply/company">Register Now</a></span>
 
 💼 Participation Fee: ₹4000 + GST (includes personal hiring space)
 
