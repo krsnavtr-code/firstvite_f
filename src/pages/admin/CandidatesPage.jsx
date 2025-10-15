@@ -25,11 +25,25 @@ const CandidatesPage = () => {
   const fetchCandidates = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/admin/candidates?page=${page}&limit=10`);
-      setCandidates(response.data.data.candidates);
-      setTotalPages(Math.ceil(response.data.total / 10));
+      const response = await api.get(`/candidates?page=${page}&limit=10`);
+      const responseData = response.data;
+
+      // Check if the response data is in the expected format
+      if (
+        responseData &&
+        responseData.data &&
+        Array.isArray(responseData.data)
+      ) {
+        setCandidates(responseData.data);
+        setTotalPages(Math.ceil(responseData.total / 10) || 1);
+      } else {
+        console.error("Unexpected API response format:", responseData);
+        setCandidates([]);
+        setTotalPages(1);
+      }
     } catch (error) {
       console.error("Error fetching candidates:", error);
+      setCandidates([]);
     } finally {
       setLoading(false);
     }
@@ -54,8 +68,10 @@ const CandidatesPage = () => {
   };
 
   const handleUpdateStatus = async () => {
+    if (!selectedCandidate) return;
+
     try {
-      await api.patch(`/admin/candidates/${selectedCandidate._id}/status`, {
+      await api.patch(`/candidates/${selectedCandidate._id}/status`, {
         status,
         notes,
       });
@@ -63,21 +79,28 @@ const CandidatesPage = () => {
       handleCloseModal();
     } catch (error) {
       console.error("Error updating candidate status:", error);
+      alert("Failed to update candidate status. Please try again.");
     }
   };
 
   const exportToCSV = async () => {
     try {
-      const response = await api.get("/admin/candidates?limit=1000");
-      const allCandidates = response.data.data.candidates;
+      const response = await api.get("/candidates?limit=1000");
+      const responseData = response.data;
+      const allCandidates = Array.isArray(responseData.data)
+        ? responseData.data
+        : [];
 
       const headers = [
         "Registration ID",
         "Name",
         "Email",
         "Phone",
+        "User Type",
         "Course",
         "College",
+        "University",
+        "Company Name",
         "Status",
         "Notes",
         "Created At",
@@ -89,8 +112,11 @@ const CandidatesPage = () => {
           `"${c.name || ""}"`,
           `"${c.email || ""}"`,
           `"${c.phone || ""}"`,
+          `"${c.userType || ""}"`,
           `"${c.course || ""}"`,
           `"${c.college || ""}"`,
+          `"${c.university || ""}"`,
+          `"${c.companyName || ""}"`,
           `"${c.status || ""}"`,
           `"${(c.notes || "").replace(/"/g, '""')}"`,
           `"${
@@ -111,48 +137,29 @@ const CandidatesPage = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      >
+    <div className="container">
+      <div className="d-flex justify-content-between align-items-center mb-2">
         <h2>Candidate Management</h2>
         <button
           onClick={exportToCSV}
           disabled={loading}
-          style={{
-            padding: "8px 14px",
-            backgroundColor: "#1976d2",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
+          className="btn btn-primary"
         >
           ⬇ Export to CSV
         </button>
       </div>
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          backgroundColor: "white",
-          border: "1px solid #ddd",
-        }}
-      >
+      <table className="table table-striped table-hover">
         <thead>
-          <tr style={{ backgroundColor: "#f2f2f2" }}>
+          <tr>
             <th>Name</th>
             <th>Registration ID</th>
             <th>Email</th>
             <th>Phone</th>
+            <th>Type</th>
             <th>Course</th>
-            <th>College</th>
+            <th>College/Company</th>
+            <th>University</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -160,13 +167,13 @@ const CandidatesPage = () => {
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="8" style={{ textAlign: "center" }}>
+              <td colSpan="8" className="text-center">
                 Loading...
               </td>
             </tr>
           ) : candidates.length === 0 ? (
             <tr>
-              <td colSpan="8" style={{ textAlign: "center" }}>
+              <td colSpan="8" className="text-center">
                 No candidates found
               </td>
             </tr>
@@ -177,10 +184,13 @@ const CandidatesPage = () => {
                 <td>{c.registrationId}</td>
                 <td>{c.email}</td>
                 <td>{c.phone}</td>
-                <td>{c.course}</td>
-                <td>{c.college}</td>
+                <td>{c.userType === "student" ? "Student" : "Company"}</td>
+                <td>{c.course || "-"}</td>
+                <td>{c.userType === "student" ? c.college : c.companyName}</td>
+                <td>{c.university || "-"}</td>
                 <td>
                   <span
+                    className="badge"
                     style={{
                       backgroundColor: statusColors[c.status] || "gray",
                       color: "white",
@@ -195,14 +205,7 @@ const CandidatesPage = () => {
                 <td>
                   <button
                     onClick={() => handleOpenModal(c)}
-                    style={{
-                      backgroundColor: "transparent",
-                      border: "1px solid #1976d2",
-                      color: "#1976d2",
-                      padding: "4px 8px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
+                    className="btn btn-primary"
                   >
                     View/Edit
                   </button>
@@ -215,20 +218,12 @@ const CandidatesPage = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <div className="d-flex justify-content-center mt-2">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
             <button
               key={num}
               onClick={() => setPage(num)}
-              style={{
-                margin: "0 4px",
-                padding: "6px 10px",
-                backgroundColor: num === page ? "#1976d2" : "#f2f2f2",
-                color: num === page ? "white" : "black",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              className="btn btn-outline-primary"
             >
               {num}
             </button>
@@ -237,7 +232,7 @@ const CandidatesPage = () => {
       )}
 
       {/* Modal */}
-      {showModal && (
+      {showModal && selectedCandidate && (
         <div
           style={{
             position: "fixed",
@@ -249,67 +244,102 @@ const CandidatesPage = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            zIndex: 1000,
           }}
         >
           <div
             style={{
               backgroundColor: "white",
               padding: "20px",
-              borderRadius: "6px",
-              width: "400px",
+              borderRadius: "8px",
+              width: "90%",
+              maxWidth: "600px",
             }}
           >
-            <h3>Update Candidate Status</h3>
-            {selectedCandidate && (
-              <>
+            <h3>Candidate Details</h3>
+            <div style={{ marginBottom: "15px" }}>
+              <p>
+                <strong>Name:</strong> {selectedCandidate.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {selectedCandidate.email}
+              </p>
+              <p>
+                <strong>Phone:</strong> {selectedCandidate.phone}
+              </p>
+              <p>
+                <strong>Type:</strong>{" "}
+                {selectedCandidate.userType === "student"
+                  ? "Student"
+                  : "Company"}
+              </p>
+
+              {selectedCandidate.userType === "student" ? (
+                <>
+                  <p>
+                    <strong>Course:</strong> {selectedCandidate.course || "-"}
+                  </p>
+                  <p>
+                    <strong>College:</strong> {selectedCandidate.college || "-"}
+                  </p>
+                  <p>
+                    <strong>University:</strong>{" "}
+                    {selectedCandidate.university || "-"}
+                  </p>
+                </>
+              ) : (
                 <p>
-                  <strong>Name:</strong> {selectedCandidate.name}
+                  <strong>Company Name:</strong>{" "}
+                  {selectedCandidate.companyName || "-"}
                 </p>
-                <p>
-                  <strong>Email:</strong> {selectedCandidate.email}
-                </p>
-                <div style={{ marginBottom: "10px" }}>
-                  <label>Status:</label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    style={{ width: "100%", padding: "6px", marginTop: "5px" }}
-                  >
-                    {["pending", "reviewed", "contacted", "rejected"].map(
-                      (option) => (
-                        <option key={option} value={option}>
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-                <div>
-                  <label>Notes:</label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows="4"
-                    style={{ width: "100%", padding: "6px" }}
-                  />
-                </div>
-              </>
-            )}
+              )}
+
+              <div style={{ marginTop: "15px" }}>
+                <label style={{ display: "block", marginBottom: "5px" }}>
+                  <strong>Status:</strong>
+                </label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="reviewed">Reviewed</option>
+                  <option value="contacted">Contacted</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: "block", marginBottom: "5px" }}>
+                  <strong>Notes:</strong>
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  style={{ width: "100%", minHeight: "100px", padding: "8px" }}
+                />
+              </div>
+            </div>
+
             <div
               style={{
                 display: "flex",
                 justifyContent: "flex-end",
-                marginTop: "20px",
+                gap: "10px",
               }}
             >
               <button
                 onClick={handleCloseModal}
                 style={{
-                  backgroundColor: "#ccc",
-                  padding: "6px 12px",
-                  border: "none",
+                  padding: "8px 16px",
+                  backgroundColor: "#f0f0f0",
+                  border: "1px solid #ccc",
                   borderRadius: "4px",
-                  marginRight: "8px",
                   cursor: "pointer",
                 }}
               >
@@ -318,15 +348,15 @@ const CandidatesPage = () => {
               <button
                 onClick={handleUpdateStatus}
                 style={{
+                  padding: "8px 16px",
                   backgroundColor: "#1976d2",
                   color: "white",
-                  padding: "6px 12px",
                   border: "none",
                   borderRadius: "4px",
                   cursor: "pointer",
                 }}
               >
-                Save
+                Save Changes
               </button>
             </div>
           </div>
