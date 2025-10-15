@@ -30,6 +30,7 @@ const SendBrochure = () => {
   const [email, setEmail] = useState("");
   const [studentName, setStudentName] = useState("");
   const [courseName, setCourseName] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
   const [subject, setSubject] = useState("Course Brochure");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -351,6 +352,7 @@ const SendBrochure = () => {
         message: message.trim(),
         studentName: studentName.trim(),
         courseName: courseName.trim(),
+        videoUrl: videoUrl.trim(),
         templateUsed: selectedTemplate,
         pdfDetails: selectedPdfDetails.map((pdf) => ({
           name: pdf.name,
@@ -380,6 +382,7 @@ const SendBrochure = () => {
             message: message.trim(),
             studentName: studentName.trim(),
             courseName: courseName.trim(),
+            videoUrl: videoUrl.trim(),
             templateUsed: selectedTemplate,
             attachments: [
               ...selectedPdfDetails.map((pdf) => ({
@@ -420,6 +423,7 @@ const SendBrochure = () => {
       setEmail("");
       setStudentName("");
       setCourseName("");
+      setVideoUrl("");
       setSubject("");
       setMessage("");
       setSelectedTemplate("custom");
@@ -440,6 +444,7 @@ const SendBrochure = () => {
           message: message.trim(),
           studentName: studentName.trim(),
           courseName: courseName.trim(),
+          videoUrl: videoUrl.trim(),
           templateUsed: selectedTemplate,
           attachments: selectedPdfDetails.map((pdf) => ({
             name: pdf.name,
@@ -634,6 +639,10 @@ const SendBrochure = () => {
     Looking forward to helping you begin your learning journey with us.
   </p>
 
+  <p style="margin: 0 0 8px 0;">
+    <a href="{{videoUrl}}">Watch the demo video</a>
+  </p>
+
   <p style="margin: 0 0 4px 0;">Warm regards,</p>
   <p style="margin: 0 0 4px 0;">
     Team – 
@@ -749,12 +758,14 @@ const SendBrochure = () => {
       // Replace variables in content
       let updatedContent = template.content
         .replace(/\{\{studentName\}\}/g, studentName || "Student")
-        .replace(/\{\{courseName\}\}/g, courseName || "this course");
+        .replace(/\{\{courseName\}\}/g, courseName || "this course")
+        .replace(/\{\{videoUrl\}\}/g, videoUrl || "");
 
       // Replace variables in subject
       let updatedSubject = template.subject
         .replace(/\{\{studentName\}\}/g, studentName || "Student")
-        .replace(/\{\{courseName\}\}/g, courseName || "this course");
+        .replace(/\{\{courseName\}\}/g, courseName || "this course")
+        .replace(/\{\{videoUrl\}\}/g, videoUrl || "");
 
       setMessage(updatedContent);
 
@@ -772,6 +783,7 @@ const SendBrochure = () => {
     activeTab,
     studentName,
     courseName,
+    videoUrl,
     selectedTemplate,
     messageTemplates,
     subject,
@@ -1091,6 +1103,25 @@ const SendBrochure = () => {
                   />
                 </div>
               )}
+              {activeTab === "uploaded" && (
+                <div className="space-y-2">
+                  <label
+                    htmlFor="videoUrl"
+                    className="block text-sm font-medium text-gray-700 flex items-center"
+                  >
+                    <FiVideo className="mr-2" />
+                    Video URL
+                  </label>
+                  <input
+                    type="text"
+                    id="videoUrl"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    placeholder="e.g., https://www.youtube.com/watch?v=VIDEO_ID"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -1133,7 +1164,7 @@ const SendBrochure = () => {
                   Mail Message
                 </label>
                 <div className="mb-2 text-xs text-red-600">
-                  Use {"{{studentName}}"} and {"{{courseName}}"} as placeholders
+                  Use {"{{studentName}}"} and {"{{courseName}} "} and {"(VideoUrl {{videoUrl}} only in Video Sender)"} as placeholders
                   that will be replaced with actual values.
                 </div>
                 <p className="text-sm text-gray-500 mb-2">
