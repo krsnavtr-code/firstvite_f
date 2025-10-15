@@ -13,8 +13,7 @@ const SendProposal = () => {
 
   // Default form values
   const defaultValues = {
-    subject:
-      "Invitation to Partner for Our Career Hiring Camp – Empower Students with Real Job Opportunities",
+    subject: "Invitation for Job Fair 2025 | FirstVITE E-Learning",
     studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear Student,
 
@@ -78,6 +77,36 @@ Warm regards,
 🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
 </div>
 `,
+    companyMessage: `<div style="color: #4DA3FF; font-size: 18px;">
+Dear [Company Name],
+
+We are excited to announce that <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>! are organizing a Job Fair which will bring together over 👥1,500+ students from multiple leading colleges/universities.
+
+The objective of this initiative is to bridge the gap between education and employment by connecting talented students directly with hiring partners and offering them career guidance, interview exposure, and skill-building sessions — all under one platform.
+
+This event presents a unique opportunity for your company to:
+✅ Engage with top talent across diverse streams.
+✅ Showcase your organization and upcoming career opportunities.
+✅ Conduct on-the-spot interviews and networking sessions with prospective candidates.
+✅ Promote your company brand among job seekers.
+✅ Access to fresh & skilled candidates.
+
+We would be honoured to have participate in this Job Fair and connect with some of the brightest emerging professionals. We are committed to providing a seamless experience for all participating companies, including dedicated space for your representatives, and structured interaction with students.
+
+🏫 For Registration kindly fill out this short form:
+👉 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com/jobfair</span>
+
+💼 Participation Fee: ₹4000 + GST (includes personal hiring space)
+
+For details and bookings, feel free to contact:
+
+Warm regards,
+<span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
+📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
+</div>
+`,
   };
 
   const {
@@ -92,6 +121,7 @@ Warm regards,
       subject: defaultValues.subject,
       studentMessage: defaultValues.studentMessage,
       collegeMessage: defaultValues.collegeMessage,
+      companyMessage: defaultValues.companyMessage,
     },
   });
 
@@ -119,7 +149,9 @@ Warm regards,
         message:
           selectedMessageType === "student"
             ? data.studentMessage
-            : data.collegeMessage,
+            : selectedMessageType === "college"
+            ? data.collegeMessage
+            : data.companyMessage,
       };
 
       // Debug log to check the selected message type and content
@@ -196,8 +228,14 @@ Warm regards,
 
         if (response.data && response.data.status === "success") {
           const messageType = watch("messageType");
-          const recipientType =
-            messageType === "student" ? "student" : "college/university";
+          let recipientType;
+          if (messageType === "student") {
+            recipientType = "student";
+          } else if (messageType === "college") {
+            recipientType = "college/university";
+          } else {
+            recipientType = "company";
+          }
 
           setSuccess(`Proposal sent successfully to ${recipientType}!`);
           toast.success(response.data.message || "Proposal sent successfully!");
@@ -208,6 +246,7 @@ Warm regards,
             messageType: messageType,
             studentMessage: defaultValues.studentMessage,
             collegeMessage: defaultValues.collegeMessage,
+            companyMessage: defaultValues.companyMessage,
             emails: "",
           });
           setFiles([]);
@@ -453,6 +492,48 @@ college3@example.com"
                   {errors.collegeMessage && (
                     <p className="mt-1 text-sm text-red-600">
                       {errors.collegeMessage.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <div
+            className={`border-2 rounded-lg p-4 transition-colors ${
+              watch("messageType") === "company"
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-gray-200 hover:border-indigo-300"
+            }`}
+          >
+            <label className="flex items-start space-x-3 cursor-pointer">
+              <input
+                type="radio"
+                {...register("messageType")}
+                value="company"
+                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="block text-sm font-medium text-gray-700">
+                    Message for Company{" "}
+                    <span className="text-red-600">
+                      (Remember change the [Company Name] before sending)
+                    </span>
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <textarea
+                    {...register("companyMessage", {
+                      required: "Company message is required",
+                    })}
+                    rows={4}
+                    className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Write your message for the company here..."
+                  />
+                  {errors.companyMessage && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.companyMessage.message}
                     </p>
                   )}
                 </div>
