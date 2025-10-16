@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import api from '../../api/axios';
+import { Link } from 'react-router-dom';
 
 export default function PaymentsList() {
   const [payments, setPayments] = useState([]);
@@ -119,9 +120,9 @@ export default function PaymentsList() {
                         {formatDate(payment.paymentDate || payment.createdAt)}
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <a href={`/admin/payments/${payment._id}`} className="text-indigo-600 hover:text-indigo-900">
+                        <Link to={`/admin/payments/${payment._id}`} className="text-indigo-600 hover:text-indigo-900">
                           View<span className="sr-only">, {payment.name}</span>
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   ))}
