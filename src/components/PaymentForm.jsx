@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
+import { createPortal } from "react-dom";
 import { loadRazorpay, initRazorpayPayment } from "../utils/razorpay";
 
-const PaymentForm = ({ onClose }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    countryCode: "+91",
-    phone: "",
-    course: "",
-    coursePrice: "",
-    paymentAmount: "",
-    terms: false,
+const PaymentForm = ({ onClose, initialData = {} }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const userType = location.state?.userType || "student";
+  const {
+    isCompanyRegistration,
+    amount: companyAmount,
+    description,
+  } = location.state || {};
+
+  const [formData, setFormData] = useState(() => {
+    const data = initialData || {};
+    return {
+      name: data.name || "",
+      email: data.email || "",
+      countryCode: data.countryCode || "+91",
+      phone: data.phone ? data.phone.replace(/^\+91/, "") : "",
+      course: data.course || "",
+      coursePrice: data.amount ? String(Number(data.amount) * 1.18) : "",
+      paymentAmount: data.amount ? String(Number(data.amount) * 1.18) : "",
+      terms: false,
+    };
   });
 
   const countryCodes = [
@@ -29,7 +43,7 @@ const PaymentForm = ({ onClose }) => {
   const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
   const [courses, setCourses] = useState(() => {
     // Try to load from sessionStorage on initial render
-    const cachedCourses = sessionStorage.getItem('cachedCourses');
+    const cachedCourses = sessionStorage.getItem("cachedCourses");
     return cachedCourses ? JSON.parse(cachedCourses) : [];
   });
   const [loadingCourses, setLoadingCourses] = useState(false);
@@ -50,20 +64,23 @@ const PaymentForm = ({ onClose }) => {
     const fetchCourses = async () => {
       try {
         setLoadingCourses(true);
-        console.time('FetchCourses');
-        
+        console.time("FetchCourses");
+
         // Fetch all published courses with a high limit
-        const response = await api.get(`/courses?isPublished=true&limit=100&page=1&all=true&fields=title,price`, {
-          timeout: 15000, // Increased timeout for larger payload
-        });
-        
-        console.log('Courses API response:', response);
-        
-        console.timeEnd('FetchCourses');
-        console.log('API Response:', response);
-        
+        const response = await api.get(
+          `/courses?isPublished=true&limit=100&page=1&all=true&fields=title,price`,
+          {
+            timeout: 15000, // Increased timeout for larger payload
+          }
+        );
+
+        console.log("Courses API response:", response);
+
+        console.timeEnd("FetchCourses");
+        console.log("API Response:", response);
+
         let coursesData = [];
-        
+
         // Handle different response structures
         if (Array.isArray(response.data)) {
           coursesData = response.data;
@@ -72,46 +89,49 @@ const PaymentForm = ({ onClose }) => {
         } else if (Array.isArray(response.data?.courses)) {
           coursesData = response.data.courses;
         }
-        
+
         if (coursesData.length === 0) {
-          console.warn('No courses found in the response');
-          toast.error('No courses available at the moment');
+          console.warn("No courses found in the response");
+          toast.error("No courses available at the moment");
           return;
         }
-        
-        console.log('Courses data received:', coursesData); // Debug log
-        console.log('Total courses received:', coursesData.length); // Debug log
-        
+
+        console.log("Courses data received:", coursesData); // Debug log
+        console.log("Total courses received:", coursesData.length); // Debug log
+
         // Cache the courses in sessionStorage
-        sessionStorage.setItem('cachedCourses', JSON.stringify(coursesData));
-        sessionStorage.setItem('coursesLastFetched', Date.now().toString());
-        
-        setCourses(prevCourses => {
+        sessionStorage.setItem("cachedCourses", JSON.stringify(coursesData));
+        sessionStorage.setItem("coursesLastFetched", Date.now().toString());
+
+        setCourses((prevCourses) => {
           // Create a map to avoid duplicates
-          const courseMap = new Map(prevCourses.map(course => [course._id, course]));
+          const courseMap = new Map(
+            prevCourses.map((course) => [course._id, course])
+          );
           // Add or update courses
-          coursesData.forEach(course => courseMap.set(course._id, course));
+          coursesData.forEach((course) => courseMap.set(course._id, course));
           return Array.from(courseMap.values());
         });
-        
+
         setHasMoreCourses(false); // No more pages to load since we're fetching all at once
       } catch (error) {
         console.error("Error fetching courses:", error);
-        let errorMessage = 'Failed to load courses';
-        
-        if (error.code === 'ECONNABORTED') {
-          errorMessage = 'Request timed out. Please check your connection and try again.';
+        let errorMessage = "Failed to load courses";
+
+        if (error.code === "ECONNABORTED") {
+          errorMessage =
+            "Request timed out. Please check your connection and try again.";
         } else if (error.response) {
           // The request was made and the server responded with a status code
-          console.error('Response data:', error.response.data);
-          console.error('Response status:', error.response.status);
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
           errorMessage = `Server error: ${error.response.status}`;
         } else if (error.request) {
           // The request was made but no response was received
-          console.error('No response received:', error.request);
-          errorMessage = 'No response from server. Please try again later.';
+          console.error("No response received:", error.request);
+          errorMessage = "No response from server. Please try again later.";
         }
-        
+
         toast.error(errorMessage);
       } finally {
         setLoadingCourses(false);
@@ -120,7 +140,7 @@ const PaymentForm = ({ onClose }) => {
 
     // Always refresh courses on initial load
     fetchCourses();
-    
+
     // Cleanup function
     return () => {
       // Any cleanup if needed
@@ -182,11 +202,12 @@ const PaymentForm = ({ onClose }) => {
       amount: orderData.amount,
       currency: orderData.currency,
       name: "FirstVITE",
-      description: `Payment for ${formData.course}`,
+      description: isCompanyRegistration
+        ? "JobFair Registration Fee"
+        : `Payment for ${formData.course}`,
       order_id: orderData.id,
       handler: async function (response) {
         try {
-          // Prepare payment data with all required fields
           const paymentData = {
             orderId: orderData.id,
             paymentId: response.razorpay_payment_id,
@@ -194,18 +215,41 @@ const PaymentForm = ({ onClose }) => {
             name: formData.name,
             email: formData.email,
             phone: formData.countryCode + formData.phone,
-            course: formData.course,
-            paymentAmount: parseFloat(formData.paymentAmount),
-            address: "Not provided", // Default value for address
-            userId: localStorage.getItem('userId') || null // Get userId from localStorage if available
+            course: isCompanyRegistration
+              ? "JobFair Registration"
+              : formData.course,
+            paymentAmount: isCompanyRegistration
+              ? companyAmount
+              : parseFloat(formData.paymentAmount),
+            address: "Not provided",
+            userId: localStorage.getItem("userId") || null,
+            isCompanyRegistration: isCompanyRegistration || false,
           };
 
           // Verify payment on the server
-          const verifyResponse = await api.post("/payments/verify", paymentData);
+          const verifyResponse = await api.post(
+            "/payments/verify",
+            paymentData
+          );
 
           if (verifyResponse.data.success) {
             toast.success("Payment successful!");
-            onClose();
+
+            if (isCompanyRegistration) {
+              // Clear the company registration data from session
+              sessionStorage.removeItem("companyRegistration");
+              // Navigate to success page for company registration
+              navigate("/", {
+                state: {
+                  message:
+                    "Your company registration and payment are complete!",
+                  isCompanyRegistration: true,
+                },
+              });
+            } else {
+              onClose?.();
+            }
+
             // Reset form
             setFormData({
               name: "",
@@ -217,11 +261,15 @@ const PaymentForm = ({ onClose }) => {
               terms: false,
             });
           } else {
-            toast.error(verifyResponse.data.message || "Payment verification failed. Please contact support.");
+            throw new Error(
+              verifyResponse.data.message || "Payment verification failed"
+            );
           }
         } catch (error) {
           console.error("Payment verification error:", error);
-          const errorMessage = error.response?.data?.message || "Error verifying payment. Please contact support.";
+          const errorMessage =
+            error.response?.data?.message ||
+            "Error verifying payment. Please contact support.";
           toast.error(errorMessage);
         }
       },
@@ -250,22 +298,31 @@ const PaymentForm = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic form validation
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.countryCode ||
-      !formData.phone ||
-      !formData.course ||
-      !formData.paymentAmount
-    ) {
-      toast.error("Please fill in all required fields");
-      return;
+    // Check if this is a company registration payment
+    const requiredFields = isCompanyRegistration
+      ? ["name", "email", "countryCode", "phone", "terms"]
+      : [
+          "name",
+          "email",
+          "countryCode",
+          "phone",
+          "course",
+          "paymentAmount",
+          "terms",
+        ];
+
+    // Validate required fields
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        toast.error(`Please fill in all required fields`);
+        return;
+      }
     }
 
+    // Validate payment amount for non-company payments
     if (
-      isNaN(formData.paymentAmount) ||
-      parseFloat(formData.paymentAmount) <= 0
+      !isCompanyRegistration &&
+      (isNaN(formData.paymentAmount) || parseFloat(formData.paymentAmount) <= 0)
     ) {
       toast.error("Please enter a valid payment amount");
       return;
@@ -274,15 +331,23 @@ const PaymentForm = ({ onClose }) => {
     setIsSubmitting(true);
 
     try {
+      // For company registration, use the predefined amount
+      const amount = isCompanyRegistration
+        ? Math.round(companyAmount * 100) // Convert to paise
+        : parseFloat(formData.paymentAmount) * 100;
+
       // Create a Razorpay order
       const response = await api.post("/payments/create-order", {
-        amount: parseFloat(formData.paymentAmount) * 100, // Convert to paise
+        amount: amount,
         currency: "INR",
         receipt: `rcpt_${Date.now()}`,
         notes: {
-          course: formData.course,
+          course: isCompanyRegistration
+            ? "JobFair Registration"
+            : formData.course,
           name: formData.name,
           email: formData.email,
+          isCompanyRegistration: isCompanyRegistration || false,
         },
       });
 
@@ -303,15 +368,39 @@ const PaymentForm = ({ onClose }) => {
     }
   };
 
-  return (
-    <div className="z-[9999] fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+  useEffect(() => {
+    // Only load from session storage if we don't have initialData
+    if (isCompanyRegistration && !initialData?.email) {
+      const companyData = sessionStorage.getItem("companyRegistration");
+      if (companyData) {
+        const { name, email, phone } = JSON.parse(companyData);
+        setFormData((prev) => ({
+          ...prev,
+          name,
+          email,
+          phone: phone.replace(/^\+91/, ""), // Remove country code if present
+          countryCode: phone.startsWith("+") ? phone.match(/^\+\d+/)[0] : "+91",
+          course: "JobFair Registration",
+          paymentAmount: (companyAmount * 1.18).toString(), // Add 18% GST
+          coursePrice: (companyAmount * 1.18).toString(), // Add 18% GST
+        }));
+      }
+    }
+  }, [isCompanyRegistration, companyAmount, initialData]);
+
+  return createPortal(
+    <div className="z-[99999] fixed inset-0 bg-transparent flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">Make a Payment</h2>
+            <h2 className="text-xl font-bold text-gray-800">
+              {initialData?.isJobFair
+                ? "Make Payment to book JobFair slot"
+                : "Make a Payment"}
+            </h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-red-500 hover:text-red-700"
               disabled={isSubmitting}
             >
               <svg
@@ -345,7 +434,12 @@ const PaymentForm = ({ onClose }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black"
+                readOnly={initialData?.isJobFair}
+                className={`p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${
+                  initialData?.isJobFair
+                    ? "bg-gray-600 text-gray-100 cursor-not-allowed"
+                    : "bg-gray-700 text-white"
+                } border-gray-800 text-black`}
                 required
               />
             </div>
@@ -363,7 +457,12 @@ const PaymentForm = ({ onClose }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black"
+                readOnly={initialData?.isJobFair}
+                className={`p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black ${
+                  initialData?.isJobFair
+                    ? "bg-gray-600 text-gray-100 cursor-not-allowed"
+                    : "bg-gray-700 text-white"
+                }`}
                 required
               />
             </div>
@@ -381,7 +480,12 @@ const PaymentForm = ({ onClose }) => {
                     name="countryCode"
                     value={formData.countryCode}
                     onChange={handleChange}
-                    className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-black dark:text-white rounded-l-md border border-r-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 h-10 px-2 bg-gray-50 border-gray-800 text-black"
+                    disabled={initialData?.isJobFair}
+                    className={`flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-black dark:text-white rounded-l-md border border-r-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 h-10 px-2 bg-gray-50 border-gray-800 text-black ${
+                      initialData?.isJobFair
+                        ? "bg-gray-600 text-gray-100 cursor-not-allowed"
+                        : "bg-gray-700 text-white"
+                    }`}
                   >
                     {countryCodes.map((country) => (
                       <option key={country.code} value={country.code}>
@@ -409,7 +513,12 @@ const PaymentForm = ({ onClose }) => {
                     pattern="[0-9]{10}"
                     inputMode="numeric"
                     maxLength={10}
-                    className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none bg-gray-700 rounded-r-md border border-l-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 border-gray-800 text-black"
+                    readOnly={initialData?.isJobFair}
+                    className={`flex-1 min-w-0 block w-full px-3 py-1 rounded-none bg-gray-700 rounded-r-md border border-l-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 border-gray-800 text-white ${
+                      initialData?.isJobFair
+                        ? "bg-gray-600 text-gray-100 cursor-not-allowed"
+                        : "bg-gray-700 text-white"
+                    }`}
                     required
                   />
                 </div>
@@ -424,7 +533,7 @@ const PaymentForm = ({ onClose }) => {
                 htmlFor="course"
                 className="block text-sm font-medium text-black"
               >
-                Course Name
+                Program Name
               </label>
               {loadingCourses ? (
                 <div className="animate-pulse">
@@ -437,7 +546,12 @@ const PaymentForm = ({ onClose }) => {
                     name="course"
                     value={formData.course}
                     onChange={handleCourseChange}
-                    className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-white bg-gray-700 bg-gray-50 border-gray-800 text-black"
+                    disabled={initialData?.isJobFair}
+                    className={`p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${
+                      initialData?.isJobFair
+                        ? "bg-gray-600 text-gray-100 cursor-not-allowed"
+                        : "bg-gray-700 text-white"
+                    }`}
                     required
                   >
                     <option value="">Select a course</option>
@@ -470,7 +584,7 @@ const PaymentForm = ({ onClose }) => {
                 htmlFor="paymentAmount"
                 className="block text-sm font-medium text-black"
               >
-                Payment Amount (₹)
+                Amount to Pay (₹)
               </label>
               <input
                 type="number"
@@ -510,7 +624,7 @@ const PaymentForm = ({ onClose }) => {
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex justify-center py-1 px-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-black bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black bg-gray-50 border-gray-800 text-black"
+                className="flex justify-center py-1 px-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black bg-gray-50 border-gray-800 text-black"
               >
                 Cancel
               </button>
@@ -525,7 +639,8 @@ const PaymentForm = ({ onClose }) => {
           </form>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

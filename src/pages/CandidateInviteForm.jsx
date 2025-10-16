@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import PaymentForm from "../components/PaymentForm";
 
 const CandidateInviteForm = ({ defaultType = "student" }) => {
   const [userType, setUserType] = useState(defaultType);
@@ -33,6 +34,7 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
   const previewCanvasRef = useRef(null);
   const navigate = useNavigate();
   const [formLink, setFormLink] = useState("");
+  const [companyFormData, setCompanyFormData] = useState(null);
 
   // Clean up object URL on component unmount
   useEffect(() => {
@@ -338,8 +340,8 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
       });
 
       // Add isPaymentDone field for company users
-      if (userType === 'company') {
-        formDataToSend.append('isPaymentDone', false);
+      if (userType === "company") {
+        formDataToSend.append("isPaymentDone", false);
       }
 
       // Send the form data to the backend
@@ -352,13 +354,56 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
       });
 
       toast.success("Application submitted successfully!");
-      navigate("/", {
-        state: {
-          title: "Application Submitted!",
-          message:
-            "Thank you for your interest. We will review your application and get back to you soon.",
-        },
-      });
+
+      // For Payment
+      if (userType === "company") {
+        const companyData = {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          companyName: formData.companyName,
+        };
+        setCompanyFormData(companyData);
+
+        // Store company registration data in session storage
+        sessionStorage.setItem(
+          "companyRegistration",
+          JSON.stringify(companyData)
+        );
+
+        // Redirect to payment page
+        const paymentModal = document.getElementById("paymentModal");
+        if (paymentModal) {
+          paymentModal.showModal();
+        } else {
+          console.error("Payment modal not found");
+          navigate("/payment", {
+            state: {
+              isCompanyRegistration: true,
+              amount: 4000,
+              description: "JobFair Registration Fee",
+              ...companyData, // Spread company data into the state
+            },
+          });
+        }
+      } else {
+        // Original success navigation for non-company users
+        navigate("/", {
+          state: {
+            title: "Application Submitted!",
+            message:
+              "Thank you for your interest. We will review your application and get back to you soon.",
+          },
+        });
+      }
+
+      // navigate("/", {
+      //   state: {
+      //     title: "Application Submitted!",
+      //     message:
+      //       "Thank you for your interest. We will review your application and get back to you soon.",
+      //   },
+      // });
     } catch (error) {
       console.error("Error submitting form:", error);
 
@@ -673,7 +718,8 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
-                {userType === "student" ? "Profile Photo" : "Organization Logo"} (For Invitation Card)
+                {userType === "student" ? "Profile Photo" : "Organization Logo"}{" "}
+                (For Invitation Card)
               </label>
 
               {/* Image Preview */}
@@ -871,6 +917,41 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
             </button>
           </div>
         </form>
+
+        <dialog id="paymentModal" className="modal">
+          <div className="modal-box bg-white text-black max-w-3xl w-[30vw] h-auto overflow-y-auto">
+            <p className="text-green-600 text-center">
+              Please complete your payment to finalize your registration.
+            </p>
+            <form method="dialog" className="modal-backdrop">
+              <button className="btn btn-sm btn-primary text-white mt-2">
+                Ok
+              </button>
+            </form>
+            {companyFormData && (
+              <PaymentForm
+                className="bg-transparent"
+                initialData={{
+                  ...companyFormData,
+                  amount: 4000, // Base amount
+                  course: "JobFair Registration",
+                  isJobFair: true,
+                }}
+                onClose={() => {
+                  const modal = document.getElementById("paymentModal");
+                  if (modal) modal.close();
+                  navigate("/", {
+                    state: {
+                      message:
+                        "Your company registration and payment are complete!",
+                      isCompanyRegistration: true,
+                    },
+                  });
+                }}
+              />
+            )}
+          </div>
+        </dialog>
       </div>
     </div>
   );
