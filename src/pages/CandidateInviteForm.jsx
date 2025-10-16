@@ -337,6 +337,11 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
         }
       });
 
+      // Add isPaymentDone field for company users
+      if (userType === 'company') {
+        formDataToSend.append('isPaymentDone', false);
+      }
+
       // Send the form data to the backend
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4002";
       await axios.post(`${apiUrl}/api/candidates`, formDataToSend, {
@@ -399,7 +404,7 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-6">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-extrabold text-gray-900">
-            JobFair Application
+            JobFair Registration
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             After applying, you will receive event details on your registered
@@ -452,11 +457,7 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                 name="name"
                 id="name"
                 required
-                placeholder={
-                  userType === "student"
-                    ? "e.g., Anisk Mishra"
-                    : "e.g., John Doe"
-                }
+                placeholder="e.g., Anisk Mishra"
                 value={formData.name}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
@@ -672,7 +673,7 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
-                Profile Photo
+                {userType === "student" ? "Profile Photo" : "Organization Logo"} (For Invitation Card)
               </label>
 
               {/* Image Preview */}
@@ -822,7 +823,6 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                   display: "none",
                 }}
               />
-
               <div className="mt-1">
                 <input
                   type="file"
