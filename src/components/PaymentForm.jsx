@@ -23,7 +23,6 @@ const PaymentForm = ({ onClose }) => {
     { code: "+61", flag: "🇦🇺", name: "Australia" },
     { code: "+65", flag: "🇸🇬", name: "Singapore" },
     { code: "+971", flag: "🇦🇪", name: "UAE" },
-    { code: "+92", flag: "🇵🇰", name: "Pakistan" },
     { code: "+86", flag: "🇨🇳", name: "China" },
   ];
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -128,12 +127,39 @@ const PaymentForm = ({ onClose }) => {
     };
   }, [coursePage]);
 
+  // const handleCourseChange = (e) => {
+  //   const selectedCourseTitle = e.target.value;
+  //   const selectedCourse = courses.find(
+  //     (course) => course.title === selectedCourseTitle
+  //   );
+
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     course: selectedCourseTitle,
+  //     coursePrice: selectedCourse?.price || "",
+  //     paymentAmount: selectedCourse?.price || "",
+  //   }));
+  // };
+
   const handleCourseChange = (e) => {
     const selectedCourseTitle = e.target.value;
+
+    if (selectedCourseTitle === "JobFair Registration") {
+      const basePrice = 4000;
+      const gstAmount = Math.round(basePrice * 0.18);
+      const totalPrice = basePrice + gstAmount;
+
+      setFormData((prev) => ({
+        ...prev,
+        course: selectedCourseTitle,
+        coursePrice: totalPrice,
+        paymentAmount: totalPrice,
+      }));
+      return;
+    }
     const selectedCourse = courses.find(
       (course) => course.title === selectedCourseTitle
     );
-
     setFormData((prev) => ({
       ...prev,
       course: selectedCourseTitle,
@@ -415,6 +441,9 @@ const PaymentForm = ({ onClose }) => {
                     required
                   >
                     <option value="">Select a course</option>
+                    <option value="JobFair Registration">
+                      JobFair Registration (₹4,000 + GST)
+                    </option>
                     {[...courses]
                       .sort((a, b) =>
                         a.title.localeCompare(b.title, "en", {
