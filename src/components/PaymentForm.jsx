@@ -595,8 +595,12 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
                 min="0"
                 step="0.01"
                 placeholder="Enter amount"
-                // readOnly={initialData?.isJobFair}
-                className={`p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black`}
+                readOnly={initialData?.isJobFair}
+                className={`p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black ${
+                  initialData?.isJobFair
+                    ? "bg-gray-600 text-gray-100 cursor-not-allowed"
+                    : "bg-gray-700 text-white"
+                }`}
                 required
               />
             </div>
