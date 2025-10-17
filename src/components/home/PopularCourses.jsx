@@ -243,7 +243,7 @@ const PopularCourses = () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-        console.log("Fetching featured courses with showOnHome=true");
+        // console.log("Fetching featured courses with showOnHome=true");
         const response = await axios.get("/courses", {
           params: {
             showOnHome: "true",

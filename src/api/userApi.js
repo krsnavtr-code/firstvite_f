@@ -233,13 +233,13 @@ const userApi = {
 export default userApi;
 
 // For debugging: Log the current API configuration
-export const logApiConfig = () => {
-  console.log('Current API Configuration:', {
-    baseURL: api.defaults.baseURL,
-    withCredentials: api.defaults.withCredentials,
-    headers: api.defaults.headers
-  });
-};
+// export const logApiConfig = () => {
+//   console.log('Current API Configuration:', {
+//     baseURL: api.defaults.baseURL,
+//     withCredentials: api.defaults.withCredentials,
+//     headers: api.defaults.headers
+//   });
+// };
 
 // Test API connection
 export const testApiConnection = async () => {
@@ -265,4 +265,4 @@ export const testApiConnection = async () => {
 };
 
 // Log the configuration when this module is imported
-logApiConfig();
+// logApiConfig();

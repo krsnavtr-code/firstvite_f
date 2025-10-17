@@ -44,7 +44,7 @@ export const getCategories = async (params = {}) => {
       }
     });
     
-    console.log('Fetching categories with params:', requestParams);
+    // console.log('Fetching categories with params:', requestParams);
     const response = await api.get('/categories', { params: requestParams });
     
     // Return the backend response directly

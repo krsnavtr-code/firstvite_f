@@ -28,12 +28,12 @@ export const LMSProvider = ({ children }) => {
   const [currentCourse, setCurrentCourse] = useState(null);
   const [progress, setProgress] = useState({});
   
-  console.log('LMSProvider - User state:', { 
-    user, 
-    isAuthenticated,
-    hasUser: !!user,
-    userId: user?._id 
-  });
+  // console.log('LMSProvider - User state:', { 
+  //   user, 
+  //   isAuthenticated,
+  //   hasUser: !!user,
+  //   userId: user?._id 
+  // });
 
   // Load enrollments when user changes
   const loadEnrollments = useCallback(async () => {

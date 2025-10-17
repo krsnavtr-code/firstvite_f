@@ -22,7 +22,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
         setIsLoading(true);
         setError(null);
 
-        console.log("Fetching all categories (without status filter)...");
+        // console.log("Fetching all categories (without status filter)...");
 
         // First, try without any status filter to see all categories
         const response = await getCategories({
@@ -32,26 +32,26 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
           sort: "name",
         });
 
-        console.log("Categories API Response (all categories):", response);
+        // console.log("Categories API Response (all categories):", response);
 
         // Process the response to extract categories
         let categoriesData = [];
         if (response) {
-          console.log("Raw response data:", response);
+          // console.log("Raw response data:", response);
 
           // Extract categories array from response
           if (Array.isArray(response)) {
-            console.log("Response is a direct array");
+            // console.log("Response is a direct array");
             categoriesData = response;
           } else if (response.data && Array.isArray(response.data)) {
-            console.log("Response has data array");
+            // console.log("Response has data array");
             categoriesData = response.data;
           } else if (response.docs && Array.isArray(response.docs)) {
             console.log("Response has docs array");
             categoriesData = response.docs;
           }
 
-          console.log("Extracted categories:", categoriesData);
+          // console.log("Extracted categories:", categoriesData);
 
           // If no categories found, try one more time with different parameters
           if (categoriesData.length === 0) {

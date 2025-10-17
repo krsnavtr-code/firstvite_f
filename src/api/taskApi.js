@@ -5,12 +5,12 @@ const API_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4002/api
 // Add request interceptor
 axios.interceptors.request.use(
   config => {
-    console.log('Request Interceptor - Sending Request:', {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      data: config.data
-    });
+    // console.log('Request Interceptor - Sending Request:', {
+    //   url: config.url,
+    //   method: config.method,
+    //   headers: config.headers,
+    //   data: config.data
+    // });
     return config;
   },
   error => {
