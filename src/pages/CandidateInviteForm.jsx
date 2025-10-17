@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import PaymentForm from "../components/PaymentForm";
+import _ from "lodash";
 
 const CandidateInviteForm = ({ defaultType = "student" }) => {
   const [userType, setUserType] = useState(defaultType);
@@ -30,11 +31,97 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
   const [crop, setCrop] = useState();
   const [completedCrop, setCompletedCrop] = useState(null);
   const [imgSrc, setImgSrc] = useState(null);
+  const [emailExists, setEmailExists] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [phoneExists, setPhoneExists] = useState(false);
+  const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const imgRef = useRef(null);
   const previewCanvasRef = useRef(null);
   const navigate = useNavigate();
   const [formLink, setFormLink] = useState("");
   const [companyFormData, setCompanyFormData] = useState(null);
+
+  // Check if phone exists in the database
+  const checkPhoneExists = async (phone) => {
+    if (!phone) {
+      setPhoneExists(false);
+      return false;
+    }
+
+    // Basic phone validation (simple check for 10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      setPhoneExists(false);
+      return false;
+    }
+
+    try {
+      setIsCheckingPhone(true);
+      const response = await axios.get(
+        `/api/candidates/check-phone?phone=${encodeURIComponent(phone)}`
+      );
+      setPhoneExists(response.data.exists);
+      return response.data.exists;
+    } catch (error) {
+      console.error("Error checking phone:", error);
+      return false;
+    } finally {
+      setIsCheckingPhone(false);
+    }
+  };
+
+  // Create debounced version of checkPhoneExists
+  const debouncedCheckPhone = useRef(
+    _.debounce(async (phone) => checkPhoneExists(phone))
+  ).current;
+
+  // Cleanup debounce on component unmount
+  useEffect(() => {
+    return () => {
+      debouncedCheckPhone.cancel();
+    };
+  }, [debouncedCheckPhone]);
+
+  // Check if email exists in the database
+  const checkEmailExists = async (email) => {
+    if (!email) {
+      setEmailExists(false);
+      return false;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailExists(false);
+      return false;
+    }
+
+    try {
+      setIsCheckingEmail(true);
+      const response = await axios.get(
+        `/api/candidates/check-email?email=${encodeURIComponent(email)}`
+      );
+      setEmailExists(response.data.exists);
+      return response.data.exists;
+    } catch (error) {
+      console.error("Error checking email:", error);
+      return false;
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  };
+
+  // Debounced version of checkEmailExists
+  const debouncedCheckEmail = useRef(
+    _.debounce((email) => checkEmailExists(email), 500)
+  ).current;
+
+  // Clean up debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedCheckEmail.cancel();
+    };
+  }, [debouncedCheckEmail]);
 
   // Clean up object URL on component unmount
   useEffect(() => {
@@ -138,8 +225,47 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, files } = e.target;
+
+    // Handle file input
+    if (name === "profilePhoto") {
+      if (files && files[0]) {
+        const file = files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          setImgSrc(reader.result);
+        };
+
+        reader.readAsDataURL(file);
+      }
+      return;
+    }
+
+    // Check if phone exists when phone field changes
+    if (name === "phone") {
+      debouncedCheckPhone(value);
+    }
+
+    // Update form data
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+
+    // Check if email exists when email field changes
+    if (name === "email") {
+      debouncedCheckEmail(value);
+    }
 
     // Skip file handling for profile photo as we handle it separately
     if (name === "profilePhoto") {
@@ -150,14 +276,6 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
     if (name === "userType") {
       handleUserTypeChange(value);
       return;
-    }
-
-    // Clear error for the field being edited
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
     }
 
     // For file inputs, we need to handle them differently
@@ -538,7 +656,7 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                 Email Address *
               </label>
               <div className="flex gap-2">
-                <div className="flex-1">
+                <div className="flex-1 relative">
                   <input
                     type="email"
                     name="email"
@@ -547,19 +665,48 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                     placeholder="e.g., example@gmail.com"
                     value={formData.email}
                     onChange={handleChange}
-                    disabled={otpSent}
-                    className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm p-2 border ${
-                      errors.email
+                    disabled={otpSent || isCheckingEmail}
+                    className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm p-2 pr-10 border ${
+                      errors.email || emailExists
                         ? "border-red-500"
                         : "border-gray-300 focus:border-indigo-500"
                     } ${otpSent ? "bg-gray-100" : ""}`}
                   />
+                  {isCheckingEmail && (
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg
+                        className="h-5 w-5 text-gray-500 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    </div>
+                  )}
+                  {emailExists && !isCheckingEmail && (
+                    <p className="mt-1 text-sm text-red-600">
+                      Already registered.
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"
                   onClick={handleSendOtp}
                   disabled={isSubmitting || otpSent || !formData.email}
-                  className={`mt-1 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                  className={`mt-1 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white h-[40px] ${
                     otpSent
                       ? "bg-green-600 hover:bg-green-700"
                       : "bg-indigo-600 hover:bg-indigo-700"
@@ -650,8 +797,37 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                     : "border-gray-300 focus:border-indigo-500"
                 }`}
               />
+              {isCheckingPhone && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-500 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </div>
+              )}
               {errors.phone && (
                 <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+              )}
+              {phoneExists && !isCheckingPhone && (
+                <p className="mt-1 text-sm text-red-600">
+                  Already registered.
+                </p>
               )}
             </div>
 
