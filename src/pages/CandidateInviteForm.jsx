@@ -35,6 +35,8 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [phoneExists, setPhoneExists] = useState(false);
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
+  const [showPendingPaymentModal, setShowPendingPaymentModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const imgRef = useRef(null);
   const previewCanvasRef = useRef(null);
   const navigate = useNavigate();
@@ -48,17 +50,41 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
       return false;
     }
 
-    // Basic phone validation (simple check for 10 digits)
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(phone)) {
-      setPhoneExists(false);
-      return false;
+    // First, check for pending payments
+    if (formData.email && formData.email.includes("@") && phone.length >= 10) {
+      try {
+        const response = await axios.get(
+          "/api/candidates/check-company-payment",
+          { params: { email: formData.email, phone } }
+        );
+
+        if (response.data.exists) {
+          if (response.data.userType === "company") {
+            setFormData((prev) => ({
+              ...prev,
+              isPaymentDone: response.data.isPaymentDone,
+            }));
+
+            if (!response.data.isPaymentDone) {
+              setShowPendingPaymentModal(true);
+              setPhoneExists(true);
+              return true;
+            }
+
+            setPhoneExists(true);
+            return true;
+          }
+        }
+      } catch (error) {
+        console.error("Error checking company payment status:", error);
+      }
     }
 
+    // Then proceed with normal phone existence check
     try {
       setIsCheckingPhone(true);
       const response = await axios.get(
-        `/api/candidates/check-phone?phone=${encodeURIComponent(phone)}`
+        `/api/candidates/check-phone?phone=${phone}`
       );
       setPhoneExists(response.data.exists);
       return response.data.exists;
@@ -489,18 +515,31 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
           JSON.stringify(companyData)
         );
 
-        // Redirect to payment page
-        const paymentModal = document.getElementById("paymentModal");
-        if (paymentModal) {
-          paymentModal.showModal();
+        // // Redirect to payment page
+        // const paymentModal = document.getElementById("paymentModal");
+        // if (paymentModal) {
+        //   paymentModal.showModal();
+        //   showPaymentModal();
+        // } else {
+        //   console.error("Payment modal not found");
+        //   navigate("/payment", {
+        //     state: {
+        //       isCompanyRegistration: true,
+        //       amount: 4000,
+        //       description: "JobFair Registration Fee",
+        //       ...companyData, // Spread company data into the state
+        //     },
+        //   });
+        // }
+        if (userType === "company") {
+          setShowPaymentModal(true);
         } else {
-          console.error("Payment modal not found");
           navigate("/payment", {
             state: {
               isCompanyRegistration: true,
               amount: 4000,
               description: "JobFair Registration Fee",
-              ...companyData, // Spread company data into the state
+              ...companyData,
             },
           });
         }
@@ -563,8 +602,8 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-6">
+    <div className="min-h-screen bg-gray-50 py-12 px-1 md:px-8 lg:px-12">
+      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-2">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-extrabold text-gray-900">
             JobFair Registration
@@ -576,9 +615,9 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* User Type Selection */}
-            <div className="sm:col-span-2 hidden">
+            <div className="hidden">
               <label className="block text-sm font-semibold text-gray-800 mb-2">
                 I am a *
               </label>
@@ -608,47 +647,8 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
               </div>
             </div>
 
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
-              >
-                {userType === "student" ? "Full Name" : "Person Name"} *
-              </label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                required
-                placeholder="e.g., Anisk Mishra"
-                value={formData.name}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-              />
-            </div>
-
-            {userType === "company" && (
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="companyName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Organization Name *
-                </label>
-                <input
-                  type="text"
-                  name="companyName"
-                  id="companyName"
-                  required
-                  placeholder="e.g., Tech Solutions Inc."
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                />
-              </div>
-            )}
-
-            <div className="sm:col-span-2">
+            {/* Email */}
+            <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
@@ -698,22 +698,28 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                   )}
                   {emailExists && !isCheckingEmail && (
                     <p className="mt-1 text-sm text-red-600">
-                      Already registered.
+                      {userType === "company"
+                        ? formData.phone?.trim()
+                          ? ""
+                          : "Already registered (For check payment Status Enter Mobile Number)"
+                        : "Already registered."}
                     </p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  disabled={isSubmitting || otpSent || !formData.email}
-                  className={`mt-1 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white h-[40px] ${
-                    otpSent
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-indigo-600 hover:bg-indigo-700"
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50`}
-                >
-                  {otpSent ? "✓ Sent" : "Send OTP"}
-                </button>
+                {!emailExists && (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={isSubmitting || otpSent || !formData.email}
+                    className={`mt-1 inline-flex items-center px-2 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white h-[40px] ${
+                      otpSent
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-indigo-600 hover:bg-indigo-700"
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50`}
+                  >
+                    {otpSent ? "✓ Sent" : "OTP"}
+                  </button>
+                )}
               </div>
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -776,7 +782,8 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
               )}
             </div>
 
-            <div>
+            {/* Phone Number */}
+            <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
               <label
                 htmlFor="phone"
                 className="block text-sm font-medium text-gray-700"
@@ -825,15 +832,22 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                 <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
               )}
               {phoneExists && !isCheckingPhone && (
-                <p className="mt-1 text-sm text-red-600">
-                  Already registered.
-                </p>
+                <div>
+                  <p className="mt-1 text-sm text-red-600">
+                    {userType === "company" || formData.isPaymentDone === false
+                      ? formData.email?.trim()
+                        ? "Yes your payment is pending. Please complete your payment."
+                        : "Already registered (For check payment Status Enter Email Id)"
+                      : "Already registered."}
+                  </p>
+                </div>
               )}
             </div>
 
+            {/* Course */}
             {userType === "student" && (
               <>
-                <div>
+                <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
                   <label
                     htmlFor="course"
                     className="block text-sm font-medium text-gray-700"
@@ -852,7 +866,7 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                   />
                 </div>
 
-                <div>
+                <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
                   <label
                     htmlFor="college"
                     className="block text-sm font-medium text-gray-700"
@@ -871,7 +885,7 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
                   />
                 </div>
 
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
                   <label
                     htmlFor="university"
                     className="block text-sm font-medium text-gray-700"
@@ -892,242 +906,345 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
               </>
             )}
 
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {userType === "student" ? "Profile Photo" : "Organization Logo"}{" "}
-                (For Invitation Card)
+            {/* Name */}
+            <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                {userType === "student" ? "Full Name" : "Person Name"} *
               </label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                required
+                placeholder="e.g., Anisk Mishra"
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+              />
+            </div>
 
-              {/* Image Preview */}
-              {previewUrl && (
-                <div className="mt-2 mb-4">
-                  <img
-                    src={previewUrl}
-                    alt="Profile preview"
-                    className="h-32 w-32 rounded-full object-cover border-2 border-gray-300"
-                  />
-                </div>
-              )}
+            {/* Company Name */}
+            {userType === "company" && !emailExists && (
+              <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
+                <label
+                  htmlFor="companyName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Organization Name *
+                </label>
+                <input
+                  type="text"
+                  name="companyName"
+                  id="companyName"
+                  required
+                  placeholder="e.g., Tech Solutions Inc."
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                />
+              </div>
+            )}
 
-              {/* Crop Modal */}
-              {imgSrc && (
-                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-                  <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-xl">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-semibold text-gray-800">
-                        Crop Your Profile Photo
-                      </h3>
-                      <button
-                        onClick={() => setImgSrc(null)}
-                        className="text-gray-500 hover:text-gray-700"
-                        aria-label="Close"
-                      >
-                        <svg
-                          className="w-6 h-6"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+            {/* Payment Button if not paid */}
+            <div className="flex items-center justify-end mt-4">
+              {(userType === "company" || formData.isPaymentDone === false) &&
+              formData.email?.trim() &&
+              formData.phone?.trim() &&
+              emailExists ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!formData.name?.trim()) {
+                      toast.error("Please enter Name");
+                      return;
+                    }
+                    if (!formData.email?.trim()) {
+                      toast.error("Please enter Email");
+                      return;
+                    }
+                    if (!formData.phone?.trim()) {
+                      toast.error("Please enter Phone Number");
+                      return;
+                    }
+
+                    setCompanyFormData({
+                      name: formData.name,
+                      email: formData.email,
+                      phone: formData.phone,
+                      course: formData.course || "JobFair Registration",
+                      userType: "company",
+                      isJobFair: true,
+                    });
+                    setShowPaymentModal(true);
+                  }}
+                  className="mt-1 inline-flex items-center px-4 py-2 border border-transparent text-font-medium rounded-md shadow-sm text-white h-[40px] bg-indigo-600 hover:bg-indigo-7focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Pay Now
+                </button>
+              ) : null}
+            </div>
+
+            {/* Profile Photo */}
+            {!emailExists && (
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {userType === "student"
+                    ? "Profile Photo"
+                    : "Photo"}{" "}
+                  (For Invitation Card)
+                </label>
+
+                {/* Image Preview */}
+                {previewUrl && (
+                  <div className="mt-2 mb-4">
+                    <img
+                      src={previewUrl}
+                      alt="Profile preview"
+                      className="h-32 w-32 rounded-full object-cover border-2 border-gray-300"
+                    />
+                  </div>
+                )}
+
+                {/* Crop Modal */}
+                {imgSrc && (
+                  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-xl">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-semibold text-gray-800">
+                          Crop Your Profile Photo
+                        </h3>
+                        <button
+                          onClick={() => setImgSrc(null)}
+                          className="text-gray-500 hover:text-gray-700"
+                          aria-label="Close"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
+                          <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
 
-                    <div className="mb-4 p-2 bg-gray-50 rounded-lg border border-gray-200">
-                      <p className="text-sm text-gray-600 mb-3">
-                        <span className="font-medium">How to crop:</span> Click
-                        and drag to select an area. The selected area will be
-                        your profile picture.
-                      </p>
-                      <div className="relative">
-                        <ReactCrop
-                          crop={crop}
-                          onChange={(c) => setCrop(c)}
-                          onComplete={(c) => setCompletedCrop(c)}
-                          aspect={1}
-                          circularCrop={true}
-                          className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden"
+                      <div className="mb-4 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                        <p className="text-sm text-gray-600 mb-3">
+                          <span className="font-medium">How to crop:</span>{" "}
+                          Click and drag to select an area. The selected area
+                          will be your profile picture.
+                        </p>
+                        <div className="relative">
+                          <ReactCrop
+                            crop={crop}
+                            onChange={(c) => setCrop(c)}
+                            onComplete={(c) => setCompletedCrop(c)}
+                            aspect={1}
+                            circularCrop={true}
+                            className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden"
+                          >
+                            <img
+                              ref={onImageLoad}
+                              src={imgSrc}
+                              alt="Crop preview"
+                              style={{
+                                maxHeight: "60vh",
+                                maxWidth: "100%",
+                                display: "block",
+                                margin: "0 auto",
+                              }}
+                              onLoad={(e) => {
+                                // Set initial crop to cover the center of the image
+                                const { width, height } = e.target;
+                                const size = Math.min(width, height) * 0.95; // 95% of the smaller dimension
+                                const x = (width - size) / 2;
+                                const y = (height - size) / 2;
+                                setCrop({
+                                  unit: "px",
+                                  width: size,
+                                  height: size,
+                                  x,
+                                  y,
+                                });
+                              }}
+                            />
+                          </ReactCrop>
+                          {!crop && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="text-center p-4 bg-white/80 rounded-lg">
+                                <svg
+                                  className="mx-auto h-12 w-12 text-gray-400"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1.5}
+                                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                                  />
+                                </svg>
+                                <p className="mt-2 text-sm text-gray-600">
+                                  Drag to select an area
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                        <button
+                          type="button"
+                          onClick={() => setImgSrc(null)}
+                          className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                          <img
-                            ref={onImageLoad}
-                            src={imgSrc}
-                            alt="Crop preview"
-                            style={{
-                              maxHeight: "60vh",
-                              maxWidth: "100%",
-                              display: "block",
-                              margin: "0 auto",
-                            }}
-                            onLoad={(e) => {
-                              // Set initial crop to cover the center of the image
-                              const { width, height } = e.target;
-                              const size = Math.min(width, height) * 0.95; // 95% of the smaller dimension
-                              const x = (width - size) / 2;
-                              const y = (height - size) / 2;
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (crop) {
+                              applyCrop();
+                            } else {
+                              // If no crop is made, use the full image
                               setCrop({
-                                unit: "px",
-                                width: size,
-                                height: size,
-                                x,
-                                y,
+                                unit: "%",
+                                width: 100,
+                                height: 100,
+                                x: 0,
+                                y: 0,
+                              });
+                              setTimeout(applyCrop, 100);
+                            }
+                          }}
+                          className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          Save Photo
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Hidden canvas for image processing */}
+                <canvas
+                  ref={previewCanvasRef}
+                  style={{
+                    display: "none",
+                  }}
+                />
+                <div className="mt-1">
+                  <input
+                    type="file"
+                    name="profilePhoto"
+                    id="profilePhoto"
+                    accept="image/*"
+                    onChange={onSelectFile}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="profilePhoto"
+                    className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    <svg
+                      className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                      xmlns="http://www.w3.org/20000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    {previewUrl ? "Change Photo" : "Upload Photo"}
+                  </label>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.profilePhoto
+                    ? formData.profilePhoto.name
+                    : "PNG, JPG, JPEG up to 5MB"}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {!emailExists && (
+            <div className="flex items-center justify-end">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Submitting..." : "Apply"}
+              </button>
+            </div>
+          )}
+        </form>
+
+        {showPaymentModal && (
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <div
+                className="fixed inset-0 transition-opacity"
+                aria-hidden="true"
+              >
+                <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+              </div>
+              <span
+                className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                aria-hidden="true"
+              >
+                &#8203;
+              </span>
+              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-[2px]">
+                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                      <div className="mt-2">
+                        {companyFormData && (
+                          <PaymentForm
+                            className="bg-transparent mt-4"
+                            initialData={{
+                              ...companyFormData,
+                              amount: 4000,
+                              course: "JobFair Registration",
+                              isJobFair: true,
+                            }}
+                            onClose={() => {
+                              setShowPaymentModal(false);
+                              navigate("/", {
+                                state: {
+                                  title: "Registration Submitted!",
+                                  message:
+                                    "Thank you for your Registration!",
+                                },
                               });
                             }}
                           />
-                        </ReactCrop>
-                        {!crop && (
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="text-center p-4 bg-white/80 rounded-lg">
-                              <svg
-                                className="mx-auto h-12 w-12 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1.5}
-                                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                                />
-                              </svg>
-                              <p className="mt-2 text-sm text-gray-600">
-                                Drag to select an area
-                              </p>
-                            </div>
-                          </div>
                         )}
                       </div>
                     </div>
-
-                    <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                      <button
-                        type="button"
-                        onClick={() => setImgSrc(null)}
-                        className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (crop) {
-                            applyCrop();
-                          } else {
-                            // If no crop is made, use the full image
-                            setCrop({
-                              unit: "%",
-                              width: 100,
-                              height: 100,
-                              x: 0,
-                              y: 0,
-                            });
-                            setTimeout(applyCrop, 100);
-                          }
-                        }}
-                        className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        Save Photo
-                      </button>
-                    </div>
                   </div>
                 </div>
-              )}
-
-              {/* Hidden canvas for image processing */}
-              <canvas
-                ref={previewCanvasRef}
-                style={{
-                  display: "none",
-                }}
-              />
-              <div className="mt-1">
-                <input
-                  type="file"
-                  name="profilePhoto"
-                  id="profilePhoto"
-                  accept="image/*"
-                  onChange={onSelectFile}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="profilePhoto"
-                  className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  <svg
-                    className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                    xmlns="http://www.w3.org/20000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  {previewUrl ? "Change Photo" : "Upload Photo"}
-                </label>
               </div>
-              <p className="mt-1 text-xs text-gray-500">
-                {formData.profilePhoto
-                  ? formData.profilePhoto.name
-                  : "PNG, JPG, JPEG up to 5MB"}
-              </p>
             </div>
           </div>
-
-          <div className="flex items-center justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? "Submitting..." : "Apply"}
-            </button>
-          </div>
-        </form>
-
-        <dialog id="paymentModal" className="modal">
-          <div className="modal-box bg-white text-black max-w-3xl w-[30vw] h-auto overflow-y-auto">
-            <p className="text-green-600 text-center">
-              Please complete your payment to finalize your registration.
-            </p>
-            <form method="dialog" className="modal-backdrop">
-              <button className="btn btn-sm btn-primary text-white mt-2">
-                Ok
-              </button>
-            </form>
-            {companyFormData && (
-              <PaymentForm
-                className="bg-transparent"
-                initialData={{
-                  ...companyFormData,
-                  amount: 4000, // Base amount
-                  course: "JobFair Registration",
-                  isJobFair: true,
-                }}
-                onClose={() => {
-                  const modal = document.getElementById("paymentModal");
-                  if (modal) modal.close();
-                  navigate("/", {
-                    state: {
-                      message:
-                        "Your company registration and payment are complete!",
-                      isCompanyRegistration: true,
-                    },
-                  });
-                }}
-              />
-            )}
-          </div>
-        </dialog>
+        )}
       </div>
     </div>
   );

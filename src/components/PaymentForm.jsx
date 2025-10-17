@@ -74,10 +74,10 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
           }
         );
 
-        console.log("Courses API response:", response);
+        // console.log("Courses API response:", response);
 
-        console.timeEnd("FetchCourses");
-        console.log("API Response:", response);
+        // console.timeEnd("FetchCourses");
+        // console.log("API Response:", response);
 
         let coursesData = [];
 
@@ -96,8 +96,8 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
           return;
         }
 
-        console.log("Courses data received:", coursesData); // Debug log
-        console.log("Total courses received:", coursesData.length); // Debug log
+        // console.log("Courses data received:", coursesData); // Debug log
+        // console.log("Total courses received:", coursesData.length); // Debug log
 
         // Cache the courses in sessionStorage
         sessionStorage.setItem("cachedCourses", JSON.stringify(coursesData));
@@ -595,12 +595,8 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
                 min="0"
                 step="0.01"
                 placeholder="Enter amount"
-                readOnly={initialData?.isJobFair}
-                className={`p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black ${
-                  initialData?.isJobFair
-                    ? "bg-gray-600 text-gray-100 cursor-not-allowed"
-                    : "bg-gray-700 text-white"
-                }`}
+                // readOnly={initialData?.isJobFair}
+                className={`p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black`}
                 required
               />
             </div>

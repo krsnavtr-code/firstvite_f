@@ -37,15 +37,15 @@ export const LMSProvider = ({ children }) => {
 
   // Load enrollments when user changes
   const loadEnrollments = useCallback(async () => {
-    console.group('Loading Enrollments');
-    console.log('Current auth state:', { user, isAuthenticated });
+    // console.group('Loading Enrollments');
+    // console.log('Current auth state:', { user, isAuthenticated });
     
     const token = localStorage.getItem('token');
     if ((!user && !token) || !isAuthenticated) {
-      console.log('No authenticated user or token, skipping enrollments load');
+      // console.log('No authenticated user or token, skipping enrollments load');
       setLoading(false);
       setEnrollments([]);
-      console.groupEnd();
+      // console.groupEnd();
       return;
     }
     

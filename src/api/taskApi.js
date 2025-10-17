@@ -22,12 +22,12 @@ axios.interceptors.request.use(
 // Add response interceptor
 axios.interceptors.response.use(
   response => {
-    console.log('Response Interceptor - Received Response:', {
-      status: response.status,
-      statusText: response.statusText,
-      data: response.data,
-      headers: response.headers
-    });
+    // console.log('Response Interceptor - Received Response:', {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   data: response.data,
+    //   headers: response.headers
+    // });
     return response;
   },
   error => {
