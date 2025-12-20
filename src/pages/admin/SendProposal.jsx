@@ -14,14 +14,14 @@ const SendProposal = () => {
   // Default form values
   const defaultValues = {
     subject: "Invitation for Job Fair 2025 | FirstVITE E-Learning",
-    colleges_Invetation_for_Student: `<div style="font-size: 16px;">
+    collegeInvitationMessage: `<div style="font-size: 16px;">
 Dear [College Name],
 
 Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
 
 Skill Development company dedicated to enhancing student employability through practical and industry-aligned courses.
 
-At <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>, we specialize in training students in high-demand technical skills including:
+At <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!, we specialize in training students in high-demand technical skills including:
 
 🔹 Java Development
 🔹 Python Programming
@@ -158,8 +158,7 @@ Warm regards,
       studentMessage: defaultValues.studentMessage,
       collegeMessage: defaultValues.collegeMessage,
       companyMessage: defaultValues.companyMessage,
-      colleges_Invetation_for_Student:
-        defaultValues.colleges_Invetation_for_Student,
+      collegeInvitationMessage: defaultValues.collegeInvitationMessage,
     },
   });
 
@@ -191,7 +190,7 @@ Warm regards,
             ? data.collegeMessage
             : selectedMessageType === "company"
             ? data.companyMessage
-            : data.colleges_Invetation_for_Student,
+            : data.collegeInvitationMessage,
       };
 
       // Debug log to check the selected message type and content
@@ -275,8 +274,10 @@ Warm regards,
             recipientType = "college/university";
           } else if (messageType === "company") {
             recipientType = "company";
+          } else if (messageType === "collegeInvitation") {
+            recipientType = "college for student program";
           } else {
-            recipientType = "college for student invitation";
+            recipientType = "company";
           }
 
           setSuccess(`Proposal sent successfully to ${recipientType}!`);
@@ -289,8 +290,7 @@ Warm regards,
             studentMessage: defaultValues.studentMessage,
             collegeMessage: defaultValues.collegeMessage,
             companyMessage: defaultValues.companyMessage,
-            colleges_Invetation_for_Student:
-              defaultValues.colleges_Invetation_for_Student,
+
             emails: "",
           });
           setFiles([]);
@@ -321,9 +321,6 @@ Warm regards,
             messageType: messageType,
             studentMessage: defaultValues.studentMessage,
             collegeMessage: defaultValues.collegeMessage,
-            companyMessage: defaultValues.companyMessage,
-            colleges_Invetation_for_Student:
-              defaultValues.colleges_Invetation_for_Student,
             emails: "",
           });
           setFiles([]);
@@ -583,6 +580,51 @@ college3@example.com"
                       {errors.companyMessage.message}
                     </p>
                   )}
+                </div>
+              </div>
+            </label>
+          </div>
+
+          {/* College collegeInvitation Message Card */}
+          <div
+            className={`border-2 rounded-lg p-4 transition-colors ${
+              watch("messageType") === "collegeInvitation"
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-gray-200 hover:border-indigo-300"
+            }`}
+          >
+            <label className="flex items-start space-x-3 cursor-pointer">
+              <input
+                type="radio"
+                {...register("messageType")}
+                value="collegeInvitation"
+                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="block text-sm font-medium text-gray-700">
+                    College Invitation for Student Program{" "}
+                    <span className="text-red-600">
+                      (Remember to change the [College Name] before sending)
+                    </span>
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <div className="mt-2">
+                    <textarea
+                      {...register("collegeInvitationMessage", {
+                        required: "College/University message is required",
+                      })}
+                      rows={4}
+                      className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Write your message for the college/university here..."
+                    />
+                    {errors.collegeInvitationMessage && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.collegeInvitationMessage.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </label>
