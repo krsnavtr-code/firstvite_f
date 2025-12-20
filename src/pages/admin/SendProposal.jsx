@@ -2,19 +2,12 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import axios from "../../api/axios";
-import { FiSend } from "react-icons/fi";
+import { FiSend, FiRefreshCw, FiPaperclip, FiX } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
-const SendProposal = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [files, setFiles] = useState([]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  // Default form values
-  const defaultValues = {
-    subject: "Invitation for Job Fair 2025 | FirstVITE E-Learning",
-    collegeInvitationMessage: `<div style="font-size: 16px;">
+// --- Configuration & Templates ---
+const EMAIL_TEMPLATES = {
+  collegeInvitationMessage: `<div style="font-size: 16px;">
 Dear [College Name],
 
 Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
@@ -49,7 +42,8 @@ Thank you & Best Regards,
 📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
 </div>`,
-    studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
+
+  studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear Student,
 
 Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
@@ -82,9 +76,9 @@ Warm regards,
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
-</div>
-`,
-    collegeMessage: `<div style="color: #4DA3FF; font-size: 18px;">
+</div>`,
+
+  collegeMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear [College Name],
 
 Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
@@ -110,9 +104,9 @@ Warm regards,
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
-</div>
-`,
-    companyMessage: `<div style="color: #4DA3FF; font-size: 18px;">
+</div>`,
+
+  companyMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear [Company Name],
 
 We are excited to announce that <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>! are organizing a Job Fair which will bring together over 👥1,500+ students from multiple leading colleges/universities.
@@ -141,197 +135,132 @@ Warm regards,
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
-</div>
-`,
-  };
+</div>`,
+};
+
+const MESSAGE_OPTIONS = [
+  {
+    id: "student",
+    label: "Message for Student",
+    field: "studentMessage",
+  },
+  {
+    id: "college",
+    label: "Message for College/University",
+    field: "collegeMessage",
+    note: "(Remember to change [College Name])",
+  },
+  {
+    id: "company",
+    label: "Message for Company",
+    field: "companyMessage",
+    note: "(Remember to change [Company Name])",
+  },
+  {
+    id: "collegeInvitation",
+    label: "College Invitation (Student Program)",
+    field: "collegeInvitationMessage",
+    note: "(Remember to change [College Name])",
+  },
+];
+
+const SendProposal = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [files, setFiles] = useState([]);
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      messageType: "student", // Set default message type
-      subject: defaultValues.subject,
-      studentMessage: defaultValues.studentMessage,
-      collegeMessage: defaultValues.collegeMessage,
-      companyMessage: defaultValues.companyMessage,
-      collegeInvitationMessage: defaultValues.collegeInvitationMessage,
+      messageType: "student",
+      subject: "Invitation from | FirstVITE E-Learning Pvt. Ltd.",
+      ...EMAIL_TEMPLATES, 
     },
   });
+
+  const currentMessageType = watch("messageType");
 
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-      setError("");
-      setSuccess("");
 
       const formData = new FormData();
 
-      // Process emails from textarea (split by newline and filter out empty lines)
+      // Better email parsing: splits by newlines AND commas
       const emailList = data.emails
-        .split("\n")
+        .split(/[\n,]+/)
         .map((email) => email.trim())
         .filter((email) => email);
 
-      // Get the selected message type
-      const selectedMessageType = watch("messageType");
+      if (emailList.length === 0) {
+        toast.error("Please enter at least one valid email.");
+        return;
+      }
 
-      // Prepare the data object that will be stringified
+      // Determine the active message content based on selection
+      const activeField = MESSAGE_OPTIONS.find(
+        (opt) => opt.id === data.messageType
+      )?.field;
+      const finalMessage = data[activeField];
+
       const emailData = {
         emails: emailList,
         subject: data.subject,
-        message:
-          selectedMessageType === "student"
-            ? data.studentMessage
-            : selectedMessageType === "college"
-            ? data.collegeMessage
-            : selectedMessageType === "company"
-            ? data.companyMessage
-            : data.collegeInvitationMessage,
+        message: finalMessage,
       };
 
-      // Debug log to check the selected message type and content
-      console.log("Selected message type:", selectedMessageType);
-      console.log("Using message:", emailData.message.substring(0, 50) + "...");
+      // Append Files
+      files.forEach((file) => formData.append("attachments", file));
 
-      // Add files first (this is important for some servers)
-      if (files && files.length > 0) {
-        console.log("Adding files to form data:", files);
-        files.forEach((file, index) => {
-          formData.append("attachments", file);
-          console.log(
-            `Added file ${index + 1}: ${file.name} (${(
-              file.size /
-              (1024 * 1024)
-            ).toFixed(2)}MB)`
-          );
-        });
-      } else {
-        console.log("No files to attach");
-      }
-
-      // Add the stringified data to formData as the last item
+      // Append Data
       formData.append("data", JSON.stringify(emailData));
 
-      // Log form data for debugging (without logging file content)
-      console.log("FormData entries:");
-      for (let pair of formData.entries()) {
-        if (pair[0] === "attachments") {
-          console.log(
-            `${pair[0]}: ${pair[1].name} (${(
-              pair[1].size /
-              (1024 * 1024)
-            ).toFixed(2)}MB)`
-          );
-        } else {
-          console.log(pair[0] + ":", pair[1]);
-        }
-      }
-
-      // Get token from localStorage
       const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
+      if (!token) throw new Error("Authentication token not found");
 
-      // Show loading toast
-      const toastId = toast.loading("Sending emails with attachments...");
+      const toastId = toast.loading("Sending emails...");
 
-      try {
-        const response = await axios({
-          method: "post",
-          url: `${
-            import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api"
-          }/v1/admin/emails/send-proposal`,
-          data: formData,
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-          timeout: 120000, // 2 minutes
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            toast.loading(`Uploading files: ${percentCompleted}%`, {
-              id: toastId,
-            });
-          },
+      const response = await axios({
+        method: "post",
+        url: `${
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api"
+        }/v1/admin/emails/send-proposal`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+        timeout: 120000,
+      });
+
+      if (response.data && response.data.status === "success") {
+        toast.success(response.data.message || "Proposal sent successfully!", {
+          id: toastId,
         });
 
-        // Update toast to success
-        toast.success("Emails sent successfully!", { id: toastId });
+        // Reset only emails and files, keep the message templates
+        setValue("emails", "");
+        setFiles([]);
+      } else {
+        throw new Error(response.data?.message || "Failed to send proposal");
+      }
+    } catch (error) {
+      console.error("Error sending proposal:", error);
 
-        if (response.data && response.data.status === "success") {
-          const messageType = watch("messageType");
-          let recipientType;
-          if (messageType === "student") {
-            recipientType = "student";
-          } else if (messageType === "college") {
-            recipientType = "college/university";
-          } else if (messageType === "company") {
-            recipientType = "company";
-          } else if (messageType === "collegeInvitation") {
-            recipientType = "college for student program";
-          } else {
-            recipientType = "company";
-          }
-
-          setSuccess(`Proposal sent successfully to ${recipientType}!`);
-          toast.success(response.data.message || "Proposal sent successfully!");
-
-          // Reset form but keep the default messages and current message type
-          reset({
-            subject: defaultValues.subject,
-            messageType: messageType,
-            studentMessage: defaultValues.studentMessage,
-            collegeMessage: defaultValues.collegeMessage,
-            companyMessage: defaultValues.companyMessage,
-
-            emails: "",
-          });
-          setFiles([]);
-        } else {
-          throw new Error(response.data?.message || "Failed to send proposal");
-        }
-      } catch (error) {
-        console.error("Error sending proposal:", error);
-
-        // Check if it's a timeout error
-        if (
-          error.code === "ECONNABORTED" ||
-          error.message.includes("timeout")
-        ) {
-          // Show success message even on timeout since emails are processed in background
-          const messageType = watch("messageType");
-          const recipientType =
-            messageType === "student" ? "student" : "college/university";
-
-          setSuccess(`Proposal is being sent to ${recipientType}!`);
-          toast.success(
-            "Your request is being processed. You'll receive a confirmation once completed."
-          );
-
-          // Still reset the form
-          reset({
-            subject: defaultValues.subject,
-            messageType: messageType,
-            studentMessage: defaultValues.studentMessage,
-            collegeMessage: defaultValues.collegeMessage,
-            emails: "",
-          });
-          setFiles([]);
-        } else {
-          // Handle other types of errors
-          const errorMessage =
-            error.response?.data?.message ||
-            "Failed to send proposal. Please try again.";
-          setError(errorMessage);
-          toast.error(errorMessage);
-        }
+      // Handle Timeout specifically
+      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+        toast.success("Request processed in background.", { duration: 4000 });
+        setValue("emails", "");
+        setFiles([]);
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to send proposal."
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -339,328 +268,177 @@ Warm regards,
   };
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-      const ALLOWED_TYPES = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/plain",
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-      ];
+    if (e.target.files?.length > 0) {
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      const newFiles = Array.from(e.target.files);
 
-      const validFiles = [];
-      const invalidFiles = [];
-      const invalidTypeFiles = [];
-
-      Array.from(e.target.files).forEach((file) => {
-        if (file.size > MAX_FILE_SIZE) {
-          invalidFiles.push(
-            `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`
-          );
-        } else if (!ALLOWED_TYPES.includes(file.type)) {
-          invalidTypeFiles.push(
-            `${file.name} (${file.type || "unknown type"})`
-          );
-        } else {
-          validFiles.push(file);
+      const validFiles = newFiles.filter((file) => {
+        if (file.size > MAX_SIZE) {
+          toast.error(`${file.name} is too large (Max 10MB)`);
+          return false;
         }
+        return true;
       });
 
-      if (invalidFiles.length > 0) {
-        toast.error(
-          `The following files exceed 10MB: ${invalidFiles.join(", ")}`
-        );
-      }
-
-      if (invalidTypeFiles.length > 0) {
-        toast.error(`Unsupported file types: ${invalidTypeFiles.join(", ")}`);
-      }
-
-      if (validFiles.length > 0) {
-        console.log("Valid files selected:", validFiles);
-        setFiles((prevFiles) => [...prevFiles, ...validFiles]);
-      }
+      setFiles((prev) => [...prev, ...validFiles]);
     }
   };
 
   const removeFile = (index) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const resetTemplate = (field) => {
+    if (
+      window.confirm("Reset this message to the original default template?")
+    ) {
+      setValue(field, EMAIL_TEMPLATES[field]);
+      toast.success("Template reset to default");
+    }
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-black">
-          Send Proposal to Colleges
-        </h1>
-        <div className="mt-2 sm:mt-0 text-sm text-gray-500">
-          <Link
-            to="/admin/email-records"
-            className="flex items-center bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 transition-colors text-white"
-          >
-            <FiSend className="mr-2" /> Sended To
-          </Link>
-        </div>
+    <div className="p-6 bg-white rounded-lg shadow-md max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 border-b pb-4">
+        <h1 className="text-2xl font-bold text-gray-800">Send Proposal</h1>
+        <Link
+          to="/admin/email-records"
+          className="mt-2 sm:mt-0 flex items-center bg-indigo-50 text-indigo-700 px-4 py-2 rounded-md hover:bg-indigo-100 transition-colors font-medium"
+        >
+          <FiSend className="mr-2" /> Sent History
+        </Link>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Email Input */}
         <div>
           <label
             htmlFor="emails"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-semibold text-gray-700 mb-1"
           >
-            Email Addresses (one per line)
+            Recipients (Emails)
           </label>
           <textarea
             id="emails"
             {...register("emails", {
-              required: "At least one email address is required",
+              required: "At least one email is required",
             })}
-            rows={5}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
-            placeholder="college1@example.com
-college2@example.com
-college3@example.com"
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
+            placeholder="college1@example.com&#10;college2@example.com"
           />
           <p className="mt-1 text-xs text-gray-500">
-            Enter one email address per line
+            Separate emails by new line or comma.
           </p>
           {errors.emails && (
-            <p className="mt-1 text-sm text-red-600">{errors.emails.message}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.emails.message}</p>
           )}
         </div>
 
+        {/* Subject Input */}
         <div>
           <label
             htmlFor="subject"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-semibold text-gray-700 mb-1"
           >
-            Subject
+            Email Subject
           </label>
           <input
             type="text"
             id="subject"
             {...register("subject", { required: "Subject is required" })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="Proposal for Partnership"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
           {errors.subject && (
-            <p className="mt-1 text-sm text-red-600">
+            <p className="text-red-500 text-sm mt-1">
               {errors.subject.message}
             </p>
           )}
         </div>
 
+        {/* Message Type Selection (Dynamic Rendering) */}
         <div className="space-y-4">
-          {/* Student Message Card */}
-          <div
-            className={`border-2 rounded-lg p-4 transition-colors ${
-              watch("messageType") === "student"
-                ? "border-indigo-500 bg-indigo-50"
-                : "border-gray-200 hover:border-indigo-300"
-            }`}
-          >
-            <label className="flex items-start space-x-3 cursor-pointer">
-              <input
-                type="radio"
-                {...register("messageType", {
-                  required: "Please select a message type",
-                })}
-                value="student"
-                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                defaultChecked
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="block text-sm font-medium text-gray-700">
-                    Message for Student
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <textarea
-                    {...register("studentMessage", {
-                      required: "Student message is required",
-                    })}
-                    rows={4}
-                    className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Write your message for the student here..."
-                  />
-                  {errors.studentMessage && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.studentMessage.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </label>
-          </div>
+          <label className="block text-sm font-semibold text-gray-700">
+            Select Message Template
+          </label>
 
-          {/* College Message Card */}
-          <div
-            className={`border-2 rounded-lg p-4 transition-colors ${
-              watch("messageType") === "college"
-                ? "border-indigo-500 bg-indigo-50"
-                : "border-gray-200 hover:border-indigo-300"
-            }`}
-          >
-            <label className="flex items-start space-x-3 cursor-pointer">
-              <input
-                type="radio"
-                {...register("messageType")}
-                value="college"
-                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="block text-sm font-medium text-gray-700">
-                    Message for College/University{" "}
-                    <span className="text-red-600">
-                      (Remember change the [College Name] before sending)
-                    </span>
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <textarea
-                    {...register("collegeMessage", {
-                      required: "College/University message is required",
-                    })}
-                    rows={4}
-                    className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Write your message for the college/university here..."
+          <div className="grid grid-cols-1 gap-4">
+            {MESSAGE_OPTIONS.map((option) => (
+              <div
+                key={option.id}
+                className={`border rounded-lg p-4 transition-all duration-200 cursor-pointer ${
+                  currentMessageType === option.id
+                    ? "border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500"
+                    : "border-gray-200 hover:border-indigo-300"
+                }`}
+              >
+                <label className="flex items-start space-x-3 cursor-pointer w-full">
+                  <input
+                    type="radio"
+                    {...register("messageType")}
+                    value={option.id}
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                   />
-                  {errors.collegeMessage && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.collegeMessage.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </label>
-          </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-gray-900">
+                        {option.label}
+                        {option.note && (
+                          <span className="text-red-500 text-xs ml-2 font-normal">
+                            {option.note}
+                          </span>
+                        )}
+                      </span>
+                      {currentMessageType === option.id && (
+                        <button
+                          type="button"
+                          onClick={() => resetTemplate(option.field)}
+                          className="text-xs flex items-center text-gray-500 hover:text-indigo-600"
+                          title="Reset to default template"
+                        >
+                          <FiRefreshCw className="mr-1" /> Reset Default
+                        </button>
+                      )}
+                    </div>
 
-          <div
-            className={`border-2 rounded-lg p-4 transition-colors ${
-              watch("messageType") === "company"
-                ? "border-indigo-500 bg-indigo-50"
-                : "border-gray-200 hover:border-indigo-300"
-            }`}
-          >
-            <label className="flex items-start space-x-3 cursor-pointer">
-              <input
-                type="radio"
-                {...register("messageType")}
-                value="company"
-                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="block text-sm font-medium text-gray-700">
-                    Message for Company{" "}
-                    <span className="text-red-600">
-                      (Remember change the [Company Name] before sending)
-                    </span>
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <textarea
-                    {...register("companyMessage", {
-                      required: "Company message is required",
-                    })}
-                    rows={4}
-                    className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Write your message for the company here..."
-                  />
-                  {errors.companyMessage && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.companyMessage.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </label>
-          </div>
-
-          {/* College collegeInvitation Message Card */}
-          <div
-            className={`border-2 rounded-lg p-4 transition-colors ${
-              watch("messageType") === "collegeInvitation"
-                ? "border-indigo-500 bg-indigo-50"
-                : "border-gray-200 hover:border-indigo-300"
-            }`}
-          >
-            <label className="flex items-start space-x-3 cursor-pointer">
-              <input
-                type="radio"
-                {...register("messageType")}
-                value="collegeInvitation"
-                className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="block text-sm font-medium text-gray-700">
-                    College Invitation for Student Program{" "}
-                    <span className="text-red-600">
-                      (Remember to change the [College Name] before sending)
-                    </span>
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <div className="mt-2">
-                    <textarea
-                      {...register("collegeInvitationMessage", {
-                        required: "College/University message is required",
-                      })}
-                      rows={4}
-                      className="w-full h-[500px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Write your message for the college/university here..."
-                    />
-                    {errors.collegeInvitationMessage && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.collegeInvitationMessage.message}
-                      </p>
+                    {/* Render Text Area only if selected */}
+                    {currentMessageType === option.id && (
+                      <div className="mt-3 animate-fadeIn">
+                        <textarea
+                          {...register(option.field, {
+                            required: "Message content is required",
+                          })}
+                          rows={12}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm leading-relaxed"
+                          placeholder={`Enter ${option.label}...`}
+                        />
+                        {errors[option.field] && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors[option.field].message}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
-                </div>
+                </label>
               </div>
-            </label>
+            ))}
           </div>
-
-          {errors.messageType && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.messageType.message}
-            </p>
-          )}
         </div>
 
+        {/* File Upload Section */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Attachments (Optional)
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Attachments
           </label>
-          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition-colors">
             <div className="space-y-1 text-center">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 48 48"
-                aria-hidden="true"
-              >
-                <path
-                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <div className="flex text-sm text-gray-600">
+              <FiPaperclip className="mx-auto h-10 w-10 text-gray-400" />
+              <div className="flex text-sm text-gray-600 justify-center">
                 <label
                   htmlFor="file-upload"
-                  className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                  className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"
                 >
                   <span>Upload files</span>
                   <input
@@ -675,48 +453,39 @@ college3@example.com"
                 <p className="pl-1">or drag and drop</p>
               </div>
               <p className="text-xs text-gray-500">
-                PDF, DOC, DOCX, XLS, XLSX, TXT, JPG, PNG, GIF up to 10MB
+                Docs, Images, PDF up to 10MB
               </p>
             </div>
           </div>
 
+          {/* File List */}
           {files.length > 0 && (
-            <div className="mt-2">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">
-                Selected files:
+            <div className="mt-4">
+              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Selected Files
               </h4>
-              <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+              <ul className="grid grid-cols-1 gap-2">
                 {files.map((file, index) => (
                   <li
                     key={index}
-                    className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200"
                   >
-                    <div className="w-0 flex-1 flex items-center">
-                      <svg
-                        className="flex-shrink-0 h-5 w-5 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="ml-2 flex-1 w-0 truncate">
+                    <div className="flex items-center truncate">
+                      <FiPaperclip className="text-gray-400 mr-2" />
+                      <span className="text-sm text-gray-700 truncate">
                         {file.name}
                       </span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
                     </div>
-                    <div className="ml-4 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => removeFile(index)}
-                        className="font-medium text-red-600 hover:text-red-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <FiX />
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -724,13 +493,25 @@ college3@example.com"
           )}
         </div>
 
-        <div className="flex justify-end">
+        {/* Submit Button */}
+        <div className="flex justify-end pt-4 border-t">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+              ${
+                isSubmitting
+                  ? "bg-indigo-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              }`}
           >
-            {isSubmitting ? "Sending..." : "Send Proposal"}
+            {isSubmitting ? (
+              <>Processing...</>
+            ) : (
+              <>
+                <FiSend className="mr-2" /> Send Proposal
+              </>
+            )}
           </button>
         </div>
       </form>
