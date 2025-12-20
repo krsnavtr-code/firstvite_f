@@ -6,14 +6,15 @@ import { FaBookOpen, FaGraduationCap, FaUsers, FaAward } from "react-icons/fa";
 export default function About() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <SEO 
+      <SEO
         title="About Us | FirstVITE - Empowering Minds Through Education"
         description="Learn about FirstVITE's mission to provide accessible, high-quality education. Discover our story, values, and the team behind our innovative e-learning platform."
         keywords="about FirstVITE, e-learning platform, online education, learn online, FirstVITE mission, education technology, online courses, professional development"
         og={{
-          title: 'About FirstVITE - Empowering Learners Worldwide',
-          description: 'Discover how FirstVITE is transforming education through accessible, high-quality online learning experiences for students everywhere.',
-          type: 'website'
+          title: "About FirstVITE - Empowering Learners Worldwide",
+          description:
+            "Discover how FirstVITE is transforming education through accessible, high-quality online learning experiences for students everywhere.",
+          type: "website",
         }}
       />
       {/* Hero Section */}
@@ -212,51 +213,51 @@ export default function About() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
-                  name: "Sachin Sharma",
-                  role: "SEO Expert",
-                  bio: "Experienced SEO strategist helping educational platforms rank higher and reach the right audience.",
-                  image: "/images/team-1.jpg",
+                  name: "Dr. Amit Verma",
+                  role: "Senior Programming Faculty",
+                  bio: "Expert in Java, Python, and Data Structures with over 10 years of experience in technical education.",
+                  image: "/images/faculty-1.jpg",
                 },
                 {
                   name: "Krishna Avtar",
-                  role: "Developer",
-                  bio: "Full-stack developer with a strong focus on building scalable and secure learning platforms.",
-                  image: "/images/team-5.jpg",
+                  role: "Full Stack Development Faculty",
+                  bio: "Specializes in MERN stack, scalable web applications, and real-world project-based learning.",
+                  image: "/images/faculty-2.jpg",
                 },
                 {
-                  name: "Ritik Kumar",
-                  role: "Content Writer",
-                  bio: "Crafts compelling educational content that simplifies complex concepts for learners of all ages.",
-                  image: "/images/team-3.jpg",
+                  name: "Rohit Sharma",
+                  role: "Web Development Trainer",
+                  bio: "Trains students in HTML, CSS, JavaScript, and modern frontend frameworks with practical examples.",
+                  image: "/images/faculty-3.jpg",
                 },
                 {
-                  name: "Sudev Mohan",
-                  role: "Designer",
-                  bio: "Passionate UI/UX designer focused on creating intuitive and visually appealing e-learning interfaces.",
-                  image: "/images/team-4.jpg",
+                  name: "Neha Gupta",
+                  role: "UI/UX & Design Faculty",
+                  bio: "Focused on teaching design thinking, UI/UX principles, and user-centered product design.",
+                  image: "/images/faculty-4.jpg",
                 },
                 {
-                  name: "Kiran Rawat",
-                  role: "SEO Team",
-                  bio: "Optimizes website visibility through data-driven SEO practices tailored for the education sector.",
-                  image: "/images/team-2.jpg",
+                  name: "Ankit Singh",
+                  role: "Digital Marketing Faculty",
+                  bio: "Mentor for SEO, SMO, Google Ads, and performance marketing in the education domain.",
+                  image: "/images/faculty-5.jpg",
                 },
                 {
-                  name: "Mohit Rajput",
-                  role: "Content Writer",
-                  bio: "Specializes in writing impactful content that enhances user engagement in digital education platforms.",
-                  image: "/images/team-6.jpg",
+                  name: "Pooja Mishra",
+                  role: "Content & Communication Skills Trainer",
+                  bio: "Helps learners improve technical writing, presentation skills, and professional communication.",
+                  image: "/images/faculty-6.jpg",
                 },
               ].map((member, index) => (
                 <div
                   key={index}
                   className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md"
                 >
-                  <img
+                  {/* <img
                     src={member.image}
                     alt={member.name}
                     className="w-full h-64 object-cover"
-                  />
+                  /> */}
                   <div className="p-6">
                     <h3 className="text-xl font-semibold text-black dark:text-white">
                       {member.name}

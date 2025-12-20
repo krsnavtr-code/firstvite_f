@@ -14,6 +14,41 @@ const SendProposal = () => {
   // Default form values
   const defaultValues = {
     subject: "Invitation for Job Fair 2025 | FirstVITE E-Learning",
+    colleges_Invetation_for_Student: `<div style="font-size: 16px;">
+Dear [College Name],
+
+Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
+
+Skill Development company dedicated to enhancing student employability through practical and industry-aligned courses.
+
+At <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>, we specialize in training students in high-demand technical skills including:
+
+🔹 Java Development
+🔹 Python Programming
+🔹 Web Development (HTML, CSS, JavaScript, React, etc.)
+🔹 Android App Development
+🔹 Other Skill-Based Courses (as per industry trends)
+
+Our mission is to bridge the skill gap between academic knowledge and industry requirements so that students become job-ready and confident in their careers.
+
+We would like to collaborate with your esteemed institution to:
+✔ Provide advanced skill training to your students
+✔ Increase their chances of placements and internships
+✔ Conduct workshops, bootcamps, and live project sessions
+✔ Guide them in real-world applications and career paths
+
+We believe this partnership can significantly benefit your students by giving them a head start in emerging technologies and practical job skills.
+
+We would be grateful if you could share this training opportunity with your student community or allow us to meet your placement/training team to discuss this collaboration further.
+
+Looking forward to your positive response.
+
+Thank you & Best Regards,
+<span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
+📞 <span style="font-weight: 600; color: #007BFF;">9990056799 | 855980758</span> 
+📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
+</div>`,
     studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear Student,
 
@@ -123,6 +158,8 @@ Warm regards,
       studentMessage: defaultValues.studentMessage,
       collegeMessage: defaultValues.collegeMessage,
       companyMessage: defaultValues.companyMessage,
+      colleges_Invetation_for_Student:
+        defaultValues.colleges_Invetation_for_Student,
     },
   });
 
@@ -152,7 +189,9 @@ Warm regards,
             ? data.studentMessage
             : selectedMessageType === "college"
             ? data.collegeMessage
-            : data.companyMessage,
+            : selectedMessageType === "company"
+            ? data.companyMessage
+            : data.colleges_Invetation_for_Student,
       };
 
       // Debug log to check the selected message type and content
@@ -234,8 +273,10 @@ Warm regards,
             recipientType = "student";
           } else if (messageType === "college") {
             recipientType = "college/university";
-          } else {
+          } else if (messageType === "company") {
             recipientType = "company";
+          } else {
+            recipientType = "college for student invitation";
           }
 
           setSuccess(`Proposal sent successfully to ${recipientType}!`);
@@ -248,6 +289,8 @@ Warm regards,
             studentMessage: defaultValues.studentMessage,
             collegeMessage: defaultValues.collegeMessage,
             companyMessage: defaultValues.companyMessage,
+            colleges_Invetation_for_Student:
+              defaultValues.colleges_Invetation_for_Student,
             emails: "",
           });
           setFiles([]);
@@ -278,6 +321,9 @@ Warm regards,
             messageType: messageType,
             studentMessage: defaultValues.studentMessage,
             collegeMessage: defaultValues.collegeMessage,
+            companyMessage: defaultValues.companyMessage,
+            colleges_Invetation_for_Student:
+              defaultValues.colleges_Invetation_for_Student,
             emails: "",
           });
           setFiles([]);

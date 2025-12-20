@@ -97,13 +97,13 @@ const Testimonials = () => {
               className={`${getCardBgColor(testimonial)} p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300`}
             >
               <div className="flex items-center mb-4">
-                <div className="flex-shrink-0">
+                {/* <div className="flex-shrink-0">
                   <img
                     className="h-12 w-12 rounded-full"
                     src={testimonial.avatar}
                     alt={`${testimonial.name}'s avatar`}
                   />
-                </div>
+                </div> */}
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-black dark:text-white">
                     {testimonial.name}
