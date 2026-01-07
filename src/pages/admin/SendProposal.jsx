@@ -169,8 +169,8 @@ const SendProposal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
-const [availableFiles, setAvailableFiles] = useState([]);
-const [selectedFiles, setSelectedFiles] = useState([]);
+  const [availableFiles, setAvailableFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const {
     register,
@@ -183,7 +183,7 @@ const [selectedFiles, setSelectedFiles] = useState([]);
     defaultValues: {
       messageType: "student",
       subject: "Invitation from | FirstVITE E-Learning Pvt. Ltd.",
-      ...EMAIL_TEMPLATES, 
+      ...EMAIL_TEMPLATES,
     },
   });
 
@@ -216,12 +216,11 @@ const [selectedFiles, setSelectedFiles] = useState([]);
         emails: emailList,
         subject: data.subject,
         message: finalMessage,
+        selectedDocuments: selectedFiles,
       };
 
-      // Append Files
       files.forEach((file) => formData.append("attachments", file));
 
-      // Append Data
       formData.append("data", JSON.stringify(emailData));
 
       const token = localStorage.getItem("token");
@@ -247,20 +246,21 @@ const [selectedFiles, setSelectedFiles] = useState([]);
           id: toastId,
         });
 
-        // Reset only emails and files, keep the message templates
+        // Reset emails, uploads, AND selected server files
         setValue("emails", "");
         setFiles([]);
+        setSelectedFiles([]); // <--- Clear the checkboxes after success
       } else {
         throw new Error(response.data?.message || "Failed to send proposal");
       }
     } catch (error) {
       console.error("Error sending proposal:", error);
 
-      // Handle Timeout specifically
       if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
         toast.success("Request processed in background.", { duration: 4000 });
         setValue("emails", "");
         setFiles([]);
+        setSelectedFiles([]); // <--- Clear the checkboxes on timeout too
       } else {
         toast.error(
           error.response?.data?.message || "Failed to send proposal."
@@ -315,11 +315,17 @@ const [selectedFiles, setSelectedFiles] = useState([]);
   }, []);
 
   const toggleFileSelection = (fileName) => {
-    setSelectedFiles((prev) =>
-      prev.includes(fileName)
+    console.log("Toggling file selection:", fileName);
+    console.log("Current selected files before toggle:", selectedFiles);
+
+    setSelectedFiles((prev) => {
+      const newSelection = prev.includes(fileName)
         ? prev.filter((name) => name !== fileName)
-        : [...prev, fileName]
-    );
+        : [...prev, fileName];
+
+      console.log("New selected files after toggle:", newSelection);
+      return newSelection;
+    });
   };
 
   return (
@@ -541,7 +547,7 @@ const [selectedFiles, setSelectedFiles] = useState([]);
                         type="checkbox"
                         checked={selectedFiles.includes(file)}
                         onChange={() => toggleFileSelection(file)}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        className="..."
                       />
                       <FiPaperclip className="text-gray-500 flex-shrink-0" />
                       <span className="text-sm text-gray-700 truncate">
@@ -557,46 +563,6 @@ const [selectedFiles, setSelectedFiles] = useState([]);
           </div>
         </div>
 
-        <div className="mt-4">
-          {uploadedFiles.length > 0 ? (
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Selected files to send:
-              </p>
-              <ul className="space-y-2">
-                {uploadedFiles.map((file, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center justify-between bg-gray-50 p-3 rounded-md"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <FiPaperclip className="text-gray-500" />
-                      <span className="text-sm text-gray-700 truncate max-w-xs">
-                        {file.originalname || file.name || "Document"}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUploadedFiles((prev) =>
-                          prev.filter((_, i) => i !== index)
-                        );
-                      }}
-                      className="text-red-500 hover:text-red-700"
-                      title="Remove file"
-                    >
-                      <FiX />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500">
-              No files selected. Upload files above.
-            </p>
-          )}
-        </div>
         {/* Submit Button */}
         <div className="flex justify-end pt-4 border-t">
           <button
