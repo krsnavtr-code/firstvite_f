@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import axios from "../../api/axios";
 import { FiSend, FiRefreshCw, FiPaperclip, FiX } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import ProposalDocumentUploader from "../../components/ProposalDocumentUploader";
 
 // --- Configuration & Templates ---
 const EMAIL_TEMPLATES = {
@@ -167,6 +168,9 @@ const MESSAGE_OPTIONS = [
 const SendProposal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+const [availableFiles, setAvailableFiles] = useState([]);
+const [selectedFiles, setSelectedFiles] = useState([]);
 
   const {
     register,
@@ -297,6 +301,27 @@ const SendProposal = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await axios.get("/v1/admin/proposal-documents");
+        setAvailableFiles(response.data.files || []);
+      } catch (error) {
+        console.error("Error fetching files:", error);
+        toast.error("Failed to load available files");
+      }
+    };
+    fetchFiles();
+  }, []);
+
+  const toggleFileSelection = (fileName) => {
+    setSelectedFiles((prev) =>
+      prev.includes(fileName)
+        ? prev.filter((name) => name !== fileName)
+        : [...prev, fileName]
+    );
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md max-w-5xl mx-auto">
       {/* Header */}
@@ -309,6 +334,15 @@ const SendProposal = () => {
           <FiSend className="mr-2" /> Sent History
         </Link>
       </div>
+
+      <ProposalDocumentUploader
+        onUploadSuccess={(files) => {
+          setUploadedFiles((prev) => [...prev, ...files]);
+        }}
+        onRemove={(file) => {
+          setUploadedFiles((prev) => prev.filter((f) => f.path !== file.path));
+        }}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Email Input */}
@@ -335,7 +369,6 @@ const SendProposal = () => {
             <p className="text-red-500 text-sm mt-1">{errors.emails.message}</p>
           )}
         </div>
-
         {/* Subject Input */}
         <div>
           <label
@@ -356,7 +389,6 @@ const SendProposal = () => {
             </p>
           )}
         </div>
-
         {/* Message Type Selection (Dynamic Rendering) */}
         <div className="space-y-4">
           <label className="block text-sm font-semibold text-gray-700">
@@ -426,7 +458,6 @@ const SendProposal = () => {
             ))}
           </div>
         </div>
-
         {/* File Upload Section */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -493,6 +524,79 @@ const SendProposal = () => {
           )}
         </div>
 
+        <div className="mt-4">
+          <p className="text-sm font-medium text-gray-700 mb-2">
+            Select files to send from available documents:
+          </p>
+          <div className="max-h-60 overflow-y-auto border rounded-md p-2">
+            {availableFiles.length > 0 ? (
+              <ul className="space-y-2">
+                {availableFiles.map((file, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center justify-between p-2 hover:bg-gray-50 rounded"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedFiles.includes(file)}
+                        onChange={() => toggleFileSelection(file)}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      />
+                      <FiPaperclip className="text-gray-500 flex-shrink-0" />
+                      <span className="text-sm text-gray-700 truncate">
+                        {file}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-500">No documents available.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          {uploadedFiles.length > 0 ? (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                Selected files to send:
+              </p>
+              <ul className="space-y-2">
+                {uploadedFiles.map((file, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center justify-between bg-gray-50 p-3 rounded-md"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <FiPaperclip className="text-gray-500" />
+                      <span className="text-sm text-gray-700 truncate max-w-xs">
+                        {file.originalname || file.name || "Document"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUploadedFiles((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                      title="Remove file"
+                    >
+                      <FiX />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">
+              No files selected. Upload files above.
+            </p>
+          )}
+        </div>
         {/* Submit Button */}
         <div className="flex justify-end pt-4 border-t">
           <button
