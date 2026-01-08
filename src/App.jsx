@@ -48,6 +48,7 @@ import PaymentDetails from "./pages/admin/PaymentDetails";
 import SendBrochure from "./pages/admin/SendBrochure";
 import SendProposal from "./pages/admin/SendProposal";
 import EmailRecords from "./pages/admin/EmailRecords";
+import TestQAPage from "./pages/admin/TestQAPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
 import CareerManagement from "./pages/admin/career/CareerManagement";
@@ -496,6 +497,9 @@ function App() {
 
             {/* Candidates Management */}
             <Route path="/admin/candidates" element={<CandidatesPage />} />
+
+            {/* Test QA Management */}
+            <Route path="/admin/test-qa" element={<TestQAPage />} />
           </Route>
 
           {/* LMS Routes */}
