@@ -42,14 +42,14 @@ export const getCourses = async (queryParams = '', isAdmin = false) => {
         // Ensure we're including all necessary fields
         params.set('fields', 'title,description,image,category,instructor,price,showOnHome,isPublished,level');
         
-        console.log('Making API request to /courses with params:', Object.fromEntries(params));
+        // console.log('Making API request to /courses with params:', Object.fromEntries(params));
         const response = await axios.get(`/courses?${params.toString()}`);
         
-        console.log('API Response data structure:', {
-            isArray: Array.isArray(response.data),
-            hasDataProperty: response.data && typeof response.data === 'object' && 'data' in response.data,
-            responseKeys: response.data ? Object.keys(response.data) : 'no data'
-        });
+        // console.log('API Response data structure:', {
+        //     isArray: Array.isArray(response.data),
+        //     hasDataProperty: response.data && typeof response.data === 'object' && 'data' in response.data,
+        //     responseKeys: response.data ? Object.keys(response.data) : 'no data'
+        // });
         
         // Handle different response formats
         if (Array.isArray(response.data)) {
@@ -75,7 +75,7 @@ export const getCourses = async (queryParams = '', isAdmin = false) => {
 // Get single course by ID with all necessary fields
 export const getCourseById = async (id) => {
     try {
-        console.log(`Fetching course with ID: ${id}`);
+        // console.log(`Fetching course with ID: ${id}`);
         const response = await axios.get(`/courses/${id}`, {
             params: {
                 fields: [
@@ -89,7 +89,7 @@ export const getCourseById = async (id) => {
                 ].join(',')
             }
         });
-        console.log('Course fetched successfully:', response.data);
+        // console.log('Course fetched successfully:', response.data);
         return response.data;
     } catch (error) {
         console.error(`Error fetching course with ID ${id}:`, error);
@@ -103,7 +103,7 @@ export const getCourseById = async (id) => {
 
 // Helper function to clean and format course data
 const prepareCourseData = (courseData) => {
-    console.log('Original course data in prepareCourseData:', JSON.stringify(courseData, null, 2));
+    // console.log('Original course data in prepareCourseData:', JSON.stringify(courseData, null, 2));
     
     // Create a deep copy to avoid mutating the original data
     const cleanData = JSON.parse(JSON.stringify(courseData));
@@ -239,7 +239,7 @@ const prepareCourseData = (courseData) => {
         }];
     }
     
-    console.log('Prepared course data:', JSON.stringify(cleanData, null, 2));
+    // console.log('Prepared course data:', JSON.stringify(cleanData, null, 2));
     return cleanData;
 };
 
@@ -268,7 +268,7 @@ export const createCourse = async (courseData) => {
         }
         
         // Log the exact data being sent
-        console.log('Sending to server:', JSON.stringify(cleanData, null, 2));
+        // console.log('Sending to server:', JSON.stringify(cleanData, null, 2));
         
         const response = await axios({
             method: 'post',
@@ -282,8 +282,8 @@ export const createCourse = async (courseData) => {
             validateStatus: (status) => status < 500 // Don't throw for 4xx errors
         });
 
-        console.log('Server response status:', response.status);
-        console.log('Server response data:', response.data);
+        // console.log('Server response status:', response.status);
+        // console.log('Server response data:', response.data);
         
         if (response.status >= 400) {
             // Handle 4xx errors
@@ -318,9 +318,9 @@ export const createCourse = async (courseData) => {
         if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
-            console.error('Response data:', error.response.data);
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
+            // console.error('Response data:', error.response.data);
+            // console.error('Response status:', error.response.status);
+            // console.error('Response headers:', error.response.headers);
             
             let errorMessage = 'An error occurred while saving the course';
             
@@ -363,7 +363,7 @@ export const createCourse = async (courseData) => {
 // Update a course (full or partial update)
 export const updateCourse = async (id, courseData, isPartial = false) => {
     try {
-        console.log(`${isPartial ? 'Partially' : 'Fully'} updating course ${id} with data:`, courseData);
+        // console.log(`${isPartial ? 'Partially' : 'Fully'} updating course ${id} with data:`, courseData);
         
         // Helper function to clean array fields
         const cleanArrayField = (field) => {
@@ -378,7 +378,7 @@ export const updateCourse = async (id, courseData, isPartial = false) => {
         };
         
         // Log the raw isFeatured value for debugging
-        console.log('Raw isFeatured value:', courseData.isFeatured, 'type:', typeof courseData.isFeatured);
+        // console.log('Raw isFeatured value:', courseData.isFeatured, 'type:', typeof courseData.isFeatured);
         
         // Clean and format the data
         const cleanData = {

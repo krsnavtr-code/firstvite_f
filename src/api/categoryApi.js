@@ -73,7 +73,7 @@ export const getCategoryById = async (id) => {
 // Create a new category
 export const createCategory = async (formData) => {
   try {
-    console.log('createCategory called with data:', formData);
+    // console.log('createCategory called with data:', formData);
     
     // Get the current token
     const token = localStorage.getItem('token');
@@ -100,14 +100,14 @@ export const createCategory = async (formData) => {
       formData.forEach((value, key) => {
         formDataObj[key] = value;
       });
-      console.log('FormData contents:', formDataObj);
+      // console.log('FormData contents:', formDataObj);
     }
     
     const config = { headers };
-    console.log('Sending request with config:', config);
+    // console.log('Sending request with config:', config);
     
     const response = await api.post('/categories', formData, config);
-    console.log('Category created successfully:', response.data);
+    // console.log('Category created successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating category:', error);
@@ -133,7 +133,7 @@ export const createCategory = async (formData) => {
 // Update an existing category
 export const updateCategory = async (id, formData) => {
   try {
-    console.log('Sending update request to /categories/' + id);
+    // console.log('Sending update request to /categories/' + id);
     
     // Prepare config
     const config = {
@@ -165,18 +165,18 @@ export const updateCategory = async (id, formData) => {
       formData.forEach((value, key) => {
         formDataObj[key] = value;
       });
-      console.log('FormData contents:', formDataObj);
+      // console.log('FormData contents:', formDataObj);
     } else {
-      console.log('Request data:', formData);
+      // console.log('Request data:', formData);
     }
     
     // Log the final headers being sent
-    console.log('Request headers:', config.headers);
+    // console.log('Request headers:', config.headers);
     
     // Make the request
     const response = await api.put(`/categories/${id}`, formData, config);
     
-    console.log('Update successful:', response.data);
+    // console.log('Update successful:', response.data);
     return response.data;
   } catch (error) {
     console.error('Update failed:', error);

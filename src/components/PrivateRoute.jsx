@@ -64,14 +64,14 @@ export default function PrivateRoute({
   }
 
   // If we get here, user is authenticated and has the required role/status
-  console.log('PrivateRoute - Access granted', {
-    path: location.pathname,
-    userRole,
-    isAuthenticated,
-    requireLMS,
-    isApproved: currentUser?.isApproved,
-    isActive: currentUser?.isActive
-  });
+  // console.log('PrivateRoute - Access granted', {
+  //   path: location.pathname,
+  //   userRole,
+  //   isAuthenticated,
+  //   requireLMS,
+  //   isApproved: currentUser?.isApproved,
+  //   isActive: currentUser?.isActive
+  // });
   
   return (
     <>

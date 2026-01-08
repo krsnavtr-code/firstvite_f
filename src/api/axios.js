@@ -70,7 +70,7 @@ api.interceptors.request.use(
           config.headers.Authorization = cleanedToken;
         }
         
-        console.log('Added Authorization header to request');
+        // console.log('Added Authorization header to request');
       } else {
         console.warn('No authentication token found for protected endpoint:', config.url);
         // Don't reject here, let the server handle the missing token
@@ -119,7 +119,7 @@ api.interceptors.response.use(
       if (originalRequest.url.includes('/auth/refresh-token') || 
           originalRequest.url.includes('/auth/login') || 
           originalRequest.url.includes('/auth/register')) {
-        console.log('Auth endpoint detected, not attempting refresh');
+        // console.log('Auth endpoint detected, not attempting refresh');
         // Clear tokens and redirect to login
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
@@ -137,7 +137,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        console.log('Attempting to refresh token...');
+        // console.log('Attempting to refresh token...');
         const refreshToken = localStorage.getItem('refreshToken');
         
         if (!refreshToken) {
@@ -145,7 +145,7 @@ api.interceptors.response.use(
           throw new Error('No refresh token available');
         }
         
-        console.log('Current refresh token:', refreshToken.substring(0, 20) + '...');
+        // console.log('Current refresh token:', refreshToken.substring(0, 20) + '...');
         
         // Request new access token using refresh token
         const response = await axios.post(
@@ -159,11 +159,11 @@ api.interceptors.response.use(
           }
         );
         
-        console.log('Refresh token response:', {
-          status: response.status,
-          hasToken: !!(response.data && response.data.token),
-          hasRefreshToken: !!(response.data && response.data.refreshToken)
-        });
+        // console.log('Refresh token response:', {
+        //   status: response.status,
+        //   hasToken: !!(response.data && response.data.token),
+        //   hasRefreshToken: !!(response.data && response.data.refreshToken)
+        // });
         
         if (!response.data || !response.data.token) {
           throw new Error('No token received in refresh response');
@@ -180,7 +180,7 @@ api.interceptors.response.use(
           localStorage.setItem('user', JSON.stringify(user));
         }
         
-        console.log('New token stored, updating request headers');
+        // console.log('New token stored, updating request headers');
         
         // Update the Authorization header for future requests
         api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
@@ -189,7 +189,7 @@ api.interceptors.response.use(
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
         
-        console.log('Retrying original request:', originalRequest.url);
+        // console.log('Retrying original request:', originalRequest.url);
         
         // Retry the original request
         return api(originalRequest);
