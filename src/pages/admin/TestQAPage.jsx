@@ -329,16 +329,19 @@ const TestQAPage = () => {
                 name="questionType"
                 value={formData.questionType}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
+                  const isMultipleChoice =
+                    e.target.value.includes("multiple_choice");
+                  setFormData((prevData) => ({
+                    ...prevData,
                     questionType: e.target.value,
-                    options: e.target.value.includes("multiple_choice")
-                      ? formData.options.length
-                        ? formData.options
+                    options: isMultipleChoice
+                      ? Array.isArray(prevData.options) &&
+                        prevData.options.length > 0
+                        ? prevData.options
                         : [{ text: "", isCorrect: false }]
                       : [],
                     correctAnswer: "",
-                  });
+                  }));
                 }}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
                 required
