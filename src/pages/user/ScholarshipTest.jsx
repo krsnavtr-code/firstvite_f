@@ -150,26 +150,58 @@ const ScholarshipTest = () => {
   const [agreed, setAgreed] = useState(false);
   const timerRef = useRef(null);
 
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/login", { state: { from: "/test" } });
+    }
+  }, [currentUser, navigate]);
+  
   // Define handleSubmit first
-  const handleSubmit = useCallback(async (finalSubmit = false) => {
+const handleSubmit = useCallback(
+  async (finalSubmit = false) => {
     try {
       if (!finalSubmit) {
         setShowReview(true);
         return;
       }
-      
+
+      // Check if user is authenticated
+      if (!currentUser) {
+        message.error("Please log in to submit the test");
+        navigate("/login", { state: { from: location.pathname } });
+        return;
+      }
+
       setIsLoading(true);
-      const result = await submitTestAnswers(answers);
+      const questionIds = questions.map((q) => q._id);
+      const result = await submitTestAnswers(answers, questionIds);
       setScore(result.score);
       setTestCompleted(true);
       setShowReview(false);
       if (timerRef.current) clearInterval(timerRef.current);
+
+      // Show success message
+      message.success("Test submitted successfully!");
     } catch (error) {
       console.error("Error submitting test:", error);
+
+      // Handle specific error messages
+      const errorMessage = typeof error === 'string'
+        ? error
+        : error.message || "Failed to submit test";
+
+      message.error(errorMessage);
+
+      // Redirect to login if token is invalid or expired
+      if (errorMessage.includes('expired') || errorMessage.includes('missing') || errorMessage.includes('authentication')) {
+        navigate("/login", { state: { from: location.pathname, message: errorMessage } });
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [answers]);
+  },
+  [answers, questions, navigate]);
+
 
   // Prevent navigation when test is in progress, questions are loaded, and not in review
   usePreventNavigation(
