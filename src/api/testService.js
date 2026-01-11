@@ -64,6 +64,23 @@ export const hasUserTakenTest = async () => {
   }
 };
 
+export const getUserTestResults = async () => {
+  try {
+    const response = await api.get('/results');
+    // Return the most recent test result or null if no results
+    return response.data.results && response.data.results.length > 0
+      ? response.data.results[0]
+      : null;
+  } catch (error) {
+    console.error('Error fetching test results:', error);
+    // If it's a 404, return null (no test results found)
+    if (error.response && error.response.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
+
 export const submitTestAnswers = async (answers, questionIds) => {
   try {
     const token = localStorage.getItem('token');
