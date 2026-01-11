@@ -135,7 +135,7 @@ import {
   WarningOutlined,
 } from "@ant-design/icons";
 
-const QUESTION_TIME_LIMIT = 5;
+const QUESTION_TIME_LIMIT = 25;
 
 const ScholarshipTest = () => {
   const navigate = useNavigate();
