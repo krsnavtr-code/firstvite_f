@@ -54,6 +54,16 @@ export const getTestQuestions = async () => {
   }
 };
 
+export const hasUserTakenTest = async () => {
+  try {
+    const response = await api.get('/has-taken-test');
+    return response.data.hasTakenTest;
+  } catch (error) {
+    console.error('Error checking test status:', error);
+    throw error;
+  }
+};
+
 export const submitTestAnswers = async (answers, questionIds) => {
   try {
     const token = localStorage.getItem('token');

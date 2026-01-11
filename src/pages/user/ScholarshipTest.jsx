@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { getTestQuestions, submitTestAnswers } from "../../api/testService";
+import {
+  getTestQuestions,
+  submitTestAnswers,
+  hasUserTakenTest,
+} from "../../api/testService";
 import TestQuestion from "../../components/test/TestQuestion";
 import TestResults from "../../components/test/TestResults";
 import TestReview from "../../components/test/TestReview";
@@ -12,29 +16,30 @@ const usePreventNavigation = (prevent, handleSubmit) => {
     const handleBeforeUnload = (e) => {
       if (!warningShown) {
         e.preventDefault();
-        const message = "Are you sure you want to leave? Your test progress will be lost.";
+        const message =
+          "Are you sure you want to leave? Your test progress will be lost.";
         e.returnValue = message;
         return message;
       }
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
+      if (document.visibilityState === "hidden") {
         // First warning
         const firstChoice = confirm(
-          '⚠️ Test Security Alert!\n\n' +
-            'You have switched away from the test window.\n' +
-            'This is a violation of test rules.\n\n' +
-            'Click OK to submit the test now.\n' +
-            'Click Cancel to restart the test.'
+          "⚠️ Test Security Alert!\n\n" +
+            "You have switched away from the test window.\n" +
+            "This is a violation of test rules.\n\n" +
+            "Click OK to submit the test now.\n" +
+            "Click Cancel to restart the test."
         );
 
         if (firstChoice) {
           // Second confirmation
           const finalConfirm = confirm(
-            '❗ Final Confirmation\n\n' +
-              'Are you sure you want to submit the test?\n\n' +
-              'This action cannot be undone.'
+            "❗ Final Confirmation\n\n" +
+              "Are you sure you want to submit the test?\n\n" +
+              "This action cannot be undone."
           );
 
           if (finalConfirm && handleSubmit) {
@@ -42,7 +47,7 @@ const usePreventNavigation = (prevent, handleSubmit) => {
           }
         } else {
           // Cancel → Reload test
-          alert('⚠️ Test will restart now.');
+          alert("⚠️ Test will restart now.");
           window.location.reload();
         }
       } else {
@@ -67,10 +72,10 @@ const usePreventNavigation = (prevent, handleSubmit) => {
     if (!prevent) {
       // Clean up any existing event listeners if they exist
       const cleanup = () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-        window.removeEventListener('visibilitychange', handleVisibilityChange);
-        document.removeEventListener('contextmenu', (e) => e.preventDefault());
-        document.removeEventListener('keydown', disableShortcuts);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        window.removeEventListener("visibilitychange", handleVisibilityChange);
+        document.removeEventListener("contextmenu", (e) => e.preventDefault());
+        document.removeEventListener("keydown", disableShortcuts);
       };
       return cleanup;
     }
@@ -148,71 +153,95 @@ const ScholarshipTest = () => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
   const [agreed, setAgreed] = useState(false);
+  const [hasTakenTest, setHasTakenTest] = useState(false);
+  const [checkingTestStatus, setCheckingTestStatus] = useState(true);
   const timerRef = useRef(null);
 
   useEffect(() => {
     if (!currentUser) {
       navigate("/login", { state: { from: "/test" } });
+      return;
     }
+
+    // Check if user has already taken the test
+    const checkTestStatus = async () => {
+      try {
+        const hasTaken = await hasUserTakenTest();
+        setHasTakenTest(hasTaken);
+      } catch (error) {
+        console.error("Error checking test status:", error);
+      } finally {
+        setCheckingTestStatus(false);
+      }
+    };
+
+    checkTestStatus();
   }, [currentUser, navigate]);
-  
+
   // Define handleSubmit first
-const handleSubmit = useCallback(
-  async (finalSubmit = false) => {
-    try {
-      if (!finalSubmit) {
-        setShowReview(true);
-        return;
+  const handleSubmit = useCallback(
+    async (finalSubmit = false) => {
+      try {
+        if (!finalSubmit) {
+          setShowReview(true);
+          return;
+        }
+
+        // Check if user is authenticated
+        if (!currentUser) {
+          message.error("Please log in to submit the test");
+          navigate("/login", { state: { from: location.pathname } });
+          return;
+        }
+
+        setIsLoading(true);
+        const questionIds = questions.map((q) => q._id);
+        const result = await submitTestAnswers(answers, questionIds);
+        setScore(result.score);
+        setTestCompleted(true);
+        setShowReview(false);
+        if (timerRef.current) clearInterval(timerRef.current);
+
+        // Show success message
+        message.success("Test submitted successfully!");
+      } catch (error) {
+        console.error("Error submitting test:", error);
+
+        // Handle specific error messages
+        const errorMessage =
+          typeof error === "string"
+            ? error
+            : error.message || "Failed to submit test";
+
+        message.error(errorMessage);
+
+        // Redirect to login if token is invalid or expired
+        if (
+          errorMessage.includes("expired") ||
+          errorMessage.includes("missing") ||
+          errorMessage.includes("authentication")
+        ) {
+          navigate("/login", {
+            state: { from: location.pathname, message: errorMessage },
+          });
+        }
+      } finally {
+        setIsLoading(false);
       }
-
-      // Check if user is authenticated
-      if (!currentUser) {
-        message.error("Please log in to submit the test");
-        navigate("/login", { state: { from: location.pathname } });
-        return;
-      }
-
-      setIsLoading(true);
-      const questionIds = questions.map((q) => q._id);
-      const result = await submitTestAnswers(answers, questionIds);
-      setScore(result.score);
-      setTestCompleted(true);
-      setShowReview(false);
-      if (timerRef.current) clearInterval(timerRef.current);
-
-      // Show success message
-      message.success("Test submitted successfully!");
-    } catch (error) {
-      console.error("Error submitting test:", error);
-
-      // Handle specific error messages
-      const errorMessage = typeof error === 'string'
-        ? error
-        : error.message || "Failed to submit test";
-
-      message.error(errorMessage);
-
-      // Redirect to login if token is invalid or expired
-      if (errorMessage.includes('expired') || errorMessage.includes('missing') || errorMessage.includes('authentication')) {
-        navigate("/login", { state: { from: location.pathname, message: errorMessage } });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  },
-  [answers, questions, navigate]);
-
+    },
+    [answers, questions, navigate]
+  );
 
   // Prevent navigation when test is in progress, questions are loaded, and not in review
   usePreventNavigation(
-    testStarted && 
-    !testCompleted && 
-    !showReview && 
-    questions.length > 0 && 
-    !isLoading, 
+    testStarted &&
+      !testCompleted &&
+      !showReview &&
+      questions.length > 0 &&
+      !isLoading,
     handleSubmit
   );
-  
+
   const handleBackToTest = () => {
     setShowReview(false);
   };
@@ -299,14 +328,16 @@ const handleSubmit = useCallback(
   const handleNext = () => {
     const currentQuestion = questions[currentQuestionIndex];
     const currentQuestionId = currentQuestion._id;
-    
+
     if (currentQuestionIndex < questions.length - 1) {
       if (answers[currentQuestionId] !== undefined) {
         setCurrentQuestionIndex((prev) => prev + 1);
         setTimeLeft(QUESTION_TIME_LIMIT); // Reset timer for the next question
       } else {
         // Show error or notification that answer is required
-        alert('Please select an answer before proceeding to the next question.');
+        alert(
+          "Please select an answer before proceeding to the next question."
+        );
       }
     }
   };
@@ -320,7 +351,52 @@ const handleSubmit = useCallback(
 
   // --- Render Sections ---
 
-  // 1. Loading
+  // 0. Checking if user has already taken the test
+  if (checkingTestStatus) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-indigo-600"></div>
+          <p className="text-gray-600 font-medium text-lg">
+            Checking your test status...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // 1. If user has already taken the test
+  if (hasTakenTest) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
+        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="p-8 md:p-12 text-center">
+            <div className="text-center mb-8">
+              <CheckCircleFilled
+                style={{ fontSize: "48px", color: "#4CAF50" }}
+              />
+              <h2 className="text-3xl font-bold text-gray-900 mt-4">
+                Test Already Completed
+              </h2>
+              <p className="text-gray-500 mt-2">
+                You have already taken the scholarship test.
+              </p>
+              <div className="mt-6">
+                <button
+                  onClick={() => navigate("/profile")}
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition-colors"
+                >
+                  Go to Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Loading
   if (isLoading && !testCompleted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
@@ -434,7 +510,7 @@ const handleSubmit = useCallback(
   // 4. Review Screen
   if (showReview) {
     return (
-      <TestReview 
+      <TestReview
         questions={questions}
         answers={answers}
         onBack={handleBackToTest}
@@ -524,8 +600,8 @@ const handleSubmit = useCallback(
               disabled={!answers[questions[currentQuestionIndex]?._id]}
               className={`flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all shadow-md ${
                 answers[questions[currentQuestionIndex]?._id]
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
               Next Question
@@ -534,11 +610,13 @@ const handleSubmit = useCallback(
           ) : (
             <button
               onClick={() => handleSubmit(false)}
-              disabled={isLoading || !answers[questions[currentQuestionIndex]?._id]}
+              disabled={
+                isLoading || !answers[questions[currentQuestionIndex]?._id]
+              }
               className={`flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all shadow-md ${
                 answers[questions[currentQuestionIndex]?._id] && !isLoading
-                  ? 'bg-green-500 text-white hover:bg-green-600 hover:shadow-lg'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? "bg-green-500 text-white hover:bg-green-600 hover:shadow-lg"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
               <CheckCircleFilled />
