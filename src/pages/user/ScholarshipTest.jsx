@@ -219,28 +219,27 @@ const handleSubmit = useCallback(
 
   const handleTimeUp = useCallback(() => {
     if (questions.length === 0) return;
-    
-    // Auto-submit if it's the last question
+
     if (currentQuestionIndex >= questions.length - 1) {
       handleSubmit();
       return;
     }
-    
-    // Move to next question when time is up, regardless of whether current question is answered
-    setCurrentQuestionIndex((prev) => {
-      const nextIndex = prev + 1;
-      // Mark current question as unanswered if not answered
-      const currentQuestion = questions[prev];
-      if (currentQuestion && !answers[currentQuestion.id]) {
-        setAnswers(prevAnswers => ({
-          ...prevAnswers,
-          [currentQuestion.id]: 'unanswered'
-        }));
+
+    const currentQuestion = questions[currentQuestionIndex];
+
+    setAnswers((prev) => {
+      if (currentQuestion && !prev[currentQuestion._id]) {
+        return {
+          ...prev,
+          [currentQuestion._id]: "unanswered",
+        };
       }
-      return nextIndex;
+      return prev;
     });
-    setTimeLeft(QUESTION_TIME_LIMIT); // Reset timer for the next question
-  }, [currentQuestionIndex, questions, answers, handleSubmit]);
+
+    setCurrentQuestionIndex((prev) => prev + 1);
+    setTimeLeft(QUESTION_TIME_LIMIT);
+  }, [currentQuestionIndex, questions, handleSubmit]);
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -261,16 +260,11 @@ const handleSubmit = useCallback(
     if (questions.length > 0 && testStarted && !testCompleted) {
       startTimer();
     }
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [
-    currentQuestionIndex,
-    questions.length,
-    startTimer,
-    testStarted,
-    testCompleted,
-  ]);
+  }, [currentQuestionIndex, testStarted, testCompleted, questions.length]);
 
   useEffect(() => {
     // Block browser back/forward navigation
