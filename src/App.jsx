@@ -65,6 +65,7 @@ import LMSLayout from "./components/lms/LMSLayout";
 import RegisterPage from "./pages/auth/RegisterPage";
 import LMS from "./pages/lms";
 import InactiveAccount from "./pages/auth/InactiveAccount";
+import ScholarshipTest from "./pages/user/ScholarshipTest";
 
 // LMS Management Components for Admin Panel
 import Sprint from "./components/admin/lmsManagement/Sprint.jsx";
@@ -85,7 +86,8 @@ const MainLayout = ({ children }) => {
     location.pathname.startsWith("/register") ||
     location.pathname.startsWith("/forgot-password") ||
     location.pathname.startsWith("/reset-password") ||
-    location.pathname.startsWith("/jobfair");
+    location.pathname.startsWith("/jobfair") ||
+    location.pathname.startsWith("/scholarship-test");
 
   return (
     <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
@@ -279,6 +281,18 @@ function App() {
               <MainLayout>
                 <TermsOfService />
               </MainLayout>
+            }
+          />
+
+          {/* Scholarship Test Route */}
+          <Route
+            path="/scholarship-test"
+            element={
+              <PrivateRoute>
+                <MainLayout>
+                  <ScholarshipTest />
+                </MainLayout>
+              </PrivateRoute>
             }
           />
 

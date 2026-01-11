@@ -583,6 +583,14 @@ function Navbar() {
                 Agent Register
               </a>
 
+              {/* Scholarship Test */}
+              <Link
+                to="/scholarship-test"
+                className="flex items-center flex-col px-1 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Scholarship Test
+              </Link>
+
               {/* Payment Dropdown */}
               <div className="relative hidden lg:block md:block">
                 <button
