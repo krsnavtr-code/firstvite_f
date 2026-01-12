@@ -9,10 +9,22 @@ import {
 import TestQuestion from "../../components/test/TestQuestion";
 import TestResults from "../../components/test/TestResults";
 import TestReview from "../../components/test/TestReview";
+import { message } from "antd"; // Ensure message is imported
 
+// Icons
+import {
+  ClockCircleOutlined,
+  LeftOutlined,
+  RightOutlined,
+  CheckCircleFilled,
+  SafetyCertificateFilled,
+  WarningOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
+
+// ... (Keep the usePreventNavigation hook exactly as it was) ...
 const usePreventNavigation = (prevent, handleSubmit) => {
   useEffect(() => {
-    // Define all functions first
     const handleBeforeUnload = (e) => {
       if (!warningShown) {
         e.preventDefault();
@@ -25,7 +37,6 @@ const usePreventNavigation = (prevent, handleSubmit) => {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        // First warning
         const firstChoice = confirm(
           "⚠️ Test Security Alert!\n\n" +
             "You have switched away from the test window.\n" +
@@ -35,7 +46,6 @@ const usePreventNavigation = (prevent, handleSubmit) => {
         );
 
         if (firstChoice) {
-          // Second confirmation
           const finalConfirm = confirm(
             "❗ Final Confirmation\n\n" +
               "Are you sure you want to submit the test?\n\n" +
@@ -43,10 +53,9 @@ const usePreventNavigation = (prevent, handleSubmit) => {
           );
 
           if (finalConfirm && handleSubmit) {
-            handleSubmit(true); // force submit
+            handleSubmit(true);
           }
         } else {
-          // Cancel → Reload test
           alert("⚠️ Test will restart now.");
           window.location.reload();
         }
@@ -56,7 +65,6 @@ const usePreventNavigation = (prevent, handleSubmit) => {
     };
 
     const disableShortcuts = (e) => {
-      // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
       if (
         (e.ctrlKey &&
           e.shiftKey &&
@@ -70,7 +78,6 @@ const usePreventNavigation = (prevent, handleSubmit) => {
     };
 
     if (!prevent) {
-      // Clean up any existing event listeners if they exist
       const cleanup = () => {
         window.removeEventListener("beforeunload", handleBeforeUnload);
         window.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -80,17 +87,14 @@ const usePreventNavigation = (prevent, handleSubmit) => {
       return cleanup;
     }
 
-    // Store the original page title
     const originalTitle = document.title;
     let warningShown = false;
 
-    // Add event listeners
     window.addEventListener("beforeunload", handleBeforeUnload);
     window.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("contextmenu", (e) => e.preventDefault());
     document.addEventListener("keydown", disableShortcuts);
 
-    // Add a confirmation dialog for test reset
     const handleResetWarning = (e) => {
       if (
         !confirm(
@@ -102,7 +106,6 @@ const usePreventNavigation = (prevent, handleSubmit) => {
       }
     };
 
-    // Listen for test reset attempts
     const testResetButtons = document.querySelectorAll(
       'button[onclick*="resetTest"], button[class*="reset"]'
     );
@@ -110,7 +113,6 @@ const usePreventNavigation = (prevent, handleSubmit) => {
       button.addEventListener("click", handleResetWarning);
     });
 
-    // Cleanup function
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -124,17 +126,6 @@ const usePreventNavigation = (prevent, handleSubmit) => {
   }, [prevent]);
 };
 
-// Icons (Keeping these from your original code)
-import {
-  ClockCircleOutlined,
-  LeftOutlined,
-  RightOutlined,
-  CheckCircleFilled,
-  TrophyFilled,
-  SafetyCertificateFilled,
-  WarningOutlined,
-} from "@ant-design/icons";
-
 const QUESTION_TIME_LIMIT = 25;
 
 const ScholarshipTest = () => {
@@ -142,7 +133,7 @@ const ScholarshipTest = () => {
   const location = useLocation();
   const { currentUser } = useAuth();
 
-  // State declarations first
+  // State
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -157,13 +148,12 @@ const ScholarshipTest = () => {
   const [checkingTestStatus, setCheckingTestStatus] = useState(true);
   const timerRef = useRef(null);
 
+  // --- Check Status ---
   useEffect(() => {
     if (!currentUser) {
       navigate("/login", { state: { from: "/test" } });
       return;
     }
-
-    // Check if user has already taken the test
     const checkTestStatus = async () => {
       try {
         const hasTaken = await hasUserTakenTest();
@@ -174,11 +164,10 @@ const ScholarshipTest = () => {
         setCheckingTestStatus(false);
       }
     };
-
     checkTestStatus();
   }, [currentUser, navigate]);
 
-  // Define handleSubmit first
+  // --- Submit Logic ---
   const handleSubmit = useCallback(
     async (finalSubmit = false) => {
       try {
@@ -187,7 +176,6 @@ const ScholarshipTest = () => {
           return;
         }
 
-        // Check if user is authenticated
         if (!currentUser) {
           message.error("Please log in to submit the test");
           navigate("/login", { state: { from: location.pathname } });
@@ -201,21 +189,14 @@ const ScholarshipTest = () => {
         setTestCompleted(true);
         setShowReview(false);
         if (timerRef.current) clearInterval(timerRef.current);
-
-        // Show success message
         message.success("Test submitted successfully!");
       } catch (error) {
         console.error("Error submitting test:", error);
-
-        // Handle specific error messages
         const errorMessage =
           typeof error === "string"
             ? error
             : error.message || "Failed to submit test";
-
         message.error(errorMessage);
-
-        // Redirect to login if token is invalid or expired
         if (
           errorMessage.includes("expired") ||
           errorMessage.includes("missing") ||
@@ -229,10 +210,9 @@ const ScholarshipTest = () => {
         setIsLoading(false);
       }
     },
-    [answers, questions, navigate]
+    [answers, questions, navigate, currentUser, location.pathname]
   );
 
-  // Prevent navigation when test is in progress, questions are loaded, and not in review
   usePreventNavigation(
     testStarted &&
       !testCompleted &&
@@ -242,26 +222,31 @@ const ScholarshipTest = () => {
     handleSubmit
   );
 
-  const handleBackToTest = () => {
-    setShowReview(false);
-  };
+  const handleBackToTest = () => setShowReview(false);
 
+  // --- Timer Logic ---
   const handleTimeUp = useCallback(() => {
     if (questions.length === 0) return;
-
     if (currentQuestionIndex >= questions.length - 1) {
-      handleSubmit();
+      handleSubmit(); // Auto submit on last question timeout? Or just finish?
+      // Usually better to force submit or move to review. Let's move to review/submit.
+      // If last question time up, we mark it unanswered and try to submit.
+      const currentQ = questions[questions.length - 1];
+      setAnswers((prev) => {
+        if (currentQ && !prev[currentQ._id]) {
+          return { ...prev, [currentQ._id]: "unanswered" };
+        }
+        return prev;
+      });
+      // Trigger submit
+      handleSubmit(true);
       return;
     }
 
     const currentQuestion = questions[currentQuestionIndex];
-
     setAnswers((prev) => {
       if (currentQuestion && !prev[currentQuestion._id]) {
-        return {
-          ...prev,
-          [currentQuestion._id]: "unanswered",
-        };
+        return { ...prev, [currentQuestion._id]: "unanswered" };
       }
       return prev;
     });
@@ -289,16 +274,20 @@ const ScholarshipTest = () => {
     if (questions.length > 0 && testStarted && !testCompleted) {
       startTimer();
     }
-
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [currentQuestionIndex, testStarted, testCompleted, questions.length]);
+  }, [
+    currentQuestionIndex,
+    testStarted,
+    testCompleted,
+    questions.length,
+    startTimer,
+  ]);
 
+  // --- Fetch Questions ---
   useEffect(() => {
-    // Block browser back/forward navigation
     const unblock = history.pushState(null, "", location.pathname);
-
     const fetchQuestions = async () => {
       try {
         const data = await getTestQuestions();
@@ -309,35 +298,26 @@ const ScholarshipTest = () => {
         setIsLoading(false);
       }
     };
-
     fetchQuestions();
-
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (unblock) unblock();
     };
   }, [location]);
 
+  // --- Navigation Handlers ---
   const handleAnswer = (questionId, answer) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: answer,
-    }));
+    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
   const handleNext = () => {
     const currentQuestion = questions[currentQuestionIndex];
-    const currentQuestionId = currentQuestion._id;
-
     if (currentQuestionIndex < questions.length - 1) {
-      if (answers[currentQuestionId] !== undefined) {
+      if (answers[currentQuestion._id] !== undefined) {
         setCurrentQuestionIndex((prev) => prev + 1);
-        setTimeLeft(QUESTION_TIME_LIMIT); // Reset timer for the next question
+        setTimeLeft(QUESTION_TIME_LIMIT);
       } else {
-        // Show error or notification that answer is required
-        alert(
-          "Please select an answer before proceeding to the next question."
-        );
+        alert("Please select an answer before proceeding.");
       }
     }
   };
@@ -345,13 +325,13 @@ const ScholarshipTest = () => {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
-      setTimeLeft(QUESTION_TIME_LIMIT); // Reset timer when going back
+      setTimeLeft(QUESTION_TIME_LIMIT);
     }
   };
 
-  // --- Render Sections ---
+  // --- RENDER ---
 
-  // 0. Checking if user has already taken the test
+  // 0. Checking Status
   if (checkingTestStatus) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
@@ -365,30 +345,26 @@ const ScholarshipTest = () => {
     );
   }
 
-  // 1. If user has already taken the test
+  // 1. Already Taken
   if (hasTakenTest) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
         <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-8 md:p-12 text-center">
-            <div className="text-center mb-8">
-              <CheckCircleFilled
-                style={{ fontSize: "48px", color: "#4CAF50" }}
-              />
-              <h2 className="text-3xl font-bold text-gray-900 mt-4">
-                Test Already Completed
-              </h2>
-              <p className="text-gray-500 mt-2">
-                You have already taken the scholarship test.
-              </p>
-              <div className="mt-6">
-                <button
-                  onClick={() => navigate("/profile")}
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition-colors"
-                >
-                  Go to Profile
-                </button>
-              </div>
+            <CheckCircleFilled style={{ fontSize: "48px", color: "#4CAF50" }} />
+            <h2 className="text-3xl font-bold text-gray-900 mt-4">
+              Test Already Completed
+            </h2>
+            <p className="text-gray-500 mt-2">
+              You have already taken the scholarship test.
+            </p>
+            <div className="mt-6">
+              <button
+                onClick={() => navigate("/profile")}
+                className="px-6 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition-colors"
+              >
+                Go to Profile
+              </button>
             </div>
           </div>
         </div>
@@ -410,7 +386,7 @@ const ScholarshipTest = () => {
     );
   }
 
-  // 2. Result Screen
+  // 3. Results
   if (testCompleted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
@@ -430,75 +406,136 @@ const ScholarshipTest = () => {
     );
   }
 
-  // 3. Instructions Screen
+  // 4. Instructions Screen (UPDATED CONTENT HERE)
   if (!testStarted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-8 md:p-12">
-            <div className="text-center mb-8">
+            {/* Header */}
+            <div className="text-center mb-10">
               <SafetyCertificateFilled
-                style={{ fontSize: "48px", color: "#4f46e5" }}
+                style={{ fontSize: "56px", color: "#4f46e5" }}
               />
-              <h2 className="text-3xl font-bold text-gray-900 mt-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-6 mb-2">
                 Scholarship Evaluation
-              </h2>
-              <p className="text-gray-500 mt-2">
-                Please review the guidelines below before proceeding.
-              </p>
+              </h1>
+              <div className="h-1 w-24 bg-indigo-500 mx-auto rounded-full"></div>
             </div>
 
-            {/* Warning Alert */}
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-8 flex items-start gap-3">
-              <WarningOutlined className="text-orange-500 text-xl mt-0.5" />
-              <div>
-                <h4 className="font-semibold text-orange-800">
-                  Time Constraint
-                </h4>
-                <p className="text-orange-700 text-sm mt-1">
-                  You have strictly {QUESTION_TIME_LIMIT} seconds per question.
-                  The test will auto-advance if time runs out.
-                </p>
+            {/* Critical Alert */}
+            <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-10 rounded-r-lg shadow-sm">
+              <div className="flex items-start gap-4">
+                <WarningOutlined className="text-red-500 text-2xl mt-1" />
+                <div>
+                  <h4 className="font-bold text-red-800 text-lg mb-1">
+                    Strict Time Constraint
+                  </h4>
+                  <p className="text-red-700">
+                    You have strictly{" "}
+                    <strong>{QUESTION_TIME_LIMIT} seconds</strong> per question.
+                    The test will <strong>auto-advance</strong> if time runs
+                    out, and you cannot revisit skipped questions.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Rules Card */}
-            <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4 text-lg">
-                Rules & Regulations
-              </h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-600 leading-relaxed">
-                <li>Ensure a stable internet connection.</li>
-                <li>Do not refresh the page or switch tabs.</li>
-                <li>Questions cannot be revisited once submitted.</li>
-                <li>Malpractice checks are active.</li>
-              </ul>
+            {/* Detailed Policy Section */}
+            <div className="bg-gray-50 rounded-2xl p-8 mb-10 border border-gray-100">
+              <div className="flex items-center gap-3 mb-6">
+                <FileTextOutlined className="text-indigo-600 text-xl" />
+                <h3 className="text-xl font-bold text-gray-900">
+                  Scholarship Test Policy & Important Warnings – FirstVite
+                </h3>
+              </div>
+
+              <div className="space-y-6 text-gray-700 leading-relaxed text-sm md:text-base">
+                <p>
+                  The FirstVite Scholarship Evaluation Test is designed to
+                  ensure a fair, transparent, and merit-based assessment process
+                  for all candidates. Before starting the online scholarship
+                  test, applicants must carefully read and follow all rules and
+                  policies mentioned below.
+                </p>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white p-4 rounded-xl border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      Time Management
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Each question has a strict time limit. Once time expires,
+                      the system automatically moves to the next question.
+                      Unanswered questions cannot be revisited. Manage your time
+                      efficiently.
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-xl border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      System Integrity
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      A stable internet connection is mandatory. Refreshing the
+                      page, switching tabs, minimizing the window, or using the
+                      back button may result in automatic disqualification.
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-xl border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      Anti-Malpractice
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Our platform detects suspicious activities. Use of unfair
+                      means, external assistance, screen recording, or multiple
+                      devices will lead to immediate cancellation and
+                      disqualification.
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-xl border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      Final Submission
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      All submitted responses are final and cannot be edited. By
+                      proceeding, you agree to comply with all FirstVite
+                      policies. Failure to follow guidelines may impact
+                      eligibility.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="border-t border-gray-100 pt-6">
-              <label className="flex items-center gap-3 cursor-pointer mb-6 group">
+            {/* Agreement & Start */}
+            <div className="border-t border-gray-100 pt-8">
+              <label className="flex items-center gap-4 cursor-pointer mb-8 group p-4 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
                 <input
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer"
+                  className="w-6 h-6 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer"
                 />
-                <span className="text-gray-700 group-hover:text-gray-900 transition-colors">
-                  I understand and agree to the rules.
+                <span className="text-gray-700 font-medium group-hover:text-gray-900">
+                  I have read and understood the rules, policies, and warnings
+                  stated above.
                 </span>
               </label>
 
               <button
                 disabled={!agreed}
                 onClick={() => setTestStarted(true)}
-                className={`w-full py-4 rounded-full text-lg font-semibold transition-all duration-200 
+                className={`w-full py-4 rounded-full text-lg font-bold tracking-wide transition-all duration-300 shadow-xl
                   ${
                     agreed
-                      ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg hover:shadow-indigo-200"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transform hover:-translate-y-1"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
                   }`}
               >
-                Start Assessment
+                Start Assessment Now
               </button>
             </div>
           </div>
@@ -507,7 +544,7 @@ const ScholarshipTest = () => {
     );
   }
 
-  // 4. Review Screen
+  // 5. Review Screen
   if (showReview) {
     return (
       <TestReview
@@ -519,17 +556,16 @@ const ScholarshipTest = () => {
     );
   }
 
-  // 5. Active Test Interface
+  // 6. Active Test Interface
   const progressPercent = Math.round(
     ((currentQuestionIndex + 1) / questions.length) * 100
   );
-
   const isTimeCritical = timeLeft <= 10;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden min-h-[600px] flex flex-col">
-        {/* Header Section */}
+        {/* Test Header */}
         <div className="p-6 md:p-8 pb-0">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-gray-700">
@@ -539,10 +575,8 @@ const ScholarshipTest = () => {
               </span>
             </h3>
 
-            {/* Timer Badge */}
             <div
-              className={`px-4 py-1.5 rounded-full flex items-center gap-2 border font-bold transition-all duration-300
-              ${
+              className={`px-4 py-1.5 rounded-full flex items-center gap-2 border font-bold transition-all duration-300 ${
                 isTimeCritical
                   ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
                   : "bg-green-50 text-green-700 border-green-200"
@@ -555,8 +589,6 @@ const ScholarshipTest = () => {
               </span>
             </div>
           </div>
-
-          {/* Progress Bar */}
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-indigo-600 transition-all duration-500 ease-out"
@@ -565,7 +597,7 @@ const ScholarshipTest = () => {
           </div>
         </div>
 
-        {/* Question Area */}
+        {/* Question Component */}
         <div className="flex-1 p-6 md:p-8 flex flex-col justify-center">
           {questions.length > 0 && (
             <TestQuestion
@@ -583,15 +615,13 @@ const ScholarshipTest = () => {
           <button
             onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-colors
-              ${
-                currentQuestionIndex === 0
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              }`}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-colors ${
+              currentQuestionIndex === 0
+                ? "text-gray-300 cursor-not-allowed"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
           >
-            <LeftOutlined style={{ fontSize: "14px" }} />
-            Previous
+            <LeftOutlined style={{ fontSize: "14px" }} /> Previous
           </button>
 
           {currentQuestionIndex < questions.length - 1 ? (
@@ -604,8 +634,7 @@ const ScholarshipTest = () => {
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
-              Next Question
-              <RightOutlined style={{ fontSize: "14px" }} />
+              Next Question <RightOutlined style={{ fontSize: "14px" }} />
             </button>
           ) : (
             <button
@@ -619,8 +648,7 @@ const ScholarshipTest = () => {
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
-              <CheckCircleFilled />
-              Review Answers
+              <CheckCircleFilled /> Review Answers
             </button>
           )}
         </div>
