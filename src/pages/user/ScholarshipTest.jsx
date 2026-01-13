@@ -418,7 +418,8 @@ const ScholarshipTest = () => {
                 style={{ fontSize: "56px", color: "#4f46e5" }}
               />
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-6 mb-2">
-                Scholarship Evaluation
+                FirstVite Scholarship Test – Online Scholarship Evaluation for
+                Students
               </h1>
               <div className="h-1 w-24 bg-indigo-500 mx-auto rounded-full"></div>
             </div>
@@ -445,9 +446,9 @@ const ScholarshipTest = () => {
             <div className="bg-gray-50 rounded-2xl p-8 mb-10 border border-gray-100">
               <div className="flex items-center gap-3 mb-6">
                 <FileTextOutlined className="text-indigo-600 text-xl" />
-                <h3 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-gray-900">
                   Scholarship Test Policy & Important Warnings – FirstVite
-                </h3>
+                </h2>
               </div>
 
               <div className="space-y-6 text-gray-700 leading-relaxed text-sm md:text-base">
@@ -465,10 +466,11 @@ const ScholarshipTest = () => {
                       Time Management
                     </h4>
                     <p className="text-sm text-gray-600">
-                      Each question has a strict time limit. Once time expires,
-                      the system automatically moves to the next question.
-                      Unanswered questions cannot be revisited. Manage your time
-                      efficiently.
+                      Each question in the FirstVite scholarship exam has a
+                      strict time limit. Once the time expires, the system will
+                      automatically move to the next question, and unanswered
+                      questions cannot be revisited. Candidates are advised to
+                      manage time efficiently to achieve the best score.
                     </p>
                   </div>
 
@@ -477,9 +479,12 @@ const ScholarshipTest = () => {
                       System Integrity
                     </h4>
                     <p className="text-sm text-gray-600">
-                      A stable internet connection is mandatory. Refreshing the
-                      page, switching tabs, minimizing the window, or using the
-                      back button may result in automatic disqualification.
+                      A stable internet connection is mandatory throughout the
+                      test. Refreshing the page, switching browser tabs,
+                      minimizing the window, or using the back button may result
+                      in automatic disqualification. The scholarship test
+                      platform is equipped with advanced malpractice detection
+                      systems to identify suspicious activities.
                     </p>
                   </div>
 
@@ -488,10 +493,10 @@ const ScholarshipTest = () => {
                       Anti-Malpractice
                     </h4>
                     <p className="text-sm text-gray-600">
-                      Our platform detects suspicious activities. Use of unfair
-                      means, external assistance, screen recording, or multiple
-                      devices will lead to immediate cancellation and
-                      disqualification.
+                      Any attempt to use unfair means, external assistance,
+                      screen recording tools, or multiple devices can lead to
+                      immediate cancellation of the test and disqualification
+                      from the FirstVite scholarship program.
                     </p>
                   </div>
 
@@ -500,10 +505,12 @@ const ScholarshipTest = () => {
                       Final Submission
                     </h4>
                     <p className="text-sm text-gray-600">
-                      All submitted responses are final and cannot be edited. By
-                      proceeding, you agree to comply with all FirstVite
-                      policies. Failure to follow guidelines may impact
-                      eligibility.
+                      All submitted responses are final and cannot be edited
+                      after submission. By proceeding with the test, candidates
+                      agree to comply with all FirstVite scholarship policies,
+                      rules, and warnings. Failure to follow these guidelines
+                      may impact eligibility for scholarships and future
+                      opportunities.
                     </p>
                   </div>
                 </div>
