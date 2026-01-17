@@ -135,16 +135,36 @@ const WhyLearnWithFirstVITE = () => {
   return (
     <div
       ref={componentRef}
-      className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-opacity duration-1000 ${
+      className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-opacity duration-1000 text-black dark:text-white ${
         isVisible ? "opacity-100 visible" : "opacity-0"
       }`}
     >
       <div className="text-center mb-12">
-        <h2 className="text-lg-mobile text-xl-tablet text-xl-desktop font-bold text-black dark:text-white text-thin-bold">
+        <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
           Why Learn with FirstVITE?
         </h2>
-        <p className="mt-4 text-xs-mobile text-sm-tablet text-sm-desktop text-thin text-black dark:text-white">
-          Compare our platform with others and see why we stand out
+        <p className="mt-4">
+          FirstVITE is more than just an education platform — it is a gateway to
+          opportunity, growth, and success. Through the{" "}
+          <strong>FirstVite Scholarship Exam</strong>, talented and deserving
+          students get a chance to prove their academic potential and receive
+          financial support for higher education. This merit-based online
+          examination ensures that students with dedication and capability are
+          rewarded fairly, regardless of their background. What truly sets
+          FirstVITE apart is its focus on{" "}
+          <strong>Online Learning Courses with ob Opportunities</strong>. Every
+          course is carefully designed to match real-world industry needs,
+          helping learners gain practical knowledge that employers value.
+          Students don’t just learn concepts; they build careers. In addition,
+          FirstVITE offers{" "}
+          <strong>Professional Skill Development Online Courses</strong> that
+          empower learners with in-demand skills, confidence, and hands-on
+          experience. From modern technology to career-oriented skills, these
+          courses prepare students for today’s competitive job market. With
+          expert guidance, flexible online learning, and scholarship support,
+          FirstVITE creates a powerful learning ecosystem. It helps students
+          learn smarter, grow faster, and move closer to their career goals with
+          confidence and clarity.
         </p>
       </div>
 

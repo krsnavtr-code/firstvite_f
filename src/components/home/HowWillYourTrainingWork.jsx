@@ -43,11 +43,14 @@ const steps = [
 
 const HowWillYourTrainingWork = () => {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black dark:text-white">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-black dark:text-white sm:text-4xl">
+        <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
           How will your training work? – with FirstVITE
         </h2>
+        <p className="mt-4">
+          <strong>FirstVite Scholarship Exam</strong> is a merit-based online initiative created to empower talented and motivated students. It offers a fair opportunity to demonstrate academic excellence and receive financial support for higher education. Through <strong>FirstVITE online courses</strong>, students gain access to industry-relevant knowledge designed by experts. The structured learning approach of FirstVITE training programs ensures practical skills, real-world exposure, and career readiness. From enrollment to certification, every step is transparent and student-focused. FirstVite believes in nurturing potential, rewarding merit, and building confident learners who are prepared to achieve long-term success in today’s competitive academic and professional environment.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md dark:shadow-none">

@@ -4,22 +4,29 @@ import { getCardBgColor } from "../../utils/gradients";
 const Content = () => {
   const bgColor = getCardBgColor();
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black dark:text-white">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-black dark:text-white sm:text-4xl">
+        <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
           Welcome to FirstVITE – Your Online Learning Partner
         </h2>
-        <p className="mt-6 text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-          FirstVITE is a trusted online learning platform where you can pursue
-          certified courses and degree programs from the comfort of your home.
-          Our mission is to make quality education accessible to students and
-          working professionals — without the limitations of time, location, or
-          background.
-        </p>
-        <p className="mt-4 text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-          Whether you want to build a career in Digital Marketing, Data Science,
-          Business Administration, or Information Technology, we offer flexible,
-          career-oriented programs tailored to your goals and schedule.
+        <p className="mt-4">
+          FirstVITE is a trusted and innovative online learning platform
+          designed to empower students and working professionals with
+          industry-ready skills. Our goal is to remove barriers of time,
+          location, and background by delivering high-quality education that
+          fits modern lifestyles. As one of the leading providers of{" "}
+          <strong>online skill training courses in India</strong>, FirstVITE
+          offers certified courses and degree programs that focus on real-world
+          applications and career growth. From Digital Marketing and Data
+          Science to Business Administration and Information Technology, our
+          programs are carefully structured to meet current industry demands. We
+          believe learning should be flexible, practical, and result-driven.
+          That’s why FirstVITE stands out as a{" "}
+          <strong>job oriented online training platform</strong>, helping
+          learners gain relevant skills that employers value. With expert
+          mentors, flexible schedules, and career-focused curricula, FirstVITE
+          is your reliable partner in building a successful and future-ready
+          career—all from the comfort of your home.
         </p>
       </div>
 
@@ -54,7 +61,9 @@ const Content = () => {
           <div
             className={`${bgColor} p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
           >
-            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">👨‍🏫 Expert Trainers</h4>
+            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">
+              👨‍🏫 Expert Trainers
+            </h4>
             <p className="text-gray-800 dark:text-gray-300">
               Learn from highly experienced trainers and industry professionals
               with hands-on expertise.
@@ -63,7 +72,9 @@ const Content = () => {
           <div
             className={`${bgColor} p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
           >
-            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">📜 Recognized Certification</h4>
+            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">
+              📜 Recognized Certification
+            </h4>
             <p className="text-gray-800 dark:text-gray-300">
               Receive valid, verifiable certificates upon successful course
               completion.
@@ -73,7 +84,9 @@ const Content = () => {
       </div>
 
       {/* Start Learning in 3 Easy Steps */}
-      <div className={`${bgColor} mb-16 text-gray-900 dark:text-white p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}>
+      <div
+        className={`${bgColor} mb-16 text-gray-900 dark:text-white p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
+      >
         <h3 className="text-2xl font-semibold text-black dark:text-white mb-6 text-center">
           Start Learning in 3 Easy Steps
         </h3>
@@ -100,14 +113,14 @@ const Content = () => {
         <h3 className="text-2xl font-semibold text-black dark:text-white mb-4">
           Join 10,000+ Successful Learners Across India
         </h3>
-        <p className="text-lg text-black dark:text-white max-w-3xl mx-auto">
+        <p className="text-lg text-black dark:text-white mx-auto">
           Thousands of learners have upskilled through our practical and
           flexible programs. Whether you're a student looking to get ahead or a
           working professional aiming for a career shift, our online education
           solutions help you stay competitive in today's fast-changing job
           market.
         </p>
-        <p className="mt-4 text-lg text-black dark:text-white max-w-3xl mx-auto">
+        <p className="mt-4 text-lg text-black dark:text-white mx-auto">
           From up-to-date course content and expert mentorship to placement
           assistance and lifetime access to learning material — FirstVITE is
           your complete learning companion.
@@ -115,7 +128,9 @@ const Content = () => {
       </div>
 
       {/* Call to Action */}
-      <div className={`${bgColor} p-8 rounded-xl shadow-lg dark:shadow-none text-center`}>
+      <div
+        className={`${bgColor} p-8 rounded-xl shadow-lg dark:shadow-none text-center`}
+      >
         <h3 className="text-2xl font-bold text-blue-800 dark:text-white mb-4">
           Enroll Now & Start Your Learning Journey Today!
         </h3>

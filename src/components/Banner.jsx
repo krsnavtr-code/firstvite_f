@@ -75,7 +75,7 @@ const CertificateModal = ({ isOpen, onClose }) => {
               >
                 <img
                   src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-                  alt=""
+                  alt="dev"
                 />
               </div>
 
@@ -171,18 +171,18 @@ function Banner() {
           <div className="lg:w-1/2 space-y-8">
             <div className="space-y-2 w-full">
               <div className="flex items-center gap-1 text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
-                <img src={logoImg} alt="logo" className="w-6" />
+                <img src={logoImg} alt="FirstVITE – Your Online Learning Partner" className="w-6" />
                 <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
                   Be The First
                 </span>
               </div>
-              <div className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
                 <span className="whitespace-nowrap">Learn</span>
                 <span className="text-[#F47C26] whitespace-nowrap">
                   {" "}
                   Anytime,
                 </span>
-              </div>
+              </h1>
               <div className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
                 <div className="flex items-start">
                   <div className="w-12 xs:w-16 sm:w-20 md:w-24 flex-shrink-0"></div>
@@ -251,7 +251,7 @@ function Banner() {
               <div className="w-[90%] hidden lg:block mx-auto mask-inset-corners hover:scale-105 transition-transform duration-500 shadow-xl dark:shadow-gray-900/50">
                 <img
                   src={bannerImg}
-                  alt="Online Learning"
+                  alt="Skill Development and Online Training Courses"
                   className="w-full h-auto rounded-none"
                 />
               </div>

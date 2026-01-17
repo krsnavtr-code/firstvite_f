@@ -298,13 +298,11 @@ const PopularCourses = () => {
     <div className="bg-white dark:bg-gray-900 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
             Best E-Learning Courses
-          </h1>
-          <p className="mt-4 text-xl text-center text-black dark:text-white">
-            Practical, skill-based online courses in areas like IT, business,
-            design, and marketing. Learn at your own pace with real-world
-            projects and expert-led content
+          </h2>
+          <p className="mt-4  text-center text-black dark:text-white">
+            FirstVite offers practical, skill-based online learning Courses designed for today’s fast-changing world. Our platform focuses on real-world skills in IT, business, design, and marketing, helping learners gain knowledge that can be applied immediately. With flexible, self-paced learning, students can study anytime, anywhere, without pressure. Each course is built around hands-on projects, ensuring that learners don’t just watch lessons but actually practice what they learn. Expert-led content provides clear guidance, industry insights, and practical strategies to build confidence and career-ready skills. Whether you are a student, working professional, or entrepreneur, FirstVite helps you upgrade your abilities and stay competitive. If you are searching for Best <strong>E-Learning Courses</strong> that focus on real results, FirstVite is the right place to start your learning journey.
           </p>
         </div>
 

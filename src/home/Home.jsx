@@ -3,7 +3,7 @@ import SEO from '../components/SEO';
 import Banner from '../components/Banner';
 import Categories from '../components/home/Categories';
 import PopularCourses from '../components/home/PopularCourses';
-import FeaturedBooks from '../components/home/Assessment';
+import Assessment from '../components/home/Assessment';
 import Stats from '../components/home/Stats';
 import Testimonials from '../components/home/Testimonials';
 import Newsletter from '../components/home/Newsletter';
@@ -39,7 +39,7 @@ function Home() {
         <PopularCourses />
 
         {/* Featured Books */}
-        <FeaturedBooks />
+        <Assessment />
 
         {/* Why learn with FirstVITE? */}
         <WhyLearnWithFirstVITE />

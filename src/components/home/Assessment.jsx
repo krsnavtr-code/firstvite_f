@@ -13,27 +13,36 @@ const Assessment = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative py-20 bg-gradient-to-b from-white to-indigo-50/30 dark:from-gray-900 dark:to-gray-800 overflow-hidden transition-colors duration-300">
+    <section className="relative py-20 text-black dark:text-white bg-gradient-to-b from-white to-indigo-50/30 dark:from-gray-900 dark:to-gray-800 overflow-hidden transition-colors duration-300">
       {/* Decorative Background Elements (Adaptive) */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-indigo-100 dark:bg-indigo-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-purple-100 dark:bg-purple-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* --- Section Header --- */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-7xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 text-sm font-semibold mb-4 border border-indigo-200 dark:border-indigo-800">
             <TrophyOutlined /> Scholarship Program 2026
           </div>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tight">
-            Unlock Your Future with{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              FirstVite
-            </span>
+          <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
+            Unlock Your Future with FirstVite
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-            The FirstVite Scholarship Exam is a merit-based online examination
-            designed to support talented students. Showcase your academic
-            potential and secure financial assistance for your higher education.
+          <p className="text-black dark:text-white leading-relaxed">
+            The FirstVite Scholarship Exam is a prestigious merit-based online
+            initiative created to empower talented and ambitious students. This
+            examination offers deserving learners an opportunity to demonstrate
+            their academic excellence while gaining access to financial support
+            for higher education. Through FirstVite, students can confidently
+            take the next step toward career success by enrolling in
+            <strong> professional certification courses</strong> online that are designed to meet
+            modern industry standards. FirstVite also provides advanced learning
+            opportunities through globally recognized <strong>SAP online certification
+            courses</strong>, helping students build job-ready skills and enhance their
+            professional credibility. With expert guidance, flexible online
+            learning, and career-focused programs, FirstVite bridges the gap
+            between education and employment. Participate in the FirstVite
+            Scholarship Exam today and unlock a future filled with knowledge,
+            growth, and limitless career possibilities.
           </p>
         </div>
 
@@ -44,10 +53,8 @@ const Assessment = () => {
             <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 text-2xl mb-6 group-hover:scale-110 transition-transform">
               <GlobalOutlined />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Eligibility Criteria
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <h3 className="text-xl font-bold mb-4">Eligibility Criteria</h3>
+            <p className=" mb-6">
               To apply for the FirstVite Scholarship 2026, candidates must meet
               the minimum academic requirements as specified below:
             </p>
@@ -59,7 +66,7 @@ const Assessment = () => {
               ].map((item, index) => (
                 <li
                   key={index}
-                  className="flex items-start gap-3 text-gray-700 dark:text-gray-300"
+                  className="flex items-start gap-3 "
                 >
                   <CheckCircleFilled className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" />
                   <span>{item}</span>
@@ -73,38 +80,38 @@ const Assessment = () => {
             <div className="w-14 h-14 bg-purple-50 dark:bg-purple-900/30 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-400 text-2xl mb-6 group-hover:scale-110 transition-transform">
               <SafetyCertificateFilled />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-xl font-bold mb-4">
               Evaluation Process
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="mb-6">
               Our evaluation process is fully digital, time-bound, and
               transparent, ensuring equal opportunity for all participants.
             </p>
             <ul className="space-y-4">
-              <li className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
+              <li className="flex items-start gap-3 ">
                 <ClockCircleFilled className="text-purple-500 dark:text-purple-400 mt-1 flex-shrink-0" />
                 <span>
-                  <strong className="text-gray-900 dark:text-white">
+                  <strong className="">
                     Time-Bound:
                   </strong>{" "}
                   Each question has a fixed time limit. Speed and accuracy are
                   key.
                 </span>
               </li>
-              <li className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
+              <li className="flex items-start gap-3 ">
                 <SafetyCertificateFilled className="text-purple-500 dark:text-purple-400 mt-1 flex-shrink-0" />
                 <span>
-                  <strong className="text-gray-900 dark:text-white">
+                  <strong className="">
                     Integrity:
                   </strong>{" "}
                   Advanced monitoring systems prevent malpractice during the
                   exam.
                 </span>
               </li>
-              <li className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
+              <li className="flex items-start gap-3 ">
                 <TrophyOutlined className="text-purple-500 dark:text-purple-400 mt-1 flex-shrink-0" />
                 <span>
-                  <strong className="text-gray-900 dark:text-white">
+                  <strong className="">
                     Merit-Based:
                   </strong>{" "}
                   Scores are auto-calculated, and awards are granted based on
