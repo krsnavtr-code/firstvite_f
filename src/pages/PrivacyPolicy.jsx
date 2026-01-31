@@ -12,12 +12,12 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <SEO 
-        title="Privacy Policy | FirstVITE"
-        description="Read our Privacy Policy to understand how FirstVITE collects, uses, and protects your personal information. Last updated on your visit."
-        keywords="privacy policy, data protection, personal information, FirstVITE privacy, online learning privacy, data security"
+        title="Privacy Policy | Eklabya"
+        description="Read our Privacy Policy to understand how Eklabya collects, uses, and protects your personal information. Last updated on your visit."
+        keywords="privacy policy, data protection, personal information, Eklabya privacy, online learning privacy, data security"
         og={{
-          title: 'Privacy Policy | FirstVITE',
-          description: `Last updated ${lastUpdated}. Learn how FirstVITE protects your privacy and handles your personal information.`,
+          title: 'Privacy Policy | Eklabya',
+          description: `Last updated ${lastUpdated}. Learn how Eklabya protects your privacy and handles your personal information.`,
           type: 'article'
         }}
       />
@@ -37,7 +37,7 @@ const PrivacyPolicy = () => {
 
         <div className="prose dark:prose-invert max-w-none">
           <p className="text-black dark:text-white mb-4">
-            At FirstVite, we are committed to protecting your privacy and
+            At Eklabya, we are committed to protecting your privacy and
             ensuring the security of your personal information. This Privacy
             Policy outlines how we collect, use, and safeguard your information
             when you use our platform.
@@ -117,7 +117,7 @@ const PrivacyPolicy = () => {
             us at:
           </p>
           <address className="not-italic text-black dark:text-white mb-8">
-            FirstVite
+            Eklabya
             <br />
             H-161 BSI Sector-63
             <br />
@@ -125,7 +125,7 @@ const PrivacyPolicy = () => {
             <br />
             Uttar Pradesh 201301
             <br />
-            Email: info@firstvite.com
+            Email: info@eklabya.com
           </address>
         </div>
       </div>

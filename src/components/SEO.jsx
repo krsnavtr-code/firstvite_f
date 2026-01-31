@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet-async';
  * SEO Component
  * 
  * @param {Object} props - Component props
- * @param {string} props.title - Page title (e.g., 'Home | FirstVITE')
+ * @param {string} props.title - Page title (e.g., 'Home | Eklabya')
  * @param {string} props.description - Meta description for the page
  * @param {string} [props.keywords] - Comma-separated keywords for SEO
  * @param {string} [props.canonical] - Canonical URL for the page
@@ -22,15 +22,15 @@ import { Helmet } from 'react-helmet-async';
  * @returns {JSX.Element} - Returns Helmet component with meta tags
  */
 const SEO = ({
-  title = 'FirstVITE - Online Learning Platform',
-  description = 'FirstVITE E-Learning Pvt Ltd offers professional and management courses, including short programs and degree collaborations with international universities.',
-  keywords = 'online courses, e-learning, professional courses, management courses, online education, FirstVITE, skill development',
+  title = 'Eklabya - Online Learning Platform',
+  description = 'Eklabya E-Learning Pvt Ltd offers professional and management courses, including short programs and degree collaborations with international universities.',
+  keywords = 'online courses, e-learning, professional courses, management courses, online education, Eklabya, skill development',
   canonical = '',
   og = {},
   twitter = {}
 }) => {
-  const siteName = 'FirstVITE';
-  const siteUrl = 'https://firstvite.com';
+  const siteName = 'Eklabya';
+  const siteUrl = 'https://eklabya.com';
   const defaultImage = `${siteUrl}/images/firstvite-logo.png`;
   
   // Default Open Graph values

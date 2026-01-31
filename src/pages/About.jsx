@@ -7,13 +7,13 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
-        title="About Us | FirstVITE - Empowering Minds Through Education"
-        description="Learn about FirstVITE's mission to provide accessible, high-quality education. Discover our story, values, and the team behind our innovative e-learning platform."
-        keywords="about FirstVITE, e-learning platform, online education, learn online, FirstVITE mission, education technology, online courses, professional development"
+        title="About Us | Eklabya - Empowering Minds Through Education"
+        description="Learn about Eklabya's mission to provide accessible, high-quality education. Discover our story, values, and the team behind our innovative e-learning platform."
+        keywords="about Eklabya, e-learning platform, online education, learn online, Eklabya mission, education technology, online courses, professional development"
         og={{
-          title: "About FirstVITE - Empowering Learners Worldwide",
+          title: "About Eklabya - Empowering Learners Worldwide",
           description:
-            "Discover how FirstVITE is transforming education through accessible, high-quality online learning experiences for students everywhere.",
+            "Discover how Eklabya is transforming education through accessible, high-quality online learning experiences for students everywhere.",
           type: "website",
         }}
       />
@@ -21,7 +21,7 @@ export default function About() {
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            About Us – FirstVITE
+            About Us – Eklabya
           </h1>
           <p className="text-xl md:text-2xl max-w-3xl mx-auto">
             Empowering minds through knowledge and learning resources
@@ -286,7 +286,7 @@ export default function About() {
             </Link>
           </div>
           <p className="text-center text-lg text-black dark:text-white mt-12">
-            Welcome to FirstVITE — your partner in skill-building and success.
+            Welcome to Eklabya — your partner in skill-building and success.
           </p>
         </div>
       </section>

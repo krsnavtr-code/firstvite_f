@@ -105,7 +105,7 @@ const CoursesByCategory = () => {
     : 'Category';
 
   // Generate SEO metadata
-  const seoTitle = `${formattedCategoryName} Courses | FirstVITE`;
+  const seoTitle = `${formattedCategoryName} Courses | Eklabya`;
   const seoDescription = `Explore our ${formattedCategoryName} courses. Enhance your skills with expert-led training and industry-relevant curriculum.`;
   const seoKeywords = `${formattedCategoryName} courses, ${formattedCategoryName} training, ${formattedCategoryName} certification, online ${formattedCategoryName} courses`;
   const canonicalUrl = `https://firstvite.com/courses/category/${categoryName}`;
@@ -118,7 +118,7 @@ const CoursesByCategory = () => {
         keywords={seoKeywords}
         canonical={canonicalUrl}
         og={{
-          title: `Best ${formattedCategoryName} Courses Online | FirstVITE`,
+          title: `Best ${formattedCategoryName} Courses Online | Eklabya`,
           description: `Learn ${formattedCategoryName} from industry experts. Enroll now for hands-on training and certification.`,
           type: 'website',
           url: canonicalUrl

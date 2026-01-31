@@ -25,22 +25,22 @@ const Assessment = () => {
             <TrophyOutlined /> Scholarship Program 2026
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
-            Unlock Your Future with FirstVite
+            Unlock Your Future with Eklabya
           </h2>
           <p className="text-black dark:text-white leading-relaxed">
-            The FirstVite Scholarship Exam is a prestigious merit-based online
+            The Eklabya Scholarship Exam is a prestigious merit-based online
             initiative created to empower talented and ambitious students. This
             examination offers deserving learners an opportunity to demonstrate
             their academic excellence while gaining access to financial support
-            for higher education. Through FirstVite, students can confidently
+            for higher education. Through Eklabya, students can confidently
             take the next step toward career success by enrolling in
             <strong> professional certification courses</strong> online that are designed to meet
-            modern industry standards. FirstVite also provides advanced learning
+            modern industry standards. Eklabya also provides advanced learning
             opportunities through globally recognized <strong>SAP online certification
             courses</strong>, helping students build job-ready skills and enhance their
             professional credibility. With expert guidance, flexible online
-            learning, and career-focused programs, FirstVite bridges the gap
-            between education and employment. Participate in the FirstVite
+            learning, and career-focused programs, Eklabya bridges the gap
+            between education and employment. Participate in the Eklabya
             Scholarship Exam today and unlock a future filled with knowledge,
             growth, and limitless career possibilities.
           </p>
@@ -55,7 +55,7 @@ const Assessment = () => {
             </div>
             <h3 className="text-xl font-bold mb-4">Eligibility Criteria</h3>
             <p className=" mb-6">
-              To apply for the FirstVite Scholarship 2026, candidates must meet
+              To apply for the Eklabya Scholarship 2026, candidates must meet
               the minimum academic requirements as specified below:
             </p>
             <ul className="space-y-4">
@@ -133,7 +133,7 @@ const Assessment = () => {
                 Ready to prove your potential?
               </h3>
               <p className="text-indigo-100 text-lg">
-                The FirstVite Scholarship Exam 2026 offers you a reliable
+                The Eklabya Scholarship Exam 2026 offers you a reliable
                 platform to showcase your abilities and secure a brighter
                 academic future.
               </p>

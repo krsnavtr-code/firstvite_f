@@ -160,7 +160,7 @@ function Navbar() {
           {/* Left Side: Contact / Info */}
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
-              <FaEnvelope size={10} /> info@firstvite.com
+              <FaEnvelope size={10} /> info@eklabya.com
             </span>
             <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
               <FaPhoneAlt size={10} /> +91 99900 56799

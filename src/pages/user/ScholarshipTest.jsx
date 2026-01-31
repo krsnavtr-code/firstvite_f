@@ -418,7 +418,7 @@ const ScholarshipTest = () => {
                 style={{ fontSize: "56px", color: "#4f46e5" }}
               />
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-6 mb-2">
-                FirstVite Scholarship Test – Online Scholarship Evaluation for
+                Eklabya Scholarship Test – Online Scholarship Evaluation for
                 Students
               </h1>
               <div className="h-1 w-24 bg-indigo-500 mx-auto rounded-full"></div>
@@ -447,13 +447,13 @@ const ScholarshipTest = () => {
               <div className="flex items-center gap-3 mb-6">
                 <FileTextOutlined className="text-indigo-600 text-xl" />
                 <h2 className="text-xl font-bold text-gray-900">
-                  Scholarship Test Policy & Important Warnings – FirstVite
+                  Scholarship Test Policy & Important Warnings – Eklabya
                 </h2>
               </div>
 
               <div className="space-y-6 text-gray-700 leading-relaxed text-sm md:text-base">
                 <p>
-                  The FirstVite Scholarship Evaluation Test is designed to
+                  The Eklabya Scholarship Evaluation Test is designed to
                   ensure a fair, transparent, and merit-based assessment process
                   for all candidates. Before starting the online scholarship
                   test, applicants must carefully read and follow all rules and
@@ -466,7 +466,7 @@ const ScholarshipTest = () => {
                       Time Management
                     </h4>
                     <p className="text-sm text-gray-600">
-                      Each question in the FirstVite scholarship exam has a
+                      Each question in the Eklabya scholarship exam has a
                       strict time limit. Once the time expires, the system will
                       automatically move to the next question, and unanswered
                       questions cannot be revisited. Candidates are advised to
@@ -496,7 +496,7 @@ const ScholarshipTest = () => {
                       Any attempt to use unfair means, external assistance,
                       screen recording tools, or multiple devices can lead to
                       immediate cancellation of the test and disqualification
-                      from the FirstVite scholarship program.
+                      from the Eklabya scholarship program.
                     </p>
                   </div>
 
@@ -507,7 +507,7 @@ const ScholarshipTest = () => {
                     <p className="text-sm text-gray-600">
                       All submitted responses are final and cannot be edited
                       after submission. By proceeding with the test, candidates
-                      agree to comply with all FirstVite scholarship policies,
+                      agree to comply with all Eklabya scholarship policies,
                       rules, and warnings. Failure to follow these guidelines
                       may impact eligibility for scholarships and future
                       opportunities.

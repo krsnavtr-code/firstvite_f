@@ -242,13 +242,13 @@ function Footer() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
+                    strokeWidth={2} 
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
                 <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="mailto:info@firstvite.com">
-                    Email: info@firstvite.com
+                  <a href="mailto:info@eklabya.com">
+                    Email: info@eklabya.com
                   </a>
                 </span>
               </li>
@@ -267,8 +267,8 @@ function Footer() {
                   />
                 </svg>
                 <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="mailto:anand@firstvite.com">
-                    Email: anand@firstvite.com
+                  <a href="mailto:anand@eklabya.com">
+                    Email: anand@eklabya.com
                   </a>
                 </span>
               </li>
@@ -280,7 +280,7 @@ function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-base text-black dark:text-white">
-              &copy; {currentYear} FirstVite. All rights reserved.
+              &copy; {currentYear} Eklabya. All rights reserved.
             </p>
             <div className="flex items-center mt-4 md:mt-0">
               <FaBook className="h-5 w-5 text-blue-500 mr-2" />

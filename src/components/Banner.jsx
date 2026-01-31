@@ -171,7 +171,7 @@ function Banner() {
           <div className="lg:w-1/2 space-y-8">
             <div className="space-y-2 w-full">
               <div className="flex items-center gap-1 text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
-                <img src={logoImg} alt="FirstVITE – Your Online Learning Partner" className="w-6" />
+                <img src={logoImg} alt="Eklabya – Your Online Learning Partner" className="w-6" />
                 <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
                   Be The First
                 </span>

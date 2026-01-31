@@ -26,7 +26,7 @@ const RegisterPage = () => {
               <path d="M10.707 1.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 9.414V17a1 1 0 001 1h3a1 1 0 001-1v-3h2v3a1 1 0 001 1h3a1 1 0 001-1V9.414l.293.293a1 1 0 001.414-1.414l-7-7z" />
             </svg>
           </Link>
-          <h1 className="text-3xl font-bold mb-4">Welcome to FirstVITE</h1>
+          <h1 className="text-3xl font-bold mb-4">Welcome to Eklabya</h1>
           <p className="text-sm opacity-90">
             To make high-quality education accessible online, helping learners
             gain practical, job-ready skills in trending domains.

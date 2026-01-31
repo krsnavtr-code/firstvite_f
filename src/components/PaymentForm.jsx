@@ -201,7 +201,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: orderData.amount,
       currency: orderData.currency,
-      name: "FirstVITE",
+      name: "Eklabya",
       description: isCompanyRegistration
         ? "JobFair Registration Fee"
         : `Payment for ${formData.course}`,

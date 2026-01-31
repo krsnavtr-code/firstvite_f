@@ -67,12 +67,12 @@ const FAQPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO 
-        title="Frequently Asked Questions | FirstVITE"
-        description="Find answers to common questions about our courses, payments, enrollment process, and more. Get help with your learning journey at FirstVITE."
-        keywords="FAQ, frequently asked questions, course help, payment questions, enrollment help, FirstVITE support, learning platform"
+        title="Frequently Asked Questions | Eklabya"
+        description="Find answers to common questions about our courses, payments, enrollment process, and more. Get help with your learning journey at Eklabya."
+        keywords="FAQ, frequently asked questions, course help, payment questions, enrollment help, Eklabya support, learning platform"
         og={{
-          title: 'Frequently Asked Questions | FirstVITE',
-          description: 'Get answers to common questions about our courses, payments, and learning platform. Everything you need to know about FirstVITE in one place.',
+          title: 'Frequently Asked Questions | Eklabya',
+          description: 'Get answers to common questions about our courses, payments, and learning platform. Everything you need to know about Eklabya in one place.',
           type: 'website'
         }}
       />

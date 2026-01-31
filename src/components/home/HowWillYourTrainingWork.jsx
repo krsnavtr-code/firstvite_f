@@ -37,7 +37,7 @@ const steps = [
   {
     icon: <FaCertificate className="text-3xl text-blue-500 dark:text-blue-400" />,
     title: "Get certified",
-    desc: "Receive a recognized certificate from FirstVITE (NSDC/NIELIT partnered) upon successful course completion",
+    desc: "Receive a recognized certificate from Eklabya (NSDC/NIELIT partnered) upon successful course completion",
   },
 ];
 
@@ -46,10 +46,10 @@ const HowWillYourTrainingWork = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black dark:text-white">
       <div className="text-center mb-12">
         <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
-          How will your training work? – with FirstVITE
+          How will your training work? – with Eklabya
         </h2>
         <p className="mt-4">
-          <strong>FirstVite Scholarship Exam</strong> is a merit-based online initiative created to empower talented and motivated students. It offers a fair opportunity to demonstrate academic excellence and receive financial support for higher education. Through <strong>FirstVITE online courses</strong>, students gain access to industry-relevant knowledge designed by experts. The structured learning approach of FirstVITE training programs ensures practical skills, real-world exposure, and career readiness. From enrollment to certification, every step is transparent and student-focused. FirstVite believes in nurturing potential, rewarding merit, and building confident learners who are prepared to achieve long-term success in today’s competitive academic and professional environment.
+          <strong>Eklabya Scholarship Exam</strong> is a merit-based online initiative created to empower talented and motivated students. It offers a fair opportunity to demonstrate academic excellence and receive financial support for higher education. Through <strong>Eklabya online courses</strong>, students gain access to industry-relevant knowledge designed by experts. The structured learning approach of Eklabya training programs ensures practical skills, real-world exposure, and career readiness. From enrollment to certification, every step is transparent and student-focused. Eklabya believes in nurturing potential, rewarding merit, and building confident learners who are prepared to achieve long-term success in today’s competitive academic and professional environment.
         </p>
       </div>
 

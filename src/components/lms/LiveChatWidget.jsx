@@ -35,7 +35,7 @@ const faq = [
   // Payments & Refunds
   {
     q: /refund|money back|cancel order|cancel enrollment/i,
-    a: "For refunds, please visit LMS > Payments > Refunds or contact support@firstvite.com.",
+    a: "For refunds, please visit LMS > Payments > Refunds or contact support@eklabya.com.",
   },
   {
     q: /payment|pay|fees|billing|invoice|transaction/i,
@@ -43,7 +43,7 @@ const faq = [
   },
   {
     q: /failed payment|transaction failed|not paid/i,
-    a: "If your payment failed, please wait 10 minutes. If still not updated, contact support@firstvite.com with your transaction ID.",
+    a: "If your payment failed, please wait 10 minutes. If still not updated, contact support@eklabya.com with your transaction ID.",
   },
   {
     q: /call|phone|talk to someone|speak with agent/i,
@@ -83,7 +83,7 @@ const faq = [
   // Account & Login
   {
     q: /login|sign in|can't login|password/i,
-    a: "If you forgot your password, use 'Forgot Password' on the login page. If login issues persist, contact support@firstvite.com.",
+    a: "If you forgot your password, use 'Forgot Password' on the login page. If login issues persist, contact support@eklabya.com.",
   },
   {
     q: /sign up|create account|register/i,
@@ -97,7 +97,7 @@ const faq = [
   // Technical Issues
   {
     q: /not working|error|technical issue|bug/i,
-    a: "Please try clearing cache and refreshing. If the issue continues, contact support@firstvite.com with a screenshot.",
+    a: "Please try clearing cache and refreshing. If the issue continues, contact support@eklabya.com with a screenshot.",
   },
   {
     q: /video not playing|content not loading/i,
@@ -107,7 +107,7 @@ const faq = [
   // General Help
   {
     q: /contact|support|help|agent/i,
-    a: "You can reach our support team at support@firstvite.com or via the Help section in the LMS.",
+    a: "You can reach our support team at support@eklabya.com or via the Help section in the LMS.",
   },
   { q: /hello|hi|hey/i, a: "Hello! 👋 How can I help you today?" },
   { q: /thank you|thanks/i, a: "You're welcome! Happy learning 🚀" },

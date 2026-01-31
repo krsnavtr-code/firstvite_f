@@ -7,33 +7,33 @@ const Content = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black dark:text-white">
       <div className="text-center mb-12">
         <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
-          Welcome to FirstVITE – Your Online Learning Partner
+          Welcome to Eklabya – Your Online Learning Partner
         </h2>
         <p className="mt-4">
-          FirstVITE is a trusted and innovative online learning platform
+          Eklabya is a trusted and innovative online learning platform
           designed to empower students and working professionals with
           industry-ready skills. Our goal is to remove barriers of time,
           location, and background by delivering high-quality education that
           fits modern lifestyles. As one of the leading providers of{" "}
-          <strong>online skill training courses in India</strong>, FirstVITE
+          <strong>online skill training courses in India</strong>, Eklabya
           offers certified courses and degree programs that focus on real-world
           applications and career growth. From Digital Marketing and Data
           Science to Business Administration and Information Technology, our
           programs are carefully structured to meet current industry demands. We
           believe learning should be flexible, practical, and result-driven.
-          That’s why FirstVITE stands out as a{" "}
+          That’s why Eklabya stands out as a{" "}
           <strong>job oriented online training platform</strong>, helping
           learners gain relevant skills that employers value. With expert
-          mentors, flexible schedules, and career-focused curricula, FirstVITE
+          mentors, flexible schedules, and career-focused curricula, Eklabya
           is your reliable partner in building a successful and future-ready
           career—all from the comfort of your home.
         </p>
       </div>
 
-      {/* Why Choose FirstVITE */}
+      {/* Why Choose Eklabya */}
       <div className="mb-16">
         <h3 className="text-2xl font-semibold text-black dark:text-white mb-6 text-center">
-          Why Choose FirstVITE?
+          Why Choose Eklabya?
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div
@@ -122,7 +122,7 @@ const Content = () => {
         </p>
         <p className="mt-4 text-lg text-black dark:text-white mx-auto">
           From up-to-date course content and expert mentorship to placement
-          assistance and lifetime access to learning material — FirstVITE is
+          assistance and lifetime access to learning material — Eklabya is
           your complete learning companion.
         </p>
       </div>
@@ -135,7 +135,7 @@ const Content = () => {
           Enroll Now & Start Your Learning Journey Today!
         </h3>
         <p className="text-lg text-black dark:text-white max-w-2xl mx-auto">
-          Empower your future with FirstVITE — where education meets
+          Empower your future with Eklabya — where education meets
           opportunity. No classroom needed. Just a device, internet, and the
           passion to grow.
         </p>

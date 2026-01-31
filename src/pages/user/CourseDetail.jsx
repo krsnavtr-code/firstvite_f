@@ -609,7 +609,7 @@ const CourseDetail = () => {
   };
 
   // Generate SEO metadata
-  const seoTitle = course ? `${course.title} | FirstVITE` : 'Course Details | FirstVITE';
+  const seoTitle = course ? `${course.title} | Eklabya` : 'Course Details | Eklabya';
   const seoDescription = course?.shortDescription || 'Learn valuable skills with our comprehensive course.';
   const courseImage = course?.imageUrl || '/images/default-course-image.jpg';
   const canonicalUrl = course ? `https://firstvite.com/course/${course._id}` : 'https://firstvite.com/courses';

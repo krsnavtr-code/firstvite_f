@@ -28,7 +28,7 @@ const ReferAndEarn = () => {
         
         // Mock data for demo
         setTimeout(() => {
-          setReferralCode('FIRSTVITE' + Math.floor(1000 + Math.random() * 9000));
+          setReferralCode('Eklabya' + Math.floor(1000 + Math.random() * 9000));
           setStats({
             totalReferrals: 0,
             activeReferrals: 0,
@@ -55,8 +55,8 @@ const ReferAndEarn = () => {
 
   const handleShare = async () => {
     const shareData = {
-      title: 'Join me on FirstVITE!',
-      text: `Use my referral code ${referralCode} to get started on FirstVITE and earn rewards!`,
+      title: 'Join me on Eklabya!',
+      text: `Use my referral code ${referralCode} to get started on Eklabya and earn rewards!`,
       url: window.location.origin + '/signup?ref=' + referralCode,
     };
 
@@ -184,7 +184,7 @@ const ReferAndEarn = () => {
         <Space direction="vertical" size="small" className="w-full dark:text-gray-300">
           <div>• Referral rewards are subject to terms and conditions.</div>
           <div>• Fraudulent activities may result in account suspension.</div>
-          <div>• FirstVITE reserves the right to modify or terminate the program at any time.</div>
+          <div>• Eklabya reserves the right to modify or terminate the program at any time.</div>
         </Space>
       </Card>
     </div>

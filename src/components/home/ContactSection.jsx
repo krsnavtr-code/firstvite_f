@@ -61,8 +61,8 @@ const ContactSection = () => {
     {
       icon: <FaEnvelope className="text-2xl text-purple-500" />,
       title: "Email Address",
-      description: "info@firstvite.com",
-      link: "mailto:info@firstvite.com",
+      description: "info@eklabya.com",
+      link: "mailto:info@eklabya.com",
       linkText: "Send email",
     },
   ];

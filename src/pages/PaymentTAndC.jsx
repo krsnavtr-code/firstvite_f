@@ -5,12 +5,12 @@ const PaymentTAndC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <SEO 
-        title="Payment Terms & Conditions | FirstVITE"
-        description="Review our payment terms and conditions. Understand your rights and responsibilities when making payments on FirstVITE's learning platform."
-        keywords="payment terms, payment conditions, refund policy, online payment terms, FirstVITE payment, course payment terms"
+        title="Payment Terms & Conditions | Eklabya"
+        description="Review our payment terms and conditions. Understand your rights and responsibilities when making payments on Eklabya's learning platform."
+        keywords="payment terms, payment conditions, refund policy, online payment terms, Eklabya payment, course payment terms"
         og={{
-          title: 'Payment Terms & Conditions | FirstVITE',
-          description: 'Understand the terms and conditions governing payments on the FirstVITE platform. Learn about refunds, payment methods, and your financial responsibilities.',
+          title: 'Payment Terms & Conditions | Eklabya',
+          description: 'Understand the terms and conditions governing payments on the Eklabya platform. Learn about refunds, payment methods, and your financial responsibilities.',
           type: 'article'
         }}
       />

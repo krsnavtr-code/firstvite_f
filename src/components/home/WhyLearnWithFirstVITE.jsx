@@ -6,7 +6,7 @@ import "../../styles/typography.css";
 
 const data = [
   {
-    benefit: "FirstVITE ISO certified certificate",
+    benefit: "Eklabya ISO certified certificate",
     firstVITE: true,
     others: false,
     youtube: false,
@@ -141,29 +141,29 @@ const WhyLearnWithFirstVITE = () => {
     >
       <div className="text-center mb-12">
         <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
-          Why Learn with FirstVITE?
+          Why Learn with Eklabya?
         </h2>
         <p className="mt-4">
-          FirstVITE is more than just an education platform — it is a gateway to
+          Eklabya is more than just an education platform — it is a gateway to
           opportunity, growth, and success. Through the{" "}
-          <strong>FirstVite Scholarship Exam</strong>, talented and deserving
+          <strong>Eklabya Scholarship Exam</strong>, talented and deserving
           students get a chance to prove their academic potential and receive
           financial support for higher education. This merit-based online
           examination ensures that students with dedication and capability are
           rewarded fairly, regardless of their background. What truly sets
-          FirstVITE apart is its focus on{" "}
+          Eklabya apart is its focus on{" "}
           <strong>Online Learning Courses with ob Opportunities</strong>. Every
           course is carefully designed to match real-world industry needs,
           helping learners gain practical knowledge that employers value.
           Students don’t just learn concepts; they build careers. In addition,
-          FirstVITE offers{" "}
+          Eklabya offers{" "}
           <strong>Professional Skill Development Online Courses</strong> that
           empower learners with in-demand skills, confidence, and hands-on
           experience. From modern technology to career-oriented skills, these
           courses prepare students for today’s competitive job market. With
           expert guidance, flexible online learning, and scholarship support,
-          FirstVITE creates a powerful learning ecosystem. It helps students
-          learn smarter, grow faster, and move closer to their career goals with
+          Eklabya creates a powerful learning ecosystem. It helps students learn
+          smarter, grow faster, and move closer to their career goals with
           confidence and clarity.
         </p>
       </div>
@@ -177,7 +177,7 @@ const WhyLearnWithFirstVITE = () => {
                 <thead>
                   <tr className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white text-thin text-xs-mobile text-sm-tablet text-sm-desktop">
                     <th className="w-1/2 px-4 py-3 text-left">Benefits</th>
-                    <th className="w-1/6 px-4 py-3">FirstVITE</th>
+                    <th className="w-1/6 px-4 py-3">Eklabya</th>
                     <th className="w-1/6 px-4 py-3">Other Platforms</th>
                     <th className="w-1/6 px-4 py-3">YouTube</th>
                   </tr>
@@ -260,7 +260,7 @@ const WhyLearnWithFirstVITE = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                     <span className="text-sm font-medium text-gray-800 dark:text-white">
-                      FirstVITE
+                      Eklabya
                     </span>
                     {renderIcon(row.firstVITE)}
                   </div>

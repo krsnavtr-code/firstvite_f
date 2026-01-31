@@ -131,7 +131,7 @@ const Career = () => {
               <span>Career Opportunities</span>
             </Title>
             <Text className="text-gray-600">
-              Find your dream job through FirstVite's career portal
+              Find your dream job through Eklabya's career portal
             </Text>
           </div>
           
