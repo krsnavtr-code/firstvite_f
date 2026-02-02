@@ -82,14 +82,13 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
         <Link to="/lms">
           <div className="w-10 h-10 p-1 overflow-hidden group-hover:scale-105 transition-transform">
             <img
-              src="http://firstvite.com/api/upload/file/img-1753961989896-7541613.png"
+              src="http://eklabya.com/api/upload/file/img-1753961989896-7541613.png"
               alt="Logo"
               className="object-cover w-full h-full"
             />
           </div>
         </Link>
 
-        
         {/* Right: Notifications + User */}
         <div className="flex items-center space-x-2">
           <button
@@ -150,7 +149,10 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
               />
               <span className="font-medium text-black dark:text-white">
                 Hi, {currentUser?.fullname || "User"}
-                <p className="text-black dark:text-gray-200" style={{ fontSize: "8px" }}>
+                <p
+                  className="text-black dark:text-gray-200"
+                  style={{ fontSize: "8px" }}
+                >
                   Become <span className="text-blue-600">Be The First</span>{" "}
                   With Us
                 </p>

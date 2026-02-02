@@ -569,7 +569,7 @@ const CourseDetail = () => {
                   className="certificate-image-container"
                   style={{
                     backgroundImage:
-                      "url('http://firstvite.com/api/upload/file/img-1754374737042-580116956.jpg')",
+                      "url('http://eklabya.com/api/upload/file/img-1754374737042-580116956.jpg')",
                     backgroundSize: "contain",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
@@ -609,24 +609,33 @@ const CourseDetail = () => {
   };
 
   // Generate SEO metadata
-  const seoTitle = course ? `${course.title} | Eklabya` : 'Course Details | Eklabya';
-  const seoDescription = course?.shortDescription || 'Learn valuable skills with our comprehensive course.';
-  const courseImage = course?.imageUrl || '/images/default-course-image.jpg';
-  const canonicalUrl = course ? `https://firstvite.com/course/${course._id}` : 'https://firstvite.com/courses';
+  const seoTitle = course
+    ? `${course.title} | Eklabya`
+    : "Course Details | Eklabya";
+  const seoDescription =
+    course?.shortDescription ||
+    "Learn valuable skills with our comprehensive course.";
+  const courseImage = course?.imageUrl || "/images/default-course-image.jpg";
+  const canonicalUrl = course
+    ? `https://firstvite.com/course/${course._id}`
+    : "https://firstvite.com/courses";
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-      <SEO 
+      <SEO
         title={seoTitle}
         description={seoDescription}
-        keywords={course?.tags?.join(', ') || 'online course, e-learning, professional development'}
+        keywords={
+          course?.tags?.join(", ") ||
+          "online course, e-learning, professional development"
+        }
         canonical={canonicalUrl}
         og={{
           title: seoTitle,
           description: seoDescription,
-          type: 'course',
+          type: "course",
           image: courseImage,
-          url: canonicalUrl
+          url: canonicalUrl,
         }}
       />
       {/* Course Header */}
@@ -744,7 +753,7 @@ const CourseDetail = () => {
                           key={i}
                           className="text-yellow-500 w-5 h-5"
                         />
-                      )
+                      ),
                     )}
                     <span className="ml-2 text-gray-700 dark:text-gray-300 font-medium">
                       {course.rating?.toFixed(1) || "4"}
@@ -836,7 +845,7 @@ const CourseDetail = () => {
                       Sample Certificate
                     </p>
                     <img
-                      src="http://firstvite.com/api/upload/file/img-1754374737042-580116956.jpg"
+                      src="http://eklabya.com/api/upload/file/img-1754374737042-580116956.jpg"
                       alt="Course Certificate Sample"
                       className="w-full h-auto rounded border border-gray-200 dark:border-gray-700"
                       onError={(e) => {
@@ -1232,7 +1241,7 @@ const CourseDetail = () => {
                                         >
                                           {topic}
                                         </li>
-                                      )
+                                      ),
                                     )}
                                   </ul>
                                 </div>
@@ -1584,7 +1593,7 @@ const CourseDetail = () => {
                     <div className="absolute bottom-0 left-0 right-0 text-center">
                       <span className="inline-block px-2 py-0.5 text-xs font-medium text-black bg-amber-500 rounded-full">
                         {Math.round(
-                          (1 - course.price / course.originalPrice) * 100
+                          (1 - course.price / course.originalPrice) * 100,
                         )}
                         % OFF
                       </span>

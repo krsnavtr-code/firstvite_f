@@ -25,7 +25,7 @@ function Home() {
             "Join thousands of students learning in-demand skills with our expert-led courses. Flexible learning, industry-recognized certifications, and career support.",
           type: "website",
           image:
-            "http://firstvite.com/api/upload/file/img-1753961989896-7541613.png",
+            "http://eklabya.com/api/upload/file/img-1753961989896-7541613.png",
         }}
       />
       <div className="flex flex-col min-h-screen">

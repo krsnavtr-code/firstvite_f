@@ -11,10 +11,10 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 const bannerImg =
-  "http://firstvite.com/api/upload/file/img-1752554019521-300496356.png";
+  "http://eklabya.com/api/upload/file/img-1752554019521-300496356.png";
 
 const logoImg =
-  "http://firstvite.com/api/upload/file/img-1753961989896-7541613.png";
+  "http://eklabya.com/api/upload/file/img-1753961989896-7541613.png";
 import "./Banner.css";
 import "../styles/typography.css";
 
@@ -84,7 +84,7 @@ const CertificateModal = ({ isOpen, onClose }) => {
                 className="certificate-image-container"
                 style={{
                   backgroundImage:
-                    "url('http://firstvite.com/api/upload/file/img-1754374737042-580116956.jpg')",
+                    "url('http://eklabya.com/api/upload/file/img-1754374737042-580116956.jpg')",
                   backgroundSize: "contain",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
