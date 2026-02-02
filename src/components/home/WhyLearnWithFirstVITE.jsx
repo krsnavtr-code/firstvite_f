@@ -278,6 +278,7 @@ const WhyLearnWithFirstVITE = () => {
                     </span>
                     {renderIcon(row.youtube)}
                   </div>
+                  
                 </div>
               </div>
             </div>
