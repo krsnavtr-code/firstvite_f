@@ -108,7 +108,7 @@ const CoursesByCategory = () => {
   const seoTitle = `${formattedCategoryName} Courses | Eklabya`;
   const seoDescription = `Explore our ${formattedCategoryName} courses. Enhance your skills with expert-led training and industry-relevant curriculum.`;
   const seoKeywords = `${formattedCategoryName} courses, ${formattedCategoryName} training, ${formattedCategoryName} certification, online ${formattedCategoryName} courses`;
-  const canonicalUrl = `https://firstvite.com/courses/category/${categoryName}`;
+  const canonicalUrl = `https://eklabya.com/courses/category/${categoryName}`;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

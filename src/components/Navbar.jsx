@@ -452,8 +452,8 @@ function Navbar() {
           {/* Mobile Header */}
           <div className="flex justify-between items-center mb-6">
             <span className="text-xl font-bold">
-              <span className="text-orange-500">First</span>
-              <span className="text-blue-600">VITE</span>
+              <span style={{ color: "#1E90FF" }}>e</span>
+              <span style={{ color: "#F47C26" }}>KLABYA</span>
             </span>
             <button
               onClick={() => setIsMobileMenuOpen(false)}

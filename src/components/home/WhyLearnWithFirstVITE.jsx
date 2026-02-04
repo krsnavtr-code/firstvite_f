@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import { FaCheckCircle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
-import "./WhyLearnWithFirstVITE.css";
 import "../../styles/typography.css";
 
 const data = [

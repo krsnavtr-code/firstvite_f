@@ -11,11 +11,11 @@ const EMAIL_TEMPLATES = {
   collegeInvitationMessage: `<div style="font-size: 16px;">
 Dear [College Name],
 
-Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
+Greetings from <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">KLABYA</span> E-Learning Pvt. Ltd.</span>!
 
 Skill Development company dedicated to enhancing student employability through practical and industry-aligned courses.
 
-At <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!, we specialize in training students in high-demand technical skills including:
+At <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">KLABYA</span> E-Learning Pvt. Ltd.</span>!, we specialize in training students in high-demand technical skills including:
 
 🔹 Java Development
 🔹 Python Programming
@@ -38,16 +38,16 @@ We would be grateful if you could share this training opportunity with your stud
 Looking forward to your positive response.
 
 Thank you & Best Regards,
-<span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
-📞 <span style="font-weight: 600; color: #007BFF;">9990056799 | 855980758</span> 
-📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
+<span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</span>
+📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
 
   studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear Student,
 
-Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
+Greetings from <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</span>!
 
 We are excited to invite you to participate in our upcoming Career Hiring Camp 2025, a unique platform where you can connect directly with leading companies that are hiring fresh graduates and final-year students.
 
@@ -64,25 +64,25 @@ This event is designed to help you kickstart your career journey with opportunit
 
 📝 <span style="font-weight: 600;">Register Now:</span>
 Click the link below to secure your spot:
-👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://firstvite.com/jobfair/apply/student">Register Now</a></span>
+👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://eklabya.com/jobfair/apply/student">Register Now</a></span>
 
 📅 Event Details will be sent to your email after registration.
-Organized by: <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
+Organized by: <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</span>
 
 Don't miss this golden opportunity to get noticed by hiring companies and start your professional journey.
 We look forward to seeing you at the event!
 
 Warm regards,
-<strong style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</strong>
+<strong style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</strong>
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
-📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
+📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
 
   collegeMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear [College Name],
 
-Greetings from <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>!
+Greetings from <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</span>!
 
 We are delighted to inform you that we are organizing a Career Hiring Camp in collaboration with several leading partner companies who are actively recruiting fresh graduates and final-year students.
 
@@ -95,22 +95,22 @@ Free participation (no registration or hidden fees)
 Certificates and recognition for participants
 
 To participation provide this to your students, please fill out the short form below:
-👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://firstvite.com/jobfair/apply/student">Register Now</a></span>
+👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://eklabya.com/jobfair/apply/student">Register Now</a></span>
 
 Our team will get in touch with you for further coordination and provide detailed schedules.
 We look forward to having your institution join us in empowering the next generation of professionals.
 
 Warm regards,
-<span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
+<span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</span>
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
-📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
+📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
 
   companyMessage: `<div style="color: #4DA3FF; font-size: 18px;">
 Dear [Company Name],
 
-We are excited to announce that <span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>! are organizing a Job Fair which will bring together over 👥1,500+ students from multiple leading colleges/universities.
+We are excited to announce that <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</span>! are organizing a Job Fair which will bring together over 👥1,500+ students from multiple leading colleges/universities.
 
 The objective of this initiative is to bridge the gap between education and employment by connecting talented students directly with hiring partners and offering them career guidance, interview exposure, and skill-building sessions — all under one platform.
 
@@ -125,17 +125,17 @@ We would be honoured to have participate in this Job Fair and connect with some 
 
 🏫 For Registration kindly fill out this short form:
 👉 <span style="font-weight: 600; color: #007BFF;">
-<a href="https://firstvite.com/jobfair/apply/company">Register Now</a></span>
+<a href="https://eklabya.com/jobfair/apply/company">Register Now</a></span>
 
 💼 Participation Fee: ₹4000 + GST (includes personal hiring space)
 
 For details and bookings, feel free to contact:
 
 Warm regards,
-<span style="font-weight: 600;"><span style="color: rgb(244, 124, 38)">First</span><span style="color: rgb(30, 144, 255)">VITE</span> E-Learning Pvt. Ltd.</span>
+<span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> E-Learning Pvt. Ltd.</span>
 📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
-📧 <span style="font-weight: 600; color: #007BFF;">info@firstvite.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://firstvite.com</span>
+📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
 };
 
@@ -182,7 +182,7 @@ const SendProposal = () => {
   } = useForm({
     defaultValues: {
       messageType: "student",
-      subject: "Invitation from | FirstVITE E-Learning Pvt. Ltd.",
+      subject: "Invitation from | eklabya E-Learning Pvt. Ltd.",
       ...EMAIL_TEMPLATES,
     },
   });

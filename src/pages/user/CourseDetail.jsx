@@ -617,8 +617,8 @@ const CourseDetail = () => {
     "Learn valuable skills with our comprehensive course.";
   const courseImage = course?.imageUrl || "/images/default-course-image.jpg";
   const canonicalUrl = course
-    ? `https://firstvite.com/course/${course._id}`
-    : "https://firstvite.com/courses";
+    ? `https://eklabya.com/course/${course._id}`
+    : "https://eklabya.com/courses";
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">

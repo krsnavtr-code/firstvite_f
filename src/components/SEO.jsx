@@ -42,8 +42,8 @@ const SEO = ({
   
   // Default Twitter card values
   const twitterCard = twitter.card || 'summary_large_image';
-  const twitterSite = twitter.site || '@firstvite';
-  const twitterCreator = twitter.creator || '@firstvite';
+  const twitterSite = twitter.site || '@eklabya';
+  const twitterCreator = twitter.creator || '@eklabya';
   
   return (
     <Helmet>
