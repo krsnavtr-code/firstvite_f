@@ -14,7 +14,7 @@ const bannerImg =
   "http://eklabya.com/api/upload/file/img-1752554019521-300496356.png";
 
 const logoImg =
-  "http://eklabya.com/api/upload/file/img-1753961989896-7541613.png";
+  "http://eklabya.com/api/upload/file/img-1770747893067-165906548.png";
 import "./Banner.css";
 import "../styles/typography.css";
 
@@ -171,7 +171,7 @@ function Banner() {
           <div className="lg:w-1/2 space-y-8">
             <div className="space-y-2 w-full">
               <div className="flex items-center gap-1 text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
-                <img src={logoImg} alt="Eklabya – Your Online Learning Partner" className="w-6" />
+                {/* <img src={logoImg} alt="Eklabya – Your Online Learning Partner" className="h-6" /> */}
                 <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
                   Be The First
                 </span>

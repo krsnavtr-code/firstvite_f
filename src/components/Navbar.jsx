@@ -26,7 +26,8 @@ function Navbar() {
   const { authUser, isAuthenticated, isAdmin, isApproved, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const logoImg =
+    "http://eklabya.com/api/upload/file/img-1770747893067-165906548.png";
   // --- State ---
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -44,7 +45,7 @@ function Navbar() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const [theme, setTheme] = useState(
-    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
+    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light",
   );
 
   // --- Refs ---
@@ -113,7 +114,7 @@ function Navbar() {
         setIsSearching(false);
       }
     }, 400),
-    []
+    [],
   );
 
   const onSearchChange = (e) => {
@@ -297,13 +298,23 @@ function Navbar() {
                   <FaBars size={22} />
                 )}
               </button>
- 
-              <Link
+
+              {/* <Link
                 to="/"
                 className="text-lg font-bold text-blue-600 dark:text-blue-400"
               >
                 <span style={{ color: "#1E90FF" }}>e</span>
                 <span style={{ color: "#F47C26" }}>KLABYA</span>
+              </Link> */}
+              <Link
+                to="/"
+                className="text-lg font-bold text-blue-600 dark:text-blue-400"
+              >
+                <img
+                  src={logoImg}
+                  alt="Eklabya – Your Online Learning Partner"
+                  className="h-10"
+                />
               </Link>
             </div>
 
