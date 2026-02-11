@@ -89,7 +89,7 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Failed to upload thumbnail"
+          "Failed to upload thumbnail",
       );
     } finally {
       setIsUploading(false);
@@ -441,7 +441,7 @@ export const CourseForm = ({ isEdit = false }) => {
             console.log("Formatted course data:", formattedData);
             console.log(
               "showOnHome in formatted data:",
-              formattedData.showOnHome
+              formattedData.showOnHome,
             );
             reset(formattedData);
 
@@ -449,7 +449,7 @@ export const CourseForm = ({ isEdit = false }) => {
             const formValues = getValues();
             console.log(
               "Form values after reset - showOnHome:",
-              formValues.showOnHome
+              formValues.showOnHome,
             );
           } catch (error) {
             console.error("Error loading course data:", error);
@@ -528,7 +528,7 @@ export const CourseForm = ({ isEdit = false }) => {
         "isFeatured in form data:",
         formData.isFeatured,
         "type:",
-        typeof formData.isFeatured
+        typeof formData.isFeatured,
       );
 
       // Validate required fields
@@ -553,13 +553,17 @@ export const CourseForm = ({ isEdit = false }) => {
         "Before cleaning - isFeatured:",
         formData.isFeatured,
         "type:",
-        typeof formData.isFeatured
+        typeof formData.isFeatured,
       );
-      
+
       // Ensure price is always included and properly formatted
-      const price = formData.isFree ? 0 : Math.max(0, Number(formData.price) || 0);
-      const originalPrice = formData.isFree ? 0 : Math.max(0, Number(formData.originalPrice) || price);
-      
+      const price = formData.isFree
+        ? 0
+        : Math.max(0, Number(formData.price) || 0);
+      const originalPrice = formData.isFree
+        ? 0
+        : Math.max(0, Number(formData.originalPrice) || price);
+
       const dataToSend = {
         ...formData,
         // Ensure boolean fields are properly set
@@ -669,16 +673,6 @@ export const CourseForm = ({ isEdit = false }) => {
     }
   };
 
-  // Generate slug from title
-  const updateSlug = (title) => {
-    if (!title) return "";
-    return title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .trim();
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -707,9 +701,6 @@ export const CourseForm = ({ isEdit = false }) => {
               <input
                 type="text"
                 {...register("title", { required: "Title is required" })}
-                onChange={(e) => {
-                  setValue("slug", updateSlug(e.target.value));
-                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Complete Web Development Bootcamp"
               />
@@ -727,7 +718,7 @@ export const CourseForm = ({ isEdit = false }) => {
               <input
                 type="text"
                 {...register("slug", { required: "Slug is required" })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., web-development-bootcamp"
               />
               {errors.slug && (
@@ -788,11 +779,11 @@ export const CourseForm = ({ isEdit = false }) => {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Short Description *
+              Meta Description *
             </label>
             <textarea
               {...register("shortDescription", {
-                required: "Short description is required",
+                required: "Meta description is required",
                 maxLength: {
                   value: 300,
                   message: "Maximum 300 characters",
@@ -875,7 +866,13 @@ export const CourseForm = ({ isEdit = false }) => {
                   <input
                     type="checkbox"
                     id="isFree"
-                    {...register("isFree")}
+                    {...register("isFree", {
+                      onChange: (e) => {
+                        if (e.target.checked) {
+                          setValue("price", 0);
+                        }
+                      },
+                    })}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label
@@ -893,8 +890,9 @@ export const CourseForm = ({ isEdit = false }) => {
                   min: { value: 0, message: "Price cannot be negative" },
                   valueAsNumber: true,
                   validate: (value) => {
-                    if (watch("isFree") && value !== 0) {
-                      return "Price must be 0 for free courses";
+                    if (watch("isFree")) {
+                      setValue("price", 0);
+                      return true;
                     }
                     return true;
                   },
