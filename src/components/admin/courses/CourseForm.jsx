@@ -329,6 +329,9 @@ export const CourseForm = ({ isEdit = false }) => {
       slug: "",
       shortDescription: "",
       description: "",
+      metaTitle: "",
+      metaDescription: "",
+      metaKeywords: "",
       benefits: ["", "", ""],
       category: "",
       instructor: "",
@@ -415,6 +418,10 @@ export const CourseForm = ({ isEdit = false }) => {
               whoIsThisFor: ensureArray(courseData.whoIsThisFor),
               prerequisites: ensureArray(courseData.prerequisites),
               skills: ensureArray(courseData.skills),
+              // Meta fields
+              metaTitle: courseData.metaTitle || "",
+              metaDescription: courseData.metaDescription || "",
+              metaKeywords: courseData.metaKeywords || "",
               // Handle curriculum - ensure it has at least one week
               curriculum: courseData.curriculum?.length
                 ? courseData.curriculum
@@ -577,6 +584,11 @@ export const CourseForm = ({ isEdit = false }) => {
         description: formData.description?.toString().trim(),
         instructor: formData.instructor?.toString().trim(),
         shortDescription: formData.shortDescription?.toString().trim() || "",
+
+        // Meta fields for SEO
+        metaTitle: formData.metaTitle?.toString().trim() || "",
+        metaDescription: formData.metaDescription?.toString().trim() || "",
+        metaKeywords: formData.metaKeywords?.toString().trim() || "",
 
         // Set price and originalPrice with proper formatting
         price: price,
@@ -779,11 +791,11 @@ export const CourseForm = ({ isEdit = false }) => {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Meta Description *
+              Short Description *
             </label>
             <textarea
               {...register("shortDescription", {
-                required: "Meta description is required",
+                required: "Short description is required",
                 maxLength: {
                   value: 300,
                   message: "Maximum 300 characters",
@@ -847,6 +859,69 @@ export const CourseForm = ({ isEdit = false }) => {
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">
                 {errors.description.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* SEO & Meta Information */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">SEO & Meta Information</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Title
+              </label>
+              <input
+                type="text"
+                {...register("metaTitle")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Complete Web Development Bootcamp - Learn from Scratch"
+                maxLength={60}
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Recommended: 50-60 characters for optimal SEO
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Keywords
+              </label>
+              <input
+                type="text"
+                {...register("metaKeywords")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., web development, javascript, react, html, css"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Separate keywords with commas
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Meta Description
+            </label>
+            <textarea
+              {...register("metaDescription", {
+                maxLength: {
+                  value: 160,
+                  message: "Maximum 160 characters for optimal SEO",
+                },
+              })}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="A compelling description for search engines (max 160 characters)"
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              Recommended: 150-160 characters for optimal SEO
+            </p>
+            {errors.metaDescription && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.metaDescription.message}
               </p>
             )}
           </div>

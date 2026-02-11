@@ -64,7 +64,7 @@ const CourseDetail = () => {
           ...acc,
           [index]: true,
         }),
-        {}
+        {},
       );
       setExpandedSections(initialExpandedState);
     }
@@ -161,7 +161,7 @@ const CourseDetail = () => {
   const discountPercentage =
     course.originalPrice > course.price
       ? Math.round(
-          ((course.originalPrice - course.price) / course.originalPrice) * 100
+          ((course.originalPrice - course.price) / course.originalPrice) * 100,
         )
       : 0;
 
@@ -196,7 +196,7 @@ const CourseDetail = () => {
               color: "white",
             },
             duration: 5000,
-          }
+          },
         );
         // Close the form after successful submission
         setShowContactForm(false);
@@ -210,14 +210,14 @@ const CourseDetail = () => {
           // Show error message to user
           toast.error(
             enrollmentResponse.message ||
-              "Failed to process enrollment. Please try again."
+              "Failed to process enrollment. Please try again.",
           );
         }
       }
     } catch (enrollError) {
       console.error("Error in enrollment process:", enrollError);
       toast.error(
-        "An error occurred while processing your request. Please try again later."
+        "An error occurred while processing your request. Please try again later.",
       );
     } finally {
       setIsSubmitting(false);
@@ -294,7 +294,7 @@ const CourseDetail = () => {
               background: "#4caf50",
               color: "white",
             },
-          }
+          },
         );
 
         // Reset form and close modal
@@ -342,7 +342,7 @@ const CourseDetail = () => {
           {
             duration: 8000,
             icon: "⏱️",
-          }
+          },
         );
       } else if (!navigator.onLine) {
         // Offline error
@@ -351,7 +351,7 @@ const CourseDetail = () => {
           {
             duration: 8000,
             icon: "🌐",
-          }
+          },
         );
       } else if (error.response?.data?.errors) {
         // Handle validation errors from the server
@@ -422,7 +422,7 @@ const CourseDetail = () => {
           `/api/courses/${course._id}/download-brochure`,
           {
             responseType: "blob", // Important for file downloads
-          }
+          },
         );
 
         // Create a blob from the response
@@ -435,7 +435,7 @@ const CourseDetail = () => {
           "download",
           `Brochure-${course.title
             .replace(/[^a-z0-9]/gi, "-")
-            .toLowerCase()}.pdf`
+            .toLowerCase()}.pdf`,
         );
 
         // Append to body, click and remove
@@ -609,13 +609,17 @@ const CourseDetail = () => {
   };
 
   // Generate SEO metadata
-  const seoTitle = course
-    ? `${course.title} | Eklabya`
-    : "Course Details | Eklabya";
+  const seoTitle =
+    course?.metaTitle || course?.title || "Course Details | Eklabya";
   const seoDescription =
+    course?.metaDescription ||
     course?.shortDescription ||
     "Learn valuable skills with our comprehensive course.";
-  const courseImage = course?.imageUrl || "/images/default-course-image.jpg";
+  const seoKeywords =
+    course?.metaKeywords ||
+    course?.tags?.join(", ") ||
+    "online course, e-learning, professional development";
+  const courseImage = course?.imageUrl || "/images/eklabya-logo-fit-E.jpeg";
   const canonicalUrl = course
     ? `https://eklabya.com/course/${course._id}`
     : "https://eklabya.com/courses";
@@ -625,10 +629,7 @@ const CourseDetail = () => {
       <SEO
         title={seoTitle}
         description={seoDescription}
-        keywords={
-          course?.tags?.join(", ") ||
-          "online course, e-learning, professional development"
-        }
+        keywords={seoKeywords}
         canonical={canonicalUrl}
         og={{
           title: seoTitle,
