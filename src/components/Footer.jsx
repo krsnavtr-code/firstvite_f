@@ -280,7 +280,7 @@ function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-base text-black dark:text-white">
-              &copy; {currentYear} eKALBYA. All rights reserved.
+              &copy; {currentYear} eKlabya. All rights reserved.
             </p>
             <div className="flex items-center mt-4 md:mt-0">
               <FaBook className="h-5 w-5 text-blue-500 mr-2" />

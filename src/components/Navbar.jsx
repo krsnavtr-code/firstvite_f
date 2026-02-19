@@ -27,7 +27,7 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const logoImg =
-    "http://eklabya.com/api/upload/file/img-1770747893067-165906548.png";
+    "http://eklabya.com/api/upload/file/img-1771494820692-744915490.png";
   // --- State ---
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);

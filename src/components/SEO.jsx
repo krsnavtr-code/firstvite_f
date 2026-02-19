@@ -1,9 +1,9 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import React from "react";
+import { Helmet } from "react-helmet-async";
 
 /**
  * SEO Component
- * 
+ *
  * @param {Object} props - Component props
  * @param {string} props.title - Page title (e.g., 'Home | Eklabya')
  * @param {string} props.description - Meta description for the page
@@ -22,29 +22,30 @@ import { Helmet } from 'react-helmet-async';
  * @returns {JSX.Element} - Returns Helmet component with meta tags
  */
 const SEO = ({
-  title = 'Eklabya - Online Learning Platform',
-  description = 'Eklabya E-Learning Pvt Ltd offers professional and management courses, including short programs and degree collaborations with international universities.',
-  keywords = 'online courses, e-learning, professional courses, management courses, online education, Eklabya, skill development',
-  canonical = '',
+  title = "Eklabya - Online Learning Platform",
+  description = "Eklabya central of excellence offers professional and management courses, including short programs and degree collaborations with international universities.",
+  keywords = "online courses, e-learning, professional courses, management courses, online education, Eklabya, skill development",
+  canonical = "",
   og = {},
-  twitter = {}
+  twitter = {},
 }) => {
-  const siteName = 'Eklabya';
-  const siteUrl = 'https://eklabya.com';
+  const siteName = "Eklabya";
+  const siteUrl = "https://eklabya.com";
   const defaultImage = `${siteUrl}/images/firstvite-logo.png`;
-  
+
   // Default Open Graph values
   const ogTitle = og.title || title;
   const ogDescription = og.description || description;
   const ogImage = og.image || defaultImage;
-  const ogType = og.type || 'website';
-  const ogUrl = og.url || (typeof window !== 'undefined' ? window.location.href : siteUrl);
-  
+  const ogType = og.type || "website";
+  const ogUrl =
+    og.url || (typeof window !== "undefined" ? window.location.href : siteUrl);
+
   // Default Twitter card values
-  const twitterCard = twitter.card || 'summary_large_image';
-  const twitterSite = twitter.site || '@eklabya';
-  const twitterCreator = twitter.creator || '@eklabya';
-  
+  const twitterCard = twitter.card || "summary_large_image";
+  const twitterSite = twitter.site || "@eklabya";
+  const twitterCreator = twitter.creator || "@eklabya";
+
   return (
     <Helmet>
       {/* Primary Meta Tags */}
@@ -52,7 +53,7 @@ const SEO = ({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       {canonical && <link rel="canonical" href={canonical} />}
-      
+
       {/* Open Graph / Facebook */}
       <meta property="og:title" content={ogTitle} />
       <meta property="og:description" content={ogDescription} />
@@ -60,14 +61,16 @@ const SEO = ({
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={ogUrl} />
       <meta property="og:site_name" content={siteName} />
-      
+
       {/* Twitter */}
       <meta name="twitter:card" content={twitterCard} />
       <meta name="twitter:title" content={ogTitle} />
       <meta name="twitter:description" content={ogDescription} />
       <meta name="twitter:image" content={ogImage} />
       {twitterSite && <meta name="twitter:site" content={twitterSite} />}
-      {twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}
+      {twitterCreator && (
+        <meta name="twitter:creator" content={twitterCreator} />
+      )}
     </Helmet>
   );
 };
