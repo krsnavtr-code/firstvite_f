@@ -63,6 +63,9 @@ const SEO = ({
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={ogUrl} />
       <meta property="og:site_name" content={siteName} />
+      {og.type === "course" && (
+        <meta property="og:course:availability" content="available" />
+      )}
 
       {/* Twitter */}
       <meta name="twitter:card" content={twitterCard} />

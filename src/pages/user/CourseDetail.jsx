@@ -609,19 +609,20 @@ const CourseDetail = () => {
   };
 
   // Generate SEO metadata
-  const seoTitle =
-    course?.metaTitle || course?.title || "Course Details | Eklabya";
+  const seoTitle = course?.metaTitle
+    ? `${course.metaTitle} | Eklabya`
+    : "Course Details | Eklabya";
+
   const seoDescription =
-    course?.metaDescription ||
-    course?.shortDescription ||
-    "Learn valuable skills with our comprehensive course.";
+    course?.metaDescription || "Learn valuable skills with our comprehensive course.";
+
   const seoKeywords =
     course?.metaKeywords ||
-    course?.tags?.join(", ") ||
-    "online course, e-learning, professional development";
+    `${course?.tags?.join(", ")}, ${course?.title}, online course, e-learning, professional development`;
+
   const courseImage = course?.imageUrl || "/images/eklabya-logo-fit-E.jpeg";
   const canonicalUrl = course
-    ? `https://eklabya.com/course/${course._id}`
+    ? `https://eklabya.com/course/${course._id || course.slug || id}`
     : "https://eklabya.com/courses";
 
   return (
