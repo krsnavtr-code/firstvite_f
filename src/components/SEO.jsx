@@ -23,9 +23,10 @@ import { Helmet } from "react-helmet-async";
  */
 const SEO = ({
   title = "Eklabya - Online Learning Platform",
-  description = "Eklabya central of excellence offers professional and management courses, including short programs and degree collaborations with international universities.",
+  description = "Eklabya centre of excellence offers professional and management courses, including short programs and degree collaborations with international universities.",
   keywords = "online courses, e-learning, professional courses, management courses, online education, Eklabya, skill development",
   canonical = "",
+  robots = "index, follow",
   og = {},
   twitter = {},
 }) => {
@@ -52,6 +53,7 @@ const SEO = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
+      <meta name="robots" content={robots} />
       {canonical && <link rel="canonical" href={canonical} />}
 
       {/* Open Graph / Facebook */}
