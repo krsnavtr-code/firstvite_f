@@ -226,7 +226,7 @@ const WeekItem = ({
             {...register(`curriculum.${weekIndex}.title`, {
               required: "Module title is required",
             })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., Introduction to React"
           />
           {errors.curriculum?.[weekIndex]?.title && (
@@ -246,7 +246,7 @@ const WeekItem = ({
               required: "Duration is required",
               min: { value: 1, message: "Minimum 1 hour" },
             })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., 5"
           />
           {errors.curriculum?.[weekIndex]?.duration && (
@@ -264,7 +264,7 @@ const WeekItem = ({
         <textarea
           {...register(`curriculum.${weekIndex}.description`)}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
           placeholder="What will students learn this week?"
         />
       </div>
@@ -281,7 +281,7 @@ const WeekItem = ({
                 {...register(`curriculum.${weekIndex}.topics.${topicIndex}`, {
                   required: "Topic is required",
                 })}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={`Topic ${topicIndex + 1}`}
               />
               <button
@@ -713,7 +713,7 @@ export const CourseForm = ({ isEdit = false }) => {
               <input
                 type="text"
                 {...register("title", { required: "Title is required" })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Complete Web Development Bootcamp"
               />
               {errors.title && (
@@ -730,7 +730,7 @@ export const CourseForm = ({ isEdit = false }) => {
               <input
                 type="text"
                 {...register("slug", { required: "Slug is required" })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., web-development-bootcamp"
               />
               {errors.slug && (
@@ -876,7 +876,7 @@ export const CourseForm = ({ isEdit = false }) => {
               <input
                 type="text"
                 {...register("metaTitle")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Complete Web Development Bootcamp - Learn from Scratch"
                 maxLength={60}
               />
@@ -892,7 +892,7 @@ export const CourseForm = ({ isEdit = false }) => {
               <input
                 type="text"
                 {...register("metaKeywords")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., web development, javascript, react, html, css"
               />
               <p className="mt-1 text-sm text-gray-500">
@@ -913,7 +913,7 @@ export const CourseForm = ({ isEdit = false }) => {
                 },
               })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
               placeholder="A compelling description for search engines (max 160 characters)"
             />
             <p className="mt-1 text-sm text-gray-500">
@@ -1026,7 +1026,7 @@ export const CourseForm = ({ isEdit = false }) => {
                   required: "Duration is required",
                   min: { value: 1, message: "Minimum 1 week" },
                 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., 12"
               />
               {errors.duration && (
@@ -1046,7 +1046,7 @@ export const CourseForm = ({ isEdit = false }) => {
                   required: "Total hours is required",
                   min: { value: 1, message: "Minimum 1 hour" },
                 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., 40"
               />
               {errors.totalHours && (
@@ -1062,7 +1062,7 @@ export const CourseForm = ({ isEdit = false }) => {
               </label>
               <select
                 {...register("level", { required: "Level is required" })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  bg-gray-300 focus:ring-2 focus:ring-blue-500"
               >
                 <option value="Beginner">Beginner</option>
                 <option value="Advanced">Advanced</option>
@@ -1154,7 +1154,7 @@ export const CourseForm = ({ isEdit = false }) => {
                 {...register(`whatYouWillLearn.${index}`, {
                   required: "This field is required",
                 })}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={`Learning point ${index + 1}`}
               />
               <button
@@ -1185,7 +1185,7 @@ export const CourseForm = ({ isEdit = false }) => {
               <input
                 type="text"
                 {...register(`prerequisites.${index}`)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={`Prerequisite ${index + 1}`}
               />
               <button
@@ -1242,7 +1242,7 @@ export const CourseForm = ({ isEdit = false }) => {
                   }
                 }
               }}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 border border-gray-300 bg-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Add a skill and press Enter"
             />
             <button
@@ -1338,7 +1338,7 @@ export const CourseForm = ({ isEdit = false }) => {
                       {...register(`faqs.${index}.question`, {
                         required: "Question is required",
                       })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 bg-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter question"
                     />
                     {errors.faqs?.[index]?.question && (

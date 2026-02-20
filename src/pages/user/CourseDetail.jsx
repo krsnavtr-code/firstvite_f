@@ -610,8 +610,8 @@ const CourseDetail = () => {
 
   // Generate SEO metadata
   const seoTitle = course?.metaTitle
-    ? `${course.metaTitle} | Eklabya`
-    : "Course Details | Eklabya";
+    ? `${course.metaTitle} | Eklabya center of excellence`
+    : "Course Details | Eklabya center of excellence";
 
   const seoDescription =
     course?.metaDescription || "Learn valuable skills with our comprehensive course.";
