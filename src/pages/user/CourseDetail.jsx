@@ -563,7 +563,7 @@ const CourseDetail = () => {
                   className="certificate-image-container"
                   style={{
                     backgroundImage:
-                      "url('http://eklabya.com/api/upload/file/img-1754374737042-580116956.jpg')",
+                      "url('http://eklabya.com/api/upload/file/img-1771581581607-86374644.png')",
                     backgroundSize: "contain",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
