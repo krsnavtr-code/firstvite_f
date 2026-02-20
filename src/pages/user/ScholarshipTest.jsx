@@ -10,6 +10,7 @@ import TestQuestion from "../../components/test/TestQuestion";
 import TestResults from "../../components/test/TestResults";
 import TestReview from "../../components/test/TestReview";
 import { message } from "antd"; // Ensure message is imported
+import SEO from "../../components/SEO";
 
 // Icons
 import {
@@ -410,6 +411,16 @@ const ScholarshipTest = () => {
   if (!testStarted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-5">
+        <SEO
+          title="Scholarship Test | Eklabya Centre of Excellence"
+          description="Apply for the Eklabya Centre of Excellence Scholarship Test and unlock academic excellence with merit-based rewards, career guidance, and expert mentoring."
+          keywords="scholarship test, scholarship evaluation, online test, Eklabya scholarship, student scholarship"
+          og={{
+            title: "Scholarship Test | Eklabya Centre of Excellence",
+            description: "Apply for the Eklabya Centre of Excellence Scholarship Test and unlock academic excellence with merit-based rewards, career guidance, and expert mentoring.",
+            type: "article",
+          }}
+        />
         <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-8 md:p-12">
             {/* Header */}

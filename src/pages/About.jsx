@@ -7,8 +7,8 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
-        title="About Us | Eklabya - Empowering Minds Through Education"
-        description="Learn about Eklabya's mission to provide accessible, high-quality education. Discover our story, values, and the team behind our innovative e-learning platform."
+        title="About Eklabya | Leading Online Learning Platform | Eklabya Centre of Excellence"
+        description="Learn about Eklabya, a trusted online learning platform offering skill-based courses, expert mentorship, and career-focused training for students and professionals."
         keywords="about Eklabya, e-learning platform, online education, learn online, Eklabya mission, education technology, online courses, professional development"
         og={{
           title: "About Eklabya - Empowering Learners Worldwide",

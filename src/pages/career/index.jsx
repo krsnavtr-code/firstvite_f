@@ -31,6 +31,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import JobCard from '../../components/career/JobCard';
 import JobApplicationModal from '../../components/career/JobApplicationModal';
 import './career.less';
+import SEO from '../../components/SEO';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -199,6 +200,16 @@ const Career = () => {
 
   return (
     <div className="career-page">
+      <SEO 
+        title="Career Opportunities | Eklabya center of excellence"
+        description="Explore career opportunities at Eklabya center of excellence. Find your dream job and take the next step in your career with us."
+        keywords="career, job, opportunity, employment, hiring, recruitment"
+        og={{
+          title: "Career Opportunities | Eklabya center of excellence",
+          description: "Explore career opportunities at Eklabya center of excellence. Find your dream job and take the next step in your career with us.",
+          type: "website",
+        }}
+      />
       {/* Hero Section */}
       <div className="career-hero">
         <div className="container">

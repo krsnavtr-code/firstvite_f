@@ -12,12 +12,12 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <SEO 
-        title="Privacy Policy | Eklabya"
-        description="Read our Privacy Policy to understand how Eklabya collects, uses, and protects your personal information. Last updated on your visit."
+        title="Privacy Policy | Eklabya Centre of Excellence"
+        description="Read the Privacy Policy of Eklabya Centre of Excellence to understand how we collect, use, and protect your personal information securely."
         keywords="privacy policy, data protection, personal information, Eklabya privacy, online learning privacy, data security"
         og={{
-          title: 'Privacy Policy | Eklabya',
-          description: `Last updated ${lastUpdated}. Learn how Eklabya protects your privacy and handles your personal information.`,
+          title: 'Privacy Policy | Eklabya Centre of Excellence',
+          description: `Last updated ${lastUpdated}. Learn how Eklabya Centre of Excellence protects your privacy and handles your personal information.`,
           type: 'article'
         }}
       />

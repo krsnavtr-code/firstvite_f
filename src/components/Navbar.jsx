@@ -298,14 +298,6 @@ function Navbar() {
                   <FaBars size={22} />
                 )}
               </button>
-
-              {/* <Link
-                to="/"
-                className="text-lg font-bold text-blue-600 dark:text-blue-400"
-              >
-                <span style={{ color: "#1E90FF" }}>e</span>
-                <span style={{ color: "#F47C26" }}>KLABYA</span>
-              </Link> */}
               <Link
                 to="/"
                 className="text-lg font-bold text-blue-600 dark:text-blue-400"
@@ -313,7 +305,7 @@ function Navbar() {
                 <img
                   src={logoImg}
                   alt="Eklabya – Your Online Learning Partner"
-                  className="h-10"
+                  className="h-10 rounded"
                 />
               </Link>
             </div>

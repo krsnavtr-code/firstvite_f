@@ -6,6 +6,7 @@ import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import PaymentForm from "../components/PaymentForm";
 import _ from "lodash";
+import SEO from "../components/SEO";
 
 const CandidateInviteForm = ({ defaultType = "student" }) => {
   const [userType, setUserType] = useState(defaultType);
@@ -603,6 +604,16 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-1 md:px-8 lg:px-12">
+      <SEO 
+        title="JobFair Registration | Eklabya Centre of Excellence"
+        description="Apply for the Student & Professional Job Fair at Eklabya Centre of Excellence and connect with top recruiters, explore career opportunities, and secure your future today."
+        keywords="jobfair registration, career event, job fair, Eklabya registration, career fair"
+        og={{
+          title: 'JobFair Registration | Eklabya Centre of Excellence',
+          description: 'Apply for the Student & Professional Job Fair at Eklabya Centre of Excellence and connect with top recruiters, explore career opportunities, and secure your future today.',
+          type: 'article'
+        }}
+      />
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-2">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-extrabold text-gray-900">

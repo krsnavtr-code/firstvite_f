@@ -16,11 +16,11 @@ function Home() {
   return (
     <>
       <SEO
-        title="Eklabya - Online Learning Platform | Professional & Management Courses"
-        description="Eklabya E-Learning offers professional and management courses, including short programs and degree collaborations with international universities. Start your learning journey today!"
-        keywords="online courses, e-learning, professional courses, management courses, online education, Eklabya, skill development, online learning platform"
+        title="Online Courses | Eklabya Centre of Excellence"
+        description="Eklabya Centre of Excellence offers certified online courses, Advance your career with flexible learning, expert faculty and recognized programs. Start your learning journey today!"
+        keywords="online courses, e-learning, professional courses, certified courses, online certificate courses, Eklabya Centre of Excellence, skill development, online learning platform, Java, Python, Data Science, Machine Learning, Artificial Intelligence, Digital Marketing, Web Development, Mobile Development, Cloud Computing, DevOps, Cybersecurity, Blockchain, IoT, AR/VR, Game Development, UI/UX Design, Project Management, Business Analysis, Data Analytics, Business Intelligence, Marketing, Sales, HR, Finance, Operations, Supply Chain, Quality Management, Lean Six Sigma, Agile, Scrum, Kanban, Product Management, Business Strategy, Leadership, Communication, Team Management, Time Management, Problem Solving, Critical Thinking, Creativity, Innovation, Entrepreneurship, Startup, Small Business, Freelancing, Remote Work, Work-Life Balance, Stress Management, Mindfulness, Meditation, Yoga, Fitness, Nutrition, Health, Wellness, Self-Care, Personal Development, Career Development, Professional Development"
         og={{
-          title: "Eklabya - Transform Your Career with Online Learning",
+          title: "Eklabya Centre of Excellence - Transform Your Career with Online Learning",
           description:
             "Join thousands of students learning in-demand skills with our expert-led courses. Flexible learning, industry-recognized certifications, and career support.",
           type: "website",

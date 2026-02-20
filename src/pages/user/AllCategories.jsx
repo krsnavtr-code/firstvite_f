@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { getCategories as getCategoriesFromApi } from "../../api/categoryApi";
 import { getCoursesByCategory } from "../../api/courseApi";
-import { FaImage, FaArrowRight } from 'react-icons/fa';
+import { FaImage, FaArrowRight } from "react-icons/fa";
+import SEO from "../../components/SEO";
 
 // Helper function to get the full image URL
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
   // If it's already a full URL, return as is
-  if (imagePath.startsWith('http')) return imagePath;
+  if (imagePath.startsWith("http")) return imagePath;
   // Otherwise, prepend the API base URL
-  return `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${imagePath}`;
+  return `${import.meta.env.VITE_API_BASE_URL.replace("/api", "")}${imagePath}`;
 };
 
 const AllCategories = () => {
@@ -23,44 +24,48 @@ const AllCategories = () => {
       try {
         // First, fetch all categories with pagination
         const response = await getCategoriesFromApi({ limit: 100 });
-        
+
         // Extract categories from the response (handling both direct array and paginated response)
-        const categoriesData = Array.isArray(response) ? response : 
-                             (response?.data || []);
-        
+        const categoriesData = Array.isArray(response)
+          ? response
+          : response?.data || [];
+
         if (!categoriesData.length) {
-          setError('No categories found.');
+          setError("No categories found.");
           setLoading(false);
           return;
         }
-        
+
         // Then, fetch course count for each category
         const categoriesWithCount = await Promise.all(
           categoriesData.map(async (category) => {
             if (!category || !category._id) return null;
-            
+
             try {
               const courses = await getCoursesByCategory(category._id);
               return {
                 ...category,
-                courseCount: Array.isArray(courses) ? courses.length : 0
+                courseCount: Array.isArray(courses) ? courses.length : 0,
               };
             } catch (err) {
-              console.error(`Error fetching courses for category ${category.name || 'unknown'}:`, err);
+              console.error(
+                `Error fetching courses for category ${category.name || "unknown"}:`,
+                err,
+              );
               return {
                 ...category,
-                courseCount: 0
+                courseCount: 0,
               };
             }
-          })
+          }),
         );
-        
+
         // Filter out any null categories that might have been returned
         const validCategories = categoriesWithCount.filter(Boolean);
         setCategories(validCategories);
       } catch (err) {
-        console.error('Error fetching categories:', err);
-        setError('Failed to load categories. Please try again later.');
+        console.error("Error fetching categories:", err);
+        setError("Failed to load categories. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -71,25 +76,23 @@ const AllCategories = () => {
 
   const renderCategoryImage = (category) => {
     const imageUrl = category.image ? getImageUrl(category.image) : null;
-    
+
     return (
       <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
         {imageUrl ? (
-          <img 
-            src={imageUrl} 
+          <img
+            src={imageUrl}
             alt={category.name}
             className="w-full h-full object-cover"
             onError={(e) => {
               // If image fails to load, show the default icon
               e.target.onerror = null;
-              e.target.style.display = 'none';
-              e.target.nextElementSibling.style.display = 'block';
+              e.target.style.display = "none";
+              e.target.nextElementSibling.style.display = "block";
             }}
           />
         ) : null}
-        {!imageUrl && (
-          <FaImage className="text-gray-400 text-2xl" />
-        )}
+        {!imageUrl && <FaImage className="text-gray-400 text-2xl" />}
       </div>
     );
   };
@@ -120,6 +123,18 @@ const AllCategories = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-4 sm:px-6 lg:px-8">
+      <SEO
+        title="Eklabya Online Course Categories & Programs | Eklabya Centre of Excellence"
+        description="Explore Eklabya’s online course categories designed for career growth, skill development, and professional certification across multiple industries."
+        keywords="course categories, eklabya categories, learning paths, course catalog, eklabya centre of excellence"
+        og={{
+          title:
+            "Eklabya Online Course Categories & Programs | Eklabya Centre of Excellence",
+          description:
+            "Explore Eklabya’s online course categories designed for career growth, skill development, and professional certification across multiple industries.",
+          type: "website",
+        }}
+      />
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -134,7 +149,7 @@ const AllCategories = () => {
           {categories.map((category) => (
             <Link
               key={category._id}
-              to={`/courses/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+              to={`/courses/category/${category.name.toLowerCase().replace(/\s+/g, "-")}`}
               className="group block bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1"
             >
               <div className="p-6">

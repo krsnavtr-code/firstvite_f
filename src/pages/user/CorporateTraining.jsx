@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaChalkboardTeacher, FaUsers, FaLaptopCode, FaHeadset, FaChartLine, FaCertificate } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import SEO from '../../components/SEO';
 
 const CorporateTraining = () => {
   const trainingPrograms = [
@@ -39,6 +40,16 @@ const CorporateTraining = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pt-24 pb-16">
+      <SEO 
+        title="Corporate Training Programs for Businesses | Eklabya Centre of Excellence"
+        description="Upgrade your workforce skills with customized corporate training programs by Eklabya. Improve productivity, leadership, and technical expertise."
+        keywords="corporate training, workforce development, employee training, business training, leadership development, technical training"
+        og={{
+          title: 'Corporate Training Solutions | Eklabya Centre of Excellence',
+          description: 'Upgrade your workforce skills with customized corporate training programs by Eklabya. Improve productivity, leadership, and technical expertise.',
+          type: 'website'
+        }}
+      />
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="container mx-auto px-4">

@@ -150,11 +150,11 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
-        title="Contact Us | Eklabya - Get in Touch"
+        title="Contact Us | Eklabya center of excellence - Get in Touch"
         description="Have questions? Contact the Eklabya team today. We're here to help with any inquiries about our courses, enrollment process, or technical support."
         keywords="contact Eklabya, support, help, inquiry, course information, customer service, email, phone, address"
         og={{
-          title: "Contact Eklabya - We're Here to Help",
+          title: "Contact Eklabya center of excellence - We're Here to Help",
           description:
             "Get in touch with our team for any questions about our courses, enrollment, or support. We look forward to hearing from you!",
           type: "website",
