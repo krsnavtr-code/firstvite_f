@@ -23,9 +23,6 @@ const MyLearning = () => {
     completed: 0,
   });
 
-  console.log("Auth context:", auth);
-  console.log("Current user:", auth?.currentUser);
-
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
@@ -38,7 +35,6 @@ const MyLearning = () => {
           return;
         }
 
-        console.log("Fetching enrollments for user:", userId);
         // Get the token from localStorage
         const token = localStorage.getItem("token");
         if (!token) {
@@ -50,7 +46,6 @@ const MyLearning = () => {
           status: "not_started", // Match the status in the database
         });
 
-        console.log("API Response:", response);
 
         if (!response || !response.success) {
           const errorMessage =
@@ -61,14 +56,11 @@ const MyLearning = () => {
           return;
         }
 
-        console.log("Raw enrollments data:", response.data);
 
         // The response now has a 'data' array containing the enrollments
         const enrollments = response.data || [];
-        console.log("Fetched enrollments:", enrollments);
 
         if (enrollments.length === 0) {
-          console.log("No active enrollments found");
           setEnrolledCourses([]);
           setStats({
             totalEnrolled: 0,
@@ -81,7 +73,6 @@ const MyLearning = () => {
 
         // Transform the data to match our component's expected format
         const courses = enrollments.map((enrollment) => {
-          console.log("Processing enrollment:", enrollment);
 
           // Extract course data from the enrollment
           const course = enrollment.course || {};
@@ -122,7 +113,6 @@ const MyLearning = () => {
           };
         });
 
-        console.log("Processed courses:", courses);
         setEnrolledCourses(courses);
 
         // Calculate stats
@@ -133,7 +123,6 @@ const MyLearning = () => {
           completed: courses.filter((c) => c.progress === 100).length,
         };
 
-        console.log("Calculated stats:", stats);
         setStats(stats);
       } catch (error) {
         console.error("Error fetching enrolled courses:", error);
@@ -145,10 +134,8 @@ const MyLearning = () => {
     };
 
     if (auth?.currentUser) {
-      console.log("User is authenticated, fetching courses...");
       fetchEnrolledCourses();
     } else {
-      console.log("No authenticated user found, not fetching courses");
       setLoading(false);
     }
   }, [auth?.currentUser]);
@@ -222,20 +209,7 @@ const MyLearning = () => {
     );
   }
 
-  // Check if user is not authenticated
-  console.log("Auth state:", {
-    auth,
-    hasUser: !!auth?.authUser,
-    authUser: auth?.authUser,
-    token: localStorage.getItem("token"),
-    storedUser: localStorage.getItem("Users"),
-  });
-
   if (!auth?.currentUser) {
-    console.log("Auth context:", auth);
-    console.log("Current user from context:", auth?.currentUser);
-    console.log("Token in localStorage:", localStorage.getItem("token"));
-    console.log("No user found, showing sign-in prompt");
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">

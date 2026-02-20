@@ -5,12 +5,10 @@ import { Link } from 'react-router-dom';
 
 const AdminMediaGallery = () => {
   const handleImageUpload = (file) => {
-    console.log('Image uploaded:', file);
     // You can add additional logic here if needed
   };
 
   const handleVideoUpload = (file) => {
-    console.log('Video uploaded:', file);
     // You can add additional logic here if needed
   };
 

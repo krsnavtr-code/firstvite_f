@@ -243,7 +243,6 @@ const PopularCourses = () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-        // console.log("Fetching featured courses with showOnHome=true");
         const response = await axios.get("/courses", {
           params: {
             showOnHome: "true",
@@ -257,7 +256,6 @@ const PopularCourses = () => {
         // Clear the timeout if the request completes
         clearTimeout(timeoutId);
 
-        console.log("Featured courses response:", response);
 
         // Handle different response formats
         let courses = [];
@@ -271,7 +269,6 @@ const PopularCourses = () => {
           throw new Error("Invalid response format from server");
         }
 
-        console.log("Parsed featured courses:", courses);
 
         // Filter courses that are marked to show on home page
         // If no courses are marked, show the most recent published courses
@@ -279,7 +276,6 @@ const PopularCourses = () => {
           (course) => course.showOnHome !== false // Include if true or undefined
         );
 
-        console.log("Filtered featured courses:", featuredCourses);
 
         // Set the courses, or an empty array if none found
         setCourses(featuredCourses);

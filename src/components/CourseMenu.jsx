@@ -22,8 +22,6 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
         setIsLoading(true);
         setError(null);
 
-        // console.log("Fetching all categories (without status filter)...");
-
         // First, try without any status filter to see all categories
         const response = await getCategories({
           // Remove status filter to see all categories
@@ -32,32 +30,22 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
           sort: "name",
         });
 
-        // console.log("Categories API Response (all categories):", response);
-
         // Process the response to extract categories
         let categoriesData = [];
         if (response) {
-          // console.log("Raw response data:", response);
-
           // Extract categories array from response
           if (Array.isArray(response)) {
-            // console.log("Response is a direct array");
             categoriesData = response;
           } else if (response.data && Array.isArray(response.data)) {
-            // console.log("Response has data array");
             categoriesData = response.data;
           } else if (response.docs && Array.isArray(response.docs)) {
-            console.log("Response has docs array");
             categoriesData = response.docs;
           }
 
-          // console.log("Extracted categories:", categoriesData);
 
           // If no categories found, try one more time with different parameters
           if (categoriesData.length === 0) {
-            console.log("No categories found, trying without any filters...");
             const fallbackResponse = await getCategories({});
-            console.log("Fallback response:", fallbackResponse);
 
             if (Array.isArray(fallbackResponse)) {
               categoriesData = fallbackResponse;
@@ -110,7 +98,6 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
     if (!categoryId) return;
 
     try {
-      console.log(`Fetching courses for category ID: ${categoryId}`);
       setIsLoadingCourses((prev) => ({ ...prev, [categoryId]: true }));
 
       // Pass the category ID as a query parameter
@@ -122,13 +109,10 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
         category: categoryId, // This should be at the root level of params
       };
 
-      console.log("API call params:", params);
       // Pass the category ID as the first argument and params as the second
       const response = await getCoursesByCategory(categoryId, params);
-      console.log("API response:", response);
 
       if (response && Array.isArray(response)) {
-        console.log(`Received ${response.length} courses`);
         setCategoryCourses((prev) => ({
           ...prev,
           [categoryId]: response,
@@ -136,13 +120,11 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
       } else if (response && response.data) {
         // Handle case where response has a data property
         const courses = Array.isArray(response.data) ? response.data : [];
-        console.log(`Received ${courses.length} courses in response.data`);
         setCategoryCourses((prev) => ({
           ...prev,
           [categoryId]: courses,
         }));
       } else {
-        console.log("No courses found in response");
         setCategoryCourses((prev) => ({
           ...prev,
           [categoryId]: [],

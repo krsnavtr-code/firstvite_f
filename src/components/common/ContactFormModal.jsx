@@ -80,8 +80,6 @@ const ContactFormModal = ({ isOpen, onClose }) => {
       // Remove the courseInterest field as it's not needed by the backend
       delete submissionData.courseInterest;
 
-      console.log("Submitting form data:", submissionData);
-
       const result = await submitContactForm(submissionData);
 
       if (result.success) {

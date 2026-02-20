@@ -8,7 +8,6 @@ import userApi from "../../api/userApi";
 import { toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
-  // console.log("AdminDashboard - Rendering...");
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -32,19 +31,15 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    // console.log("AdminDashboard - useEffect running");
     const fetchData = async () => {
-      // console.log("Fetching dashboard data...");
       try {
         setLoading(true);
 
         // Fetch categories
         try {
           const categoriesRes = await getCategories();
-          // console.log("Categories response:", categoriesRes);
           const categoriesData = categoriesRes.data || categoriesRes || [];
           setCategories(categoriesData);
-          // console.log("Processed categories:", categoriesData);
         } catch (error) {
           console.error("Error fetching categories:", error);
           toast.error("Failed to load categories");
@@ -53,10 +48,8 @@ const AdminDashboard = () => {
         // Fetch courses
         try {
           const coursesRes = await getCourses();
-          console.log("Courses response:", coursesRes);
           const coursesData = coursesRes.data || coursesRes || [];
           setCourses(coursesData);
-          console.log("Processed courses:", coursesData);
         } catch (error) {
           console.error("Error fetching courses:", error);
           toast.error("Failed to load courses");
@@ -65,10 +58,8 @@ const AdminDashboard = () => {
         // Fetch users
         try {
           const usersRes = await userApi.getUsers();
-          console.log("Users response:", usersRes);
           const usersData = usersRes.data || usersRes || [];
           setUsers(usersData);
-          console.log("Processed users:", usersData);
         } catch (error) {
           console.error("Error fetching users:", error);
           toast.error("Failed to load users");
@@ -84,7 +75,6 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  // console.log("AdminDashboard - Render with state:", { loading, categories });
 
   if (loading) {
     return (
@@ -111,7 +101,6 @@ const AdminDashboard = () => {
   ];
 
   const totalRevenue = courses.reduce((acc, course) => acc + (course.directPayments || []).reduce((acc2, payment) => acc2 + payment.paymentAmount, 0), 0);
-  // console.log("Total Revenue:", totalRevenue);
   return (
     <div className="p-6">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">

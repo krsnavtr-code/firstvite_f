@@ -12,9 +12,7 @@ const FAQPage = () => {
   useEffect(() => {
     const fetchFAQs = async () => {
       try {
-        console.log('Fetching FAQs...');
         const data = await getFAQs();
-        console.log('Received FAQs data:', data);
         
         if (!Array.isArray(data)) {
           console.error('Expected an array of FAQs but got:', data);
@@ -24,7 +22,6 @@ const FAQPage = () => {
         }
         
         setFaqs(data);
-        console.log(`Loaded ${data.length} FAQs`);
       } catch (err) {
         console.error('Error fetching FAQs:', err);
         setError('Failed to load FAQs. Please try again later.');

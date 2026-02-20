@@ -72,10 +72,6 @@ export function AuthProvider({ children }) {
 
           // If we get a 401, the interceptor will handle token refresh
           if (error.response?.status === 401) {
-            console.log(
-              "Authentication token is invalid or expired, attempting refresh..."
-            );
-
             try {
               // Try to refresh the token
               const refreshResponse = await api.post("/auth/refresh-token", {
@@ -88,8 +84,6 @@ export function AuthProvider({ children }) {
                   refreshToken: newRefreshToken,
                   user,
                 } = refreshResponse.data;
-
-                console.log("Token refresh successful");
 
                 // Update tokens in localStorage
                 localStorage.setItem("token", newToken);
@@ -284,8 +278,6 @@ export function AuthProvider({ children }) {
 
   // Logout function
   const logout = () => {
-    console.log("Logging out user...");
-
     try {
       // Clear all auth-related data from localStorage
       localStorage.removeItem("token");
@@ -297,8 +289,6 @@ export function AuthProvider({ children }) {
 
       // Reset user state
       setCurrentUser(null);
-
-      console.log("User logged out successfully");
 
       // Redirect to login
       navigate("/login", { replace: true });

@@ -8,9 +8,7 @@ const userApi = {
   // Get all users with optional filters
   getUsers: async (filters = {}) => {
     try {
-      console.log("Fetching users with filters:", filters);
       const response = await api.get("/users", { params: filters });
-      console.log("Users response:", response);
       return response.data;
     } catch (error) {
       console.error("Error fetching users:", {
@@ -274,10 +272,8 @@ export default userApi;
 // Test API connection
 export const testApiConnection = async () => {
   try {
-    console.log("Testing API connection...");
     // Test with a more appropriate endpoint
     const response = await api.get("/courses");
-    console.log("API test response:", response.data);
     return true;
   } catch (error) {
     console.error("API connection test failed:", {

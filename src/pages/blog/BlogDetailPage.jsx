@@ -33,10 +33,8 @@ export default function BlogDetailPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        console.log("Fetching blog post with slug:", slug);
         setIsLoading(true);
         const response = await getBlogPostBySlug(slug);
-        console.log("API Response:", response);
 
         // Updated to handle the correct response structure
         const postData = response?.data?.post || response?.post;
@@ -47,14 +45,9 @@ export default function BlogDetailPage() {
         }
 
         setPost(postData);
-        console.log("Post state set:", postData);
 
         // Fetch related posts after the main post is loaded
         if (postData?.categories?.length > 0) {
-          console.log(
-            "Fetching related posts for category:",
-            postData.categories[0]._id
-          );
           fetchRelatedPosts(postData.categories[0]._id, postData._id);
         }
 
@@ -70,7 +63,6 @@ export default function BlogDetailPage() {
 
     const fetchRelatedPosts = async (categoryId, excludePostId) => {
       try {
-        console.log("Fetching related posts for category:", categoryId);
         setIsRelatedLoading(true);
         const response = await getPostsByCategory(categoryId, {
           exclude: excludePostId,
@@ -79,7 +71,6 @@ export default function BlogDetailPage() {
 
         // Handle both response structures: response.data.posts and response.posts
         const relatedPosts = response?.data?.posts || response?.posts || [];
-        console.log("Related posts response:", { response, relatedPosts });
 
         setRelatedPosts(Array.isArray(relatedPosts) ? relatedPosts : []);
       } catch (error) {

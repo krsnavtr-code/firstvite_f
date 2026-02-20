@@ -5,12 +5,6 @@ const API_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4002/api
 // Add request interceptor
 axios.interceptors.request.use(
   config => {
-    // console.log('Request Interceptor - Sending Request:', {
-    //   url: config.url,
-    //   method: config.method,
-    //   headers: config.headers,
-    //   data: config.data
-    // });
     return config;
   },
   error => {
@@ -22,12 +16,6 @@ axios.interceptors.request.use(
 // Add response interceptor
 axios.interceptors.response.use(
   response => {
-    // console.log('Response Interceptor - Received Response:', {
-    //   status: response.status,
-    //   statusText: response.statusText,
-    //   data: response.data,
-    //   headers: response.headers
-    // });
     return response;
   },
   error => {
@@ -55,9 +43,6 @@ const getAuthToken = () => {
     // Check for token in localStorage.token (used by AuthContext)
     const token = localStorage.getItem('token');
     if (token) {
-      console.log('Auth token retrieved from localStorage.token');
-      console.log('Token length:', token.length);
-      console.log('Token prefix:', token.substring(0, 10) + '...');
       return token;
     }
     
@@ -67,9 +52,6 @@ const getAuthToken = () => {
       try {
         const user = JSON.parse(userInfo);
         if (user?.token) {
-          console.log('Auth token retrieved from userInfo.token');
-          console.log('Token length:', user.token.length);
-          console.log('Token prefix:', user.token.substring(0, 10) + '...');
           return user.token;
         }
       } catch (e) {
@@ -255,20 +237,8 @@ export const deleteTask = async (taskId) => {
 
 // Submit task answers
 export const submitTaskAnswers = async ({ taskId, sessionId, answers, score, timeSpent }) => {
-  try {
-    console.log('Submitting task answers with data:', {
-      taskId,
-      sessionId,
-      score,
-      timeSpent,
-      answersCount: Object.keys(answers || {}).length
-    });
-    
+  try {    
     const config = getConfig();
-    console.log('Request config:', {
-      hasToken: !!config?.headers?.Authorization,
-      headers: Object.keys(config?.headers || {})
-    });
     
     const response = await axios.post(
       `${API_URL}/${taskId}/submit`,
@@ -282,7 +252,6 @@ export const submitTaskAnswers = async ({ taskId, sessionId, answers, score, tim
       config
     );
     
-    console.log('Submission successful:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error submitting task answers:', {

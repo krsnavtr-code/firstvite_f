@@ -48,12 +48,6 @@ const SprintDetails = () => {
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const { currentUser, isAuthenticated } = useAuth();
 
-  // Debug: Log auth state
-  useEffect(() => {
-    console.log("Auth State - isAuthenticated:", isAuthenticated);
-    console.log("Auth State - Current User:", currentUser);
-  }, [isAuthenticated, currentUser]);
-
   // Get user ID safely
   const getUserId = () => {
     const userId = currentUser?._id || localStorage.getItem("userId");
@@ -512,45 +506,27 @@ const SprintDetails = () => {
                               return;
                             }
 
-                            console.log("Fetching results for user:", userId);
                             const tasks = sessionTasks[session._id] || [];
-                            console.log("Tasks in session:", tasks.length);
 
                             const results = [];
 
                             // Get submissions for each task
                             for (const task of tasks) {
                               try {
-                                console.log("Fetching task:", task._id);
                                 const response = await getTask(task._id);
-                                console.log("Task API response:", response);
 
                                 // Handle different response structures
                                 const taskData =
                                   response?.data?.task || response?.task;
-                                console.log("Task data:", taskData);
 
                                 const submissions = taskData?.submissions || [];
-                                console.log(
-                                  "Submissions found:",
-                                  submissions.length
-                                );
 
                                 if (submissions.length > 0) {
-                                  console.log("All submissions:", submissions);
                                   const userSubmission = submissions.find(
                                     (sub) =>
                                       sub.user?._id === userId ||
                                       sub.user === userId
                                   );
-
-                                  console.log("User submission for task:", {
-                                    taskId: task._id,
-                                    taskTitle: task.title,
-                                    userId,
-                                    foundSubmission: !!userSubmission,
-                                    submission: userSubmission,
-                                  });
 
                                   if (userSubmission) {
                                     results.push({
@@ -572,23 +548,12 @@ const SprintDetails = () => {
                               }
                             }
 
-                            console.log("Final results:", results);
-
                             if (results.length === 0) {
                               // Log more details about why no results were found
                               console.warn(
                                 "No submissions found. Checking task data..."
                               );
                               const tasks = sessionTasks[session._id] || [];
-                              tasks.forEach((task) => {
-                                console.log(
-                                  `Task ${task._id} (${task.title}):`,
-                                  "Has submissions:",
-                                  !!task.submissions?.length,
-                                  "Submissions:",
-                                  task.submissions
-                                );
-                              });
                             }
 
                             setCurrentResults({

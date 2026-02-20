@@ -7,8 +7,6 @@ const AdminLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    console.log("AdminLayout - Logging out");
-    // The logout function should be provided by the AuthContext
     navigate("/login");
   };
 
@@ -24,7 +22,6 @@ const AdminLayout = () => {
   // Since we're already wrapped in PrivateRoute with allowedRoles=['admin'],
   // we can assume the user is an admin at this point
   if (!currentUser || !isAuthenticated) {
-    console.log("AdminLayout - No user or not authenticated");
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md text-center">

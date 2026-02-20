@@ -120,13 +120,10 @@ const TaskTest = () => {
   /** Fetch Task */
   useEffect(() => {
     const fetchData = async () => {
-      console.log("Fetching task data...");
       try {
         const res = await getTask(taskId);
-        console.log("Task API response:", res);
 
         if (res && res.data && res.data.task) {
-          console.log("Task data received:", res.data.task);
           const taskData = res.data.task;
           setTask(taskData);
 
@@ -137,7 +134,6 @@ const TaskTest = () => {
               initAns[i] = q.questionType === "true_false" ? null : [];
             });
           }
-          console.log("Initialized answers:", initAns);
           setAnswers(initAns);
           setStartTime(new Date());
         } else {
@@ -150,7 +146,6 @@ const TaskTest = () => {
           "Failed to load task: " + (error.message || "Unknown error")
         );
       } finally {
-        console.log("Finished loading task");
         setLoading(false);
       }
     };
@@ -159,7 +154,6 @@ const TaskTest = () => {
 
     const timer = setInterval(() => setTimeSpent((t) => t + 1), 1000);
     return () => {
-      console.log("Cleaning up task timer");
       clearInterval(timer);
     };
   }, [taskId]);

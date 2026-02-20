@@ -27,8 +27,6 @@ export const enrollInCourse = async (courseId) => {
       };
     }
     
-    console.log('Sending enrollment request for course:', courseId);
-    
     const response = await axios.post('/api/enrollments', { 
       courseId: courseId,
       status: 'pending' // Changed to pending to require admin approval
@@ -41,13 +39,6 @@ export const enrollInCourse = async (courseId) => {
       },
       timeout: 15000, // 15 seconds timeout
       validateStatus: (status) => status < 500 // Don't throw for 4xx errors
-    });
-    
-    // Log successful enrollment
-    console.log('Enrollment successful:', {
-      courseId,
-      userId: user.id,
-      response: response.data
     });
     
     // Return standardized success response
@@ -154,16 +145,12 @@ export const getUserEnrollments = async (userId, options = {}) => {
       page = 1 
     } = options;
 
-    console.log('Fetching enrollments for user:', userId);
-
     // Build request data without userId since it comes from the JWT token
     const requestData = {
       status,
       limit,
       page
     };
-
-    console.log('Sending request to /enrollments/my-enrollments with data:', requestData);
 
     const response = await axios.get('/enrollments/my-enrollments', {
       params: requestData,
@@ -174,9 +161,6 @@ export const getUserEnrollments = async (userId, options = {}) => {
       timeout: 10000 // 10 seconds timeout
     });
 
-    // Log successful response
-    console.log('Enrollments fetched successfully:', response.data);
-    
     // Check if the response has the expected data structure
     if (!response.data || !response.data.success) {
       console.error('Unexpected response format:', response.data);
@@ -295,13 +279,6 @@ export const updateEnrollmentStatus = async (enrollmentId, status, notes = '') =
         timeout: 10000 // 10 seconds timeout
       }
     );
-    
-    // Log successful update (sensitive data redacted in production)
-    console.log('Updated enrollment status', {
-      enrollmentId,
-      status,
-      updatedBy: user.id
-    });
     
     return {
       success: true,

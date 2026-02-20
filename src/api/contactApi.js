@@ -16,22 +16,15 @@ const api = axios.create({
 // Request interceptor for adding auth token and logging
 api.interceptors.request.use(
   (config) => {
-    console.log('LocalStorage token:', localStorage.getItem('token')); // Debug log
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('Setting Authorization header with token:', token.substring(0, 10) + '...'); // Log first 10 chars
     } else {
       console.warn('No token found in localStorage');
     }
     
     // Log request details in development
     if (import.meta.env.DEV || true) { // Force logging in all environments for now
-      console.log(`[${config.method?.toUpperCase()}] ${config.url}`, {
-        data: config.data,
-        params: config.params,
-        headers: config.headers,
-      });
     }
     
     return config;
@@ -176,7 +169,6 @@ const submitContactForm = async (formData) => {
       }),
     };
 
-    console.log('Submitting contact form with data:', requestData);
 
     // Add retry logic for rate limiting
     const maxRetries = 2;
@@ -197,7 +189,6 @@ const submitContactForm = async (formData) => {
         lastResponse = response;
         
         // If we get here, the request was successful
-        console.log('Contact form submission successful:', response.data);
         
         return {
           success: response.data?.success || true,
@@ -383,8 +374,6 @@ const getContacts = async (options = {}) => {
     if (options.date) params.append('date', options.date);
     if (options.course) params.append('course', options.course);
 
-    console.log('Making request to:', `/api/contacts?${params.toString()}`);
-    
     const response = await api.get(`/api/contacts?${params.toString()}`, {
       headers: {
         Authorization: `Bearer ${authToken}`,

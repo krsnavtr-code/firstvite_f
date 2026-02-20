@@ -37,9 +37,7 @@ export default function Contact() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        console.log("Fetching courses...");
         const response = await getCourses("", false); // Empty string for category to get all courses, false for published only
-        console.log("Courses API response:", response);
 
         // Check different possible response structures
         let coursesData = [];
@@ -66,7 +64,6 @@ export default function Contact() {
             name: course.title || course.name || "Untitled Course",
           }));
 
-          console.log("Formatted courses:", formattedCourses);
           setCourses(formattedCourses);
         } else {
           console.warn("No courses found in the response");

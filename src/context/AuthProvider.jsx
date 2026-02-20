@@ -105,7 +105,6 @@ export default function AuthProvider({ children }) {
 
   // Update both auth state and localStorage
   const updateAuthUser = useCallback((userData) => {
-    console.log('Updating auth user:', userData);
     
     if (userData) {
       // Ensure user has required fields
@@ -118,7 +117,6 @@ export default function AuthProvider({ children }) {
         ...userData
       };
       
-      console.log('Setting auth user with data:', userWithRole);
       localStorage.setItem('user', JSON.stringify(userWithRole));
       setAuthUser(userWithRole);
       
@@ -129,7 +127,6 @@ export default function AuthProvider({ children }) {
       }
     } else {
       // Logout
-      console.log('Logging out user');
       logout();
     }
   }, []);
@@ -141,7 +138,6 @@ export default function AuthProvider({ children }) {
     
     // If no token, set loading to false immediately
     if (!storedToken) {
-      console.log('No token found in localStorage');
       setLoading(false);
       return;
     }
@@ -163,13 +159,11 @@ export default function AuthProvider({ children }) {
     try {
       // Verify token and get fresh user data
       const response = await api.get('/auth/me');
-      console.log('Auth me response:', response.data);
       
       if (response.data.success && response.data.user) {
         // Update auth user with fresh data from the server
         updateAuthUser(response.data.user);
       } else {
-        console.log('No valid user data in response, logging out');
         // If no valid user data, clear the token
         logout();
       }
@@ -177,7 +171,6 @@ export default function AuthProvider({ children }) {
       console.error('Error loading user:', error);
       // If token is invalid or other error, clear it
       if (!error.response || error.response.status === 401) {
-        console.log('Token invalid or expired, logging out');
         logout();
       }
     } finally {
@@ -193,12 +186,7 @@ export default function AuthProvider({ children }) {
 
   // Debug auth state changes
   useEffect(() => {
-    console.log('Auth state updated:', { 
-      isAuthenticated: !!authUser,
-      userRole: authUser?.role,
-      isApproved: authUser?.isApproved,
-      loading 
-    });
+    
   }, [authUser, loading]);
 
   // Only render children once we've tried to load the user

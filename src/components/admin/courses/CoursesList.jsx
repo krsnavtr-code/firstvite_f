@@ -34,9 +34,7 @@ const CoursesList = () => {
       try {
         setLoading(true);
         
-        console.log('Fetching categories...');
         const categoriesData = await getCategoriesForForm();
-        console.log('Categories fetched:', categoriesData);
         setCategories(categoriesData);
         
         // Build query parameters
@@ -50,9 +48,7 @@ const CoursesList = () => {
         // Remove undefined values
         Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
         
-        console.log('Fetching courses with params:', params);
         const response = await getCourses(new URLSearchParams(params).toString(), true);
-        console.log('API Response:', response);
         
         // Handle different response formats
         let coursesData = [];
@@ -65,7 +61,6 @@ const CoursesList = () => {
           coursesData = Object.values(response.data);
         }
         
-        console.log('Processed courses data:', coursesData);
         setCourses(coursesData);
       } catch (error) {
         console.error('Error fetching data:', error);

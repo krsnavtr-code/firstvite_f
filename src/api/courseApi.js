@@ -246,11 +246,8 @@ const prepareCourseData = (courseData) => {
 // Create a new course
 export const createCourse = async (courseData) => {
     try {
-        console.log('Original course data:', courseData);
-        
         // Clean and format the course data first
         const cleanData = prepareCourseData(courseData);
-        console.log('Prepared course data:', cleanData);
         
         // Check for required fields after processing
         const requiredFields = ['title', 'description', 'category', 'instructor', 'level'];
@@ -310,7 +307,6 @@ export const createCourse = async (courseData) => {
             throw new Error('The server response is missing the course ID');
         }
         
-        console.log('Course created successfully:', responseCourseData);
         return responseCourseData;
     } catch (error) {
         console.error('Error creating course:', error);
@@ -421,7 +417,6 @@ export const updateCourse = async (id, courseData, isPartial = false) => {
               )
             : cleanData;
 
-        console.log('Sending cleaned data:', dataToSend);
         
         const method = isPartial ? 'patch' : 'put';
         const response = await axios[method](`/courses/${id}`, dataToSend, {
@@ -430,7 +425,6 @@ export const updateCourse = async (id, courseData, isPartial = false) => {
             }
         });
         
-        console.log(`Course ${isPartial ? 'partially ' : ''}updated successfully:`, response.data);
         return response.data;
     } catch (error) {
         console.error(`Error ${isPartial ? 'partially ' : ''}updating course ${id}:`, error);
@@ -445,13 +439,11 @@ export const updateCourse = async (id, courseData, isPartial = false) => {
 // Update specific course section
 export const updateCourseSection = async (id, section, sectionData) => {
     try {
-        console.log(`Updating course ${id} section '${section}' with data:`, sectionData);
         const response = await axios.patch(`/courses/${id}/section/${section}`, sectionData, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
-        console.log(`Course section '${section}' updated successfully:`, response.data);
         return response.data;
     } catch (error) {
         console.error(`Error updating course ${id} section '${section}':`, error);
@@ -466,9 +458,7 @@ export const updateCourseSection = async (id, section, sectionData) => {
 // Delete a course
 export const deleteCourse = async (id) => {
     try {
-        console.log(`Deleting course with ID: ${id}`);
         const response = await axios.delete(`/courses/${id}`);
-        console.log('Course deleted successfully:', response.data);
         return response.data;
     } catch (error) {
         console.error(`Error deleting course ${id}:`, error);
@@ -546,18 +536,11 @@ export const downloadBrochure = async (courseId) => {
 
 export const getCategoriesForForm = async () => {   
     try {
-        console.log('Fetching categories for form');
-        
         // First, try with a simple query to get all categories
-        console.log('Making API call to /categories');
         const response = await axios.get('/categories');
-        
-        console.log('Raw categories API response:', response);
-        console.log('Response data:', response.data);
         
         // Check if we have a data property with an array
         if (response.data && Array.isArray(response.data)) {
-            console.log('Found categories directly in response.data');
             return response.data.map(cat => ({
                 value: cat._id,
                 label: cat.title || cat.name || 'Unnamed Category'
@@ -566,7 +549,6 @@ export const getCategoriesForForm = async () => {
         
         // Check for nested data property
         if (response.data?.data && Array.isArray(response.data.data)) {
-            console.log('Found categories in response.data.data');
             return response.data.data.map(cat => ({
                 value: cat._id,
                 label: cat.title || cat.name || 'Unnamed Category'
@@ -575,7 +557,6 @@ export const getCategoriesForForm = async () => {
         
         // Check for results property (some APIs use this)
         if (response.data?.results && Array.isArray(response.data.results)) {
-            console.log('Found categories in response.data.results');
             return response.data.results.map(cat => ({
                 value: cat._id,
                 label: cat.title || cat.name || 'Unnamed Category'

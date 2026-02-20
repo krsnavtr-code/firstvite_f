@@ -20,20 +20,16 @@ const CoursesByCategory = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log("Fetching categories...");
         const response = await getCategories({ limit: 100 }); // Get all categories with a higher limit
 
         // Handle paginated response
         const categoriesData = response.data || [];
-        console.log("Categories fetched:", categoriesData);
         setAllCategories(categoriesData);
 
         // Reset category state when component mounts or categoryName changes
         setCategory(null);
 
         if (categoryName) {
-          console.log("Category slug from URL:", categoryName);
-
           // First try to find by slug (exact match)
           let categoryData = categoriesData.find(
             (cat) => cat?.slug?.toLowerCase() === categoryName.toLowerCase(),
@@ -60,11 +56,8 @@ const CoursesByCategory = () => {
             );
           }
 
-          console.log("Found category data:", categoryData);
-
           if (categoryData) {
             setCategory(categoryData);
-            console.log("Fetching courses for category ID:", categoryData._id);
             const coursesResponse = await getCoursesByCategory(
               categoryData._id,
             );
@@ -72,7 +65,6 @@ const CoursesByCategory = () => {
             const coursesData = Array.isArray(coursesResponse)
               ? coursesResponse
               : coursesResponse.data || [];
-            console.log("Fetched courses:", coursesData);
             setCourses(coursesData);
             return; // Exit early after handling category courses
           } else {
@@ -81,7 +73,6 @@ const CoursesByCategory = () => {
         }
 
         // If no category or category not found, show all courses
-        console.log("Fetching all courses");
         const allCoursesResponse = await getCoursesByCategory();
         // Handle both array and paginated response
         const allCourses = Array.isArray(allCoursesResponse)
@@ -301,7 +292,6 @@ const CourseCard = ({ course }) => {
 
       try {
         const url = getImageUrl(course.thumbnail);
-        console.log("Loading image:", url);
 
         if (isMounted) {
           setImageState({
@@ -317,7 +307,6 @@ const CourseCard = ({ course }) => {
         // Set up load/error handlers
         const onLoad = () => {
           if (isMounted) {
-            console.log("Image loaded successfully");
             setImageState({
               url: url,
               isLoading: false,
@@ -327,7 +316,6 @@ const CourseCard = ({ course }) => {
         };
 
         const onError = (e) => {
-          console.warn("Failed to load image:", url, e);
           if (isMounted) {
             setImageState({
               url: "/images/course-placeholder.jpg",

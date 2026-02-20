@@ -206,9 +206,7 @@ export const deleteCategory = async (id) => {
       }
     };
     
-    console.log(`Deleting category with ID: ${id}`);
     const response = await api.delete(`/categories/${id}`, config);
-    console.log('Delete successful:', response.data);
     return response.data;
   } catch (error) {
     console.error(`Error deleting category with ID ${id}:`, error);

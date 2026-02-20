@@ -80,22 +80,15 @@ const FirstviteCommunity = () => {
   
   // Helper function to ensure discussions is always an array
   const safeSetDiscussions = (data) => {
-    // console.log('safeSetDiscussions called with data:', data);
-    
     if (Array.isArray(data)) {
-      // console.log('Data is an array, setting discussions directly');
       setDiscussions(data);
     } else if (data && Array.isArray(data.results)) {
-      // console.log('Data has results array, setting discussions to data.results');
       setDiscussions(data.results);
     } else if (data && Array.isArray(data.discussions)) {
-      // console.log('Data has discussions array, setting discussions to data.discussions');
       setDiscussions(data.discussions);
     } else if (data && data.data && Array.isArray(data.data)) {
-      // console.log('Data is in data.data array, setting discussions to data.data');
       setDiscussions(data.data);
     } else {
-      // console.warn('Unexpected discussions data format, defaulting to empty array. Data received:', data);
       setDiscussions([]);
     }
   };
@@ -289,12 +282,6 @@ const FirstviteCommunity = () => {
     }
   };
 
-  // Debug log for discussions data
-  // console.log('All discussions:', discussions);
-  // console.log('Selected category:', selectedCategory);
-  // console.log('Search query:', searchQuery);
-  // console.log('Active tab:', activeTab);
-
   // Filter and sort discussions
   const filteredDiscussions = discussions
     .filter((discussion) => {
@@ -310,15 +297,6 @@ const FirstviteCommunity = () => {
       const matchesSearch = searchQuery === '' || 
         (discussion.title && discussion.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (discussion.content && discussion.content.toLowerCase().includes(searchQuery.toLowerCase()));
-        
-      // console.log('Discussion:', {
-      //   id: discussion._id,
-      //   title: discussion.title,
-      //   category: discussion.category,
-      //   matchesCategory,
-      //   matchesSearch,
-      //   timestamp: discussion.timestamp
-      // });
       
       return matchesCategory && matchesSearch;
     })

@@ -36,8 +36,6 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
           }
         );
 
-        console.log("Enrollments API Response:", enrollmentsResponse);
-
         // Handle the response based on the API structure
         let enrollments = [];
         if (
@@ -50,29 +48,15 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
           enrollments = enrollmentsResponse.data;
         }
 
-        console.log("Processed Enrollments:", enrollments);
-
         // Find the most relevant enrollment
         let activeEnrollment = null;
         if (enrollments.length > 0) {
           // Try to find an active enrollment, or just take the first one
           activeEnrollment = enrollments[0];
 
-          // Log the selected enrollment details for debugging
-          console.log("Selected enrollment details:", {
-            id: activeEnrollment._id,
-            status: activeEnrollment.status,
-            hasCourse: !!activeEnrollment.course,
-            courseTitle: activeEnrollment.course?.title,
-            enrollmentDate:
-              activeEnrollment.enrollmentDate || activeEnrollment.createdAt,
-          });
         }
 
         if (activeEnrollment) {
-          console.log("Active enrollment with course:", activeEnrollment);
-          // The course data is already populated in the enrollment.course object
-          // We'll keep the original structure but ensure we can access the course data
           setCurrentEnrollment({
             ...activeEnrollment,
             // Make sure we have the course details from the nested course object
@@ -129,7 +113,6 @@ const EnrollUserModal = ({ visible, onCancel, onEnroll, userId }) => {
     );
   };
 
-  console.log("Rendering with currentEnrollment:", currentEnrollment);
 
   return (
     <Modal

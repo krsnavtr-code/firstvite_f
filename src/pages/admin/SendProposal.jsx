@@ -315,15 +315,11 @@ const SendProposal = () => {
   }, []);
 
   const toggleFileSelection = (fileName) => {
-    console.log("Toggling file selection:", fileName);
-    console.log("Current selected files before toggle:", selectedFiles);
-
     setSelectedFiles((prev) => {
       const newSelection = prev.includes(fileName)
         ? prev.filter((name) => name !== fileName)
         : [...prev, fileName];
 
-      console.log("New selected files after toggle:", newSelection);
       return newSelection;
     });
   };

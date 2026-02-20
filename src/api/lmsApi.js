@@ -21,7 +21,6 @@ export const enrollInCourse = async (courseId) => {
  */
 export const getMyEnrollments = async () => {
   try {
-    console.log('Fetching enrollments from /enrollments/my-enrollments');
     const response = await axios.get('/enrollments/my-enrollments', {
       params: {
         status: undefined, // Get all enrollments regardless of status
@@ -31,22 +30,13 @@ export const getMyEnrollments = async () => {
     
     // Log the full response for debugging
     console.group('Enrollments API Response');
-    console.log('Status:', response.status);
-    console.log('Response data:', response.data);
-    console.log('Response headers:', response.headers);
-    console.log('Has data:', !!response.data);
-    console.log('Success:', response.data?.success);
-    console.log('Data type:', Array.isArray(response.data?.data) ? 'array' : typeof response.data?.data);
-    console.log('Data length:', Array.isArray(response.data?.data) ? response.data.data.length : 'N/A');
     console.groupEnd();
     
     // Handle different response formats
     if (response.data) {
       if (response.data.success && Array.isArray(response.data.data)) {
-        console.log('Returning enrollments:', response.data.data);
         return response.data.data;
       } else if (Array.isArray(response.data)) {
-        console.log('Returning direct array response:', response.data);
         return response.data;
       }
     }

@@ -71,9 +71,7 @@ const ImageUploader = ({ onUploadSuccess, label = 'Upload Image', className = ''
       });
 
       // Log response details for debugging
-      console.log('Image upload response status:', response.status);
       const responseText = await response.text();
-      console.log('Image upload response text:', responseText);
       
       let data;
       try {
@@ -87,7 +85,6 @@ const ImageUploader = ({ onUploadSuccess, label = 'Upload Image', className = ''
         throw new Error(data.message || `Upload failed with status ${response.status}`);
       }
 
-      console.log('Image upload successful, response:', data);
       toast.success('Image uploaded successfully');
       
       if (onUploadSuccess) {

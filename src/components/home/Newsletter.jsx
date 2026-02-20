@@ -8,7 +8,6 @@ const Newsletter = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Here you would typically send the email to your backend
-    console.log('Subscribed with email:', email);
     setIsSubscribed(true);
     setEmail('');
     

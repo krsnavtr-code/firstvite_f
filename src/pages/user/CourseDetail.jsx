@@ -275,8 +275,6 @@ const CourseDetail = () => {
         },
       };
 
-      console.log("Submitting enrollment with data:", enrollmentData);
-
       // Submit the enrollment with contact info
       const response = await axios.post("/api/enrollments", enrollmentData, {
         headers: {
@@ -309,11 +307,8 @@ const CourseDetail = () => {
         setShowContactForm(false);
 
         // Trigger brochure download
-        console.log("Checking for brochure download...");
-        console.log("Course brochure URL:", course.brochureUrl);
 
         if (course.brochureUrl) {
-          console.log("Brochure URL found, initiating download...");
           // Give the browser a moment to process the form submission
           setTimeout(() => {
             try {
@@ -471,7 +466,6 @@ const CourseDetail = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    console.log("Input changed:", { name, value, type });
 
     setFormData((prev) => ({
       ...prev,
@@ -940,9 +934,6 @@ const CourseDetail = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pb-4 justify-center">
                       <button
                         className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-full font-medium transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300 hover:bg-blue-50"
-                        onClick={() => {
-                          console.log("Open preview video");
-                        }}
                       >
                         <FaPlay className="mr-2" />
                         Watch Preview

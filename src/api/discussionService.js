@@ -17,14 +17,7 @@ export const createDiscussion = async (discussionData) => {
 export const getDiscussions = async (filters = {}) => {
   try {
     const params = new URLSearchParams(filters);
-    console.log('Fetching discussions with filters:', filters);
     const response = await api.get(`${API_URL}?${params}`);
-    
-    // Log complete response structure for debugging
-    console.log('API Response:', {
-      status: response.status,
-      data: response.data
-    });
     
     // Check if response.data exists
     if (!response.data) {
@@ -34,13 +27,11 @@ export const getDiscussions = async (filters = {}) => {
     
     // The backend returns discussions in response.data.data
     if (response.data.data && Array.isArray(response.data.data)) {
-      console.log(`Returning ${response.data.data.length} discussions from response.data.data`);
       return response.data.data;
     }
     
     // Fallback to direct array if data is an array
     if (Array.isArray(response.data)) {
-      console.log(`Returning ${response.data.length} discussions from direct array`);
       return response.data;
     }
     

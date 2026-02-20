@@ -52,26 +52,9 @@ export default function PrivateRoute({
     const hasAllowedRole = normalizedAllowedRoles.includes(normalizedUserRole);
 
     if (!hasAllowedRole) {
-      console.log('PrivateRoute - Role-based access denied', {
-        currentRole: userRole,
-        normalizedUserRole,
-        allowedRoles,
-        normalizedAllowedRoles,
-        hasToken: !!localStorage.getItem('token')
-      });
       return <Navigate to="/unauthorized" replace />;
     }
   }
-
-  // If we get here, user is authenticated and has the required role/status
-  // console.log('PrivateRoute - Access granted', {
-  //   path: location.pathname,
-  //   userRole,
-  //   isAuthenticated,
-  //   requireLMS,
-  //   isApproved: currentUser?.isApproved,
-  //   isActive: currentUser?.isActive
-  // });
   
   return (
     <>

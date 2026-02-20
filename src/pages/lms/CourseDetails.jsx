@@ -82,7 +82,6 @@ const CourseDetails = () => {
         const response = await getSprintsByCourse(courseId, {
           populate: "tasks",
         });
-        console.log("Sprints API Response:", response);
 
         let sprintsData = [];
         if (response && response.data && Array.isArray(response.data.sprints)) {

@@ -57,14 +57,10 @@ const Sprint = () => {
       let response;
       
       if (courseId) {
-        console.log('Fetching sprints for course:', courseId);
         response = await getSprintsByCourse(courseId);
       } else {
-        console.log('Fetching all sprints');
         response = await getAllSprints();
       }
-      
-      console.log('API Response:', response);
       
       // Handle different response formats
       let sprints = [];
@@ -82,7 +78,6 @@ const Sprint = () => {
         sprints = response.data?.sprints || [];
       }
       
-      console.log('Processed sprints:', sprints);
       setSprints(Array.isArray(sprints) ? sprints : []);
     } catch (error) {
       console.error('Error fetching sprints:', {
@@ -141,16 +136,11 @@ const Sprint = () => {
         isActive: values.isActive !== undefined ? values.isActive : true
       };
       
-      console.log('Sending sprint data to server:', JSON.stringify(sprintData, null, 2));
-
       if (editingSprint) {
-        console.log('Updating sprint with ID:', editingSprint._id);
         await updateSprint(editingSprint._id, sprintData);
         message.success('Sprint updated successfully');
       } else {
-        console.log('Creating new sprint');
         const response = await createSprint(sprintData);
-        console.log('Create sprint response:', response);
         message.success('Sprint created successfully');
       }
 

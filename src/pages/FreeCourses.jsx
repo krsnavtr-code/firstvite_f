@@ -15,17 +15,14 @@ const FreeCourses = () => {
       try {
         setLoading(true);
         const categoryId = '68887f978b23a2d739ac5be4'; // The specified category ID
-        console.log(`Fetching courses for category: ${categoryId}`);
         
         // Fetch all published courses from the specified category
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/courses?category=${categoryId}&isPublished=true`
         );
         
-        console.log('Category courses response:', response.data);
         
         const coursesData = Array.isArray(response.data) ? response.data : [];
-        console.log(`Found ${coursesData.length} courses in this category`);
         
         // Sort courses: free ones first, then paid ones
         const sortedCourses = [...coursesData].sort((a, b) => {

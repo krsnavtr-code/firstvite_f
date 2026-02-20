@@ -74,11 +74,6 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
           }
         );
 
-        // console.log("Courses API response:", response);
-
-        // console.timeEnd("FetchCourses");
-        // console.log("API Response:", response);
-
         let coursesData = [];
 
         // Handle different response structures
@@ -95,9 +90,6 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
           toast.error("No courses available at the moment");
           return;
         }
-
-        // console.log("Courses data received:", coursesData); // Debug log
-        // console.log("Total courses received:", coursesData.length); // Debug log
 
         // Cache the courses in sessionStorage
         sessionStorage.setItem("cachedCourses", JSON.stringify(coursesData));

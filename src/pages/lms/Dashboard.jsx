@@ -41,28 +41,6 @@ const Dashboard = () => {
         // Load enrollments through LMS context
         await loadEnrollments();
 
-        console.log("Enrollments:", enrollments);
-        console.log(
-          "Enrollment statuses:",
-          enrollments.map((e) => ({
-            id: e?._id,
-            status: e?.status,
-            course: e?.course?.title || e?.courseId,
-          }))
-        );
-
-        // Debug: Log all enrollments with their status and progress
-        console.log(
-          "All enrollments with status and progress:",
-          enrollments.map((e) => ({
-            id: e?._id,
-            title: e?.course?.title || "Unknown",
-            status: e?.status,
-            progress: e?.progress,
-            completionStatus: e?.completionStatus,
-          }))
-        );
-
         // Calculate dashboard stats from enrollments
         const inProgressCount = enrollments.filter(
           (e) =>

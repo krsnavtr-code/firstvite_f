@@ -100,9 +100,6 @@ const CareerManagement = () => {
       // First, get all enrollments
       const res = await api.get('/enrollments/all');
       
-      // Log the response for debugging
-      console.log('Enrollments API response:', res.data);
-      
       // Check if res.data.data exists and is an array
       if (!res.data || !res.data.success || !Array.isArray(res.data.data)) {
         console.error('Unexpected API response format:', res.data);
@@ -112,21 +109,8 @@ const CareerManagement = () => {
       // Get the enrollments array from response
       const enrollments = res.data.data;
       
-      // Log the job's course ID for debugging
-      console.log('Job course ID:', job.courseId?._id || job.courseId);
-      
-      // Log all enrollments for debugging
-      console.log('All enrollments:', enrollments.map(e => ({
-        _id: e._id,
-        course: e.course,
-        courseId: typeof e.course === 'object' ? e.course?._id : e.course,
-        user: e.user,
-        status: e.status
-      })));
-      
       // Filter enrollments for the specific course and map to student data
       const jobCourseId = job.courseId?._id || job.courseId;
-      console.log('Job course ID (string):', String(jobCourseId));
       
       // First, log all enrollments for the job's course regardless of status
       const allCourseEnrollments = enrollments.filter(enrollment => {
@@ -148,8 +132,6 @@ const CareerManagement = () => {
         return matches;
       });
       
-      console.log('All enrollments for course (any status):', allCourseEnrollments);
-      
       // Consider enrollments as active if status is undefined or 'active'
       const courseEnrollments = allCourseEnrollments.filter(enrollment => {
         const isActive = !enrollment.status || enrollment.status === 'active';
@@ -169,8 +151,6 @@ const CareerManagement = () => {
         return isActive;
       });
       
-      console.log('Filtered course enrollments:', courseEnrollments);
-      
       // Map to student data with better error handling
       const studentData = courseEnrollments.map(enrollment => {
         const user = typeof enrollment.user === 'object' ? enrollment.user : {};
@@ -186,7 +166,6 @@ const CareerManagement = () => {
         studentData.map(student => [student._id, student])
       ).values());
       
-      console.log('Unique students:', uniqueStudents);
       
       if (uniqueStudents.length === 0) {
         toast.info('No active students found for this course');

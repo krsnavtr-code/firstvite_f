@@ -52,14 +52,11 @@ function Login() {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-      console.log('Login - Attempting login with:', data);
-      
       // Clear any existing tokens and user data
       localStorage.removeItem('token');
       localStorage.removeItem('Users');
       
       const response = await api.post("/users/login", data);
-      console.log('Login - Response received:', response.data);
 
       if (response.data.success) {
         // Extract token and user data from response
@@ -71,15 +68,12 @@ function Login() {
           userData = response.data.data;
         }
 
-        console.log('Login - Extracted user data:', userData);
-        
         if (!token) {
           throw new Error('No authentication token received');
         }
 
         // Store the token in localStorage
         localStorage.setItem("token", token);
-        console.log('Login - Token stored in localStorage');
 
         // Ensure user data has required fields
         const userWithRole = {
@@ -90,7 +84,6 @@ function Login() {
           ...userData
         };
 
-        console.log('Login - Updating auth context with user:', userWithRole);
         
         // Store user data in localStorage
         localStorage.setItem("Users", JSON.stringify(userWithRole));
@@ -114,13 +107,11 @@ function Login() {
         // If no redirect specified and user is admin, go to admin dashboard
         if (userWithRole.role === 'admin') {
           redirectTo = '/admin/dashboard';
-          console.log('Login - User is admin, redirecting to admin dashboard');
         }
         
         // Default to home if no specific redirect
         redirectTo = redirectTo || '/';
         
-        console.log('Login - Final redirect to:', redirectTo);
         navigate(redirectTo, { replace: true });
       } else {
         const errorMsg = response.data.message || 'Login failed';

@@ -68,8 +68,6 @@ export const getFAQs = async (params = {}) => {
       limit: 50
     };
     
-    console.log('Fetching FAQs with params:', { ...defaultParams, ...params });
-    
     try {
       const response = await api.get(FAQ_ENDPOINT, { 
         params: { 
@@ -80,8 +78,6 @@ export const getFAQs = async (params = {}) => {
         // Don't throw errors for 404, we'll handle it in catch
         validateStatus: (status) => status < 500
       });
-      
-      console.log('FAQ API Response:', response.data);
       
       // Handle different response formats
       if (Array.isArray(response.data)) {

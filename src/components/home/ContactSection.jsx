@@ -32,7 +32,6 @@ const ContactSection = () => {
 
     // Simulate form submission
     setTimeout(() => {
-      console.log("Form submitted:", formData);
       setIsSubmitting(false);
       setIsSubmitted(true);
       setFormData({ name: "", email: "", subject: "", message: "" });

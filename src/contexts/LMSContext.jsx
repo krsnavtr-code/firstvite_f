@@ -28,21 +28,13 @@ export const LMSProvider = ({ children }) => {
   const [currentCourse, setCurrentCourse] = useState(null);
   const [progress, setProgress] = useState({});
   
-  // console.log('LMSProvider - User state:', { 
-  //   user, 
-  //   isAuthenticated,
-  //   hasUser: !!user,
-  //   userId: user?._id 
-  // });
 
   // Load enrollments when user changes
   const loadEnrollments = useCallback(async () => {
     // console.group('Loading Enrollments');
-    // console.log('Current auth state:', { user, isAuthenticated });
     
     const token = localStorage.getItem('token');
     if ((!user && !token) || !isAuthenticated) {
-      // console.log('No authenticated user or token, skipping enrollments load');
       setLoading(false);
       setEnrollments([]);
       // console.groupEnd();
@@ -82,7 +74,6 @@ export const LMSProvider = ({ children }) => {
       }
       
       const response = await getMyEnrollments();
-      console.log('Enrollments API response:', response);
       
       // Process the response based on its format
       let enrollmentsData = [];
@@ -100,20 +91,10 @@ export const LMSProvider = ({ children }) => {
                        !enrollment.isGuestEnrollment;
         
         if (!isValid) {
-          console.log('Filtering out invalid enrollment:', {
-            id: enrollment._id,
-            hasUser: !!enrollment.user,
-            hasCourse: !!enrollment.course,
-            isGuest: enrollment.isGuestEnrollment
-          });
         }
         
         return isValid;
       });
-      
-      console.log('Filtered enrollments:', enrollmentsData);
-      
-      console.log(`Found ${enrollmentsData.length} enrollments`);
       
       // Process each enrollment to ensure consistent structure
       const processedEnrollments = enrollmentsData.map(enrollment => {
@@ -136,7 +117,6 @@ export const LMSProvider = ({ children }) => {
         };
       });
       
-      console.log('Processed enrollments:', processedEnrollments);
       setEnrollments(processedEnrollments);
       
     } catch (err) {

@@ -23,13 +23,10 @@ const Settings = () => {
   };
 
   const handlePasswordChange = async (values) => {
-    // Implement password change logic here
-    console.log('Password change:', values);
     message.success('Password updated successfully');
   };
 
   const handleNotificationChange = (checked) => {
-    console.log(`Notification ${checked ? 'enabled' : 'disabled'}`);
     message.info(`Notifications ${checked ? 'enabled' : 'disabled'}`);
   };
 

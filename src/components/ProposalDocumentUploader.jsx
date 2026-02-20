@@ -75,7 +75,6 @@ const ProposalDocumentUploader = ({ onUploadSuccess, onRemove }) => {
         timeout: 60000, // 60 seconds timeout
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          console.log(`Upload progress: ${percentCompleted}%`);
         },
       });
 

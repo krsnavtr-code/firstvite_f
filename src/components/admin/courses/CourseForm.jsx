@@ -70,9 +70,7 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      console.log("Starting file upload...");
       const response = await uploadCourseImage(formData);
-      console.log("Upload response:", response);
 
       if (!response || !response.success) {
         throw new Error(response?.message || "Upload failed");
@@ -80,7 +78,6 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
 
       // Make sure we're storing just the path part, not the full URL
       const imagePath = response.location;
-      console.log("Setting image path:", imagePath);
 
       onFileSelect(imagePath);
       toast.success("Thumbnail uploaded successfully");
@@ -399,8 +396,6 @@ export const CourseForm = ({ isEdit = false }) => {
           try {
             const response = await getCourseById(id);
             const courseData = response.data;
-            console.log("Fetched course data:", courseData);
-            console.log("showOnHome in response:", courseData.showOnHome);
 
             // Helper function to ensure array fields have at least one empty string
             const ensureArray = (arr) =>
@@ -445,19 +440,11 @@ export const CourseForm = ({ isEdit = false }) => {
               certificateIncluded: courseData.certificateIncluded !== false, // default to true if not set
             };
 
-            console.log("Formatted course data:", formattedData);
-            console.log(
-              "showOnHome in formatted data:",
-              formattedData.showOnHome,
-            );
             reset(formattedData);
 
             // Log the form values after reset to verify
             const formValues = getValues();
-            console.log(
-              "Form values after reset - showOnHome:",
-              formValues.showOnHome,
-            );
+            
           } catch (error) {
             console.error("Error loading course data:", error);
             toast.error("Failed to load course data. Please try again.");
@@ -530,13 +517,6 @@ export const CourseForm = ({ isEdit = false }) => {
   const onSubmit = async (formData) => {
     try {
       setLoading(true);
-      console.log("Form submitted with data:", formData);
-      console.log(
-        "isFeatured in form data:",
-        formData.isFeatured,
-        "type:",
-        typeof formData.isFeatured,
-      );
 
       // Validate required fields
       if (!formData.title || formData.title.trim().length < 5) {
@@ -554,14 +534,6 @@ export const CourseForm = ({ isEdit = false }) => {
       if (!formData.instructor || formData.instructor.trim().length < 2) {
         throw new Error("Instructor name is required");
       }
-
-      // Clean and format the data before sending to API
-      console.log(
-        "Before cleaning - isFeatured:",
-        formData.isFeatured,
-        "type:",
-        typeof formData.isFeatured,
-      );
 
       // Ensure price is always included and properly formatted
       const price = formData.isFree
@@ -666,8 +638,6 @@ export const CourseForm = ({ isEdit = false }) => {
         language: formData.language?.toString().trim() || "English",
         duration: formData.duration?.toString().trim() || "0 min",
       };
-
-      console.log("Submitting course data:", dataToSend);
 
       if (isEdit) {
         await updateCourse(id, dataToSend);
