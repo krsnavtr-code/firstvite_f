@@ -1,4 +1,4 @@
-import api from './axios';
+import api from "./axios";
 
 /**
  * User API Service
@@ -8,12 +8,12 @@ const userApi = {
   // Get all users with optional filters
   getUsers: async (filters = {}) => {
     try {
-      console.log('Fetching users with filters:', filters);
-      const response = await api.get('/users', { params: filters });
-      console.log('Users response:', response);
+      console.log("Fetching users with filters:", filters);
+      const response = await api.get("/users", { params: filters });
+      console.log("Users response:", response);
       return response.data;
     } catch (error) {
-      console.error('Error fetching users:', {
+      console.error("Error fetching users:", {
         message: error.message,
         status: error.response?.status,
         statusText: error.response?.statusText,
@@ -42,10 +42,10 @@ const userApi = {
   // Create a new user
   create: async (userData) => {
     try {
-      const response = await api.post('/users', userData);
+      const response = await api.post("/users", userData);
       return response.data;
     } catch (error) {
-      console.error('Error creating user:', error);
+      console.error("Error creating user:", error);
       throw error;
     }
   },
@@ -60,35 +60,38 @@ const userApi = {
       throw error;
     }
   },
-  
+
   // Update user profile (phone, address)
   updateProfile: async (profileData) => {
     try {
       // Use the correct endpoint /auth/profile (baseURL already includes /api)
-      const response = await api.put('/auth/profile', profileData);
-      
+      const response = await api.put("/auth/profile", profileData);
+
       // Check for success response
       if (response.data && response.data.success) {
         // Update the user data in localStorage if available
         if (response.data.user) {
-          const currentUser = JSON.parse(localStorage.getItem('Users') || '{}');
-          localStorage.setItem('Users', JSON.stringify({
-            ...currentUser,
-            ...response.data.user
-          }));
+          const currentUser = JSON.parse(localStorage.getItem("Users") || "{}");
+          localStorage.setItem(
+            "Users",
+            JSON.stringify({
+              ...currentUser,
+              ...response.data.user,
+            }),
+          );
         }
         return response.data;
       }
-      
-      throw new Error(response.data?.message || 'Failed to update profile');
+
+      throw new Error(response.data?.message || "Failed to update profile");
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
       if (error.response?.status === 401) {
         // Clear invalid token and redirect to login
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('Users');
-        window.location.href = '/login';
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("Users");
+        window.location.href = "/login";
       }
       throw error.response?.data || error;
     }
@@ -108,65 +111,64 @@ const userApi = {
   changePassword: async (userId, currentPassword, newPassword) => {
     try {
       const response = await api.put(
-        '/auth/change-password',
+        "/auth/change-password",
         { currentPassword, newPassword },
         {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          withCredentials: true  // Important for sending cookies if using them
-        }
+          withCredentials: true, // Important for sending cookies if using them
+        },
       );
-      
+
       // Update the token in localStorage if a new one was returned
       if (response.data?.token) {
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem("token", response.data.token);
       }
-      
+
       return {
         success: true,
-        message: response.data?.message || 'Password changed successfully',
-        data: response.data?.data
+        message: response.data?.message || "Password changed successfully",
+        data: response.data?.data,
       };
-      
     } catch (error) {
-      console.error('Error changing password:', error);
-      
+      console.error("Error changing password:", error);
+
       if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         const { status, data } = error.response;
-        
+
         if (status === 401) {
           // Clear invalid token and redirect to login
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "/login";
           return {
             success: false,
-            message: 'Session expired. Please log in again.',
-            error: 'Authentication required'
+            message: "Session expired. Please log in again.",
+            error: "Authentication required",
           };
         }
-        
+
         return {
           success: false,
-          message: data?.message || 'Failed to change password',
-          error: data?.error || 'Unknown error occurred'
+          message: data?.message || "Failed to change password",
+          error: data?.error || "Unknown error occurred",
         };
       } else if (error.request) {
         // The request was made but no response was received
         return {
           success: false,
-          message: 'No response from server. Please check your connection.',
-          error: 'Network error'
+          message: "No response from server. Please check your connection.",
+          error: "Network error",
         };
       } else {
         // Something happened in setting up the request
         return {
           success: false,
-          message: 'Error setting up the request',
-          error: error.message
+          message: "Error setting up the request",
+          error: error.message,
         };
       }
     }
@@ -180,14 +182,14 @@ const userApi = {
         { newPassword },
         {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          withCredentials: true
-        }
+          withCredentials: true,
+        },
       );
       return response.data;
     } catch (error) {
-      console.error('Error changing user password (admin):', error);
+      console.error("Error changing user password (admin):", error);
       throw error.response?.data || error;
     }
   },
@@ -206,28 +208,56 @@ const userApi = {
   // Update user LMS approval status
   updateLMSStatus: async (userId, isApproved) => {
     try {
-      const response = await api.put(`/users/${userId}/lms-status`, { isApproved });
-      return response.data;
-    } catch (error) {
-      console.error('Error updating user LMS status:', error);
-      throw error;
-    }
-  },
-  
-  // Admin enrolls a user in a course
-  adminEnrollUser: async (userId, courseId, status = 'active') => {
-    try {
-      const response = await api.post('/enrollments/admin-enroll', {
-        userId,
-        courseId,
-        status
+      const response = await api.put(`/users/${userId}/lms-status`, {
+        isApproved,
       });
       return response.data;
     } catch (error) {
-      console.error('Error enrolling user in course:', error);
+      console.error("Error updating user LMS status:", error);
+      throw error;
+    }
+  },
+
+  // Admin enrolls a user in a course
+  adminEnrollUser: async (userId, courseId, status = "active") => {
+    try {
+      const response = await api.post("/enrollments/admin-enroll", {
+        userId,
+        courseId,
+        status,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error enrolling user in course:", error);
       throw error.response?.data || error;
     }
-  }
+  },
+
+  // Forgot password - send reset email
+  forgotPassword: async (email) => {
+    try {
+      const response = await api.post("/auth/forgot-password", { email });
+      return response.data;
+    } catch (error) {
+      console.error("Error sending forgot password email:", error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Reset password - submit new password
+  resetPassword: async (token, email, password) => {
+    try {
+      const response = await api.post("/auth/reset-password", {
+        token,
+        email,
+        password,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      throw error.response?.data || error;
+    }
+  },
 };
 
 export default userApi;
@@ -244,25 +274,22 @@ export default userApi;
 // Test API connection
 export const testApiConnection = async () => {
   try {
-    console.log('Testing API connection...');
+    console.log("Testing API connection...");
     // Test with a more appropriate endpoint
-    const response = await api.get('/courses');
-    console.log('API test response:', response.data);
+    const response = await api.get("/courses");
+    console.log("API test response:", response.data);
     return true;
   } catch (error) {
-    console.error('API connection test failed:', {
+    console.error("API connection test failed:", {
       message: error.message,
       config: {
         url: error.config?.baseURL + error.config?.url,
-        method: error.config?.method
+        method: error.config?.method,
       },
       status: error.response?.status,
       statusText: error.response?.statusText,
-      responseData: error.response?.data
+      responseData: error.response?.data,
     });
     return false;
   }
 };
-
-// Log the configuration when this module is imported
-// logApiConfig();

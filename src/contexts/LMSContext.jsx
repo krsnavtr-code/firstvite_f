@@ -56,7 +56,6 @@ export const LMSProvider = ({ children }) => {
         const userData = localStorage.getItem('user');
         if (userData) {
           currentUser = JSON.parse(userData);
-          console.log('Retrieved user from localStorage:', currentUser);
         }
       } catch (e) {
         console.error('Error parsing user from localStorage:', e);
@@ -72,12 +71,10 @@ export const LMSProvider = ({ children }) => {
       return;
     }
 
-    console.log('Loading enrollments for user:', userId);
     setLoading(true);
     setError(null);
     
     try {
-      console.log('Fetching enrollments...');
       // Ensure token is set in headers
       const token = localStorage.getItem('token');
       if (token) {

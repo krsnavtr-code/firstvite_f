@@ -13,9 +13,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchEnrollments = async () => {
       try {
-        console.log('Fetching enrollments...');
         await loadEnrollments();
-        console.log('Enrollments loaded successfully');
       } catch (err) {
         console.error('Error loading enrollments:', err);
         message.error(error || 'Failed to load your courses');

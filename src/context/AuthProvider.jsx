@@ -38,7 +38,6 @@ export default function AuthProvider({ children }) {
       
       // Call the login API
       const response = await api.post('/auth/login', { email, password });
-      console.log('Login response:', response.data);
       
       if (response.data.success && response.data.token) {
         const { token, user } = response.data;

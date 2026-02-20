@@ -66,6 +66,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import LMS from "./pages/lms";
 import InactiveAccount from "./pages/auth/InactiveAccount";
 import ScholarshipTest from "./pages/user/ScholarshipTest";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // LMS Management Components for Admin Panel
 import Sprint from "./components/admin/lmsManagement/Sprint.jsx";
@@ -522,6 +523,15 @@ function App() {
             element={
               <MainLayout>
                 <RegisterPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/reset-password"
+            element={
+              <MainLayout>
+                <ResetPasswordPage />
               </MainLayout>
             }
           />

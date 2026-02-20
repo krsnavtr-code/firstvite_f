@@ -4,9 +4,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import SEO from "../../components/SEO";
+import userApi from "../../api/userApi";
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,6 +22,12 @@ const LoginPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+  } = useForm();
+
+  const {
+    register: registerForgot,
+    handleSubmit: handleForgotSubmit,
+    formState: { errors: forgotErrors },
   } = useForm();
 
   useEffect(() => {
@@ -48,6 +57,23 @@ const LoginPage = () => {
       toast.error(error.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const onForgotPassword = async (formData) => {
+    try {
+      setIsSendingReset(true);
+      const response = await userApi.forgotPassword(formData.email);
+      toast.success(
+        response.message || "Password reset email sent successfully!",
+      );
+      setShowForgotPassword(false);
+    } catch (error) {
+      toast.error(
+        error.message || "Failed to send reset email. Please try again.",
+      );
+    } finally {
+      setIsSendingReset(false);
     }
   };
 
@@ -143,6 +169,13 @@ const LoginPage = () => {
                   />
                   Remember me
                 </label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-blue-500 hover:underline"
+                >
+                  Forgot Password?
+                </button>
               </div>
 
               <button
@@ -163,6 +196,68 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">
+              Reset Password
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Enter your email address and we'll send you a link to reset your
+              password.
+            </p>
+            <form
+              onSubmit={handleForgotSubmit(onForgotPassword)}
+              className="space-y-4"
+            >
+              <div>
+                <label
+                  htmlFor="forgot-email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email address
+                </label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  placeholder="Enter your email"
+                  {...registerForgot("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {forgotErrors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {forgotErrors.email.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSendingReset}
+                  className="flex-1 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50"
+                >
+                  {isSendingReset ? "Sending..." : "Send Reset Link"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 };
