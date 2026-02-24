@@ -144,8 +144,9 @@ function Navbar() {
   };
 
   const navLinks = [
-    { to: "/free-courses", label: "Free Courses" },
-    { to: "/lms", label: "SMART Board", isSpecial: true },
+    { to: "/courses", label: "All Course" },
+    { to: "/categories", label: "Categories" },
+    { to: "/free-course", label: "Free Courses" },
     { to: "/scholarship-test", label: "Scholarship" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ];
@@ -161,7 +162,7 @@ function Navbar() {
           {/* Left Side: Contact / Info */}
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
-              <FaEnvelope size={10} /> info@eklabya.com
+              <FaEnvelope size={10} /> Mail Us
             </span>
             <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
               <FaPhoneAlt size={10} /> +91 99900 56799
@@ -169,14 +170,14 @@ function Navbar() {
           </div>
 
           {/* Right Side: Actions (Theme, Pay, Agent, Auth) */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="flex items-center gap-1 hover:text-white transition-colors"
             >
               {theme === "dark" ? <FaSun size={12} /> : <FaMoon size={12} />}
-              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+              <span>{theme === "dark" ? "" : ""}</span>
             </button>
 
             <div className="h-3 w-px bg-gray-700 mx-1"></div>
@@ -190,6 +191,16 @@ function Navbar() {
             >
               Agent Register
             </a>
+
+            <div className="h-3 w-px bg-gray-700 mx-1"></div>
+
+            {/* SMART Board */}
+            <Link
+              to="/lms"
+              className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 transition-colors"
+            >
+              SMART Board
+            </Link>
 
             {/* Payment Dropdown (Small Version) */}
             <div className="relative" ref={paymentDropdownRef}>
@@ -207,10 +218,10 @@ function Navbar() {
                       setShowPaymentForm(true);
                       setShowPaymentDropdown(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 text-lg hover:bg-gray-50 flex items-center justify-between"
                   >
                     <span>
-                      Pay Using
+                      Pay Using{" "}
                       <span className="text-orange-600">RazorPay</span>
                     </span>
                   </button>
@@ -284,7 +295,7 @@ function Navbar() {
       ================================================================== */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-10 md:h-12 gap-4">
+          <div className="flex items-center justify-between h-10 md:h-12 gap-2">
             {/* 1. Logo */}
             <div className="flex-shrink-0 flex items-center gap-1">
               {/* Mobile Toggle (Left of logo on mobile) */}
@@ -311,23 +322,33 @@ function Navbar() {
             </div>
 
             {/* 2. Navigation Links (Desktop) */}
-            <div className="hidden md:flex items-center space-x-1 lg:space-x-6">
-              <div className="relative group px-2">
+            <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
+              <div className="relative group">
                 <CourseMenu />
               </div>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`text-sm font-semibold transition-colors ${
-                    link.isSpecial
-                      ? "text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-md"
-                      : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.to;
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`text-sm font-semibold transition-all duration-300 relative ${
+                      link.isSpecial
+                        ? isActive
+                          ? "text-blue-700 bg-blue-100 px-3 py-1.5 rounded-md shadow-md transform scale-105"
+                          : "text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-md hover:shadow-md hover:scale-105"
+                        : isActive
+                          ? "text-blue-600 dark:text-blue-400 font-bold"
+                          : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
+                    }`}
+                  >
+                    {link.label}
+                    {!link.isSpecial && isActive && (
+                      <span className="absolute bottom-[-5px] left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400 transform scale-x-100 transition-transform duration-300"></span>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
 
             {/* 3. Search Bar (Desktop) & Mobile Actions */}

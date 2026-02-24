@@ -1,45 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import SEO from '../components/SEO';
-import axios from 'axios';
-import { FaSearch, FaStar, FaClock, FaUser, FaBook } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
+import axios from "axios";
+import { FaSearch, FaStar, FaClock, FaUser, FaBook } from "react-icons/fa";
 
 const FreeCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [filteredCourses, setFilteredCourses] = useState([]);
 
   useEffect(() => {
     const fetchCategoryCourses = async () => {
       try {
         setLoading(true);
-        const categoryId = '68887f978b23a2d739ac5be4'; // The specified category ID
-        
+        const categoryId = "68887f978b23a2d739ac5be4"; // The specified category ID
+
         // Fetch all published courses from the specified category
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/courses?category=${categoryId}&isPublished=true`
+          `${import.meta.env.VITE_API_URL}/api/courses?category=${categoryId}&isPublished=true`,
         );
-        
-        
+
         const coursesData = Array.isArray(response.data) ? response.data : [];
-        
+
         // Sort courses: free ones first, then paid ones
         const sortedCourses = [...coursesData].sort((a, b) => {
           // If one is free and the other isn't, free comes first
-          if ((a.price === 0 || a.isFree) && (b.price > 0 && !b.isFree)) return -1;
-          if ((b.price === 0 || b.isFree) && (a.price > 0 && !a.isFree)) return 1;
-          
+          if ((a.price === 0 || a.isFree) && b.price > 0 && !b.isFree)
+            return -1;
+          if ((b.price === 0 || b.isFree) && a.price > 0 && !a.isFree) return 1;
+
           // If both are free or both are paid, sort by title
           return a.title.localeCompare(b.title);
         });
-        
+
         setCourses(sortedCourses);
         setFilteredCourses(sortedCourses);
-        
       } catch (error) {
-        console.error('Error fetching category courses:', error);
-        console.error('Error details:', error.response?.data || error.message);
+        console.error("Error fetching category courses:", error);
+        console.error("Error details:", error.response?.data || error.message);
         setCourses([]);
         setFilteredCourses([]);
       } finally {
@@ -51,14 +50,21 @@ const FreeCourses = () => {
   }, []);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
+    if (searchQuery.trim() === "") {
       setFilteredCourses(courses);
     } else {
       const filtered = courses.filter(
         (course) =>
           course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (course.instructor && course.instructor.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (course.category && course.category.name && course.category.name.toLowerCase().includes(searchQuery.toLowerCase()))
+          (course.instructor &&
+            course.instructor
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())) ||
+          (course.category &&
+            course.category.name &&
+            course.category.name
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())),
       );
       setFilteredCourses(filtered);
     }
@@ -78,14 +84,15 @@ const FreeCourses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <SEO 
+      <SEO
         title="Free Online Courses with Certificate | Eklabya Centre of Excellence"
         description="Join Eklabya free online courses with certificate. Upgrade your skills with expert-led training in business, tech, and career development. Start learning today!"
         keywords="free courses, online learning, free online courses, learn new skills, free education, online courses, free certification, skill development, eklabya, eklabya centre of excellence"
         og={{
-          title: 'Free Online Courses | Learn New Skills for Free | Eklabya',
-          description: 'Start learning today with our collection of free online courses. No hidden fees, no credit card required. Enhance your skills at no cost!',
-          type: 'website'
+          title: "Free Online Courses | Learn New Skills for Free | Eklabya",
+          description:
+            "Start learning today with our collection of free online courses. No hidden fees, no credit card required. Enhance your skills at no cost!",
+          type: "website",
         }}
       />
       <main className="container mx-auto px-4 py-8">
@@ -122,7 +129,7 @@ const FreeCourses = () => {
                 key={course._id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
-                <Link to={`/course/${course._id}`}>
+                <Link to={`/free-course/${course.slug || course._id}`}>
                   <div className="h-40 bg-gray-200 dark:bg-gray-700 relative">
                     {course.thumbnail ? (
                       <img

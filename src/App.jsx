@@ -196,10 +196,19 @@ function App() {
           />
 
           <Route
-            path="/free-courses"
+            path="/free-course"
             element={
               <MainLayout>
                 <FreeCourses />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/free-course/:id"
+            element={
+              <MainLayout>
+                <CourseDetail />
               </MainLayout>
             }
           />
