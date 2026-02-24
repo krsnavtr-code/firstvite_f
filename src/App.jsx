@@ -223,6 +223,15 @@ function App() {
           />
 
           <Route
+            path="/category/:categoryName"
+            element={
+              <MainLayout>
+                <CoursesByCategory />
+              </MainLayout>
+            }
+          />
+
+          <Route
             path="/categories"
             element={
               <MainLayout>
