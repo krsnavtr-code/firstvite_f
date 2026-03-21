@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet-async";
  * SEO Component
  *
  * @param {Object} props - Component props
- * @param {string} props.title - Page title (e.g., 'Home | Eklabya')
+ * @param {string} props.title - Page title (e.g., 'Home | Eklavya')
  * @param {string} props.description - Meta description for the page
  * @param {string} [props.keywords] - Comma-separated keywords for SEO
  * @param {string} [props.canonical] - Canonical URL for the page
@@ -22,15 +22,15 @@ import { Helmet } from "react-helmet-async";
  * @returns {JSX.Element} - Returns Helmet component with meta tags
  */
 const SEO = ({
-  title = "Eklabya - Online Learning Platform",
-  description = "Eklabya centre of excellence offers professional and management courses, including short programs and degree collaborations with international universities.",
-  keywords = "online courses, e-learning, professional courses, management courses, online education, Eklabya, skill development",
+  title = "Eklavya - Online Learning Platform",
+  description = "Eklavya centre of excellence offers professional and management courses, including short programs and degree collaborations with international universities.",
+  keywords = "online courses, e-learning, professional courses, management courses, online education, Eklavya, skill development",
   canonical = "",
   robots = "index, follow",
   og = {},
   twitter = {},
 }) => {
-  const siteName = "Eklabya";
+  const siteName = "Eklavya";
   const siteUrl = "https://eklabya.com";
   const defaultImage = `${siteUrl}/images/firstvite-logo.png`;
 
@@ -44,8 +44,8 @@ const SEO = ({
 
   // Default Twitter card values
   const twitterCard = twitter.card || "summary_large_image";
-  const twitterSite = twitter.site || "@eklabya";
-  const twitterCreator = twitter.creator || "@eklabya";
+  const twitterSite = twitter.site || "@eklavya";
+  const twitterCreator = twitter.creator || "@eklavya";
 
   return (
     <Helmet>

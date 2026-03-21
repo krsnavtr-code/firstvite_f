@@ -605,12 +605,12 @@ const CandidateInviteForm = ({ defaultType = "student" }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-1 md:px-8 lg:px-12">
       <SEO 
-        title="JobFair Registration | Eklabya Centre of Excellence"
-        description="Apply for the Student & Professional Job Fair at Eklabya Centre of Excellence and connect with top recruiters, explore career opportunities, and secure your future today."
-        keywords="jobfair registration, career event, job fair, Eklabya registration, career fair"
+        title="JobFair Registration | Eklavya Centre of Excellence"
+        description="Apply for the Student & Professional Job Fair at Eklavya Centre of Excellence and connect with top recruiters, explore career opportunities, and secure your future today."
+        keywords="jobfair registration, career event, job fair, Eklavya registration, career fair"
         og={{
-          title: 'JobFair Registration | Eklabya Centre of Excellence',
-          description: 'Apply for the Student & Professional Job Fair at Eklabya Centre of Excellence and connect with top recruiters, explore career opportunities, and secure your future today.',
+          title: 'JobFair Registration | Eklavya Centre of Excellence',
+          description: 'Apply for the Student & Professional Job Fair at Eklavya Centre of Excellence and connect with top recruiters, explore career opportunities, and secure your future today.',
           type: 'article'
         }}
       />

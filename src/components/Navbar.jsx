@@ -315,7 +315,7 @@ function Navbar() {
               >
                 <img
                   src={logoImg}
-                  alt="Eklabya – Your Online Learning Partner"
+                  alt="Eklavya – Your Online Learning Partner"
                   className="h-10 rounded"
                 />
               </Link>

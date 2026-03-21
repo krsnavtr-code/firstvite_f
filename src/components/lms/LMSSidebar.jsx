@@ -49,10 +49,10 @@ const LMSSidebar = ({ collapsed, theme: themeProp }) => {
       onClick: () => navigate("/lms/refer-and-earn"),
     },
     {
-      key: "firstvite-community",
+      key: "eklavya-community",
       icon: <TeamOutlined />,
-      label: "FV Community",
-      onClick: () => navigate("/lms/firstvite-community"),
+      label: "Community",
+      onClick: () => navigate("/lms/eklavya-community"),
     },
     {
       key: "settings",
@@ -80,13 +80,13 @@ const LMSSidebar = ({ collapsed, theme: themeProp }) => {
     >
       <Menu
         mode="inline"
-        theme={themeProp === 'dark' ? 'dark' : 'light'}
+        theme={themeProp === "dark" ? "dark" : "light"}
         selectedKeys={[selectedKey]}
         style={{
-          background: 'transparent',
-          borderRight: 'none',
-          padding: '8px 4px',
-          color: themeProp === 'dark' ? 'black' : 'white'
+          background: "transparent",
+          borderRight: "none",
+          padding: "8px 4px",
+          color: themeProp === "dark" ? "black" : "white",
         }}
         items={menuItems.map((item) => ({
           ...item,

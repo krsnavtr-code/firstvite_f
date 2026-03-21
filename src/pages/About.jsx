@@ -7,13 +7,13 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
-        title="About Eklabya | Leading Online Learning Platform | Eklabya Centre of Excellence"
-        description="Learn about Eklabya, a trusted online learning platform offering skill-based courses, expert mentorship, and career-focused training for students and professionals."
-        keywords="about Eklabya, e-learning platform, online education, learn online, Eklabya mission, education technology, online courses, professional development"
+        title="About Eklavya | Leading Online Learning Platform | Eklavya Centre of Excellence"
+        description="Learn about Eklavya, a trusted online learning platform offering skill-based courses, expert mentorship, and career-focused training for students and professionals."
+        keywords="about Eklavya, e-learning platform, online education, learn online, Eklavya mission, education technology, online courses, professional development"
         og={{
-          title: "About Eklabya - Empowering Learners Worldwide",
+          title: "About Eklavya - Empowering Learners Worldwide",
           description:
-            "Discover how Eklabya is transforming education through accessible, high-quality online learning experiences for students everywhere.",
+            "Discover how Eklavya is transforming education through accessible, high-quality online learning experiences for students everywhere.",
           type: "website",
         }}
       />
@@ -21,7 +21,7 @@ export default function About() {
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            About Us – Eklabya
+            About Us – Eklavya
           </h1>
           <p className="text-xl md:text-2xl max-w-3xl mx-auto">
             Empowering minds through knowledge and learning resources
@@ -286,7 +286,7 @@ export default function About() {
             </Link>
           </div>
           <p className="text-center text-lg text-black dark:text-white mt-12">
-            Welcome to Eklabya — your partner in skill-building and success.
+            Welcome to Eklavya — your partner in skill-building and success.
           </p>
         </div>
       </section>

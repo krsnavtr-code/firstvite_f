@@ -1,15 +1,15 @@
-import { Navigate } from 'react-router-dom';
-import Dashboard from '../pages/lms/Dashboard';
-import Settings from '../pages/lms/Settings';
-import FirstviteCommunity from '../pages/lms/FirstviteCommunity';
-import Assignments from '../pages/lms/Assignments';
-import CourseDetails from '../pages/lms/CourseDetails';
-import SprintDetails from '../pages/lms/SprintDetails';
-import TaskTest from '../pages/lms/TaskTest';
-import MyLearning from '../pages/lms/MyLearning';
-import ReferAndEarn from '../pages/lms/ReferAndEarn';
-import Career from '../pages/lms/Career';
-import CallbackRequest from '../pages/lms/CallbackRequest';
+import { Navigate } from "react-router-dom";
+import Dashboard from "../pages/lms/Dashboard";
+import Settings from "../pages/lms/Settings";
+import FirstviteCommunity from "../pages/lms/FirstviteCommunity";
+import Assignments from "../pages/lms/Assignments";
+import CourseDetails from "../pages/lms/CourseDetails";
+import SprintDetails from "../pages/lms/SprintDetails";
+import TaskTest from "../pages/lms/TaskTest";
+import MyLearning from "../pages/lms/MyLearning";
+import ReferAndEarn from "../pages/lms/ReferAndEarn";
+import Career from "../pages/lms/Career";
+import CallbackRequest from "../pages/lms/CallbackRequest";
 
 const lmsRoutes = [
   {
@@ -25,7 +25,7 @@ const lmsRoutes = [
     element: <Settings />,
   },
   {
-    path: "firstvite-community",
+    path: "eklavya-community",
     element: <FirstviteCommunity />,
   },
   {

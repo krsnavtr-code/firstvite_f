@@ -412,10 +412,10 @@ const FirstviteCommunity = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Eklabya Community
+                Eklavya Community
               </h1>
               <p className="text-gray-500">
-                Connect, share and learn with the Eklabya community
+                Connect, share and learn with the Eklavya community
               </p>
             </div>
             <div className="flex items-center space-x-4">

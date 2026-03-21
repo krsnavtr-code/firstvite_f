@@ -114,8 +114,8 @@ const ResetPasswordPage = () => {
   return (
     <>
       <SEO
-        title="Reset Password | Eklabya"
-        description="Reset your Eklabya account password"
+        title="Reset Password | Eklavya"
+        description="Reset your Eklavya account password"
         robots="noindex, nofollow"
       />
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">

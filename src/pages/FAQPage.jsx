@@ -64,12 +64,12 @@ const FAQPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO 
-        title="Eklabya FAQ – Online Course Help & Support Guide"
-        description="Find answers to common questions about Eklabya online courses, enrollment process, fees, certifications, access details, and student support services."
-        keywords="FAQ, frequently asked questions, course help, payment questions, enrollment help, Eklabya support, learning platform"
+        title="Eklavya FAQ – Online Course Help & Support Guide"
+        description="Find answers to common questions about Eklavya online courses, enrollment process, fees, certifications, access details, and student support services."
+        keywords="FAQ, frequently asked questions, course help, payment questions, enrollment help, Eklavya support, learning platform"
         og={{
-          title: 'Eklabya FAQ – Online Course Help & Support Guide',
-          description: 'Get answers to common questions about our courses, payments, and learning platform. Everything you need to know about Eklabya in one place.',
+          title: 'Eklavya FAQ – Online Course Help & Support Guide',
+          description: 'Get answers to common questions about our courses, payments, and learning platform. Everything you need to know about Eklavya in one place.',
           type: 'website'
         }}
       />

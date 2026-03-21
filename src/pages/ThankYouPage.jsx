@@ -26,9 +26,9 @@ const ThankYouPage = () => {
   return (
     <>
       <SEO
-        title="Thank You | Eklabya - Registration Successful"
-        description="Thank you for registering with Eklabya! Your registration was successful. Check your email for further instructions."
-        keywords="thank you, registration successful, Eklabya, online learning, course enrollment"
+        title="Thank You | Eklavya - Registration Successful"
+        description="Thank you for registering with Eklavya! Your registration was successful. Check your email for further instructions."
+        keywords="thank you, registration successful, Eklavya, online learning, course enrollment"
         robots="noindex, nofollow"
       />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">

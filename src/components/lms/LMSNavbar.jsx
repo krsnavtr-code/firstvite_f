@@ -80,11 +80,11 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
       <header className="flex items-center justify-between px-6 dark:bg-[#001529] bg-[#fff] shadow-sm border-b border-gray-100">
         {/* Left: Logo */}
         <Link to="/lms">
-          <div className="w-10 h-10 p-1 overflow-hidden group-hover:scale-105 transition-transform">
+          <div className="h-10 p-1 overflow-hidden group-hover:scale-105 transition-transform">
             <img
-              src="http://eklabya.com/api/upload/file/img-1753961989896-7541613.png"
+              src="http://eklabya.com/api/upload/file/img-1771494820692-744915490.png"
               alt="Logo"
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-full rounded"
             />
           </div>
         </Link>
