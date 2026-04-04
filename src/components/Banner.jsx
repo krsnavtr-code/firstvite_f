@@ -11,10 +11,10 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 const bannerImg =
-  "http://eklabya.com/api/upload/file/img-1752554019521-300496356.png";
+  "http://theeklavya.com/api/upload/file/img-1752554019521-300496356.png";
 
 const logoImg =
-  "http://eklabya.com/api/upload/file/img-1770747893067-165906548.png";
+  "http://theeklavya.com/api/upload/file/img-1770747893067-165906548.png";
 import "./Banner.css";
 import "../styles/typography.css";
 
