@@ -165,7 +165,7 @@ function Navbar() {
               <FaEnvelope size={10} /> Mail Us
             </span>
             <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
-              <FaPhoneAlt size={10} /> +91 99900 56799
+              <FaPhoneAlt size={10} /> +91 9891030303
             </span>
           </div>
 

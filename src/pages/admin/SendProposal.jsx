@@ -39,7 +39,7 @@ Looking forward to your positive response.
 
 Thank you & Best Regards,
 <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</span>
-📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
@@ -74,7 +74,7 @@ We look forward to seeing you at the event!
 
 Warm regards,
 <strong style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</strong>
-📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
@@ -102,7 +102,7 @@ We look forward to having your institution join us in empowering the next genera
 
 Warm regards,
 <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</span>
-📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
@@ -133,7 +133,7 @@ For details and bookings, feel free to contact:
 
 Warm regards,
 <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</span>
-📞 <span style="font-weight: 600; color: #007BFF;">9990056799</span> 
+📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
 🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
 </div>`,
@@ -208,7 +208,7 @@ const SendProposal = () => {
 
       // Determine the active message content based on selection
       const activeField = MESSAGE_OPTIONS.find(
-        (opt) => opt.id === data.messageType
+        (opt) => opt.id === data.messageType,
       )?.field;
       const finalMessage = data[activeField];
 
@@ -263,7 +263,7 @@ const SendProposal = () => {
         setSelectedFiles([]); // <--- Clear the checkboxes on timeout too
       } else {
         toast.error(
-          error.response?.data?.message || "Failed to send proposal."
+          error.response?.data?.message || "Failed to send proposal.",
         );
       }
     } finally {

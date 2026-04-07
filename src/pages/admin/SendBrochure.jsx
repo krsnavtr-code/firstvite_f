@@ -61,16 +61,24 @@ const SendBrochure = () => {
       if (!selectedFile) return;
 
       // Check file type
-      const allowedTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm'];
+      const allowedTypes = [
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+        "video/x-matroska",
+        "video/webm",
+      ];
       if (!allowedTypes.includes(selectedFile.type)) {
-        toast.error('Invalid file type. Please select a valid video file (MP4, MOV, AVI, MKV, or WebM).');
+        toast.error(
+          "Invalid file type. Please select a valid video file (MP4, MOV, AVI, MKV, or WebM).",
+        );
         return;
       }
 
       // Check file size (500MB limit)
       const maxSize = 500 * 1024 * 1024; // 500MB in bytes
       if (selectedFile.size > maxSize) {
-        toast.error('File is too large. Maximum size is 500MB.');
+        toast.error("File is too large. Maximum size is 500MB.");
         return;
       }
 
@@ -105,7 +113,7 @@ const SendBrochure = () => {
           },
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
+              (progressEvent.loaded * 100) / progressEvent.total,
             );
             setProgress(percentCompleted);
           },
@@ -259,7 +267,7 @@ const SendBrochure = () => {
   const handleVideoSelection = (e) => {
     const selectedOptions = Array.from(
       e.target.selectedOptions,
-      (option) => option.value
+      (option) => option.value,
     );
     setSelectedVideos(selectedOptions);
   };
@@ -270,7 +278,7 @@ const SendBrochure = () => {
     return videos.filter(
       (video) =>
         video.name.toLowerCase().includes(term) ||
-        video.path.toLowerCase().includes(term)
+        video.path.toLowerCase().includes(term),
     );
   }, [videos, videoSearchTerm]);
 
@@ -280,7 +288,7 @@ const SendBrochure = () => {
         setLoading(true);
         const response = await api.get("/pdfs");
         const generated = response.data.filter(
-          (pdf) => pdf.type === "generated"
+          (pdf) => pdf.type === "generated",
         );
         const uploaded = response.data.filter((pdf) => pdf.type === "uploaded");
         setPdfs({ generated, uploaded });
@@ -298,7 +306,7 @@ const SendBrochure = () => {
   const handlePdfSelection = (e) => {
     const selectedOptions = Array.from(
       e.target.selectedOptions,
-      (option) => option.value
+      (option) => option.value,
     );
     setSelectedPdfs(selectedOptions);
   };
@@ -312,7 +320,7 @@ const SendBrochure = () => {
     return currentPdfs.filter(
       (pdf) =>
         pdf.name.toLowerCase().includes(term) ||
-        pdf.path.toLowerCase().includes(term)
+        pdf.path.toLowerCase().includes(term),
     );
   }, [activeTab, pdfs, searchTerm]);
 
@@ -331,7 +339,7 @@ const SendBrochure = () => {
 
     // Get the selected video details
     const selectedVideoDetails = videos.filter((video) =>
-      selectedVideos.includes(video.path)
+      selectedVideos.includes(video.path),
     );
 
     try {
@@ -340,7 +348,7 @@ const SendBrochure = () => {
       // Get the selected PDF details
       const allPdfs = [...pdfs.generated, ...pdfs.uploaded];
       const selectedPdfDetails = allPdfs.filter((pdf) =>
-        selectedPdfs.includes(pdf.path)
+        selectedPdfs.includes(pdf.path),
       );
 
       // Prepare request data with both PDFs and videos
@@ -405,7 +413,7 @@ const SendBrochure = () => {
           console.error("Error saving email record:", dbError);
           // Don't fail the entire operation if saving to DB fails
           toast.error(
-            "Email sent but failed to save record. Please check console for details."
+            "Email sent but failed to save record. Please check console for details.",
           );
         }
       }
@@ -435,7 +443,7 @@ const SendBrochure = () => {
       try {
         const allPdfs = [...pdfs.generated, ...pdfs.uploaded];
         const selectedPdfDetails = allPdfs.filter((pdf) =>
-          selectedPdfs.includes(pdf.path)
+          selectedPdfs.includes(pdf.path),
         );
 
         await api.post("/emails/save-email-record", {
@@ -462,7 +470,7 @@ const SendBrochure = () => {
 
       toast.error(
         error.response?.data?.message ||
-          "Failed to send mail. Please try again."
+          "Failed to send mail. Please try again.",
       );
     } finally {
       setSending(false);
@@ -735,7 +743,7 @@ const SendBrochure = () => {
     <span style="color: rgb(244, 124, 38)">e</span><span style="color: rgb(30, 144, 255)">KLAVYA</span> center of excellence Pvt. Ltd.
   </p>
   <p style="margin: 0 0 4px 0;">📧 info@eklabya.com</p>
-  <p style="margin: 0;">📞 +91-9990056799 | 🌐 www.eklabya.com</p>
+  <p style="margin: 0;">📞 +91-9891030303 | 🌐 www.eklabya.com</p>
 </div>
 `,
       },
@@ -1164,8 +1172,9 @@ const SendBrochure = () => {
                   Mail Message
                 </label>
                 <div className="mb-2 text-xs text-red-600">
-                  Use {"{{studentName}}"} and {"{{courseName}} "} and {"(VideoUrl {{videoUrl}} only in Video Sender)"} as placeholders
-                  that will be replaced with actual values.
+                  Use {"{{studentName}}"} and {"{{courseName}} "} and{" "}
+                  {"(VideoUrl {{videoUrl}} only in Video Sender)"} as
+                  placeholders that will be replaced with actual values.
                 </div>
                 <p className="text-sm text-gray-500 mb-2">
                   You can edit the email content in the editor below
@@ -1219,21 +1228,21 @@ const SendBrochure = () => {
                               // Make sure paragraph spacing looks natural
                               .replace(
                                 /<p>/g,
-                                '<p style="margin: 0 0 8px 0; line-height: 1.6; font-size: 14px;">'
+                                '<p style="margin: 0 0 8px 0; line-height: 1.6; font-size: 14px;">',
                               )
                               // Make lists look clean
                               .replace(
                                 /<ul>/g,
-                                '<ul style="margin: 8px 0 8px 20px; padding: 0; font-size: 14px;">'
+                                '<ul style="margin: 8px 0 8px 20px; padding: 0; font-size: 14px;">',
                               )
                               .replace(
                                 /<li>/g,
-                                '<li style="margin-bottom: 4px; line-height: 1.5;">'
+                                '<li style="margin-bottom: 4px; line-height: 1.5;">',
                               )
                               // Adjust heading styling for better hierarchy
                               .replace(
                                 /<h3>/g,
-                                '<h3 style="font-size:16px; margin:12px 0 6px 0; color:#222;">'
+                                '<h3 style="font-size:16px; margin:12px 0 6px 0; color:#222;">',
                               ),
                           }}
                         />
@@ -1268,7 +1277,7 @@ const SendBrochure = () => {
           </div>
         </form>
       </div>
-      
+
       {/* Video Upload Modal */}
       <VideoUploadModal
         isOpen={showVideoUpload}

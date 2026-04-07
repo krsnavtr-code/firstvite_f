@@ -73,7 +73,7 @@ export default function Contact() {
         console.error("Error fetching courses:", error);
         toast.error(
           "Failed to load course options. " +
-            (error.response?.data?.message || "")
+            (error.response?.data?.message || ""),
         );
       } finally {
         setIsLoadingCourses(false);
@@ -137,7 +137,7 @@ export default function Contact() {
         {
           position: "top-center",
           autoClose: 5000,
-        }
+        },
       );
     } finally {
       setIsSubmitting(false);
@@ -210,7 +210,7 @@ export default function Contact() {
                       Phone
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-300">
-                      +91 9990056799
+                      +91 9891030303
                       <br />
                       Mon - Fri, 9:00 AM - 6:00 PM
                     </p>
