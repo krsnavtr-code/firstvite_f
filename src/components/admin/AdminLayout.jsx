@@ -29,9 +29,9 @@ const AdminLayout = () => {
       return true;
     }
 
-    // Check user permissions
-    const permissions = currentUser?.adminPermissions || new Map();
-    const pagePermission = permissions.get(page);
+    // Check user permissions (now stored as plain object)
+    const permissions = currentUser?.adminPermissions || {};
+    const pagePermission = permissions[page];
     return pagePermission?.canView || false;
   };
 

@@ -50,6 +50,8 @@ export function AuthProvider({ children }) {
               isActive: response.data.isActive !== false, // Default to true if not specified
               phone: response.data.phone || "",
               address: response.data.address || "",
+              adminRoleId: response.data.adminRoleId,
+              adminPermissions: response.data.adminPermissions || {},
             };
 
             localStorage.setItem("user", JSON.stringify(userData));
@@ -92,9 +94,8 @@ export function AuthProvider({ children }) {
                 }
 
                 // Update the authorization header
-                api.defaults.headers.common[
-                  "Authorization"
-                ] = `Bearer ${newToken}`;
+                api.defaults.headers.common["Authorization"] =
+                  `Bearer ${newToken}`;
 
                 // Update user data
                 const userData = {
@@ -106,6 +107,8 @@ export function AuthProvider({ children }) {
                   isApproved: user.isApproved,
                   phone: user.phone || "",
                   address: user.address || "",
+                  adminRoleId: user.adminRoleId,
+                  adminPermissions: user.adminPermissions || new Map(),
                 };
 
                 localStorage.setItem("user", JSON.stringify(userData));
@@ -211,6 +214,8 @@ export function AuthProvider({ children }) {
           isActive: user.isActive !== false, // Default to true if not specified
           phone: user.phone || "",
           address: user.address || "",
+          adminRoleId: user.adminRoleId,
+          adminPermissions: user.adminPermissions || new Map(),
         };
 
         localStorage.setItem("user", JSON.stringify(userData));
@@ -320,7 +325,7 @@ export function AuthProvider({ children }) {
     currentUser,
     isAuthenticated: !!currentUser,
     isApproved: currentUser?.isApproved || false,
-    isAdmin: currentUser?.role === 'admin',
+    isAdmin: currentUser?.role === "admin",
     loading,
     login,
     register,
