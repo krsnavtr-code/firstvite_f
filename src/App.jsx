@@ -52,6 +52,7 @@ import TestQAPage from "./pages/admin/TestQAPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
 import CareerManagement from "./pages/admin/career/CareerManagement";
+import AdminManagement from "./pages/admin/AdminManagement";
 import lmsRoutes from "./routes/lmsRoutes";
 
 // Blog Components
@@ -530,6 +531,12 @@ function App() {
 
             {/* Candidates Management */}
             <Route path="/admin/candidates" element={<CandidatesPage />} />
+
+            {/* Admin Management */}
+            <Route
+              path="/admin/admin-management"
+              element={<AdminManagement />}
+            />
 
             {/* Test QA Management */}
             <Route path="/admin/test-qa" element={<TestQAPage />} />
