@@ -25,7 +25,7 @@ const lmsRoutes = [
     element: <Settings />,
   },
   {
-    path: "eklavya-community",
+    path: "eklabya-community",
     element: <FirstviteCommunity />,
   },
   {

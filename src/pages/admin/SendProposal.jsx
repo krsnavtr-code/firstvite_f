@@ -11,11 +11,11 @@ const EMAIL_TEMPLATES = {
   collegeInvitationMessage: `<div style="font-size: 16px;">
 Dear [College Name],
 
-Greetings from <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">KLAVYA</span> center of excellence Pvt. Ltd.</span>!
+Greetings from <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">KLABYA</span> center of excellence Pvt. Ltd.</span>!
 
 Skill Development company dedicated to enhancing student employability through practical and industry-aligned courses.
 
-At <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">KLAVYA</span> center of excellence Pvt. Ltd.</span>!, we specialize in training students in high-demand technical skills including:
+At <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">KLABYA</span> center of excellence Pvt. Ltd.</span>!, we specialize in training students in high-demand technical skills including:
 
 🔹 Java Development
 🔹 Python Programming
@@ -182,7 +182,7 @@ const SendProposal = () => {
   } = useForm({
     defaultValues: {
       messageType: "student",
-      subject: "Invitation from | eklavya center of excellence Pvt. Ltd.",
+      subject: "Invitation from | Eklabya center of excellence Pvt. Ltd.",
       ...EMAIL_TEMPLATES,
     },
   });

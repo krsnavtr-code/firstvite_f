@@ -12,12 +12,12 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <SEO 
-        title="Privacy Policy | Eklavya Centre of Excellence"
-        description="Read the Privacy Policy of Eklavya Centre of Excellence to understand how we collect, use, and protect your personal information securely."
-        keywords="privacy policy, data protection, personal information, Eklavya privacy, online learning privacy, data security"
+        title="Privacy Policy | Eklabya Centre of Excellence"
+        description="Read the Privacy Policy of Eklabya Centre of Excellence to understand how we collect, use, and protect your personal information securely."
+        keywords="privacy policy, data protection, personal information, Eklabya privacy, online learning privacy, data security"
         og={{
-          title: 'Privacy Policy | Eklavya Centre of Excellence',
-          description: `Last updated ${lastUpdated}. Learn how Eklavya Centre of Excellence protects your privacy and handles your personal information.`,
+          title: 'Privacy Policy | Eklabya Centre of Excellence',
+          description: `Last updated ${lastUpdated}. Learn how Eklabya Centre of Excellence protects your privacy and handles your personal information.`,
           type: 'article'
         }}
       />
@@ -37,7 +37,7 @@ const PrivacyPolicy = () => {
 
         <div className="prose dark:prose-invert max-w-none">
           <p className="text-black dark:text-white mb-4">
-            At Eklavya, we are committed to protecting your privacy and
+            At Eklabya, we are committed to protecting your privacy and
             ensuring the security of your personal information. This Privacy
             Policy outlines how we collect, use, and safeguard your information
             when you use our platform.
@@ -117,7 +117,7 @@ const PrivacyPolicy = () => {
             us at:
           </p>
           <address className="not-italic text-black dark:text-white mb-8">
-            Eklavya
+            Eklabya
             <br />
             H-161 BSI Sector-63
             <br />

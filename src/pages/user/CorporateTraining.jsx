@@ -41,12 +41,12 @@ const CorporateTraining = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pt-24 pb-16">
       <SEO 
-        title="Corporate Training Programs for Businesses | Eklavya Centre of Excellence"
-        description="Upgrade your workforce skills with customized corporate training programs by Eklavya. Improve productivity, leadership, and technical expertise."
+        title="Corporate Training Programs for Businesses | Eklabya Centre of Excellence"
+        description="Upgrade your workforce skills with customized corporate training programs by Eklabya. Improve productivity, leadership, and technical expertise."
         keywords="corporate training, workforce development, employee training, business training, leadership development, technical training"
         og={{
-          title: 'Corporate Training Solutions | Eklavya Centre of Excellence',
-          description: 'Upgrade your workforce skills with customized corporate training programs by Eklavya. Improve productivity, leadership, and technical expertise.',
+          title: 'Corporate Training Solutions | Eklabya Centre of Excellence',
+          description: 'Upgrade your workforce skills with customized corporate training programs by Eklabya. Improve productivity, leadership, and technical expertise.',
           type: 'website'
         }}
       />

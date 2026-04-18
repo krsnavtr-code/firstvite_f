@@ -85,11 +85,11 @@ const FreeCourses = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
-        title="Free Online Courses with Certificate | Eklavya Centre of Excellence"
-        description="Join Eklavya free online courses with certificate. Upgrade your skills with expert-led training in business, tech, and career development. Start learning today!"
-        keywords="free courses, online learning, free online courses, learn new skills, free education, online courses, free certification, skill development, eklavya, eklavya centre of excellence"
+        title="Free Online Courses with Certificate | Eklabya Centre of Excellence"
+        description="Join Eklabya free online courses with certificate. Upgrade your skills with expert-led training in business, tech, and career development. Start learning today!"
+        keywords="free courses, online learning, free online courses, learn new skills, free education, online courses, free certification, skill development, Eklabya, Eklabya centre of excellence"
         og={{
-          title: "Free Online Courses | Learn New Skills for Free | Eklavya",
+          title: "Free Online Courses | Learn New Skills for Free | Eklabya",
           description:
             "Start learning today with our collection of free online courses. No hidden fees, no credit card required. Enhance your skills at no cost!",
           type: "website",

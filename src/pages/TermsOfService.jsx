@@ -12,12 +12,12 @@ const TermsOfService = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <SEO
-        title="Terms of Service | Eklavya Centre of Excellence"
-        description="Read the official Terms of Service of Eklavya Centre of Excellence to understand user responsibilities, policies, conditions, and service guidelines."
-        keywords="terms of service, terms and conditions, user agreement, Eklavya terms, online learning terms"
+        title="Terms of Service | Eklabya Centre of Excellence"
+        description="Read the official Terms of Service of Eklabya Centre of Excellence to understand user responsibilities, policies, conditions, and service guidelines."
+        keywords="terms of service, terms and conditions, user agreement, Eklabya terms, online learning terms"
         og={{
-          title: "Terms of Service | Eklavya",
-          description: `Last updated ${lastUpdated}. By using Eklavya, you agree to these terms and conditions.`,
+          title: "Terms of Service | Eklabya",
+          description: `Last updated ${lastUpdated}. By using Eklabya, you agree to these terms and conditions.`,
           type: "article",
         }}
       />
@@ -37,7 +37,7 @@ const TermsOfService = () => {
 
           <div className="prose dark:prose-invert max-w-none">
             <p className="text-black dark:text-white mb-6">
-              Welcome to Eklavya. By accessing or using our website and
+              Welcome to Eklabya. By accessing or using our website and
               services, you agree to be bound by these Terms of Service. Please
               read them carefully before using our services.
             </p>
@@ -75,7 +75,7 @@ const TermsOfService = () => {
             </h2>
             <p className="text-black dark:text-white mb-4">
               All content on our platform, including text, graphics, logos, and
-              course materials, is the property of Eklavya or its content
+              course materials, is the property of Eklabya or its content
               suppliers and is protected by intellectual property laws.
             </p>
 
@@ -92,7 +92,7 @@ const TermsOfService = () => {
               5. Limitation of Liability
             </h2>
             <p className="text-black dark:text-white mb-4">
-              Eklavya shall not be liable for any indirect, incidental,
+              Eklabya shall not be liable for any indirect, incidental,
               special, consequential, or punitive damages resulting from your
               access to or use of our services.
             </p>
@@ -132,7 +132,7 @@ const TermsOfService = () => {
               If you have any questions about these Terms, please contact us at:
             </p>
             <address className="not-italic text-black dark:text-white mb-8">
-              Eklavya
+              Eklabya
               <br />
               H-161 BSI Sector-63
               <br />

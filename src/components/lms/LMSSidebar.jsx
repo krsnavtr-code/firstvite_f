@@ -49,10 +49,10 @@ const LMSSidebar = ({ collapsed, theme: themeProp }) => {
       onClick: () => navigate("/lms/refer-and-earn"),
     },
     {
-      key: "eklavya-community",
+      key: "eklabya-community",
       icon: <TeamOutlined />,
       label: "Community",
-      onClick: () => navigate("/lms/eklavya-community"),
+      onClick: () => navigate("/lms/eklabya-community"),
     },
     {
       key: "settings",

@@ -201,12 +201,12 @@ const Career = () => {
   return (
     <div className="career-page">
       <SEO 
-        title="Career Opportunities | Eklavya center of excellence"
-        description="Explore career opportunities at Eklavya center of excellence. Find your dream job and take the next step in your career with us."
+        title="Career Opportunities | Eklabya center of excellence"
+        description="Explore career opportunities at Eklabya center of excellence. Find your dream job and take the next step in your career with us."
         keywords="career, job, opportunity, employment, hiring, recruitment"
         og={{
-          title: "Career Opportunities | Eklavya center of excellence",
-          description: "Explore career opportunities at Eklavya center of excellence. Find your dream job and take the next step in your career with us.",
+          title: "Career Opportunities | Eklabya center of excellence",
+          description: "Explore career opportunities at Eklabya center of excellence. Find your dream job and take the next step in your career with us.",
           type: "website",
         }}
       />

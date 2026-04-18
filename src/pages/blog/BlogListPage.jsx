@@ -121,12 +121,12 @@ export default function BlogListPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO 
-        title="Eklavya Centre of Excellence Blog | Career Insights"
-        description="Explore expert articles, career guidance, technology updates, and industry insights on the official blog of Eklavya Centre of Excellence."
-        keywords="education blog, career advice, learning resources, industry insights, Eklavya articles, professional development"
+        title="Eklabya Centre of Excellence Blog | Career Insights"
+        description="Explore expert articles, career guidance, technology updates, and industry insights on the official blog of Eklabya Centre of Excellence."
+        keywords="education blog, career advice, learning resources, industry insights, Eklabya articles, professional development"
         og={{
-          title: 'Eklavya Centre of Excellence Blog - Education & Career Insights',
-          description: 'Discover expert articles, study tips, and industry insights from Eklavya. Stay ahead in your learning journey with our educational blog.',
+          title: 'Eklabya Centre of Excellence Blog - Education & Career Insights',
+          description: 'Discover expert articles, study tips, and industry insights from Eklabya. Stay ahead in your learning journey with our educational blog.',
           type: 'website'
         }}
       />

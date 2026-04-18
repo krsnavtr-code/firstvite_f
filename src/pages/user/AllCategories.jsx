@@ -124,14 +124,14 @@ const AllCategories = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-4 sm:px-6 lg:px-8">
       <SEO
-        title="Eklavya Online Course Categories & Programs | Eklavya Centre of Excellence"
-        description="Explore Eklavya’s online course categories designed for career growth, skill development, and professional certification across multiple industries."
-        keywords="course categories, eklavya categories, learning paths, course catalog, eklavya centre of excellence"
+        title="Eklabya Online Course Categories & Programs | Eklabya Centre of Excellence"
+        description="Explore Eklabya’s online course categories designed for career growth, skill development, and professional certification across multiple industries."
+        keywords="course categories, Eklabya categories, learning paths, course catalog, Eklabya centre of excellence"
         og={{
           title:
-            "Eklavya Online Course Categories & Programs | Eklavya Centre of Excellence",
+            "Eklabya Online Course Categories & Programs | Eklabya Centre of Excellence",
           description:
-            "Explore Eklavya’s online course categories designed for career growth, skill development, and professional certification across multiple industries.",
+            "Explore Eklabya’s online course categories designed for career growth, skill development, and professional certification across multiple industries.",
           type: "website",
         }}
       />

@@ -491,7 +491,7 @@ const SendBrochure = () => {
       },
       courseEnquiry: {
         name: "Course Enquiry",
-        subject: `About {{courseName}} - Eklavya Center of Excellence`,
+        subject: `About {{courseName}} - Eklabya Center of Excellence`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
   <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
@@ -500,7 +500,7 @@ const SendBrochure = () => {
     Greetings from 
     <strong>
     <span style="color: rgb(30, 144, 255);">e</span> center of excellence Pvt. Ltd!
-      <span style="color: rgb(244, 124, 38);">KLAVYA</span>
+      <span style="color: rgb(244, 124, 38);">KLABYA</span>
     </strong>
   </p> 
 
@@ -520,7 +520,7 @@ const SendBrochure = () => {
     <li style="margin-bottom: 4px;">✅ Real-time Case Studies & Projects</li>
     <li style="margin-bottom: 4px;">✅ Access to Server for Practical Training</li>
     <li style="margin-bottom: 4px;">✅ Resume Building + Interview Preparation</li>
-    <li style="margin-bottom: 4px;">✅ Certificate from eklavya upon Completion</li>
+    <li style="margin-bottom: 4px;">✅ Certificate from Eklabya upon Completion</li>
   </ul>
 
   <h3 style="margin: 12px 0 6px 0; color: #222; font-size: 16px;">
@@ -535,7 +535,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 4px 0;">
     Team – 
     <span style="color: rgb(30, 144, 255);">e</span> 
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span> Center of Excellence Pvt. Ltd.
+    <span style="color: rgb(244, 124, 38);">KLABYA</span> Center of Excellence Pvt. Ltd.
   </p>
   <p style="margin: 0 0 4px 0;">📩 info@eklabya.com</p>
   <p style="margin: 0;">
@@ -549,7 +549,7 @@ const SendBrochure = () => {
       },
       webinarInvite: {
         name: "Learning Approach Invitation",
-        subject: `Take the Next Step in Your Career with eklavya Center of Excellence Pvt. Ltd`,
+        subject: `Take the Next Step in Your Career with Eklabya Center of Excellence Pvt. Ltd`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
   <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
@@ -557,7 +557,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 8px 0;">
     Greetings from 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span> center of excellence Pvt. Ltd!
+    <span style="color: rgb(244, 124, 38);">KLABYA</span> center of excellence Pvt. Ltd!
   </p>
 
   <p style="margin: 0 0 8px 0;">
@@ -567,7 +567,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 8px 0;">
     At 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span>, we offer a wide range of in-demand programs such as 
+    <span style="color: rgb(244, 124, 38);">KLABYA</span>, we offer a wide range of in-demand programs such as 
     <strong>Java</strong>, <strong>Python</strong>, <strong>AI & Machine Learning</strong>, 
     <strong>Cyber Security</strong>, <strong>Digital Marketing</strong>, <strong>SAP</strong>, 
     <strong>Power BI</strong>, <strong>Cloud Computing (Azure)</strong>, <strong>Salesforce</strong>, and more.
@@ -593,7 +593,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 4px 0;">
     Team – 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span> center of excellence Pvt. Ltd.
+    <span style="color: rgb(244, 124, 38);">KLABYA</span> center of excellence Pvt. Ltd.
   </p>
   <p style="margin: 0 0 4px 0;">📩 info@eklabya.com</p>
   <p style="margin: 0;">
@@ -607,7 +607,7 @@ const SendBrochure = () => {
       },
       videoSender: {
         name: "Video Sender",
-        subject: `Take the Next Step in Your Career with eklavya center of excellence Pvt. Ltd`,
+        subject: `Take the Next Step in Your Career with Eklabya center of excellence Pvt. Ltd`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
   <p style="margin: 0 0 8px 0;">Dear {{studentName}},</p>
@@ -615,7 +615,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 8px 0;">
     Greetings from 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span> center of excellence Pvt. Ltd!
+    <span style="color: rgb(244, 124, 38);">KLABYA</span> center of excellence Pvt. Ltd!
   </p>
 
   <p style="margin: 0 0 8px 0;">
@@ -625,7 +625,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 8px 0;">
     At 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span>, we offer a wide range of in-demand programs such as 
+    <span style="color: rgb(244, 124, 38);">KLABYA</span>, we offer a wide range of in-demand programs such as 
     <strong>Java</strong>, <strong>Python</strong>, <strong>AI & Machine Learning</strong>, 
     <strong>Cyber Security</strong>, <strong>Digital Marketing</strong>, <strong>SAP</strong>, 
     <strong>Power BI</strong>, <strong>Cloud Computing (Azure)</strong>, <strong>Salesforce</strong>, and more.
@@ -655,7 +655,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 4px 0;">
     Team – 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span> center of excellence Pvt. Ltd.
+    <span style="color: rgb(244, 124, 38);">KLABYA</span> center of excellence Pvt. Ltd.
   </p>
   <p style="margin: 0 0 4px 0;">📩 info@eklabya.com</p>
   <p style="margin: 0;">🌐 <a href="https://eklabya.com" style="color: rgb(30, 144, 255); text-decoration: none;">www.eklabya.com</a></p>
@@ -664,7 +664,7 @@ const SendBrochure = () => {
       },
       allCoursesProposal: {
         name: "All Courses Proposal",
-        subject: `Proposal for Student Skill Development & Certification Programs – eklavya center of excellence Pvt. Ltd`,
+        subject: `Proposal for Student Skill Development & Certification Programs – Eklabya center of excellence Pvt. Ltd`,
         content: `
 <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
   <p style="margin: 0 0 8px 0;">
@@ -674,13 +674,13 @@ const SendBrochure = () => {
   <p style="margin: 0 0 8px 0;">
     Warm greetings from 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span> center of excellence Pvt. Ltd.
+    <span style="color: rgb(244, 124, 38);">KLABYA</span> center of excellence Pvt. Ltd.
   </p>
 
   <p style="margin: 0 0 8px 0;">
     We are pleased to introduce 
     <span style="color: rgb(30, 144, 255);">e</span>
-    <span style="color: rgb(244, 124, 38);">KLAVYA</span> center of excellence Pvt. Ltd., a leading online learning platform focused on delivering high-quality certification programs designed to enhance students’ employability and industry readiness.
+    <span style="color: rgb(244, 124, 38);">KLABYA</span> center of excellence Pvt. Ltd., a leading online learning platform focused on delivering high-quality certification programs designed to enhance students’ employability and industry readiness.
   </p>
 
   <p style="margin: 0 0 8px 0;">
@@ -712,9 +712,9 @@ const SendBrochure = () => {
 
   <ul style="margin: 0 0 8px 20px; padding: 0;">
     <li>100% Online Learning (Live + Recorded Classes)</li>
-    <li>Delivered by Industry Experts from Eklavya</li>
+    <li>Delivered by Industry Experts from Eklabya</li>
     <li>Practical, Project-Based Learning</li>
-    <li>Certification from Eklavya center of excellence Pvt. Ltd</li>
+    <li>Certification from Eklabya center of excellence Pvt. Ltd</li>
     <li>Placement Guidance and Career Support</li>
     <li>Internship Assistance (where applicable)</li>
   </ul>
@@ -737,10 +737,10 @@ const SendBrochure = () => {
 
   <p style="margin: 0 0 4px 0;">Warm regards,</p>
   <p style="margin: 0 0 4px 0;">
-    Team <span style="color: rgb(244, 124, 38)">e</span><span style="color: rgb(30, 144, 255)">KLAVYA</span>
+    Team <span style="color: rgb(244, 124, 38)">e</span><span style="color: rgb(30, 144, 255)">KLABYA</span>
   </p>
   <p style="margin: 0 0 4px 0;">
-    <span style="color: rgb(244, 124, 38)">e</span><span style="color: rgb(30, 144, 255)">KLAVYA</span> center of excellence Pvt. Ltd.
+    <span style="color: rgb(244, 124, 38)">e</span><span style="color: rgb(30, 144, 255)">KLABYA</span> center of excellence Pvt. Ltd.
   </p>
   <p style="margin: 0 0 4px 0;">📧 info@eklabya.com</p>
   <p style="margin: 0;">📞 +91-9891030303 | 🌐 www.eklabya.com</p>

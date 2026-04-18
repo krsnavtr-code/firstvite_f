@@ -5,12 +5,12 @@ const PaymentTAndC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <SEO 
-        title="Payment Terms & Conditions | Eklavya Centre of Excellence"
-        description="Read the official payment terms and conditions of Eklavya Centre of Excellence including fees, refund policy, billing process, and secure transaction guidelines."
-        keywords="payment terms, payment conditions, refund policy, online payment terms, Eklavya payment, course payment terms"
+        title="Payment Terms & Conditions | Eklabya Centre of Excellence"
+        description="Read the official payment terms and conditions of Eklabya Centre of Excellence including fees, refund policy, billing process, and secure transaction guidelines."
+        keywords="payment terms, payment conditions, refund policy, online payment terms, Eklabya payment, course payment terms"
         og={{
-          title: 'Payment Terms & Conditions | Eklavya Centre of Excellence',
-          description: 'Read the official payment terms and conditions of Eklavya Centre of Excellence including fees, refund policy, billing process, and secure transaction guidelines.',
+          title: 'Payment Terms & Conditions | Eklabya Centre of Excellence',
+          description: 'Read the official payment terms and conditions of Eklabya Centre of Excellence including fees, refund policy, billing process, and secure transaction guidelines.',
           type: 'article'
         }}
       />

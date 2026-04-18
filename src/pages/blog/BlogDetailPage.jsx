@@ -166,8 +166,8 @@ export default function BlogDetailPage() {
   } = post;
 
   // Generate SEO metadata based on the blog post
-  const seoTitle = post ? `${post.title} | Eklavya Blog` : 'Blog Post | Eklavya';
-  const seoDescription = post?.excerpt || 'Read this article on Eklavya';
+  const seoTitle = post ? `${post.title} | Eklabya Blog` : 'Blog Post | Eklabya';
+  const seoDescription = post?.excerpt || 'Read this article on Eklabya';
   const seoKeywords = post?.tags?.join(', ') || 'blog, article, education, learning';
   const canonicalUrl = post ? `https://firstvite.com/blog/${post.slug}` : 'https://firstvite.com/blog';
 
@@ -179,8 +179,8 @@ export default function BlogDetailPage() {
         keywords={seoKeywords}
         canonical={canonicalUrl}
         og={{
-          title: post?.title || 'Eklavya Blog',
-          description: post?.excerpt || 'Read this article on Eklavya',
+          title: post?.title || 'Eklabya Blog',
+          description: post?.excerpt || 'Read this article on Eklabya',
           type: 'article',
           image: post?.imageUrl,
           url: canonicalUrl
@@ -253,7 +253,7 @@ export default function BlogDetailPage() {
                 <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
                   <div className="flex items-center mr-6 mb-2 sm:mb-0">
                     <UserOutlined className="mr-1" />
-                    <span>{author?.name || "Eklavya"}</span>
+                    <span>{author?.name || "Eklabya"}</span>
                   </div>
                   <div className="flex items-center mr-6 mb-2 sm:mb-0">
                     <CalendarOutlined className="mr-1" />

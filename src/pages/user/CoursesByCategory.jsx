@@ -109,11 +109,11 @@ const CoursesByCategory = () => {
 
   // Generate SEO metadata
   const seoTitle = category
-    ? `${formattedCategoryName} Courses | Eklavya Centre of Excellence`
-    : "Online Professional Courses | Eklavya Learning Hub";
+    ? `${formattedCategoryName} Courses | Eklabya Centre of Excellence`
+    : "Online Professional Courses | Eklabya Learning Hub";
   const seoDescription = category
     ? `Explore our ${formattedCategoryName} courses. Enhance your skills with expert-led training and industry-relevant curriculum with Eklabya's industry-focused online courses.`
-    : "Upgrade your skills with Eklavya's industry-focused online courses. Learn from experts, get certified, and grow your career with flexible learning.";
+    : "Upgrade your skills with Eklabya's industry-focused online courses. Learn from experts, get certified, and grow your career with flexible learning.";
   const seoKeywords = category
     ? `${formattedCategoryName} courses, ${formattedCategoryName} training, ${formattedCategoryName} certification, online ${formattedCategoryName} courses`
     : "online courses, professional courses, certification, skills training, career development";
@@ -130,11 +130,11 @@ const CoursesByCategory = () => {
         canonical={canonicalUrl}
         og={{
           title: category
-            ? `Best ${formattedCategoryName} Courses Online | Eklavya`
-            : "Expert-Led Online Courses | Eklavya Learning Hub",
+            ? `Best ${formattedCategoryName} Courses Online | Eklabya`
+            : "Expert-Led Online Courses | Eklabya Learning Hub",
           description: category
             ? `Learn ${formattedCategoryName} from industry experts. Enroll now for hands-on training and certification.`
-            : "Transform your career with Eklavya's expert-led online courses. Get certified, upskill, and reskill with flexible learning.",
+            : "Transform your career with Eklabya's expert-led online courses. Get certified, upskill, and reskill with flexible learning.",
           type: "website",
           url: canonicalUrl,
         }}
