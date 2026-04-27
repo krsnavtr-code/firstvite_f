@@ -224,13 +224,13 @@ const location = useLocation();
                       >
                         <FaEdit className="h-5 w-5" />
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => handleDelete(category._id)}
                         className="text-red-600 hover:text-red-900"
                         title="Delete"
                       >
                         <FaTrash className="h-5 w-5" />
-                      </button>
+                      </button> */}
                     </div>
                   </td>
                 </tr>

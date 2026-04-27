@@ -389,13 +389,13 @@ const CoursesList = () => {
                             >
                               <FaEdit className="w-5 h-5" />
                             </Link>
-                            <button
+                            {/* <button
                               onClick={() => handleDelete(course._id)}
                               className="text-red-600 hover:text-red-900"
                               title="Delete Course"
                             >
                               <FaTrash className="w-5 h-5" />
-                            </button>
+                            </button> */}
                             <button
                               onClick={() => {
                                 setSelectedCourse(course);
