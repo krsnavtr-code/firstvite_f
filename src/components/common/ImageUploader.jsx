@@ -1,110 +1,151 @@
- import { useState } from 'react';
-import { toast } from 'react-toastify';
-import { FaUpload, FaTimes } from 'react-icons/fa';
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { FaUpload, FaTimes } from "react-icons/fa";
 
-const ImageUploader = ({ onUploadSuccess, label = 'Upload Image', className = '', maxSizeMB = 5 }) => {
+const ImageUploader = ({
+  onUploadSuccess,
+  label = "Upload Image",
+  className = "",
+  maxSizeMB = 5,
+}) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [file, setFile] = useState(null);
+  const [previewUrls, setPreviewUrls] = useState([]);
+  const [files, setFiles] = useState([]);
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    
-    if (!selectedFile) return;
+    const selectedFiles = Array.from(e.target.files);
 
-    // Check file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!validTypes.includes(selectedFile.type)) {
-      toast.error('Only JPG, PNG, and WebP images are allowed');
-      return;
-    }
+    if (!selectedFiles || selectedFiles.length === 0) return;
 
-    // Check file size (default 5MB)
+    // Check file types and sizes
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     const maxSize = maxSizeMB * 1024 * 1024; // Convert MB to bytes
-    if (selectedFile.size > maxSize) {
-      toast.error(`File size must be less than ${maxSizeMB}MB`);
-      return;
+
+    const validFiles = [];
+    const newPreviewUrls = [];
+
+    for (const file of selectedFiles) {
+      if (!validTypes.includes(file.type)) {
+        toast.error(
+          `${file.name} is not a valid image type. Only JPG, PNG, WebP, and GIF are allowed.`,
+        );
+        continue;
+      }
+
+      if (file.size > maxSize) {
+        toast.error(
+          `${file.name} is too large. Maximum size is ${maxSizeMB}MB.`,
+        );
+        continue;
+      }
+
+      validFiles.push(file);
+      newPreviewUrls.push(URL.createObjectURL(file));
     }
 
-    // Create preview
-    const fileUrl = URL.createObjectURL(selectedFile);
-    setPreviewUrl(fileUrl);
-    setFile(selectedFile);
+    if (validFiles.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+      setPreviewUrls((prevUrls) => [...prevUrls, ...newPreviewUrls]);
+      toast.success(`${validFiles.length} image(s) added`);
+    }
   };
 
-  const removeImage = () => {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
+  const removeImage = (index) => {
+    if (previewUrls[index]) {
+      URL.revokeObjectURL(previewUrls[index]);
     }
-    setPreviewUrl('');
-    setFile(null);
+    setFiles(files.filter((file, i) => i !== index));
+    setPreviewUrls(previewUrls.filter((url, i) => i !== index));
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      toast.error('Please select an image to upload');
+    if (files.length === 0) {
+      toast.error("Please select images to upload");
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
+    const uploadedFiles = [];
+    let successCount = 0;
+    let errorCount = 0;
 
     try {
       setIsUploading(true);
-      const token = localStorage.getItem('token');
-      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4002/api';
-      
-      // Add cache-busting parameter
-      const url = new URL(`${API_URL}/upload/image`);
-      url.searchParams.append('_t', Date.now());
-      
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        credentials: 'include',
-        body: formData,
-      });
+      const token = localStorage.getItem("token");
+      const API_URL =
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api";
 
-      // Log response details for debugging
-      const responseText = await response.text();
-      
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error('Failed to parse JSON response:', e);
-        throw new Error('Invalid server response');
-      }
+      // Upload each file individually
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
 
-      if (!response.ok) {
-        throw new Error(data.message || `Upload failed with status ${response.status}`);
-      }
+        try {
+          // Add cache-busting parameter
+          const url = new URL(`${API_URL}/upload/image`);
+          url.searchParams.append("_t", Date.now());
 
-      toast.success('Image uploaded successfully');
-      
-      if (onUploadSuccess) {
-        // Handle both response formats for backward compatibility
-        const result = data.data || data;
-        if (result) {
-          onUploadSuccess({
-            url: result.url || result.path,
-            path: result.path,
-            name: result.name || file.name,
-            type: 'image'
+          const headers = {};
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+
+          const response = await fetch(url, {
+            method: "POST",
+            headers: headers,
+            credentials: "include",
+            body: formData,
           });
+
+          const responseText = await response.text();
+          let data;
+          try {
+            data = JSON.parse(responseText);
+          } catch (e) {
+            console.error("Failed to parse JSON response:", e);
+            throw new Error("Invalid server response");
+          }
+
+          if (!response.ok) {
+            throw new Error(
+              data.message || `Upload failed with status ${response.status}`,
+            );
+          }
+
+          const result = data.data || data;
+          if (result) {
+            uploadedFiles.push({
+              url: result.url || result.path,
+              path: result.path,
+              name: result.name || file.name,
+              type: "image",
+            });
+            successCount++;
+          }
+        } catch (error) {
+          console.error(`Error uploading ${file.name}:`, error);
+          errorCount++;
         }
       }
-      
-      // Clean up
-      removeImage();
+
+      if (successCount > 0) {
+        toast.success(`${successCount} image(s) uploaded successfully`);
+        if (onUploadSuccess) {
+          onUploadSuccess(uploadedFiles);
+        }
+      }
+
+      if (errorCount > 0) {
+        toast.error(`${errorCount} image(s) failed to upload`);
+      }
+
+      // Clean up all previews and reset files
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+      setFiles([]);
+      setPreviewUrls([]);
     } catch (error) {
-      console.error('Upload error:', error);
-      toast.error(error.message || 'Failed to upload image');
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload images");
     } finally {
       setIsUploading(false);
     }
@@ -112,66 +153,78 @@ const ImageUploader = ({ onUploadSuccess, label = 'Upload Image', className = ''
 
   return (
     <div className={`space-y-4 ${className}`}>
+      {/* File selector */}
       <div className="flex items-center justify-center w-full">
         <label
           htmlFor="image-upload"
-          className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer 
-            ${previewUrl ? 'border-gray-300' : 'border-blue-500 hover:bg-blue-50 dark:border-blue-600 dark:hover:border-blue-500 dark:hover:bg-gray-700'}
+          className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer 
+            border-blue-500 hover:bg-blue-50 dark:border-blue-600 dark:hover:border-blue-500 dark:hover:bg-gray-700
             transition-colors duration-200 relative`}
         >
-          {previewUrl ? (
-            <div className="relative w-full h-full group">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="w-full h-full object-cover rounded-lg"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/placeholder.svg';
-                }}
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeImage();
-                }}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              >
-                <FaTimes size={16} />
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center p-6 text-center">
-              <FaUpload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                <span className="font-semibold">Click to upload</span> or drag and drop
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                PNG, JPG, WebP, GIF (MAX. {maxSizeMB}MB)
-              </p>
-            </div>
-          )}
+          <div className="flex flex-col items-center justify-center p-6 text-center">
+            <FaUpload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="font-semibold">Click to upload</span> or drag and
+              drop
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              PNG, JPG, WebP, GIF (MAX. {maxSizeMB}MB each) - Multiple files
+              allowed
+            </p>
+          </div>
           <input
             id="image-upload"
             type="file"
             className="hidden"
             accept="image/*"
+            multiple
             onChange={handleFileChange}
             disabled={isUploading}
           />
         </label>
       </div>
-      
+
+      {/* Image previews grid */}
+      {previewUrls.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {previewUrls.map((url, index) => (
+            <div key={index} className="relative group">
+              <img
+                src={url}
+                alt={`Preview ${index + 1}`}
+                className="w-full h-32 object-cover rounded-lg border"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/placeholder.svg";
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <FaTimes size={12} />
+              </button>
+              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg truncate">
+                {files[index]?.name}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Upload button */}
       <div className="flex justify-end">
         <button
           type="button"
           onClick={handleUpload}
-          disabled={!file || isUploading}
+          disabled={files.length === 0 || isUploading}
           className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-            ${(!file || isUploading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            ${files.length === 0 || isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          {isUploading ? 'Uploading...' : 'Upload Image'}
+          {isUploading
+            ? `Uploading ${files.length} image(s)...`
+            : `Upload ${files.length} Image(s)`}
         </button>
       </div>
     </div>
