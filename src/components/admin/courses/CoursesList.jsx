@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
@@ -9,11 +9,7 @@ import {
   FaDownload,
   FaPaperPlane,
 } from "react-icons/fa";
-import {
-  getCourses,
-  deleteCourse,
-  getCategoriesForForm,
-} from "../../../api/courseApi";
+import { getCourses, getCategoriesForForm } from "../../../api/courseApi";
 import api from "../../../api/axios";
 import SendCoursePdfModal from "./SendCoursePdfModal";
 
@@ -22,8 +18,13 @@ const CoursesList = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
   const [showHomeFilter, setShowHomeFilter] = useState("all");
+
+  // Search States
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const searchTimerRef = useRef(null); // Use ref for timer to avoid re-renders
+
   const [generatingPdf, setGeneratingPdf] = useState(null);
   const [deletingPdf, setDeletingPdf] = useState(null);
   const [showSendPdfModal, setShowSendPdfModal] = useState(false);
@@ -34,12 +35,26 @@ const CoursesList = () => {
     return saved ? JSON.parse(saved) : {};
   });
 
+  // 1. Improved Debounce Logic
+  useEffect(() => {
+    // Clear existing timer
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
+    // Set new timer
+    searchTimerRef.current = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(searchTimerRef.current);
+  }, [searchTerm]);
+
+  // 2. Fetch Logic
   const fetchCourses = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
         category: selectedCategory || undefined,
-        search: searchTerm || undefined,
+        search: debouncedSearchTerm || undefined,
         showOnHome:
           showHomeFilter !== "all"
             ? showHomeFilter === "yes"
@@ -49,11 +64,9 @@ const CoursesList = () => {
         all: "true",
       };
 
-      // Clean undefined
       Object.keys(params).forEach(
         (key) => params[key] === undefined && delete params[key],
       );
-
       const response = await getCourses(
         new URLSearchParams(params).toString(),
         true,
@@ -61,15 +74,13 @@ const CoursesList = () => {
 
       let data = Array.isArray(response) ? response : response?.data || [];
       if (!Array.isArray(data)) data = Object.values(data);
-
       setCourses(data);
     } catch (error) {
       toast.error("Failed to load courses");
-      setCourses([]);
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, searchTerm, showHomeFilter]);
+  }, [selectedCategory, debouncedSearchTerm, showHomeFilter]);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -87,6 +98,7 @@ const CoursesList = () => {
     localStorage.setItem("pdfUrls", JSON.stringify(pdfUrls));
   }, [pdfUrls]);
 
+  // UI Handlers
   const handleGeneratePdf = async (course) => {
     try {
       setGeneratingPdf(course._id);
@@ -123,57 +135,52 @@ const CoursesList = () => {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-48">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6">
-      {/* Header - More Compact */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Courses</h1>
-          <p className="text-xs text-gray-500">
-            Manage your course catalog and PDFs.
+          <h1 className="text-lg font-bold text-gray-900">Courses List</h1>
+          <p className="text-[11px] text-gray-500 uppercase tracking-wider">
+            Manage your content
           </p>
         </div>
         <Link
           to="new"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-sm font-medium transition shadow-sm"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded text-sm font-semibold transition shadow-sm"
         >
-          + Add Course
+          + Add New
         </Link>
       </div>
 
-      {/* Tighter Filter Bar */}
-      <div className="bg-white p-3 rounded shadow-sm border border-gray-100 flex flex-wrap gap-3 items-end mb-4">
-        <div className="w-full md:w-48">
-          <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">
-            Search
+      {/* Filter Bar */}
+      <div className="bg-white p-2.5 rounded-md border border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 shadow-sm">
+        <div className="">
+          <label className="text-[10px] font-bold text-gray-800 uppercase ml-1">
+            Search Database
           </label>
-          <div className="relative">
-            <FaSearch className="absolute left-2.5 top-2.5 text-gray-400 text-xs" />
+          <div className="relative mt-0.5">
+            <FaSearch className="absolute left-2.5 top-2.5 text-gray-400 text-[10px]" />
             <input
-              className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none"
-              placeholder="Search..."
+              className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded focus:border-indigo-400 outline-none transition-all"
+              placeholder="Search by title or level..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onBlur={() => setDebouncedSearchTerm(searchTerm)} // Immediate search on blur
             />
           </div>
         </div>
-        <div className="w-full md:w-40">
-          <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">
+
+        <div className="">
+          <label className="text-[10px] font-bold text-gray-800 uppercase ml-1">
             Category
           </label>
           <select
-            className="w-full py-1.5 text-sm border border-gray-200 rounded outline-none"
+            className="w-full mt-0.5 py-1.5 px-2 text-sm border border-gray-200 rounded outline-none text-gray-800 bg-gray-200 focus:bg-white"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            <option value="">All</option>
+            <option value="">All Categories</option>
             {categories.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
@@ -181,159 +188,152 @@ const CoursesList = () => {
             ))}
           </select>
         </div>
-        <div className="w-full md:w-32">
-          <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">
-            Visibility
+
+        <div className="">
+          <label className="text-[10px] font-bold text-gray-800 uppercase ml-1">
+            Home Feed
           </label>
           <select
-            className="w-full py-1.5 text-sm border border-gray-200 rounded outline-none"
+            className="w-full mt-0.5 py-1.5 px-2 text-sm border border-gray-200 rounded outline-none text-gray-800 bg-gray-200"
             value={showHomeFilter}
             onChange={(e) => setShowHomeFilter(e.target.value)}
           >
             <option value="all">All</option>
-            <option value="yes">On Home</option>
+            <option value="yes">Visible</option>
             <option value="no">Hidden</option>
           </select>
         </div>
       </div>
 
-      {/* Table - High Density */}
-      <div className="overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left text-[11px] font-bold text-gray-500 uppercase">
-                Course
-              </th>
-              <th className="px-3 py-2 text-left text-[11px] font-bold text-gray-500 uppercase">
-                Category
-              </th>
-              <th className="px-3 py-2 text-left text-[11px] font-bold text-gray-500 uppercase">
-                Price
-              </th>
-              <th className="px-3 py-2 text-left text-[11px] font-bold text-gray-500 uppercase">
-                Status
-              </th>
-              <th className="px-4 py-2 text-right text-[11px] font-bold text-gray-500 uppercase">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {courses.length === 0 ? (
+      {/* Main Table */}
+      <div className="border border-gray-200 rounded-md bg-white shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="h-32 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td
-                  colSpan="5"
-                  className="py-8 text-center text-sm text-gray-400"
-                >
-                  No courses found.
-                </td>
+                <th className="px-4 py-2 text-left text-[10px] font-bold text-gray-400 uppercase">
+                  Course Info
+                </th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold text-gray-400 uppercase">
+                  Category
+                </th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold text-gray-400 uppercase">
+                  Price
+                </th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold text-gray-400 uppercase">
+                  Status
+                </th>
+                <th className="px-4 py-2 text-right text-[10px] font-bold text-gray-400 uppercase">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              courses.map((course) => (
-                <tr
-                  key={course._id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-4 py-2.5 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {/* <img
-                        className="h-8 w-8 rounded object-cover border border-gray-100"
-                        src={course.thumbnail}
-                        alt=""
-                      /> */}
-                      <div className="ml-3">
-                        <div className="text-sm font-medium text-gray-900 leading-tight">
-                          {course.title}
-                        </div>
-                        <div className="text-[11px] text-gray-500 uppercase">
-                          {course.level}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-gray-600">
-                    {course.category?.name || "—"}
-                  </td>
-                  <td className="px-3 py-2.5 text-xs font-semibold text-gray-700">
-                    ₹{course.price?.toLocaleString()}
-                  </td>
-                  <td className="px-3 py-2.5 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                        course.isPublished
-                          ? "bg-green-100 text-green-700"
-                          : "bg-orange-100 text-orange-700"
-                      }`}
-                    >
-                      {course.isPublished ? "Live" : "Draft"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end space-x-1">
-                      <Link
-                        to={`/admin/courses/${course._id}/edit`}
-                        className="p-1.5 text-blue-500 hover:bg-blue-50 rounded"
-                        title="Edit"
-                      >
-                        <FaEdit size={14} />
-                      </Link>
-
-                      <button
-                        onClick={() => {
-                          setSelectedCourse(course);
-                          setShowSendPdfModal(true);
-                        }}
-                        className="p-1.5 text-emerald-500 hover:bg-emerald-50 rounded"
-                        title="Send PDF"
-                      >
-                        <FaPaperPlane size={14} />
-                      </button>
-
-                      {pdfUrls[course._id] ? (
-                        <>
-                          <a
-                            href={pdfUrls[course._id].url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 text-indigo-500 hover:bg-indigo-50 rounded"
-                            title="Download PDF"
-                          >
-                            <FaDownload size={14} />
-                          </a>
-                          <button
-                            onClick={() => handleDeletePdf(course)}
-                            disabled={deletingPdf === course._id}
-                            className="p-1.5 text-red-500 hover:bg-red-50 rounded"
-                          >
-                            {deletingPdf === course._id ? (
-                              <div className="h-3 w-3 animate-spin border-2 border-red-500 border-t-transparent rounded-full" />
-                            ) : (
-                              <FaTrash size={14} />
-                            )}
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => handleGeneratePdf(course)}
-                          disabled={generatingPdf === course._id}
-                          className="p-1.5 text-gray-400 hover:bg-gray-50 rounded"
-                          title="Generate PDF"
-                        >
-                          {generatingPdf === course._id ? (
-                            <div className="h-3 w-3 animate-spin border-2 border-indigo-500 border-t-transparent rounded-full" />
-                          ) : (
-                            <FaFilePdf size={14} />
-                          )}
-                        </button>
-                      )}
-                    </div>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {courses.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="py-10 text-center text-xs text-gray-400 uppercase tracking-widest"
+                  >
+                    No matching results
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                courses.map((course) => (
+                  <tr
+                    key={course._id}
+                    className="hover:bg-indigo-50/30 transition-colors"
+                  >
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div className="text-sm font-semibold text-gray-800">
+                        {course.title}
+                      </div>
+                      <div className="text-[10px] text-gray-400 uppercase font-medium">
+                        {course.level}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-gray-600">
+                      {course.category?.name || "—"}
+                    </td>
+                    <td className="px-3 py-2 text-xs font-mono text-gray-700">
+                      ₹{course.price?.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-tighter ${
+                          course.isPublished
+                            ? "bg-green-100 text-green-700 border border-green-200"
+                            : "bg-orange-100 text-orange-700 border border-orange-200"
+                        }`}
+                      >
+                        {course.isPublished ? "Published" : "Draft"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end space-x-1">
+                        <Link
+                          to={`/admin/courses/${course._id}/edit`}
+                          className="p-1.5 text-blue-500 hover:bg-white border border-transparent hover:border-blue-100 rounded shadow-sm"
+                          title="Edit"
+                        >
+                          <FaEdit size={12} />
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            setShowSendPdfModal(true);
+                          }}
+                          className="p-1.5 text-emerald-500 hover:bg-white border border-transparent hover:border-emerald-100 rounded shadow-sm"
+                        >
+                          <FaPaperPlane size={12} />
+                        </button>
+                        {pdfUrls[course._id] ? (
+                          <>
+                            <a
+                              href={pdfUrls[course._id].url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-indigo-500 hover:bg-white border border-transparent hover:border-indigo-100 rounded shadow-sm"
+                            >
+                              <FaDownload size={12} />
+                            </a>
+                            <button
+                              onClick={() => handleDeletePdf(course)}
+                              disabled={deletingPdf === course._id}
+                              className="p-1.5 text-red-500 hover:bg-white border border-transparent hover:border-red-100 rounded shadow-sm"
+                            >
+                              {deletingPdf === course._id ? (
+                                <div className="h-3 w-3 animate-spin border-2 border-red-500 border-t-transparent rounded-full" />
+                              ) : (
+                                <FaTrash size={12} />
+                              )}
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => handleGeneratePdf(course)}
+                            disabled={generatingPdf === course._id}
+                            className="p-1.5 text-gray-400 hover:bg-white border border-transparent hover:border-gray-200 rounded shadow-sm"
+                          >
+                            {generatingPdf === course._id ? (
+                              <div className="h-3 w-3 animate-spin border-2 border-indigo-500 border-t-transparent rounded-full" />
+                            ) : (
+                              <FaFilePdf size={12} />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {selectedCourse && (
