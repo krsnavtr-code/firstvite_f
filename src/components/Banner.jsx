@@ -11,10 +11,10 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 const bannerImg =
-  "http://eklabya.com/api/upload/file/img-1752554019521-300496356.png";
+  "http://eklabya.com/api/upload/file/banner-5383.jpg";
 
 const logoImg =
-  "http://eklabya.com/api/upload/file/img-1770747893067-165906548.png";
+  "http://eklabya.com/api/upload/file/eKlabya-0644.png";
 import "./Banner.css";
 import "../styles/typography.css";
 
@@ -84,7 +84,7 @@ const CertificateModal = ({ isOpen, onClose }) => {
                 className="certificate-image-container"
                 style={{
                   backgroundImage:
-                    "url('http://eklabya.com/api/upload/file/img-1771581581607-86374644.png')",
+                    "url('http://eklabya.com/api/upload/file/eklabya-certificate-4563.png')",
                   backgroundSize: "contain",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
@@ -248,7 +248,7 @@ function Banner() {
           {/* Right Content */}
           <div className="lg:w-1/2 mt-8 lg:mt-0">
             <div className="relative">
-              <div className="w-[90%] hidden lg:block mx-auto mask-inset-corners hover:scale-105 transition-transform duration-500 shadow-xl dark:shadow-gray-900/50">
+              <div className="w-[80%] hidden lg:block mx-auto mask-inset-corners hover:scale-105 transition-transform duration-500 shadow-xl dark:shadow-gray-900/50">
                 <img
                   src={bannerImg}
                   alt="Skill Development and Online Training Courses"

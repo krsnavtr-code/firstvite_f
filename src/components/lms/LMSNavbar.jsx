@@ -82,7 +82,7 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
         <Link to="/lms">
           <div className="h-10 p-1 overflow-hidden group-hover:scale-105 transition-transform">
             <img
-              src="http://eklabya.com/api/upload/file/img-1771494820692-744915490.png"
+              src="http://eklabya.com/api/upload/file/eKlabya-0644.png"
               alt="Logo"
               className="object-cover w-full h-full rounded"
             />
