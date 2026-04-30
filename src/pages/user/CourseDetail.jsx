@@ -563,7 +563,7 @@ const CourseDetail = () => {
                   className="certificate-image-container"
                   style={{
                     backgroundImage:
-                      "url('http://eklabya.com/api/upload/file/img-1771581581607-86374644.png')",
+                      "url('https://www.eklabya.com/api/upload/file/img-1771581581607-86374644.png')",
                     backgroundSize: "contain",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
@@ -608,7 +608,8 @@ const CourseDetail = () => {
     : "Course Details | Eklabya center of excellence";
 
   const seoDescription =
-    course?.metaDescription || "Learn valuable skills with our comprehensive course.";
+    course?.metaDescription ||
+    "Learn valuable skills with our comprehensive course.";
 
   const seoKeywords =
     course?.metaKeywords ||
@@ -616,8 +617,8 @@ const CourseDetail = () => {
 
   const courseImage = course?.imageUrl || "/images/eklabya-logo-fit-E.jpeg";
   const canonicalUrl = course
-    ? `https://eklabya.com/course/${course._id || course.slug || id}`
-    : "https://eklabya.com/courses";
+    ? `https://www.eklabya.com/course/${course._id || course.slug || id}`
+    : "https://www.eklabya.com/courses";
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
@@ -841,7 +842,7 @@ const CourseDetail = () => {
                       Sample Certificate
                     </p>
                     <img
-                      src="http://eklabya.com/api/upload/file/img-1754374737042-580116956.jpg"
+                      src="https://www.eklabya.com/api/upload/file/img-1754374737042-580116956.jpg"
                       alt="Course Certificate Sample"
                       className="w-full h-auto rounded border border-gray-200 dark:border-gray-700"
                       onError={(e) => {
@@ -932,9 +933,7 @@ const CourseDetail = () => {
 
                   {course.previewVideo && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pb-4 justify-center">
-                      <button
-                        className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-full font-medium transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300 hover:bg-blue-50"
-                      >
+                      <button className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-full font-medium transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300 hover:bg-blue-50">
                         <FaPlay className="mr-2" />
                         Watch Preview
                       </button>

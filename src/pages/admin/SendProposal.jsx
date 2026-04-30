@@ -41,7 +41,7 @@ Thank you & Best Regards,
 <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</span>
 📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://www.eklabya.com</span>
 </div>`,
 
   studentMessage: `<div style="color: #4DA3FF; font-size: 18px;">
@@ -64,7 +64,7 @@ This event is designed to help you kickstart your career journey with opportunit
 
 📝 <span style="font-weight: 600;">Register Now:</span>
 Click the link below to secure your spot:
-👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://eklabya.com/jobfair/apply/student">Register Now</a></span>
+👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://www.eklabya.com/jobfair/apply/student">Register Now</a></span>
 
 📅 Event Details will be sent to your email after registration.
 Organized by: <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</span>
@@ -76,7 +76,7 @@ Warm regards,
 <strong style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</strong>
 📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://www.eklabya.com</span>
 </div>`,
 
   collegeMessage: `<div style="color: #4DA3FF; font-size: 18px;">
@@ -95,7 +95,7 @@ Free participation (no registration or hidden fees)
 Certificates and recognition for participants
 
 To participation provide this to your students, please fill out the short form below:
-👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://eklabya.com/jobfair/apply/student">Register Now</a></span>
+👉 <span style="font-weight: 600; color: #007BFF;"><a href="https://www.eklabya.com/jobfair/apply/student">Register Now</a></span>
 
 Our team will get in touch with you for further coordination and provide detailed schedules.
 We look forward to having your institution join us in empowering the next generation of professionals.
@@ -104,7 +104,7 @@ Warm regards,
 <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</span>
 📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://www.eklabya.com</span>
 </div>`,
 
   companyMessage: `<div style="color: #4DA3FF; font-size: 18px;">
@@ -125,7 +125,7 @@ We would be honoured to have participate in this Job Fair and connect with some 
 
 🏫 For Registration kindly fill out this short form:
 👉 <span style="font-weight: 600; color: #007BFF;">
-<a href="https://eklabya.com/jobfair/apply/company">Register Now</a></span>
+<a href="https://www.eklabya.com/jobfair/apply/company">Register Now</a></span>
 
 💼 Participation Fee: ₹4000 + GST (includes personal hiring space)
 
@@ -135,7 +135,7 @@ Warm regards,
 <span style="font-weight: 600;"><span style="color: rgb(30, 144, 255)">e</span><span style="color: rgb(244, 124, 38)">LABYA</span> center of excellence Pvt. Ltd.</span>
 📞 <span style="font-weight: 600; color: #007BFF;">9891030303</span> 
 📧 <span style="font-weight: 600; color: #007BFF;">info@eklabya.com</span>
-🌐 <span style="font-weight: 600; color: #007BFF;">https://eklabya.com</span>
+🌐 <span style="font-weight: 600; color: #007BFF;">https://www.eklabya.com</span>
 </div>`,
 };
 

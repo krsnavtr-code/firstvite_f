@@ -540,7 +540,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 4px 0;">📩 info@eklabya.com</p>
   <p style="margin: 0;">
     🌐 
-    <a href="https://eklabya.com" style="color: rgb(30, 144, 255); text-decoration: none;">
+    <a href="https://www.eklabya.com" style="color: rgb(30, 144, 255); text-decoration: none;">
       www.eklabya.com
     </a>
   </p>
@@ -598,7 +598,7 @@ const SendBrochure = () => {
   <p style="margin: 0 0 4px 0;">📩 info@eklabya.com</p>
   <p style="margin: 0;">
     🌐 
-    <a href="https://eklabya.com" style="color: rgb(30, 144, 255); text-decoration: none;">
+    <a href="https://www.eklabya.com" style="color: rgb(30, 144, 255); text-decoration: none;">
       www.eklabya.com
     </a>
   </p>
@@ -658,7 +658,7 @@ const SendBrochure = () => {
     <span style="color: rgb(244, 124, 38);">KLABYA</span> center of excellence Pvt. Ltd.
   </p>
   <p style="margin: 0 0 4px 0;">📩 info@eklabya.com</p>
-  <p style="margin: 0;">🌐 <a href="https://eklabya.com" style="color: rgb(30, 144, 255); text-decoration: none;">www.eklabya.com</a></p>
+  <p style="margin: 0;">🌐 <a href="https://www.eklabya.com" style="color: rgb(30, 144, 255); text-decoration: none;">www.eklabya.com</a></p>
 </div>
 `,
       },

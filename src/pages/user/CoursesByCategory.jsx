@@ -118,8 +118,8 @@ const CoursesByCategory = () => {
     ? `${formattedCategoryName} courses, ${formattedCategoryName} training, ${formattedCategoryName} certification, online ${formattedCategoryName} courses`
     : "online courses, professional courses, certification, skills training, career development";
   const canonicalUrl = category
-    ? `https://eklabya.com/courses/category/${categoryName}`
-    : "https://eklabya.com/courses";
+    ? `https://www.eklabya.com/courses/category/${categoryName}`
+    : "https://www.eklabya.com/courses";
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
