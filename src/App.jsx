@@ -224,7 +224,7 @@ function App() {
           />
 
           <Route
-            path="/:categoryName/courses"
+            path="/courses/:categoryName"
             element={
               <MainLayout>
                 <CoursesByCategory />
