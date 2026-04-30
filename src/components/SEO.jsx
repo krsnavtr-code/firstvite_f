@@ -25,7 +25,7 @@ const SEO = ({
   title = "eklabya - Online Learning Platform",
   description = "eklabya centre of excellence offers professional and management courses, including short programs and degree collaborations with international universities.",
   keywords = "online courses, e-learning, professional courses, management courses, online education, eklabya, skill development",
-  canonical = "",
+  canonical,
   robots = "index, follow",
   og = {},
   twitter = {},
@@ -33,6 +33,11 @@ const SEO = ({
   const siteName = "eklabya";
   const siteUrl = "https://eklabya.com";
   const defaultImage = `${siteUrl}/images/firstvite-logo.png`;
+
+  // Auto-generate canonical URL from current page if not provided
+  const canonicalUrl =
+    canonical ||
+    (typeof window !== "undefined" ? window.location.href : siteUrl);
 
   // Default Open Graph values
   const ogTitle = og.title || title;
@@ -54,7 +59,7 @@ const SEO = ({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="robots" content={robots} />
-      {canonical && <link rel="canonical" href={canonical} />}
+      <link rel="canonical" href={canonicalUrl} />
 
       {/* Open Graph / Facebook */}
       <meta property="og:title" content={ogTitle} />
