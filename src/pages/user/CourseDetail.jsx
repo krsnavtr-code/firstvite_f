@@ -617,7 +617,7 @@ const CourseDetail = () => {
 
   const courseImage = course?.imageUrl || "/images/eklabya-logo-fit-E.jpeg";
   const canonicalUrl = course
-    ? `https://www.eklabya.com/course/${course._id || course.slug || id}`
+    ? `https://www.eklabya.com/course/${course.slug || course._id || id}`
     : "https://www.eklabya.com/courses";
 
   return (

@@ -118,7 +118,7 @@ const CoursesByCategory = () => {
     ? `${formattedCategoryName} courses, ${formattedCategoryName} training, ${formattedCategoryName} certification, online ${formattedCategoryName} courses`
     : "online courses, professional courses, certification, skills training, career development";
   const canonicalUrl = category
-    ? `https://www.eklabya.com/courses/category/${categoryName}`
+    ? `https://www.eklabya.com/${categoryName}/courses`
     : "https://www.eklabya.com/courses";
 
   return (
@@ -213,7 +213,7 @@ const CoursesByCategory = () => {
                     .map((cat) => (
                       <li key={cat._id}>
                         <Link
-                          to={`/courses/category/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                          to={`/${cat.name.toLowerCase().replace(/\s+/g, "-")}/courses`}
                           className={`block px-1 py-0 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
                             category?._id === cat._id
                               ? "bg-blue-50 text-blue-600 font-medium"

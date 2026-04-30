@@ -149,7 +149,7 @@ const AllCategories = () => {
           {categories.map((category) => (
             <Link
               key={category._id}
-              to={`/category/${category.name.toLowerCase().replace(/\s+/g, "-")}`}
+              to={`/${category.name.toLowerCase().replace(/\s+/g, "-")}/courses`}
               className="group block bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1"
             >
               <div className="p-6">
