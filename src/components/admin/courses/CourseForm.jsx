@@ -329,7 +329,6 @@ export const CourseForm = ({ isEdit = false }) => {
       metaTitle: "",
       metaDescription: "",
       metaKeywords: "",
-      benefits: ["", "", ""],
       category: "",
       instructor: "",
       isFree: false,
@@ -348,7 +347,6 @@ export const CourseForm = ({ isEdit = false }) => {
       image: "",
       thumbnail: "",
       previewVideo: "",
-      benefits: ["No specific benefits listed"],
       whatYouWillLearn: ["Learn valuable skills"],
       requirements: ["No special requirements"],
       whoIsThisFor: ["Anyone interested in learning"],
@@ -444,7 +442,6 @@ export const CourseForm = ({ isEdit = false }) => {
 
             // Log the form values after reset to verify
             const formValues = getValues();
-            
           } catch (error) {
             console.error("Error loading course data:", error);
             toast.error("Failed to load course data. Please try again.");
@@ -625,13 +622,6 @@ export const CourseForm = ({ isEdit = false }) => {
                 topics: ["Course introduction"],
               },
             ],
-        // Ensure boolean fields are properly set
-        certificateIncluded: formData.certificateIncluded !== false,
-        isFeatured:
-          formData.isFeatured === true || formData.isFeatured === "true",
-        isPublished:
-          formData.isPublished === true || formData.isPublished === "true",
-        // Ensure required fields have values
         level: ["Beginner", "Intermediate", "Advanced"].includes(formData.level)
           ? formData.level
           : "Beginner",

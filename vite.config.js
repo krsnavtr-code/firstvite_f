@@ -36,7 +36,25 @@ export default defineConfig({
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    sourcemap: true,
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          antd: ["antd", "@ant-design/compatible"],
+          motion: ["framer-motion"],
+          router: ["react-router-dom"],
+          ui: ["react-hot-toast", "react-toastify"],
+          icons: [
+            "react-icons",
+            "lucide-react",
+            "@fortawesome/fontawesome-free",
+          ],
+          utils: ["axios", "dayjs", "date-fns", "lodash.debounce"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
   },
   preview: {
     port: 4173, // Preview server port
