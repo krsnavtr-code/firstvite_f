@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import * as adminApi from "../../api/adminApi";
 
 const AdminLayout = () => {
-  const { currentUser, isAuthenticated, loading } = useAuth();
+  const { currentUser, isAuthenticated, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [availablePages, setAvailablePages] = useState([]);
 
@@ -38,7 +38,7 @@ const AdminLayout = () => {
   };
 
   const handleLogout = () => {
-    navigate("/login");
+    logout();
   };
 
   // Show loading state
