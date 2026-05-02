@@ -23,106 +23,23 @@ import {
   FileTextOutlined,
 } from "@ant-design/icons";
 
-// ... (Keep the usePreventNavigation hook exactly as it was) ...
-const usePreventNavigation = (prevent, handleSubmit) => {
+// Simplified navigation hook - only shows warning before unload, no back button hijacking
+const usePreventNavigation = (prevent) => {
   useEffect(() => {
+    if (!prevent) return;
+
     const handleBeforeUnload = (e) => {
-      if (!warningShown) {
-        e.preventDefault();
-        const message =
-          "Are you sure you want to leave? Your test progress will be lost.";
-        e.returnValue = message;
-        return message;
-      }
+      e.preventDefault();
+      const message =
+        "Are you sure you want to leave? Your test progress will be lost.";
+      e.returnValue = message;
+      return message;
     };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        const firstChoice = confirm(
-          "⚠️ Test Security Alert!\n\n" +
-            "You have switched away from the test window.\n" +
-            "This is a violation of test rules.\n\n" +
-            "Click OK to submit the test now.\n" +
-            "Click Cancel to restart the test."
-        );
-
-        if (firstChoice) {
-          const finalConfirm = confirm(
-            "❗ Final Confirmation\n\n" +
-              "Are you sure you want to submit the test?\n\n" +
-              "This action cannot be undone."
-          );
-
-          if (finalConfirm && handleSubmit) {
-            handleSubmit(true);
-          }
-        } else {
-          alert("⚠️ Test will restart now.");
-          window.location.reload();
-        }
-      } else {
-        document.title = originalTitle;
-      }
-    };
-
-    const disableShortcuts = (e) => {
-      if (
-        (e.ctrlKey &&
-          e.shiftKey &&
-          (e.key === "I" || e.key === "J" || e.key === "C")) ||
-        e.key === "F12" ||
-        (e.ctrlKey && e.key === "u")
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    };
-
-    if (!prevent) {
-      const cleanup = () => {
-        window.removeEventListener("beforeunload", handleBeforeUnload);
-        window.removeEventListener("visibilitychange", handleVisibilityChange);
-        document.removeEventListener("contextmenu", (e) => e.preventDefault());
-        document.removeEventListener("keydown", disableShortcuts);
-      };
-      return cleanup;
-    }
-
-    const originalTitle = document.title;
-    let warningShown = false;
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("visibilitychange", handleVisibilityChange);
-    document.addEventListener("contextmenu", (e) => e.preventDefault());
-    document.addEventListener("keydown", disableShortcuts);
-
-    const handleResetWarning = (e) => {
-      if (
-        !confirm(
-          "Are you sure you want to reset your test? All progress will be lost."
-        )
-      ) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-
-    const testResetButtons = document.querySelectorAll(
-      'button[onclick*="resetTest"], button[class*="reset"]'
-    );
-    testResetButtons.forEach((button) => {
-      button.addEventListener("click", handleResetWarning);
-    });
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
-      document.removeEventListener("contextmenu", (e) => e.preventDefault());
-      document.removeEventListener("keydown", disableShortcuts);
-      testResetButtons.forEach((button) => {
-        button.removeEventListener("click", handleResetWarning);
-      });
-      document.title = originalTitle;
     };
   }, [prevent]);
 };
@@ -211,7 +128,7 @@ const ScholarshipTest = () => {
         setIsLoading(false);
       }
     },
-    [answers, questions, navigate, currentUser, location.pathname]
+    [answers, questions, navigate, currentUser, location.pathname],
   );
 
   usePreventNavigation(
@@ -220,7 +137,6 @@ const ScholarshipTest = () => {
       !showReview &&
       questions.length > 0 &&
       !isLoading,
-    handleSubmit
   );
 
   const handleBackToTest = () => setShowReview(false);
@@ -288,7 +204,6 @@ const ScholarshipTest = () => {
 
   // --- Fetch Questions ---
   useEffect(() => {
-    const unblock = history.pushState(null, "", location.pathname);
     const fetchQuestions = async () => {
       try {
         const data = await getTestQuestions();
@@ -302,7 +217,6 @@ const ScholarshipTest = () => {
     fetchQuestions();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (unblock) unblock();
     };
   }, [location]);
 
@@ -417,7 +331,8 @@ const ScholarshipTest = () => {
           keywords="scholarship test, scholarship evaluation, online test, Eklabya scholarship, student scholarship"
           og={{
             title: "Scholarship Test | Eklabya Centre of Excellence",
-            description: "Apply for the Eklabya Centre of Excellence Scholarship Test and unlock academic excellence with merit-based rewards, career guidance, and expert mentoring.",
+            description:
+              "Apply for the Eklabya Centre of Excellence Scholarship Test and unlock academic excellence with merit-based rewards, career guidance, and expert mentoring.",
             type: "article",
           }}
         />
@@ -464,10 +379,10 @@ const ScholarshipTest = () => {
 
               <div className="space-y-6 text-gray-700 leading-relaxed text-sm md:text-base">
                 <p>
-                  The Eklabya Scholarship Evaluation Test is designed to
-                  ensure a fair, transparent, and merit-based assessment process
-                  for all candidates. Before starting the online scholarship
-                  test, applicants must carefully read and follow all rules and
+                  The Eklabya Scholarship Evaluation Test is designed to ensure
+                  a fair, transparent, and merit-based assessment process for
+                  all candidates. Before starting the online scholarship test,
+                  applicants must carefully read and follow all rules and
                   policies mentioned below.
                 </p>
 
@@ -477,8 +392,8 @@ const ScholarshipTest = () => {
                       Time Management
                     </h4>
                     <p className="text-sm text-gray-600">
-                      Each question in the Eklabya scholarship exam has a
-                      strict time limit. Once the time expires, the system will
+                      Each question in the Eklabya scholarship exam has a strict
+                      time limit. Once the time expires, the system will
                       automatically move to the next question, and unanswered
                       questions cannot be revisited. Candidates are advised to
                       manage time efficiently to achieve the best score.
@@ -576,7 +491,7 @@ const ScholarshipTest = () => {
 
   // 6. Active Test Interface
   const progressPercent = Math.round(
-    ((currentQuestionIndex + 1) / questions.length) * 100
+    ((currentQuestionIndex + 1) / questions.length) * 100,
   );
   const isTimeCritical = timeLeft <= 10;
 
