@@ -81,7 +81,7 @@ const MainLayout = ({ children }) => {
   // Check if the current route is an admin route
   const isAdminRoute = location.pathname.startsWith("/admin");
   // Check if the current route is an LMS route
-  const isLMSRoute = location.pathname.startsWith("/lms");
+  const isLMSRoute = location.pathname.startsWith("/smart-board");
   // Check if the current route is login, register, forgot-password, reset-password, or jobfair
   const isAuthRoute =
     location.pathname.startsWith("/login") ||
@@ -402,13 +402,13 @@ function App() {
                 requireLMS={true}
                 allowedRoles={["student", "admin"]}
               >
-                <Navigate to="/lms" replace />
+                <Navigate to="/smart-board" replace />
               </PrivateRoute>
             }
           />
 
           <Route
-            path="/lms"
+            path="/smart-board"
             element={
               <PrivateRoute
                 requireLMS={true}

@@ -49,14 +49,14 @@ const Dashboard = () => {
               e?.status === "in_progress" ||
               e?.completionStatus === "in_progress") &&
             e?.progress > 0 &&
-            e?.progress < 100
+            e?.progress < 100,
         ).length;
 
         const completedCount = enrollments.filter(
           (e) =>
             e?.progress === 100 ||
             e?.status === "completed" ||
-            e?.completionStatus === "completed"
+            e?.completionStatus === "completed",
         ).length;
 
         // Calculate total hours (example: 1 hour per course)
@@ -81,7 +81,7 @@ const Dashboard = () => {
   }, [enrollments.length]); // Only re-run when enrollments change
 
   const handleContinueLearning = (courseId) => {
-    navigate(`/lms/courses/${courseId}`);
+    navigate(`/smart-board/courses/${courseId}`);
   };
 
   const renderEnrollmentCard = (enrollment) => {
@@ -95,7 +95,7 @@ const Dashboard = () => {
       ? new Date(enrollment.lastAccessed).toLocaleDateString()
       : "Never";
     const isEnrolled = ["enrolled", "in_progress", "completed"].includes(
-      enrollment.status
+      enrollment.status,
     );
     const completedLessons = enrollment.completedLessons || 0;
     const totalLessons = course.lessons?.length || 0;
@@ -209,7 +209,9 @@ const Dashboard = () => {
                 </span>
                 <Button
                   type="primary"
-                  onClick={() => navigate(`/lms/courses/${course.id}/enroll`)}
+                  onClick={() =>
+                    navigate(`/smart-board/courses/${course.id}/enroll`)
+                  }
                 >
                   Enroll Now
                 </Button>
@@ -324,7 +326,7 @@ const Dashboard = () => {
                   Invite friends & earn exciting rewards
                 </p>
                 <Link
-                  to="/lms/refer-and-earn"
+                  to="/smart-board/refer-and-earn"
                   className="inline-block px-5 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-full shadow hover:bg-blue-700 transition"
                 >
                   Click Here
@@ -386,7 +388,10 @@ const Dashboard = () => {
                 description="You haven't enrolled in any courses yet"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
               >
-                <Button type="primary" onClick={() => navigate("/lms/courses")}>
+                <Button
+                  type="primary"
+                  onClick={() => navigate("/smart-board/courses")}
+                >
                   Browse Courses
                 </Button>
               </Empty>

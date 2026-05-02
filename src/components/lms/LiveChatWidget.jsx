@@ -155,19 +155,29 @@ function getBotReply(text, userId) {
 }
 
 export default function LiveChatWidget({ open, onClose }) {
-  const [messages, setMessages] = usePersistentState("lms_chat_messages", defaultWelcome);
+  const [messages, setMessages] = usePersistentState(
+    "lms_chat_messages",
+    defaultWelcome,
+  );
   const [input, setInput] = useState("");
   const [isMin, setIsMin] = usePersistentState("lms_chat_min", false);
   const [userId, setUserId] = usePersistentState("lms_chat_user_id", "");
   const [isTyping, setIsTyping] = useState(false);
-  const [sessionId, setSessionId] = usePersistentState("lms_chat_session_id", "");
+  const [sessionId, setSessionId] = usePersistentState(
+    "lms_chat_session_id",
+    "",
+  );
   const listRef = useRef(null);
   const navigate = useNavigate();
 
-  const getUnread = () => Number(localStorage.getItem('lms_chat_unread') || 0);
+  const getUnread = () => Number(localStorage.getItem("lms_chat_unread") || 0);
   const setUnread = (val) => {
-    localStorage.setItem('lms_chat_unread', String(val));
-    try { window.dispatchEvent(new CustomEvent('lms-chat-unread', { detail: { count: val } })); } catch {}
+    localStorage.setItem("lms_chat_unread", String(val));
+    try {
+      window.dispatchEvent(
+        new CustomEvent("lms-chat-unread", { detail: { count: val } }),
+      );
+    } catch {}
   };
   const incUnreadIfClosed = () => {
     if (!open) setUnread(getUnread() + 1);
@@ -208,7 +218,12 @@ export default function LiveChatWidget({ open, onClose }) {
         try {
           const data = await chatApi.getMessages(sessionId, 200);
           if (Array.isArray(data) && data.length) {
-            const mapped = data.map(d => ({ id: d._id || `${d.role}-${d.ts}`, role: d.role, text: d.text, ts: new Date(d.ts).getTime() }));
+            const mapped = data.map((d) => ({
+              id: d._id || `${d.role}-${d.ts}`,
+              role: d.role,
+              text: d.text,
+              ts: new Date(d.ts).getTime(),
+            }));
             setMessages(mapped);
             // viewing history clears unread locally too
             setUnread(0);
@@ -227,10 +242,13 @@ export default function LiveChatWidget({ open, onClose }) {
   }, [open, sessionId]);
 
   const endChat = async (close = true) => {
-    try { if (sessionId) await chatApi.endSession(sessionId); } catch {}
+    try {
+      if (sessionId) await chatApi.endSession(sessionId);
+    } catch {}
     setMessages(defaultWelcome);
     // also reset call flow for this user if exists
-    if (userId && callRequest[userId]) callRequest[userId] = { step: 0, language: null, number: null };
+    if (userId && callRequest[userId])
+      callRequest[userId] = { step: 0, language: null, number: null };
     // rotate session id for a fresh conversation
     const sid = `sess-${Math.random().toString(36).slice(2, 8)}-${Date.now()}`;
     setSessionId(sid);
@@ -239,17 +257,29 @@ export default function LiveChatWidget({ open, onClose }) {
 
   const handleCallNavigate = () => {
     // Add a short bot message before navigating
-    const botMsg = { id: `b-${Date.now()}`, role: "bot", text: "Opening callback request page...", ts: Date.now() };
-    setMessages(prev => [
-      ...prev,
-      botMsg,
-    ]);
+    const botMsg = {
+      id: `b-${Date.now()}`,
+      role: "bot",
+      text: "Opening callback request page...",
+      ts: Date.now(),
+    };
+    setMessages((prev) => [...prev, botMsg]);
     // persist bot message
-    chatApi.saveMessage({ sessionId, userId, role: 'bot', text: botMsg.text, ts: botMsg.ts }).catch(() => {});
+    chatApi
+      .saveMessage({
+        sessionId,
+        userId,
+        role: "bot",
+        text: botMsg.text,
+        ts: botMsg.ts,
+      })
+      .catch(() => {});
     incUnreadIfClosed();
     // create a handoff record
-    chatApi.createHandoff(sessionId, 'User requested callback via quick action').catch(() => {});
-    setTimeout(() => navigate("/lms/callback"), 300);
+    chatApi
+      .createHandoff(sessionId, "User requested callback via quick action")
+      .catch(() => {});
+    setTimeout(() => navigate("/smart-board/callback"), 300);
   };
 
   const send = () => {
@@ -257,33 +287,83 @@ export default function LiveChatWidget({ open, onClose }) {
     if (!text) return;
 
     // Commands to end/close chat
-    if (/^(end|close|quit) chat$/i.test(text) || /^(end|close|quit)$/i.test(text)) {
-      const userMsg = { id: `u-${Date.now()}`, role: "user", text, ts: Date.now() };
-      const botEnd = { id: `b-${Date.now()+1}`, role: "bot", text: "Chat ended. Have a great day!", ts: Date.now()+1 };
-      setMessages(prev => [...prev, userMsg, botEnd]);
-      chatApi.saveMessage({ sessionId, userId, role: 'user', text: userMsg.text, ts: userMsg.ts }).catch(() => {});
-      chatApi.saveMessage({ sessionId, userId, role: 'bot', text: botEnd.text, ts: botEnd.ts }).catch(() => {});
+    if (
+      /^(end|close|quit) chat$/i.test(text) ||
+      /^(end|close|quit)$/i.test(text)
+    ) {
+      const userMsg = {
+        id: `u-${Date.now()}`,
+        role: "user",
+        text,
+        ts: Date.now(),
+      };
+      const botEnd = {
+        id: `b-${Date.now() + 1}`,
+        role: "bot",
+        text: "Chat ended. Have a great day!",
+        ts: Date.now() + 1,
+      };
+      setMessages((prev) => [...prev, userMsg, botEnd]);
+      chatApi
+        .saveMessage({
+          sessionId,
+          userId,
+          role: "user",
+          text: userMsg.text,
+          ts: userMsg.ts,
+        })
+        .catch(() => {});
+      chatApi
+        .saveMessage({
+          sessionId,
+          userId,
+          role: "bot",
+          text: botEnd.text,
+          ts: botEnd.ts,
+        })
+        .catch(() => {});
       setInput("");
       setTimeout(() => endChat(true), 400);
       return;
     }
 
-    const userMsg = { id: `u-${Date.now()}`, role: "user", text, ts: Date.now() };
-    setMessages(prev => [...prev, userMsg]);
-    chatApi.saveMessage({ sessionId, userId, role: 'user', text, ts: userMsg.ts }).catch(() => {});
+    const userMsg = {
+      id: `u-${Date.now()}`,
+      role: "user",
+      text,
+      ts: Date.now(),
+    };
+    setMessages((prev) => [...prev, userMsg]);
+    chatApi
+      .saveMessage({ sessionId, userId, role: "user", text, ts: userMsg.ts })
+      .catch(() => {});
     setInput("");
     setTimeout(() => {
       setIsTyping(true);
       const reply = getBotReply(text, userId || "anon");
-      const botMsg = { id: `b-${Date.now()}`, role: "bot", text: reply, ts: Date.now() };
-      setMessages(prev => [
-        ...prev,
-        botMsg,
-      ]);
-      chatApi.saveMessage({ sessionId, userId, role: 'bot', text: reply, ts: botMsg.ts }).catch(() => {});
+      const botMsg = {
+        id: `b-${Date.now()}`,
+        role: "bot",
+        text: reply,
+        ts: Date.now(),
+      };
+      setMessages((prev) => [...prev, botMsg]);
+      chatApi
+        .saveMessage({
+          sessionId,
+          userId,
+          role: "bot",
+          text: reply,
+          ts: botMsg.ts,
+        })
+        .catch(() => {});
       // If bot suggests human agent, create a handoff
-      if (/human agent|talk to (an )?agent|connect you to a human/i.test(reply)) {
-        chatApi.createHandoff(sessionId, 'Bot suggested human agent').catch(() => {});
+      if (
+        /human agent|talk to (an )?agent|connect you to a human/i.test(reply)
+      ) {
+        chatApi
+          .createHandoff(sessionId, "Bot suggested human agent")
+          .catch(() => {});
       }
       incUnreadIfClosed();
       setIsTyping(false);
@@ -297,7 +377,7 @@ export default function LiveChatWidget({ open, onClose }) {
       "Refund policy",
       "Get certificate",
     ],
-    []
+    [],
   );
 
   if (!open) return null;
@@ -310,7 +390,8 @@ export default function LiveChatWidget({ open, onClose }) {
           <div className="flex items-center gap-2">
             <span className="font-semibold">Live Chat</span>
             <span className="flex items-center gap-1 text-xs opacity-90">
-              <span className="inline-block w-2 h-2 rounded-full bg-green-400" /> Online
+              <span className="inline-block w-2 h-2 rounded-full bg-green-400" />{" "}
+              Online
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -328,19 +409,33 @@ export default function LiveChatWidget({ open, onClose }) {
             >
               ⎋
             </button>
-            <button onClick={onClose} className="hover:bg-white/20 rounded px-2 py-1" aria-label="Close">×</button>
+            <button
+              onClick={onClose}
+              className="hover:bg-white/20 rounded px-2 py-1"
+              aria-label="Close"
+            >
+              ×
+            </button>
           </div>
         </div>
 
         {/* Body */}
         {!isMin && (
           <>
-            <div ref={listRef} className="h-64 overflow-y-auto px-3 py-2 space-y-2 bg-gray-50">
-              {messages.map(m => (
-                <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div
+              ref={listRef}
+              className="h-64 overflow-y-auto px-3 py-2 space-y-2 bg-gray-50"
+            >
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                >
                   <div
                     className={`max-w-[85%] px-3 py-2 rounded-lg whitespace-pre-wrap break-words ${
-                      m.role === "user" ? "bg-blue-600 text-white rounded-br-none" : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
+                      m.role === "user"
+                        ? "bg-blue-600 text-white rounded-br-none"
+                        : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                     }`}
                     title={new Date(m.ts).toLocaleString()}
                   >
@@ -352,9 +447,18 @@ export default function LiveChatWidget({ open, onClose }) {
                 <div className="flex justify-start">
                   <div className="bg-white border border-gray-200 text-gray-600 rounded-bl-none rounded-lg px-3 py-2">
                     <span className="inline-flex gap-1 items-center">
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span
+                        className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <span
+                        className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "150ms" }}
+                      />
+                      <span
+                        className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      />
                     </span>
                   </div>
                 </div>

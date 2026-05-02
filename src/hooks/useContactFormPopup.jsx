@@ -16,7 +16,7 @@ const useContactFormPopup = () => {
       // Don't show on admin, LMS, auth, or thank you routes
       if (
         path.startsWith("/admin") ||
-        path.startsWith("/lms") ||
+        path.startsWith("/smart-board") ||
         path.startsWith("/login") ||
         path.startsWith("/signup") ||
         path.startsWith("/forgot-password") ||

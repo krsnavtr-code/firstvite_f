@@ -137,7 +137,7 @@ const Profile = () => {
   };
 
   const handleCourseClick = (courseId) => {
-    navigate(`/lms/courses/${courseId}`);
+    navigate(`/smart-board/courses/${courseId}`);
   };
 
   if (!authUser) {
@@ -596,7 +596,7 @@ const Profile = () => {
                   Start your learning journey by enrolling in a course.
                 </p>
                 <button
-                  onClick={() => navigate("/lms/courses")}
+                  onClick={() => navigate("/smart-board/courses")}
                   className="text-indigo-600 font-semibold hover:text-indigo-700"
                 >
                   Browse Courses &rarr;

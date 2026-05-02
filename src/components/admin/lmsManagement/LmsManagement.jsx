@@ -116,7 +116,7 @@ const LmsManagement = () => {
         </div>
         <div className="hidden sm:flex items-center gap-3">
           <Link
-            to="/lms/dashboard"
+            to="/smart-board/dashboard"
             className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-black"
             title="Preview the LMS as a learner"
           >

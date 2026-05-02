@@ -1,8 +1,13 @@
-import React, { useEffect } from 'react';
-import { Card, Progress, Button, Empty, Skeleton, message, Tag } from 'antd';
-import { BookOutlined, ArrowRightOutlined, TrophyOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { useLMS } from '../../contexts/LMSContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { Card, Progress, Button, Empty, Skeleton, message, Tag } from "antd";
+import {
+  BookOutlined,
+  ArrowRightOutlined,
+  TrophyOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
+import { useLMS } from "../../contexts/LMSContext";
+import { useNavigate } from "react-router-dom";
 
 const { Meta } = Card;
 
@@ -15,16 +20,16 @@ const Dashboard = () => {
       try {
         await loadEnrollments();
       } catch (err) {
-        console.error('Error loading enrollments:', err);
-        message.error(error || 'Failed to load your courses');
+        console.error("Error loading enrollments:", err);
+        message.error(error || "Failed to load your courses");
       }
     };
-    
+
     fetchEnrollments();
   }, [loadEnrollments, error]);
 
   const handleCourseClick = (courseId) => {
-    navigate(`/lms/courses/${courseId}`);
+    navigate(`/smart-board/courses/${courseId}`);
   };
 
   if (loading && enrollments.length === 0) {
@@ -33,7 +38,10 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold mb-8">My Learning</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="h-80 shadow-sm hover:shadow-md transition-shadow">
+            <Card
+              key={i}
+              className="h-80 shadow-sm hover:shadow-md transition-shadow"
+            >
               <Skeleton active avatar paragraph={{ rows: 3 }} />
             </Card>
           ))}
@@ -47,28 +55,32 @@ const Dashboard = () => {
       <div className="p-6 max-w-7xl mx-auto text-black">
         <h1 className="text-3xl font-bold mb-8">My Learning</h1>
         <div className="bg-white rounded-lg p-8 shadow-sm">
-          <Empty 
+          <Empty
             description={
               <div className="flex flex-col items-center">
-                <p className="text-lg text-gray-700 mb-4">You haven't enrolled in any courses yet</p>
-                <p className="text-gray-500 mb-6">Browse our course catalog to start learning!</p>
+                <p className="text-lg text-gray-700 mb-4">
+                  You haven't enrolled in any courses yet
+                </p>
+                <p className="text-gray-500 mb-6">
+                  Browse our course catalog to start learning!
+                </p>
               </div>
             }
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 size="large"
-                onClick={() => navigate('/courses')}
+                onClick={() => navigate("/courses")}
                 icon={<BookOutlined />}
                 className="mb-2 sm:mb-0"
               >
                 Browse All Courses
               </Button>
-              <Button 
+              <Button
                 size="large"
-                onClick={() => navigate('/courses?popular=true')}
+                onClick={() => navigate("/courses?popular=true")}
                 icon={<TrophyOutlined />}
               >
                 Popular Courses

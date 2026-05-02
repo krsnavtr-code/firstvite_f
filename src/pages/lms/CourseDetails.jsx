@@ -42,7 +42,7 @@ const CourseDetails = () => {
     const userId = currentUser?._id;
     if (!userId) return false;
     return task.submissions.some(
-      (sub) => sub.user?._id === userId || sub.user === userId
+      (sub) => sub.user?._id === userId || sub.user === userId,
     );
   };
 
@@ -67,11 +67,11 @@ const CourseDetails = () => {
 
         // Find the enrollment and course data
         const currentEnrollment = enrollments.find(
-          (e) => e.course._id === courseId
+          (e) => e.course._id === courseId,
         );
         if (!currentEnrollment) {
           message.error("Course not found in your enrollments");
-          navigate("/lms/dashboard");
+          navigate("/smart-board/dashboard");
           return;
         }
 
@@ -120,7 +120,7 @@ const CourseDetails = () => {
             } catch (error) {
               console.error(
                 `Error loading tasks for sprint ${sprint._id}:`,
-                error
+                error,
               );
             }
           }
@@ -147,14 +147,14 @@ const CourseDetails = () => {
   const handleSprintClick = (sprint, e) => {
     // Prevent the card click from interfering with button click
     if (e && e.stopPropagation) e.stopPropagation();
-    navigate(`/lms/courses/${courseId}/sprints/${sprint._id}`);
+    navigate(`/smart-board/courses/${courseId}/sprints/${sprint._id}`);
   };
 
   const getSprintStatus = (sprint) => {
     if (!sprint.tasks || !sprint.tasks.length) return "Not Started";
 
     const hasCompletedTasks = sprint.tasks.some((task) =>
-      isTaskCompleted(task)
+      isTaskCompleted(task),
     );
     const allTasksCompleted = areAllTasksCompleted(sprint.tasks);
 
@@ -167,7 +167,7 @@ const CourseDetails = () => {
     if (!sprint.tasks || !sprint.tasks.length) return "default";
 
     const hasCompletedTasks = sprint.tasks.some((task) =>
-      isTaskCompleted(task)
+      isTaskCompleted(task),
     );
     const allTasksCompleted = areAllTasksCompleted(sprint.tasks);
 
@@ -198,7 +198,7 @@ const CourseDetails = () => {
 
     const totalProgress = Object.values(sprintProgress).reduce(
       (sum, progress) => sum + progress,
-      0
+      0,
     );
 
     return Math.round(totalProgress / sprints.length);
@@ -212,7 +212,7 @@ const CourseDetails = () => {
       <Button
         type="text"
         icon={<ArrowLeftOutlined />}
-        onClick={() => navigate("/lms/dashboard")}
+        onClick={() => navigate("/smart-board/dashboard")}
         className="mb-4 text-black dark:text-black"
       >
         Back to Dashboard
@@ -252,16 +252,16 @@ const CourseDetails = () => {
                       progress === 100
                         ? "success"
                         : progress > 0
-                        ? "processing"
-                        : "default"
+                          ? "processing"
+                          : "default"
                     }
                     className="text-sm"
                   >
                     {progress === 100
                       ? "Completed"
                       : progress > 0
-                      ? `In Progress (${progress}%)`
-                      : "Not Started"}
+                        ? `In Progress (${progress}%)`
+                        : "Not Started"}
                   </Tag>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     {sprints.length}{" "}
@@ -375,7 +375,7 @@ const CourseDetails = () => {
                           window.open(
                             sprint.whatsappGroupLink,
                             "_blank",
-                            "noopener,noreferrer"
+                            "noopener,noreferrer",
                           );
                         }}
                       >

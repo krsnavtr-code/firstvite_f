@@ -9,12 +9,14 @@ import { FaSun, FaMoon } from "react-icons/fa";
 
 const { Header } = Layout;
 
+const logoImg = "http://eklabya.com/api/upload/file/eKlabya-fit-logo-8874.png";
+
 const LMSNavbar = ({ theme, onThemeChange }) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
   const [unread, setUnread] = useState(() =>
-    Number(localStorage.getItem("lms_chat_unread") || 0)
+    Number(localStorage.getItem("lms_chat_unread") || 0),
   );
 
   const toggleTheme = () => {
@@ -24,7 +26,9 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
   useEffect(() => {
     const onUnread = (e) =>
       setUnread(
-        Number(e?.detail?.count ?? localStorage.getItem("lms_chat_unread") ?? 0)
+        Number(
+          e?.detail?.count ?? localStorage.getItem("lms_chat_unread") ?? 0,
+        ),
       );
     const onStorage = (e) => {
       if (e.key === "lms_chat_unread") setUnread(Number(e.newValue || 0));
@@ -59,7 +63,7 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
         onClick: handleLogout,
       },
     ],
-    []
+    [],
   );
 
   const userMenu = useMemo(
@@ -72,21 +76,22 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
         }
       },
     }),
-    [userMenuItems]
+    [userMenuItems],
   );
 
   return (
     <>
       <header className="flex items-center justify-between px-6 dark:bg-[#001529] bg-[#fff] shadow-sm border-b border-gray-100">
         {/* Left: Logo */}
-        <Link to="/lms">
-          <div className="h-10 p-1 overflow-hidden group-hover:scale-105 transition-transform">
-            <img
-              src="http://eklabya.com/api/upload/file/eKlabya-0644.png"
-              alt="Logo"
-              className="object-cover w-full h-full rounded"
-            />
-          </div>
+        <Link
+          to="/smart-board"
+          className="text-lg font-bold text-blue-600 dark:text-blue-400"
+        >
+          <img
+            src={logoImg}
+            alt="eklabya – Your Online Learning Partner"
+            className="h-10 rounded"
+          />
         </Link>
 
         {/* Right: Notifications + User */}
@@ -134,7 +139,7 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
             size="small"
             offset={[0, 0]}
             style={{ fontSize: "12px" }}
-            onClick={() => navigate("/lms/notifications")}
+            onClick={() => navigate("/smart-board/notifications")}
           >
             <BellOutlined className="text-md hover:text-blue-600 cursor-pointer transition-colors text-black dark:text-white" />
           </Badge>

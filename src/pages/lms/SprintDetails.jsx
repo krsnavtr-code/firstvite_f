@@ -59,7 +59,7 @@ const SprintDetails = () => {
     if (!task?.submissions?.length) return false;
     const userId = getUserId();
     return task.submissions.some(
-      (sub) => sub.user?._id === userId || sub.user === userId
+      (sub) => sub.user?._id === userId || sub.user === userId,
     );
   };
 
@@ -146,10 +146,10 @@ const SprintDetails = () => {
             .catch((error) => {
               console.error(
                 `Error fetching tasks for session ${session._id}:`,
-                error
+                error,
               );
               return { sessionId: session._id, tasks: [] };
-            })
+            }),
         );
 
         const tasksResults = await Promise.all(tasksPromises);
@@ -210,7 +210,7 @@ const SprintDetails = () => {
       <Button
         type="text"
         icon={<ArrowLeftOutlined />}
-        onClick={() => navigate(`/lms/courses/${courseId}`)}
+        onClick={() => navigate(`/smart-board/courses/${courseId}`)}
         className="mb-4 text-black dark:text-black"
       >
         Back to Course
@@ -255,7 +255,7 @@ const SprintDetails = () => {
                 className={`p-4 flex justify-between items-center transition-colors ${
                   isSessionUnlocked(
                     sessions.findIndex((s) => s._id === session._id),
-                    sessions
+                    sessions,
                   )
                     ? "bg-gray-200 dark:bg-[#001529] text-black dark:text-white hover:bg-blue-50 dark:hover:bg-[#001550] cursor-pointer border-l-4 border-blue-500"
                     : "bg-gray-200 dark:bg-[#001529] text-black dark:text-white cursor-not-allowed border-l-4 border-gray-300"
@@ -264,7 +264,7 @@ const SprintDetails = () => {
                   if (
                     isSessionUnlocked(
                       sessions.findIndex((s) => s._id === session._id),
-                      sessions
+                      sessions,
                     )
                   ) {
                     toggleSession(session._id);
@@ -275,13 +275,13 @@ const SprintDetails = () => {
                   {(() => {
                     const sessionTasksList = sessionTasks[session._id] || [];
                     const completedTasks = sessionTasksList.filter((task) =>
-                      isTaskCompleted(task)
+                      isTaskCompleted(task),
                     );
                     const completionPercentage =
                       sessionTasksList.length > 0
                         ? Math.round(
                             (completedTasks.length / sessionTasksList.length) *
-                              100
+                              100,
                           )
                         : 0;
                     const isCompleted = areAllTasksCompleted(sessionTasksList);
@@ -311,7 +311,7 @@ const SprintDetails = () => {
                     } else if (
                       !isSessionUnlocked(
                         sessions.findIndex((s) => s._id === session._id),
-                        sessions
+                        sessions,
                       )
                     ) {
                       icon = (
@@ -332,16 +332,16 @@ const SprintDetails = () => {
                                     isCompleted
                                       ? "success"
                                       : inProgress
-                                      ? "processing"
-                                      : "default"
+                                        ? "processing"
+                                        : "default"
                                   }
                                   className="ml-2 text-xs"
                                 >
                                   {isCompleted
                                     ? "Completed"
                                     : inProgress
-                                    ? "In Progress"
-                                    : "Not Started"}
+                                      ? "In Progress"
+                                      : "Not Started"}
                                 </Tag>
                               )}
                             </div>
@@ -391,7 +391,7 @@ const SprintDetails = () => {
                               <iframe
                                 src={currentVideoUrl.replace(
                                   "/view?usp=sharing",
-                                  "/preview"
+                                  "/preview",
                                 )}
                                 width="100%"
                                 height="100%"
@@ -412,35 +412,47 @@ const SprintDetails = () => {
                           >
                             <div className="space-y-4">
                               {currentQuestions.map((question, index) => (
-                                <div key={index} className="p-4 border rounded-lg">
+                                <div
+                                  key={index}
+                                  className="p-4 border rounded-lg"
+                                >
                                   <div className="font-medium mb-2">
                                     {index + 1}. {question.question}
                                   </div>
                                   <div className="space-y-2">
-                                    {question.options?.map((option, optIndex) => {
-                                      // Handle both string and object options
-                                      const optionText = typeof option === 'object' ? option.text : option;
-                                      const isCorrect = typeof option === 'object' 
-                                        ? option.isCorrect 
-                                        : question.correctAnswer === optIndex;
-                                      
-                                      return (
-                                        <div 
-                                          key={optIndex}
-                                          className={`p-2 rounded ${
-                                            isCorrect
-                                              ? 'bg-green-50 text-green-700 border border-green-200' 
-                                              : 'bg-gray-50'
-                                          }`}
-                                        >
-                                          {String.fromCharCode(65 + optIndex)}. {optionText}
-                                        </div>
-                                      );
-                                    })}
+                                    {question.options?.map(
+                                      (option, optIndex) => {
+                                        // Handle both string and object options
+                                        const optionText =
+                                          typeof option === "object"
+                                            ? option.text
+                                            : option;
+                                        const isCorrect =
+                                          typeof option === "object"
+                                            ? option.isCorrect
+                                            : question.correctAnswer ===
+                                              optIndex;
+
+                                        return (
+                                          <div
+                                            key={optIndex}
+                                            className={`p-2 rounded ${
+                                              isCorrect
+                                                ? "bg-green-50 text-green-700 border border-green-200"
+                                                : "bg-gray-50"
+                                            }`}
+                                          >
+                                            {String.fromCharCode(65 + optIndex)}
+                                            . {optionText}
+                                          </div>
+                                        );
+                                      },
+                                    )}
                                   </div>
                                   {question.explanation && (
                                     <div className="mt-2 p-2 bg-blue-50 text-blue-700 rounded text-sm">
-                                      <strong>Explanation:</strong> {question.explanation}
+                                      <strong>Explanation:</strong>{" "}
+                                      {question.explanation}
                                     </div>
                                   )}
                                 </div>
@@ -469,7 +481,7 @@ const SprintDetails = () => {
                   className={
                     !isSessionUnlocked(
                       sessions.findIndex((s) => s._id === session._id),
-                      sessions
+                      sessions,
                     )
                       ? "opacity-50 pointer-events-none"
                       : ""
@@ -498,10 +510,10 @@ const SprintDetails = () => {
                                   userId: currentUser?._id,
                                   localStorageUser:
                                     localStorage.getItem("user"),
-                                }
+                                },
                               );
                               message.error(
-                                "Please log in to view test results."
+                                "Please log in to view test results.",
                               );
                               return;
                             }
@@ -525,7 +537,7 @@ const SprintDetails = () => {
                                   const userSubmission = submissions.find(
                                     (sub) =>
                                       sub.user?._id === userId ||
-                                      sub.user === userId
+                                      sub.user === userId,
                                   );
 
                                   if (userSubmission) {
@@ -534,7 +546,7 @@ const SprintDetails = () => {
                                       title: task.title,
                                       score: userSubmission.score,
                                       submittedAt: new Date(
-                                        userSubmission.submittedAt
+                                        userSubmission.submittedAt,
                                       ).toLocaleDateString(),
                                       passed: userSubmission.score >= 80,
                                     });
@@ -543,7 +555,7 @@ const SprintDetails = () => {
                               } catch (taskError) {
                                 console.error(
                                   `Error processing task ${task._id}:`,
-                                  taskError
+                                  taskError,
                                 );
                               }
                             }
@@ -551,7 +563,7 @@ const SprintDetails = () => {
                             if (results.length === 0) {
                               // Log more details about why no results were found
                               console.warn(
-                                "No submissions found. Checking task data..."
+                                "No submissions found. Checking task data...",
                               );
                               const tasks = sessionTasks[session._id] || [];
                             }
@@ -582,7 +594,7 @@ const SprintDetails = () => {
                             taskIndex,
                             sessionTasks[session._id],
                             sessions.findIndex((s) => s._id === session._id),
-                            sessions
+                            sessions,
                           );
                           const isCompleted = isTaskCompleted(task);
 
@@ -593,15 +605,15 @@ const SprintDetails = () => {
                                 isCompleted
                                   ? "bg-gray-200 dark:bg-[#001529] border-l-4 border-green-500"
                                   : !isUnlocked
-                                  ? "bg-gray-200 dark:bg-[#001529] border-l-4 border-gray-300 opacity-75"
-                                  : "bg-gray-200 dark:bg-[#001529] border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer shadow-sm hover:shadow-md"
+                                    ? "bg-gray-200 dark:bg-[#001529] border-l-4 border-gray-300 opacity-75"
+                                    : "bg-gray-200 dark:bg-[#001529] border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer shadow-sm hover:shadow-md"
                               }`}
                               onClick={
                                 isUnlocked && !isCompleted
                                   ? (e) => {
                                       e.stopPropagation();
                                       navigate(
-                                        `/lms/courses/${courseId}/sprints/${sprintId}/sessions/${session._id}/tasks/${task._id}`
+                                        `/smart-board/courses/${courseId}/sprints/${sprintId}/sessions/${session._id}/tasks/${task._id}`,
                                       );
                                     }
                                   : undefined

@@ -197,7 +197,8 @@ function Navbar() {
 
             {/* SMART Board */}
             <Link
-              to="/lms"
+              to="/smart-board"
+              target="_blank"
               className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 transition-colors"
             >
               SMART Board
