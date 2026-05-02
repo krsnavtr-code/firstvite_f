@@ -35,7 +35,7 @@ function Footer() {
                 <FaWhatsapp className="h-6 w-6" />
               </a>
               <a
-                href="https://twitter.com"
+                href="/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
@@ -43,7 +43,7 @@ function Footer() {
                 <FaTwitter className="h-6 w-6" />
               </a>
               <a
-                href="https://www.linkedin.com/company/firstvite/"
+                href="/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
@@ -51,7 +51,7 @@ function Footer() {
                 <FaLinkedin className="h-6 w-6" />
               </a>
               <a
-                href="https://www.facebook.com/firstviteeducation/"
+                href="/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
