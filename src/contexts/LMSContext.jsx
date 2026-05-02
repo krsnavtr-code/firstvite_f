@@ -1,13 +1,19 @@
 // LMSContext.jsx
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useAuth } from './AuthContext';
-import api from '../api/axios';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { useAuth } from "./AuthContext";
+import api from "../api/axios";
 import {
   getMyEnrollments,
   getCourseContent,
   updateLessonProgress as updateLessonProgressApi,
-  generateCertificate as generateCertificateApi
-} from '../api/lmsApi';
+  generateCertificate as generateCertificateApi,
+} from "../api/lmsApi";
 
 // Create a context for LMS
 const LMSContext = createContext();
@@ -15,48 +21,47 @@ const LMSContext = createContext();
 export const useLMS = () => {
   const context = useContext(LMSContext);
   if (!context) {
-    throw new Error('useLMS must be used within an LMSProvider');
+    throw new Error("useLMS must be used within an LMSProvider");
   }
   return context;
 };
 
 export const LMSProvider = ({ children }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated } = useAuth();
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentCourse, setCurrentCourse] = useState(null);
   const [progress, setProgress] = useState({});
-  
 
   // Load enrollments when user changes
   const loadEnrollments = useCallback(async () => {
     // console.group('Loading Enrollments');
-    
-    const token = localStorage.getItem('token');
-    if ((!user && !token) || !isAuthenticated) {
+
+    const token = localStorage.getItem("token");
+    if ((!currentUser && !token) || !isAuthenticated) {
       setLoading(false);
       setEnrollments([]);
       // console.groupEnd();
       return;
     }
-    
-    // If we have a token but no user, try to get the user from localStorage
-    let currentUser = user;
-    if (!currentUser && token) {
+
+    // If we have a token but no currentUser, try to get the currentUser from localStorage
+    let userFromStorage = currentUser;
+    if (!userFromStorage && token) {
       try {
-        const userData = localStorage.getItem('user');
+        const userData = localStorage.getItem("user");
         if (userData) {
-          currentUser = JSON.parse(userData);
+          userFromStorage = JSON.parse(userData);
         }
       } catch (e) {
-        console.error('Error parsing user from localStorage:', e);
+        console.error("Error parsing user from localStorage:", e);
       }
     }
-    
-    const userId = currentUser?._id || user?._id;
+
+    const userId = userFromStorage?._id || currentUser?._id;
     if (!userId) {
-      console.error('No user ID available for fetching enrollments');
+      console.error("No user ID available for fetching enrollments");
       setLoading(false);
       setEnrollments([]);
       console.groupEnd();
@@ -65,69 +70,75 @@ export const LMSProvider = ({ children }) => {
 
     setLoading(true);
     setError(null);
-    
+
     try {
       // Ensure token is set in headers
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       }
-      
+
       const response = await getMyEnrollments();
-      
+
       // Process the response based on its format
       let enrollmentsData = [];
-      
+
       if (Array.isArray(response)) {
         enrollmentsData = response;
       } else if (response?.data) {
         enrollmentsData = Array.isArray(response.data) ? response.data : [];
       }
-      
+
       // Filter out guest enrollments and ensure the course exists
-      enrollmentsData = enrollmentsData.filter(enrollment => {
-        const isValid = enrollment.user && 
-                       enrollment.course && 
-                       !enrollment.isGuestEnrollment;
-        
+      enrollmentsData = enrollmentsData.filter((enrollment) => {
+        const isValid =
+          enrollment.user && enrollment.course && !enrollment.isGuestEnrollment;
+
         if (!isValid) {
         }
-        
+
         return isValid;
       });
-      
+
       // Process each enrollment to ensure consistent structure
-      const processedEnrollments = enrollmentsData.map(enrollment => {
+      const processedEnrollments = enrollmentsData.map((enrollment) => {
         // Handle case where course might be a string ID or an object
-        const course = typeof enrollment.course === 'string' 
-          ? { _id: enrollment.course }
-          : enrollment.course || {};
-          
+        const course =
+          typeof enrollment.course === "string"
+            ? { _id: enrollment.course }
+            : enrollment.course || {};
+
         return {
           ...enrollment,
           course: {
-            _id: course._id || enrollment.courseId || 'unknown-course',
-            title: course.title || 'Untitled Course',
-            description: course.description || '',
+            _id: course._id || enrollment.courseId || "unknown-course",
+            title: course.title || "Untitled Course",
+            description: course.description || "",
             image: course.image || null,
-            ...course
+            ...course,
           },
-          progress: Math.min(100, Math.max(0, Number(enrollment.progress) || 0)),
-          completionStatus: enrollment.completionStatus || 'in_progress'
+          progress: Math.min(
+            100,
+            Math.max(0, Number(enrollment.progress) || 0),
+          ),
+          completionStatus: enrollment.completionStatus || "in_progress",
         };
       });
-      
+
       setEnrollments(processedEnrollments);
-      
     } catch (err) {
-      console.error('Error loading enrollments:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load enrollments');
+      console.error("Error loading enrollments:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load enrollments",
+      );
     } finally {
       setLoading(false);
       console.groupEnd();
     }
-  }, [user, isAuthenticated]);
-  
+  }, [currentUser, isAuthenticated]);
+
   // Load enrollments when user changes
   useEffect(() => {
     loadEnrollments();
@@ -137,14 +148,14 @@ export const LMSProvider = ({ children }) => {
   const loadCourseContent = async (courseId) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await getCourseContent(courseId);
       setCurrentCourse(data);
       return data;
     } catch (err) {
-      console.error('Error loading course content:', err);
-      setError(err.message || 'Failed to load course content');
+      console.error("Error loading course content:", err);
+      setError(err.message || "Failed to load course content");
       throw err;
     } finally {
       setLoading(false);
@@ -155,36 +166,36 @@ export const LMSProvider = ({ children }) => {
   const updateLessonProgress = async (courseId, lessonId) => {
     try {
       const data = await updateLessonProgressApi(courseId, lessonId);
-      
+
       // Update local state
-      setCurrentCourse(prev => ({
+      setCurrentCourse((prev) => ({
         ...prev,
         enrollment: {
           ...prev.enrollment,
           progress: data.progress,
           completionStatus: data.completionStatus,
           completedLessons: [
-            ...new Set([...prev.enrollment.completedLessons, lessonId])
-          ]
-        }
+            ...new Set([...prev.enrollment.completedLessons, lessonId]),
+          ],
+        },
       }));
-      
+
       // Update enrollments list
-      setEnrollments(prev => 
-        prev.map(enrollment => 
+      setEnrollments((prev) =>
+        prev.map((enrollment) =>
           enrollment.course._id === courseId
-            ? { 
-                ...enrollment, 
+            ? {
+                ...enrollment,
                 progress: data.progress,
-                completionStatus: data.completionStatus 
+                completionStatus: data.completionStatus,
               }
-            : enrollment
-        )
+            : enrollment,
+        ),
       );
-      
+
       return data;
     } catch (err) {
-      console.error('Error updating progress:', err);
+      console.error("Error updating progress:", err);
       throw err;
     }
   };
@@ -193,24 +204,24 @@ export const LMSProvider = ({ children }) => {
   const generateCertificate = async (courseId) => {
     try {
       const data = await generateCertificateApi(courseId);
-      
+
       // Update local state
-      setEnrollments(prev => 
-        prev.map(enrollment => 
+      setEnrollments((prev) =>
+        prev.map((enrollment) =>
           enrollment.course._id === courseId
-            ? { 
-                ...enrollment, 
+            ? {
+                ...enrollment,
                 certificateIssued: true,
                 certificateId: data.certificateId,
-                certificateIssuedAt: data.issuedAt
+                certificateIssuedAt: data.issuedAt,
               }
-            : enrollment
-        )
+            : enrollment,
+        ),
       );
-      
+
       return data;
     } catch (err) {
-      console.error('Error generating certificate:', err);
+      console.error("Error generating certificate:", err);
       throw err;
     }
   };
@@ -224,11 +235,11 @@ export const LMSProvider = ({ children }) => {
     loadCourseContent,
     updateLessonProgress,
     generateCertificate,
-    isEnrolled: (courseId) => 
-      enrollments.some(e => e.course._id === courseId || e.course === courseId)
+    isEnrolled: (courseId) =>
+      enrollments.some(
+        (e) => e.course._id === courseId || e.course === courseId,
+      ),
   };
 
   return <LMSContext.Provider value={value}>{children}</LMSContext.Provider>;
 };
-
-

@@ -25,7 +25,7 @@ const AdminDashboard = () => {
       if (currentUser?.adminRoleId) {
         try {
           const response = await adminApi.getAdminUsers();
-          const currentUserData = response.data.data.users.find(
+          const currentUserData = response.data.users?.find(
             (user) => user._id === currentUser._id,
           );
           if (currentUserData) {
@@ -57,8 +57,8 @@ const AdminDashboard = () => {
     }
 
     // Check user permissions
-    const permissions = currentUser?.adminPermissions || new Map();
-    const pagePermission = permissions.get(page);
+    const permissions = currentUser?.adminPermissions || {};
+    const pagePermission = permissions[page];
     return pagePermission?.canView || false;
   };
 

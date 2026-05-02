@@ -36,35 +36,6 @@ api.interceptors.response.use(
       config: error.config,
     });
 
-    if (error.response) {
-      // Server responded with error status
-      const { status, data } = error.response;
-      if (status === 401) {
-        // Handle unauthorized access
-        toast.error("Unauthorized. Please login again.");
-        window.location.href = "/login";
-      } else if (status === 403) {
-        // Handle forbidden access
-        toast.error("Access denied.");
-      } else if (status === 404) {
-        // Handle not found
-        toast.error("Resource not found.");
-      } else if (status >= 500) {
-        // Handle server errors
-        toast.error("Server error. Please try again later.");
-      } else {
-        // Handle other errors
-        toast.error(data?.message || "An error occurred.");
-      }
-    } else if (error.request) {
-      // Request made but no response
-      toast.error("No response from server. Please check your connection.");
-    } else {
-      // Something happened in setting up the request
-      toast.error("Error setting up request. Please try again.");
-    }
-
-    return Promise.reject(error);
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
       // Only handle if not already on the login page and not a public route
@@ -77,8 +48,10 @@ api.interceptors.response.use(
       ].some((route) => window.location.pathname.startsWith(route));
 
       if (!isPublicRoute) {
-        // Clear auth data
+        // Clear all auth data
         localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
         localStorage.removeItem("Users");
 
         // Show error message if there is one
@@ -93,6 +66,15 @@ api.interceptors.response.use(
           window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
         }
       }
+    } else if (error.response?.status === 403) {
+      // Handle forbidden access
+      toast.error("Access denied.");
+    } else if (error.response?.status === 404) {
+      // Handle not found
+      toast.error("Resource not found.");
+    } else if (error.response?.status >= 500) {
+      // Handle server errors
+      toast.error("Server error. Please try again later.");
     } else if (error.response?.data?.message) {
       // Show error message from server if available
       toast.error(error.response.data.message);

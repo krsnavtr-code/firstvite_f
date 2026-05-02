@@ -14,10 +14,10 @@ function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  
+
   // Open modal when component mounts or location changes
   useEffect(() => {
-    if (location.pathname === '/login') {
+    if (location.pathname === "/login") {
       const modal = document.getElementById("my_modal_3");
       if (modal) {
         modal.showModal();
@@ -25,7 +25,7 @@ function Login() {
     }
   }, [location]);
 
-  const { setAuthUser } = useAuth();
+  const { updateUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const modalRef = useRef(null);
 
@@ -40,11 +40,11 @@ function Login() {
     };
 
     // Add event listener when component mounts
-    document.addEventListener('click', handleClickOutside);
-    
+    document.addEventListener("click", handleClickOutside);
+
     // Clean up event listener when component unmounts
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, []);
 
@@ -53,44 +53,64 @@ function Login() {
     try {
       setIsSubmitting(true);
       // Clear any existing tokens and user data
-      localStorage.removeItem('token');
-      localStorage.removeItem('Users');
-      
-      const response = await api.post("/users/login", data);
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("Users");
+      localStorage.removeItem("user");
+
+      const response = await api.post("/auth/login", data);
 
       if (response.data.success) {
-        // Extract token and user data from response
-        const token = response.data.token || response.data.data?.token || response.data.data?.accessToken;
-        let userData = response.data.user || response.data.data?.user || response.data.data;
-        
+        // Extract token, refreshToken and user data from response
+        const token =
+          response.data.token ||
+          response.data.data?.token ||
+          response.data.data?.accessToken;
+        const refreshToken =
+          response.data.refreshToken || response.data.data?.refreshToken;
+        let userData =
+          response.data.user || response.data.data?.user || response.data.data;
+
         // If user data is nested in a data property, use that
-        if (response.data.data && typeof response.data.data === 'object' && !userData?._id) {
+        if (
+          response.data.data &&
+          typeof response.data.data === "object" &&
+          !userData?._id
+        ) {
           userData = response.data.data;
         }
 
         if (!token) {
-          throw new Error('No authentication token received');
+          throw new Error("No authentication token received");
         }
 
-        // Store the token in localStorage
+        // Store the tokens in localStorage
         localStorage.setItem("token", token);
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+        }
 
         // Ensure user data has required fields
         const userWithRole = {
           _id: userData._id,
-          fullname: userData.fullname || userData.name || 'User',
+          fullname: userData.fullname || userData.name || "User",
           email: userData.email,
-          role: userData.role || 'user',
-          ...userData
+          role: userData.role || "user",
+          isApproved: userData.isApproved,
+          isActive: userData.isActive !== false,
+          phone: userData.phone || "",
+          address: userData.address || "",
+          adminRoleId: userData.adminRoleId,
+          adminPermissions: userData.adminPermissions || {},
+          ...userData,
         };
 
-        
         // Store user data in localStorage
-        localStorage.setItem("Users", JSON.stringify(userWithRole));
-        
+        localStorage.setItem("user", JSON.stringify(userWithRole));
+
         // Update auth context
-        setAuthUser(userWithRole);
-        
+        updateUser(userWithRole);
+
         // Show success message
         toast.success("Login successful!");
 
@@ -103,24 +123,27 @@ function Login() {
         // Get redirect URL from query params or default to home
         const urlParams = new URLSearchParams(window.location.search);
         let redirectTo = urlParams.get("redirect");
-        
+
         // If no redirect specified and user is admin, go to admin dashboard
-        if (userWithRole.role === 'admin') {
-          redirectTo = '/admin/dashboard';
+        if (userWithRole.role === "admin") {
+          redirectTo = "/admin/dashboard";
         }
-        
+
         // Default to home if no specific redirect
-        redirectTo = redirectTo || '/';
-        
+        redirectTo = redirectTo || "/";
+
         navigate(redirectTo, { replace: true });
       } else {
-        const errorMsg = response.data.message || 'Login failed';
-        console.error('Login - Server error:', errorMsg);
+        const errorMsg = response.data.message || "Login failed";
+        console.error("Login - Server error:", errorMsg);
         throw new Error(errorMsg);
       }
     } catch (err) {
       console.error("Login error:", err);
-      const errorMessage = err.response?.data?.message || err.message || "Login failed. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please try again.";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -128,17 +151,17 @@ function Login() {
   };
   return (
     <div>
-      <dialog 
-        id="my_modal_3" 
-        className="modal"
-      >
-        <div 
-          ref={modalRef} 
+      <dialog id="my_modal_3" className="modal">
+        <div
+          ref={modalRef}
           className="modal-box dark:bg-slate-800 w-fit"
           onClick={(e) => e.stopPropagation()}
         >
-          <form onSubmit={handleSubmit(onSubmit)} onClick={(e) => e.stopPropagation()}>
-            <button 
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
               type="button"
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={() => document.getElementById("my_modal_3").close()}
@@ -197,7 +220,7 @@ function Login() {
                   className="underline text-blue-500 cursor-pointer w-24"
                   onClick={() => {
                     document.getElementById("my_modal_3").close();
-                    navigate('/signup');
+                    navigate("/signup");
                     // Small timeout to ensure the route updates before showing the modal
                     setTimeout(() => {
                       document.getElementById("signup_modal").showModal();

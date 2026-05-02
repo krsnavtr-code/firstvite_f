@@ -23,7 +23,8 @@ import api from "../api/axios";
 import PaymentForm from "./PaymentForm";
 
 function Navbar() {
-  const { authUser, isAuthenticated, isAdmin, isApproved, logout } = useAuth();
+  const { currentUser, isAuthenticated, isAdmin, isApproved, logout } =
+    useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const logoImg =
@@ -239,15 +240,17 @@ function Navbar() {
                   className="flex items-center gap-2 hover:text-white font-semibold"
                 >
                   <FaUser size={10} />
-                  {authUser?.name?.split(" ")[0] || "My Account"}
+                  {currentUser?.name?.split(" ")[0] || "My Account"}
                 </button>
 
                 {/* Profile Dropdown */}
                 {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 py-2 text-sm text-gray-700 dark:text-gray-200 z-50 animate-fade-in-down">
                     <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-                      <p className="font-semibold">{authUser?.name}</p>
-                      <p className="text-xs text-gray-500">{authUser?.email}</p>
+                      <p className="font-semibold">{currentUser?.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {currentUser?.email}
+                      </p>
                     </div>
                     <Link
                       to="/my-learning"
@@ -491,13 +494,13 @@ function Navbar() {
           {isAuthenticated ? (
             <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                {authUser?.name?.charAt(0)}
+                {currentUser?.name?.charAt(0)}
               </div>
               <div>
                 <p className="font-bold text-sm text-gray-900 dark:text-white">
-                  {authUser?.name}
+                  {currentUser?.name}
                 </p>
-                <p className="text-xs text-gray-500">{authUser?.email}</p>
+                <p className="text-xs text-gray-500">{currentUser?.email}</p>
               </div>
             </div>
           ) : (

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import {
   FaEdit,
   FaTrash,
@@ -42,7 +42,7 @@ const TestQAPage = () => {
     try {
       setLoading(true);
       const response = await api.get("/api/admin/test-qa");
-      setQAs(response.data.data);
+      setQAs(response.data.data || []);
     } catch (err) {
       toast.error("Failed to load Q&A");
       console.error("Error fetching Q&A:", err);
@@ -68,41 +68,41 @@ const TestQAPage = () => {
     });
   };
 
- const handleSubmit = async (e) => {
-   e.preventDefault();
-   try {
-     const payload = {
-       ...formData,
-       // For multiple choice questions, we don't need correctAnswer
-       ...(formData.questionType === "multiple_choice_single" ||
-       formData.questionType === "multiple_choice_multiple"
-         ? { correctAnswer: undefined }
-         : { options: undefined }),
-     };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        ...formData,
+        // For multiple choice questions, we don't need correctAnswer
+        ...(formData.questionType === "multiple_choice_single" ||
+        formData.questionType === "multiple_choice_multiple"
+          ? { correctAnswer: undefined }
+          : { options: undefined }),
+      };
 
-     if (editingQA) {
-       await api.put(`/api/admin/test-qa/${editingQA._id}`, payload);
-       toast.success("Q&A updated successfully");
-     } else {
-       await api.post("/api/admin/test-qa", payload);
-       toast.success("Q&A added successfully");
-     }
+      if (editingQA) {
+        await api.put(`/api/admin/test-qa/${editingQA._id}`, payload);
+        toast.success("Q&A updated successfully");
+      } else {
+        await api.post("/api/admin/test-qa", payload);
+        toast.success("Q&A added successfully");
+      }
 
-     setShowForm(false);
-     setEditingQA(null);
-     setFormData({
-       question: "",
-       questionType: "short_answer",
-       options: [{ text: "", isCorrect: false }],
-       correctAnswer: "",
-       explanation: "",
-       isActive: true,
-     });
-     fetchQAs();
-   } catch (err) {
-     toast.error(err.response?.data?.message || "Something went wrong");
-   }
- };
+      setShowForm(false);
+      setEditingQA(null);
+      setFormData({
+        question: "",
+        questionType: "short_answer",
+        options: [{ text: "", isCorrect: false }],
+        correctAnswer: "",
+        explanation: "",
+        isActive: true,
+      });
+      fetchQAs();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Something went wrong");
+    }
+  };
 
   const handleEdit = (qa) => {
     setEditingQA(qa);
@@ -133,7 +133,7 @@ const TestQAPage = () => {
     try {
       await api.patch(`/api/admin/test-qa/${id}/toggle`);
       toast.success(
-        `Q&A ${currentStatus ? "deactivated" : "activated"} successfully`
+        `Q&A ${currentStatus ? "deactivated" : "activated"} successfully`,
       );
       fetchQAs();
     } catch (err) {
@@ -146,7 +146,7 @@ const TestQAPage = () => {
     newOptions[index] = { ...newOptions[index], [field]: value };
     setFormData({ ...formData, options: newOptions });
   };
-  
+
   const addOption = () => {
     setFormData({
       ...formData,

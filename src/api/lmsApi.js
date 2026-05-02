@@ -28,10 +28,6 @@ export const getMyEnrollments = async () => {
       }
     });
     
-    // Log the full response for debugging
-    console.group('Enrollments API Response');
-    console.groupEnd();
-    
     // Handle different response formats
     if (response.data) {
       if (response.data.success && Array.isArray(response.data.data)) {

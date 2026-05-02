@@ -17,9 +17,11 @@ const AdminLayout = () => {
   const fetchAvailablePages = async () => {
     try {
       const response = await adminApi.getAvailablePages();
-      setAvailablePages(response.data.data.pages);
+      setAvailablePages(response.data.pages || []);
     } catch (error) {
       console.error("Error fetching available pages:", error);
+      // Set default pages if API fails
+      setAvailablePages([]);
     }
   };
 

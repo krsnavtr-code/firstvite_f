@@ -39,19 +39,19 @@ export function AuthProvider({ children }) {
           // Get fresh user data
           const response = await api.get("/auth/profile");
 
-          if (response.data && isMounted) {
+          if (response.data && response.data.user && isMounted) {
             // Store the updated user data
             const userData = {
-              _id: response.data._id,
-              fullname: response.data.fullname,
-              email: response.data.email,
-              role: response.data.role,
-              isApproved: response.data.isApproved,
-              isActive: response.data.isActive !== false, // Default to true if not specified
-              phone: response.data.phone || "",
-              address: response.data.address || "",
-              adminRoleId: response.data.adminRoleId,
-              adminPermissions: response.data.adminPermissions || {},
+              _id: response.data.user._id,
+              fullname: response.data.user.fullname,
+              email: response.data.user.email,
+              role: response.data.user.role,
+              isApproved: response.data.user.isApproved,
+              isActive: response.data.user.isActive !== false,
+              phone: response.data.user.phone || "",
+              address: response.data.user.address || "",
+              adminRoleId: response.data.user.adminRoleId,
+              adminPermissions: response.data.user.adminPermissions || {},
             };
 
             localStorage.setItem("user", JSON.stringify(userData));
@@ -85,7 +85,7 @@ export function AuthProvider({ children }) {
                   token: newToken,
                   refreshToken: newRefreshToken,
                   user,
-                } = refreshResponse.data;
+                } = refreshResponse.data; 
 
                 // Update tokens in localStorage
                 localStorage.setItem("token", newToken);
@@ -108,7 +108,7 @@ export function AuthProvider({ children }) {
                   phone: user.phone || "",
                   address: user.address || "",
                   adminRoleId: user.adminRoleId,
-                  adminPermissions: user.adminPermissions || new Map(),
+                  adminPermissions: user.adminPermissions || {},
                 };
 
                 localStorage.setItem("user", JSON.stringify(userData));
@@ -215,7 +215,7 @@ export function AuthProvider({ children }) {
           phone: user.phone || "",
           address: user.address || "",
           adminRoleId: user.adminRoleId,
-          adminPermissions: user.adminPermissions || new Map(),
+          adminPermissions: user.adminPermissions || {},
         };
 
         localStorage.setItem("user", JSON.stringify(userData));
