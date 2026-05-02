@@ -387,7 +387,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
                       >
                         <div className="p-2">
                           <Link
-                            to={`/courses/category/${
+                            to={`/courses/${
                               category.slug ||
                               category.name.toLowerCase().replace(/\s+/g, "-")
                             }`}
