@@ -142,7 +142,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/payment-t-and-c"
+                  to="/payment-terms-and-conditions"
                   className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
                   Payment T&C

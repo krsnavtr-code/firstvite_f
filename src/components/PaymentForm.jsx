@@ -71,7 +71,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
           `/courses?isPublished=true&limit=100&page=1&all=true&fields=title,price`,
           {
             timeout: 15000, // Increased timeout for larger payload
-          }
+          },
         );
 
         let coursesData = [];
@@ -98,7 +98,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
         setCourses((prevCourses) => {
           // Create a map to avoid duplicates
           const courseMap = new Map(
-            prevCourses.map((course) => [course._id, course])
+            prevCourses.map((course) => [course._id, course]),
           );
           // Add or update courses
           coursesData.forEach((course) => courseMap.set(course._id, course));
@@ -170,7 +170,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
       return;
     }
     const selectedCourse = courses.find(
-      (course) => course.title === selectedCourseTitle
+      (course) => course.title === selectedCourseTitle,
     );
     setFormData((prev) => ({
       ...prev,
@@ -221,7 +221,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
           // Verify payment on the server
           const verifyResponse = await api.post(
             "/payments/verify",
-            paymentData
+            paymentData,
           );
 
           if (verifyResponse.data.success) {
@@ -254,7 +254,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
             });
           } else {
             throw new Error(
-              verifyResponse.data.message || "Payment verification failed"
+              verifyResponse.data.message || "Payment verification failed",
             );
           }
         } catch (error) {
@@ -347,7 +347,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
         await initiateRazorpayPayment(response.data.order);
       } else {
         throw new Error(
-          response.data.message || "Failed to create payment order"
+          response.data.message || "Failed to create payment order",
         );
       }
     } catch (error) {
@@ -554,7 +554,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
                       .sort((a, b) =>
                         a.title.localeCompare(b.title, "en", {
                           sensitivity: "base",
-                        })
+                        }),
                       )
                       .map((course) => (
                         <option key={course._id} value={course.title}>
@@ -612,7 +612,8 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
                 htmlFor="terms"
                 className="block text-sm font-medium text-black"
               >
-                I accept the payment <Link to="/payment-t-and-c">T&C</Link>
+                I accept the payment{" "}
+                <Link to="/payment-terms-and-conditions">T&C</Link>
               </label>
             </div>
 
@@ -637,7 +638,7 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

@@ -336,7 +336,7 @@ function App() {
           />
 
           <Route
-            path="/payment-t-and-c"
+            path="/payment-terms-and-conditions"
             element={
               <MainLayout>
                 <PaymentTAndC />
