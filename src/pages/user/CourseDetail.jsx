@@ -55,6 +55,7 @@ const CourseDetail = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
   const [showCertificate, setShowCertificate] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   // Initialize expanded sections when course data is loaded
   useEffect(() => {
@@ -497,6 +498,11 @@ const CourseDetail = () => {
 
   const rating = course.rating || 4;
 
+  // Handle video preview
+  const handleVideoPreview = () => {
+    setShowVideoModal(true);
+  };
+
   const CertificateModal = ({ isOpen, onClose }) => {
     // Prevent right-click context menu
     useEffect(() => {
@@ -903,8 +909,11 @@ const CourseDetail = () => {
                 >
                   Download Brochure <FaArrowRight className="ml-2" />
                 </button>
-                {course.previewVideo && (
-                  <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center">
+                {(course.previewVideo || true) && (
+                  <button
+                    onClick={handleVideoPreview}
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center"
+                  >
                     <FaPlay className="mr-2" /> Preview this course
                   </button>
                 )}
@@ -931,9 +940,12 @@ const CourseDetail = () => {
 
                   <hr />
 
-                  {course.previewVideo && (
+                  {(course.previewVideo || true) && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pb-4 justify-center">
-                      <button className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-full font-medium transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300 hover:bg-blue-50">
+                      <button
+                        onClick={handleVideoPreview}
+                        className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-full font-medium transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300 hover:bg-blue-50"
+                      >
                         <FaPlay className="mr-2" />
                         Watch Preview
                       </button>
@@ -1754,6 +1766,61 @@ const CourseDetail = () => {
         isOpen={showCertificate}
         onClose={() => setShowCertificate(false)}
       />
+
+      {/* Video Preview Modal */}
+      <AnimatePresence>
+        {showVideoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowVideoModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center p-4 border-b">
+                <h3 className="text-lg font-semibold">Course Preview</h3>
+                <button
+                  onClick={() => setShowVideoModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4">
+                <video controls className="w-full rounded" preload="metadata">
+                  <source
+                    src={
+                      course.previewVideo ||
+                      "http://www.eklabya.com/api/upload/file/DemoVideo-1781.mp4"
+                    }
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
