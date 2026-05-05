@@ -87,7 +87,10 @@ const ImageGallery = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Media Library</h1>
+        <div className="flex flex-col">
+          <h1 className="text-2xl">Media Library</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Upload and manage your media files. Supported formats: JPG, PNG, GIF, MP4, WebM, MOV.</p>
+        </div>
         <div className="flex space-x-2">
           <Link 
             to="/admin/media" 

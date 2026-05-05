@@ -10,7 +10,7 @@ const Testimonials = () => {
       role: "Book Enthusiast",
       content:
         "This platform has completely transformed my reading habits. The book recommendations are spot on, and the reading experience is seamless.",
-      avatar: "http://www.eklabya.com/api/upload/file/1777960745027-1855.png",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745027-1855.png",
       rating: 5,
     },
     {
@@ -19,7 +19,7 @@ const Testimonials = () => {
       role: "Student",
       content:
         "As a student, I appreciate the wide range of academic books available. The search functionality makes it easy to find exactly what I need.",
-      avatar: "http://www.eklabya.com/api/upload/file/1777960745036-6410.png",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745036-6410.png",
       rating: 4,
     },
     {
@@ -28,7 +28,7 @@ const Testimonials = () => {
       role: "Librarian",
       content:
         "I recommend this platform to all our library members. The collection is vast and the interface is user-friendly.",
-      avatar: "http://www.eklabya.com/api/upload/file/1777960745003-1010.png",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745003-1010.png",
       rating: 5,
     },
     {
@@ -37,7 +37,7 @@ const Testimonials = () => {
       role: "Author",
       content:
         "This platform has completely transformed my reading habits. The book recommendations are spot on, and the reading experience is seamless.",
-      avatar: "http://www.eklabya.com/api/upload/file/1777960745009-2116.png",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745009-2116.png",
       rating: 5,
     },
     {
@@ -46,7 +46,7 @@ const Testimonials = () => {
       role: "Book Enthusiast",
       content:
         "This platform has completely transformed my reading habits. The book recommendations are spot on, and the reading experience is seamless.",
-      avatar: "http://www.eklabya.com/api/upload/file/1777960744997-1415.png",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960744997-1415.png",
       rating: 5,
     },
     {
@@ -55,7 +55,7 @@ const Testimonials = () => {
       role: "Student",
       content:
         "As a student, I appreciate the wide range of academic books available. The search functionality makes it easy to find exactly what I need.",
-      avatar: "http://www.eklabya.com/api/upload/file/1777960745017-4063.png",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745017-4063.png",
       rating: 4,
     },
   ];
