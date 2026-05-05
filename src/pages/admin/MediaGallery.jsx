@@ -1,7 +1,7 @@
-import React from 'react';
-import MediaUploader from '../../components/common/MediaUploader';
-import ImageGallery from '../../components/admin/ImageGallery';
-import { Link } from 'react-router-dom';
+import React from "react";
+import MediaUploader from "../../components/common/MediaUploader";
+import ImageGallery from "../../components/admin/ImageGallery";
+import { Link } from "react-router-dom";
 
 const AdminMediaGallery = () => {
   const handleImageUpload = (file) => {
@@ -53,6 +53,7 @@ const AdminMediaGallery = () => {
         <MediaUploader
           onImageUploadSuccess={handleImageUpload}
           onVideoUploadSuccess={handleVideoUpload}
+          maxVideoSizeMB={500}
         />
       </div>
 
