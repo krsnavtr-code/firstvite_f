@@ -42,16 +42,23 @@ const useContactFormPopup = () => {
       return;
     }
 
-    // Only show the popup on allowed routes
+    // Only show the popup on allowed routes and if it hasn't been shown in this session
     if (shouldShowForm(currentPath)) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        setIsInitialized(true);
-      }, 3000); // Show after 3 seconds
+      // Check if the popup has already been shown in this session
+      const hasBeenShown = sessionStorage.getItem(CONTACT_FORM_SHOWN_KEY);
 
-      return () => clearTimeout(timer);
+      if (!hasBeenShown && !isInitialized) {
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+          setIsInitialized(true);
+          // Mark that the popup has been shown in this session
+          sessionStorage.setItem(CONTACT_FORM_SHOWN_KEY, "true");
+        }, 5000); // Show after 5 seconds
+
+        return () => clearTimeout(timer);
+      }
     }
-  }, [location.pathname]);
+  }, [location.pathname, isInitialized]);
 
   const closeModal = () => {
     setIsOpen(false);

@@ -10,7 +10,7 @@ const Testimonials = () => {
       role: "Book Enthusiast",
       content:
         "This platform has completely transformed my reading habits. The book recommendations are spot on, and the reading experience is seamless.",
-      avatar: "../../images/team-1.jpg",
+      avatar: "http://www.eklabya.com/api/upload/file/1777960745027-1855.png",
       rating: 5,
     },
     {
@@ -19,7 +19,7 @@ const Testimonials = () => {
       role: "Student",
       content:
         "As a student, I appreciate the wide range of academic books available. The search functionality makes it easy to find exactly what I need.",
-      avatar: "../../images/team-2.jpg",
+      avatar: "http://www.eklabya.com/api/upload/file/1777960745036-6410.png",
       rating: 4,
     },
     {
@@ -28,8 +28,8 @@ const Testimonials = () => {
       role: "Librarian",
       content:
         "I recommend this platform to all our library members. The collection is vast and the interface is user-friendly.",
-      avatar: "../../images/team-3.jpg",
-      rating: 5,  
+      avatar: "http://www.eklabya.com/api/upload/file/1777960745003-1010.png",
+      rating: 5,
     },
     {
       id: 4,
@@ -37,7 +37,7 @@ const Testimonials = () => {
       role: "Author",
       content:
         "This platform has completely transformed my reading habits. The book recommendations are spot on, and the reading experience is seamless.",
-      avatar: "../../images/team-4.jpg",
+      avatar: "http://www.eklabya.com/api/upload/file/1777960745009-2116.png",
       rating: 5,
     },
     {
@@ -46,7 +46,7 @@ const Testimonials = () => {
       role: "Book Enthusiast",
       content:
         "This platform has completely transformed my reading habits. The book recommendations are spot on, and the reading experience is seamless.",
-      avatar: "../../images/team-5.jpg",
+      avatar: "http://www.eklabya.com/api/upload/file/1777960744997-1415.png",
       rating: 5,
     },
     {
@@ -55,7 +55,7 @@ const Testimonials = () => {
       role: "Student",
       content:
         "As a student, I appreciate the wide range of academic books available. The search functionality makes it easy to find exactly what I need.",
-      avatar: "../../images/team-6.jpg",
+      avatar: "http://www.eklabya.com/api/upload/file/1777960745017-4063.png",
       rating: 4,
     },
   ];
@@ -97,13 +97,13 @@ const Testimonials = () => {
               className={`${getCardBgColor(testimonial)} p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300`}
             >
               <div className="flex items-center mb-4">
-                {/* <div className="flex-shrink-0">
+                <div className="flex-shrink-0">
                   <img
-                    className="h-12 w-12 rounded-full"
+                    className="h-12 w-12 rounded-full object-cover"
                     src={testimonial.avatar}
                     alt={`${testimonial.name}'s avatar`}
                   />
-                </div> */}
+                </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-black dark:text-white">
                     {testimonial.name}

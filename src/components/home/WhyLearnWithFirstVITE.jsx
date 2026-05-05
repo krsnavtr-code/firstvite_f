@@ -55,8 +55,7 @@ const data = [
 ];
 
 const renderIcon = (value) => {
-  const iconClass =
-    "text-xl mx-auto transition-transform duration-300 hover:scale-110";
+  const iconClass = "text-xl transition-transform duration-300 hover:scale-110";
 
   if (value === true)
     return (
@@ -91,7 +90,7 @@ const WhyLearnWithFirstVITE = () => {
       {
         threshold: 0.1, // Trigger when 10% of the component is visible
         rootMargin: "0px 0px -50px 0px", // Adjust this to control when the animation triggers
-      }
+      },
     );
 
     if (componentRef.current) {
@@ -107,7 +106,7 @@ const WhyLearnWithFirstVITE = () => {
 
   const toggleValue = (rowIndex, column) => {
     const cell = document.querySelector(
-      `[data-row="${rowIndex}"][data-column="${column}"] .flip-icon`
+      `[data-row="${rowIndex}"][data-column="${column}"] .flip-icon`,
     );
     if (cell) {
       cell.classList.add("flip");
@@ -189,20 +188,12 @@ const WhyLearnWithFirstVITE = () => {
                         idx % 2 === 0
                           ? "bg-white dark:bg-gray-800"
                           : "bg-gray-50 dark:bg-gray-700"
-                      } hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer`}
+                      }`}
                     >
-                      <td
-                        className="w-1/2 px-4 py-3 text-left font-medium text-thin-bold"
-                        onClick={(e) => handleCellClick(e, idx, "benefit")}
-                      >
+                      <td className="w-1/2 px-4 py-3 text-left font-medium text-thin-bold">
                         {row.benefit}
                       </td>
-                      <td
-                        className="w-1/6 px-4 py-3 text-center"
-                        onClick={(e) => handleCellClick(e, idx, "firstVITE")}
-                        data-row={idx}
-                        data-column="firstVITE"
-                      >
+                      <td className="w-1/6 px-4 py-3 text-center">
                         <div
                           className="flip-icon-container"
                           style={{ "--delay": idx % 3 }}
@@ -210,12 +201,7 @@ const WhyLearnWithFirstVITE = () => {
                           {renderIcon(row.firstVITE)}
                         </div>
                       </td>
-                      <td
-                        className="w-1/6 px-4 py-3 text-center"
-                        onClick={(e) => handleCellClick(e, idx, "others")}
-                        data-row={idx}
-                        data-column="others"
-                      >
+                      <td className="w-1/6 px-4 py-3 text-center">
                         <div
                           className="flip-icon-container"
                           style={{ "--delay": (idx % 3) + 1 }}
@@ -223,12 +209,7 @@ const WhyLearnWithFirstVITE = () => {
                           {renderIcon(row.others)}
                         </div>
                       </td>
-                      <td
-                        className="w-1/6 px-4 py-3 text-center"
-                        onClick={(e) => handleCellClick(e, idx, "youtube")}
-                        data-row={idx}
-                        data-column="youtube"
-                      >
+                      <td className="w-1/6 px-4 py-3 text-center">
                         <div
                           className="flip-icon-container"
                           style={{ "--delay": (idx % 3) + 2 }}
@@ -261,23 +242,28 @@ const WhyLearnWithFirstVITE = () => {
                     <span className="text-sm font-medium text-gray-800 dark:text-white">
                       Eklabya
                     </span>
-                    {renderIcon(row.firstVITE)}
+                    <div className="flex items-center">
+                      {renderIcon(row.firstVITE)}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                     <span className="text-sm font-medium text-gray-800 dark:text-white">
                       Other Platforms
                     </span>
-                    {renderIcon(row.others)}
+                    <div className="flex items-center">
+                      {renderIcon(row.others)}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                     <span className="text-sm font-medium text-gray-800 dark:text-white">
                       YouTube
                     </span>
-                    {renderIcon(row.youtube)}
+                    <div className="flex items-center">
+                      {renderIcon(row.youtube)}
+                    </div>
                   </div>
-                  
                 </div>
               </div>
             </div>
