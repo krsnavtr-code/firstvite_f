@@ -1,29 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import {
-  Card,
-  Button,
-  Progress,
-  Tag,
-  message,
-  Skeleton,
-  Empty,
-  Divider,
-} from "antd";
-import {
-  ArrowLeftOutlined,
-  PlayCircleOutlined,
-  CheckCircleOutlined,
-  BookOutlined,
-  WhatsAppOutlined,
-} from "@ant-design/icons";
 import { getSprintsByCourse } from "../../api/sprintApi";
 import { getSessionsBySprint } from "../../api/sessionApi";
 import { getTasksBySession } from "../../api/taskApi";
 import { useLMS } from "../../contexts/LMSContext";
 import { useAuth } from "../../contexts/AuthContext";
-
-const { Meta } = Card;
 
 const CourseDetails = () => {
   const { courseId } = useParams();
@@ -33,29 +14,23 @@ const CourseDetails = () => {
   const [sprints, setSprints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState(null);
-  const [enrollment, setEnrollment] = useState(null);
   const [sprintProgress, setSprintProgress] = useState({});
 
-  // Check if task has been completed by user
   const isTaskCompleted = (task) => {
     if (!task?.submissions?.length) return false;
     const userId = currentUser?._id;
-    if (!userId) return false;
     return task.submissions.some(
       (sub) => sub.user?._id === userId || sub.user === userId,
     );
   };
 
-  // Check if all tasks in a sprint are completed
   const areAllTasksCompleted = (tasks) => {
     if (!tasks || !tasks.length) return false;
     return tasks.every((task) => isTaskCompleted(task));
   };
 
-  // Calculate completion percentage for a sprint
   const calculateSprintProgress = (sprint) => {
     if (!sprint.tasks || !sprint.tasks.length) return 0;
-
     const completedTasks = sprint.tasks.filter((task) => isTaskCompleted(task));
     return Math.round((completedTasks.length / sprint.tasks.length) * 100);
   };
@@ -64,359 +39,284 @@ const CourseDetails = () => {
     const fetchCourseAndSprints = async () => {
       try {
         setLoading(true);
-
-        // Find the enrollment and course data
         const currentEnrollment = enrollments.find(
           (e) => e.course._id === courseId,
         );
         if (!currentEnrollment) {
-          message.error("Course not found in your enrollments");
           navigate("/smart-board/dashboard");
           return;
         }
-
-        setEnrollment(currentEnrollment);
         setCourse(currentEnrollment.course);
 
-        // Fetch sprints for this course with tasks
         const response = await getSprintsByCourse(courseId, {
           populate: "tasks",
         });
+        let sprintsData = response?.data?.sprints || response || [];
 
-        let sprintsData = [];
-        if (response && response.data && Array.isArray(response.data.sprints)) {
-          sprintsData = response.data.sprints;
-        } else if (Array.isArray(response)) {
-          sprintsData = response;
-        } else {
-          console.warn("Unexpected sprints data format:", response);
-        }
-
-        // Calculate progress for each sprint and ensure tasks are properly loaded
         const progressData = {};
         const updatedSprints = [];
 
         for (const sprint of sprintsData) {
-          // Make sure we have tasks for this sprint
           let sprintWithTasks = sprint;
           if (!sprint.tasks || !sprint.tasks.length) {
-            try {
-              // Get all sessions for this sprint first
-              const sessionsResponse = await getSessionsBySprint(sprint._id);
-              const sessions = sessionsResponse?.data?.sessions || [];
-
-              // Get all tasks from all sessions
-              const allTasks = [];
-              for (const session of sessions) {
-                const tasksResponse = await getTasksBySession(session._id);
-                if (tasksResponse?.data?.tasks) {
-                  allTasks.push(...tasksResponse.data.tasks);
-                }
-              }
-              sprintWithTasks = {
-                ...sprint,
-                tasks: allTasks,
-              };
-            } catch (error) {
-              console.error(
-                `Error loading tasks for sprint ${sprint._id}:`,
-                error,
-              );
+            const sessionsResponse = await getSessionsBySprint(sprint._id);
+            const sessions = sessionsResponse?.data?.sessions || [];
+            const allTasks = [];
+            for (const session of sessions) {
+              const tasksResponse = await getTasksBySession(session._id);
+              if (tasksResponse?.data?.tasks)
+                allTasks.push(...tasksResponse.data.tasks);
             }
+            sprintWithTasks = { ...sprint, tasks: allTasks };
           }
-
           progressData[sprint._id] = calculateSprintProgress(sprintWithTasks);
           updatedSprints.push(sprintWithTasks);
         }
-
         setSprintProgress(progressData);
         setSprints(updatedSprints);
       } catch (error) {
         console.error("Error loading course details:", error);
-        message.error("Failed to load course details");
       } finally {
         setLoading(false);
       }
     };
 
-    if (enrollments.length > 0 && currentUser) {
-      fetchCourseAndSprints();
-    }
-  }, [courseId, enrollments, navigate, currentUser]);
+    if (enrollments.length > 0 && currentUser) fetchCourseAndSprints();
+  }, [courseId, enrollments, currentUser]);
 
-  const handleSprintClick = (sprint, e) => {
-    // Prevent the card click from interfering with button click
-    if (e && e.stopPropagation) e.stopPropagation();
-    navigate(`/smart-board/courses/${courseId}/sprints/${sprint._id}`);
-  };
+  const progress = sprints.length
+    ? Math.round(
+        Object.values(sprintProgress).reduce((a, b) => a + b, 0) /
+          sprints.length,
+      )
+    : 0;
 
-  const getSprintStatus = (sprint) => {
-    if (!sprint.tasks || !sprint.tasks.length) return "Not Started";
-
-    const hasCompletedTasks = sprint.tasks.some((task) =>
-      isTaskCompleted(task),
-    );
-    const allTasksCompleted = areAllTasksCompleted(sprint.tasks);
-
-    if (allTasksCompleted) return "Completed";
-    if (hasCompletedTasks) return "In Progress";
-    return "Not Started";
-  };
-
-  const getStatusColor = (sprint) => {
-    if (!sprint.tasks || !sprint.tasks.length) return "default";
-
-    const hasCompletedTasks = sprint.tasks.some((task) =>
-      isTaskCompleted(task),
-    );
-    const allTasksCompleted = areAllTasksCompleted(sprint.tasks);
-
-    if (allTasksCompleted) return "success";
-    if (hasCompletedTasks) return "processing";
-    return "default";
-  };
-
-  if (loading) {
+  if (loading)
     return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <Skeleton active paragraph={{ rows: 8 }} />
+      <div className="p-6 max-w-5xl mx-auto animate-pulse">
+        <div className="h-4 w-32 bg-gray-200 dark:bg-slate-700 rounded mb-6"></div>
+        <div className="h-64 bg-gray-100 dark:bg-slate-800 rounded-2xl mb-8"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="h-40 bg-gray-100 dark:bg-slate-800 rounded-xl"></div>
+          <div className="h-40 bg-gray-100 dark:bg-slate-800 rounded-xl"></div>
+        </div>
       </div>
     );
-  }
-
-  if (!course) {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <Empty description="Course not found" />
-      </div>
-    );
-  }
-
-  // Calculate overall course progress based on sprint progress
-  const calculateCourseProgress = () => {
-    if (sprints.length === 0) return 0;
-
-    const totalProgress = Object.values(sprintProgress).reduce(
-      (sum, progress) => sum + progress,
-      0,
-    );
-
-    return Math.round(totalProgress / sprints.length);
-  };
-
-  const progress = calculateCourseProgress();
-  const isCompleted = progress === 100;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <Button
-        type="text"
-        icon={<ArrowLeftOutlined />}
-        onClick={() => navigate("/smart-board/dashboard")}
-        className="mb-4 text-black dark:text-black"
-      >
-        Back to Dashboard
-      </Button>
-
-      {/* Course Card */}
-      <div className="bg-gray-200 dark:bg-[#001529] rounded-lg shadow-sm p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-1/3">
+    <div className="max-w-6xl mx-auto transition-all">
+      {/* Hero Course Section */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none mb-10">
+        <div className="flex flex-col lg:flex-row">
+          <div className="lg:w-2/5 relative aspect-video lg:aspect-auto">
             <img
-              src={
-                course.thumbnail ||
-                "https://via.placeholder.com/300x200?text=Course"
-              }
-              alt={course.title}
-              className="w-full h-48 object-cover rounded-lg"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://via.placeholder.com/300x200?text=Course";
-              }}
+              src={course.thumbnail || "https://via.placeholder.com/600x400"}
+              alt=""
+              className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent lg:hidden"></div>
           </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-start">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  {course.title}
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {course.description || "No description available"}
-                </p>
 
-                <div className="flex items-center gap-4 mb-4">
-                  <Tag
-                    color={
-                      progress === 100
-                        ? "success"
-                        : progress > 0
-                          ? "processing"
-                          : "default"
-                    }
-                    className="text-sm"
-                  >
-                    {progress === 100
-                      ? "Completed"
-                      : progress > 0
-                        ? `In Progress (${progress}%)`
-                        : "Not Started"}
-                  </Tag>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {sprints.length}{" "}
-                    {sprints.length === 1 ? "Sprint" : "Sprints"}
-                  </span>
-                </div>
-              </div>
+          <div className="p-6 lg:p-10 lg:w-3/5 flex flex-col justify-center">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${progress === 100 ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}
+              >
+                {progress === 100
+                  ? "Completed"
+                  : progress > 0
+                    ? "In Progress"
+                    : "Not Started"}
+              </span>
+              <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-bold uppercase tracking-wider">
+                {sprints.length} Sprints
+              </span>
             </div>
 
-            {/* Progress */}
-            <div className="mt-4">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                <span>Your Progress</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">
-                  {progress}% •{" "}
-                  {sprints.filter((s) => sprintProgress[s._id] === 100).length}/
-                  {sprints.length} Sprints
+            <h1 className="text-3xl font-black text-slate-800 dark:text-white mb-4 leading-tight">
+              {course.title}
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 mb-8 line-clamp-3">
+              {course.description}
+            </p>
+
+            {/* Course Progress Bar */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-end">
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                  Overall Progress
+                </span>
+                <span className="text-lg font-black text-blue-600">
+                  {progress}%
                 </span>
               </div>
-              <div className="relative">
-                <div className="flex items-center mb-1">
-                  <Progress
-                    percent={progress}
-                    status={isCompleted ? "success" : "active"}
-                    showInfo={false}
-                    strokeWidth={8}
-                    className="flex-1"
-                  />
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
-                  {sprints.filter((s) => sprintProgress[s._id] === 100).length}{" "}
-                  of {sprints.length} sprints completed
-                </div>
+              <div className="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-1000 ease-out rounded-full ${progress === 100 ? "bg-green-500" : "bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]"}`}
+                  style={{ width: `${progress}%` }}
+                ></div>
               </div>
+              <p className="text-xs text-slate-400 text-right font-medium">
+                {sprints.filter((s) => sprintProgress[s._id] === 100).length} of{" "}
+                {sprints.length} sprints completed
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Sprints Section */}
-      <div className="mb-10">
-        {/* Heading */}
-        <h2 className="text-2xl font-bold mb-6 flex items-center text-gray-800 dark:text-black">
-          <BookOutlined className="mr-3 text-blue-600" /> Course Sprints
-        </h2>
+      <div>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 dark:text-white">
+            Curriculum Sprints
+          </h2>
+        </div>
 
-        {/* Empty State */}
         {sprints.length === 0 ? (
-          <Empty
-            description={
-              <span className="text-gray-600 dark:text-gray-400">
-                No sprints available for this course
-              </span>
-            }
-            className="py-12"
-          />
+          <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+            <p className="text-slate-500">
+              No sprints published yet for this course.
+            </p>
+          </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            {sprints.map((sprint) => (
-              <Card
-                key={sprint._id}
-                className="hover:shadow-xl transition-all bg-white dark:bg-[#0d1b2a] text-black dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
-                onClick={(e) => handleSprintClick(sprint, e)}
-              >
-                <div className="flex flex-col h-full">
-                  {/* Title + Status */}
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {sprints.map((sprint) => {
+              const sp = sprintProgress[sprint._id] || 0;
+              const isComp = sp === 100;
+
+              return (
+                <div
+                  key={sprint._id}
+                  onClick={() =>
+                    navigate(
+                      `/smart-board/courses/${courseId}/sprints/${sprint._id}`,
+                    )
+                  }
+                  className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/5"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white group-hover:text-blue-600 transition-colors line-clamp-1">
                       {sprint.name}
-                      <Tag
-                        color={getStatusColor(sprint)}
-                        className="text-xs px-2 py-0.5 rounded"
-                      >
-                        {getSprintStatus(sprint)}
-                      </Tag>
                     </h3>
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={
-                        sprintProgress[sprint._id] === 100 ? (
-                          <CheckCircleOutlined className="text-green-500" />
-                        ) : (
-                          <PlayCircleOutlined className="text-blue-500" />
-                        )
-                      }
-                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                      onClick={(e) => handleSprintClick(sprint, e)}
+                    <div
+                      className={`p-1.5 rounded-lg ${isComp ? "bg-green-100 text-green-600" : "bg-blue-50 text-blue-600"}`}
                     >
-                      {sprintProgress[sprint._id] === 100
-                        ? "Review"
-                        : "Continue"}
-                    </Button>
+                      {isComp ? (
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1">
-                    {sprint.description || "No description available"}
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 line-clamp-2 h-10 leading-relaxed">
+                    {sprint.description ||
+                      "Learn the fundamentals and advanced concepts in this sprint module."}
                   </p>
 
-                  {/* WhatsApp Group Button */}
-                  {sprint.whatsappGroupLink && (
-                    <div className="mt-3 overflow-hidden w-fit">
-                      <Button
-                        type="primary"
-                        icon={<WhatsAppOutlined />}
-                        size="small"
-                        className="bg-green-600 hover:bg-green-700 border-none rounded px-4 transition-transform duration-300 hover:translate-x-2"
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
+                    <div className="flex gap-4">
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        {sprint.duration || 0} Days
+                      </span>
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                          />
+                        </svg>
+                        {sprint.tasks?.length || 0} Tasks
+                      </span>
+                    </div>
+                    {sprint.whatsappGroupLink && (
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open(
-                            sprint.whatsappGroupLink,
-                            "_blank",
-                            "noopener,noreferrer",
-                          );
+                          window.open(sprint.whatsappGroupLink, "_blank");
                         }}
+                        className="text-green-500 hover:bg-green-50 p-2 rounded-lg transition-colors"
+                        title="Join WhatsApp Group"
                       >
-                        Join WhatsApp Group
-                      </Button>
-                    </div>
-                  )}
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
 
-                  {/* Duration + Tasks */}
-                  {sprint.duration && (
-                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-3">
-                      <span>⏳ {sprint.duration} days</span>
-                      <span>📝 {sprint.tasks?.length || 0} tasks</span>
-                    </div>
-                  )}
-
-                  {/* Progress Bar */}
-                  {sprintProgress[sprint._id] > 0 && (
-                    <div className="mt-4">
-                      <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                        <span>Progress</span>
-                        <span className="font-medium text-gray-800 dark:text-gray-200">
-                          {sprintProgress[sprint._id] || 0}%
-                        </span>
-                      </div>
-                      <Progress
-                        percent={sprintProgress[sprint._id] || 0}
-                        status={
-                          sprintProgress[sprint._id] === 100
-                            ? "success"
-                            : "active"
-                        }
-                        showInfo={false}
-                        strokeWidth={6}
-                        className="mb-0"
-                      />
+                  {/* Individual Sprint Progress */}
+                  {sp > 0 && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-100 dark:bg-slate-800">
+                      <div
+                        className={`h-full transition-all duration-700 ${isComp ? "bg-green-500" : "bg-blue-600"}`}
+                        style={{ width: `${sp}%` }}
+                      ></div>
                     </div>
                   )}
                 </div>
-              </Card>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -32,10 +32,10 @@ const LMSLayout = () => {
       </header>
 
       {/* Main content area */}
-      <div className="flex mt-10 flex-1">
+      <div className="flex mt-12 flex-1 text-black dark:text-white">
         {/* Sidebar */}
         <aside
-          className={`fixed left-0 top-10 bottom-0 z-[900] transition-all duration-200 overflow-hidden shadow-md
+          className={`fixed left-0 top-12 bottom-0 z-[900] transition-all duration-200 overflow-hidden shadow-md
             ${collapsed ? "w-[60px]" : "w-[160px]"}`}
         >
           <LMSSidebar
@@ -47,11 +47,11 @@ const LMSLayout = () => {
 
         {/* Page Content */}
         <main
-          className={`flex-1 p-1 transition-all duration-200 min-h-[calc(100vh-40px)] bg-[#001529] dark:bg-slate-900
+          className={`flex-1 transition-all duration-200 min-h-[calc(100vh-50px)] bg-[#001529] dark:bg-slate-900
             ${collapsed ? "ml-[60px]" : "ml-[160px]"}`}
         >
-          <div className="bg-white dark:bg-slate-800 rounded-lg p-1 min-h-full shadow-sm">
-            <div className="lms-container">
+          <div className="bg-white dark:bg-slate-800 min-h-full shadow-sm">
+            <div className="lms-container p-4">
               <Outlet />
             </div>
           </div>

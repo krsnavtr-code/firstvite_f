@@ -1,217 +1,204 @@
-import React, { useState } from 'react';
-import { Card, Tabs, Form, Input, Button, Switch, message, Select, Upload, Avatar } from 'antd';
-import { UserOutlined, UploadOutlined, MailOutlined, LockOutlined, NotificationOutlined, GlobalOutlined } from '@ant-design/icons';
+import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
-const { Option } = Select;
-
 const Settings = () => {
-  const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
   const { currentUser, updateProfile } = useAuth();
+  const [activeTab, setActiveTab] = useState("profile");
+  const [loading, setLoading] = useState(false);
 
-  const onFinish = async (values) => {
+  // State for form fields
+  const [formData, setFormData] = useState({
+    name: currentUser?.fullname || "",
+    email: currentUser?.email || "",
+    bio: "I am a passionate learner!",
+    language: "en",
+    timezone: "UTC+05:30",
+  });
+
+  const [notifications, setNotifications] = useState({
+    email: true,
+    updates: true,
+    promo: false,
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      setLoading(true);
-      await updateProfile(values);
-      message.success('Profile updated successfully');
+      await updateProfile(formData);
+      alert("Profile updated successfully");
     } catch (error) {
-      message.error(error.message);
+      alert(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePasswordChange = async (values) => {
-    message.success('Password updated successfully');
+  const toggleNotification = (key) => {
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
-
-  const handleNotificationChange = (checked) => {
-    message.info(`Notifications ${checked ? 'enabled' : 'disabled'}`);
-  };
-
-  const uploadProps = {
-    name: 'avatar',
-    action: '/api/upload',
-    showUploadList: false,
-    onChange(info) {
-      if (info.file.status === 'done') {
-        message.success('Profile picture updated successfully');
-      } else if (info.file.status === 'error') {
-        message.error('Upload failed');
-      }
-    },
-  };
-
-  const items = [
-    {
-      key: "1",
-      label: (
-        <span>
-          <UserOutlined />
-          Profile
-        </span>
-      ),
-      children: (
-        <div className="flex flex-col md:flex-row gap-8 text-black dark:text-white">
-          <div className="w-full md:w-1/3 flex flex-col items-center">
-            <Avatar
-              size={120}
-              icon={<UserOutlined />}
-              src={currentUser?.photoURL}
-              className="mb-4"
-            />
-            <Upload {...uploadProps}>
-              <Button icon={<UploadOutlined />}>Change Photo</Button>
-            </Upload>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-              JPG, GIF or PNG. Max size of 2MB
-            </p>
-          </div>
-
-          <div className="flex-1">
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              initialValues={{
-                name: currentUser?.fullname || "",
-                email: currentUser?.email || "",
-                bio: "I am a passionate learner!",
-              }}
-              className="dark:[&_.ant-form-item-label>label]:text-white"
-            >
-              <Form.Item name="name" label="Full Name">
-                <Input prefix={<UserOutlined />} placeholder="Your name" />
-              </Form.Item>
-
-              <Form.Item name="email" label="Email">
-                <Input prefix={<MailOutlined />} disabled />
-              </Form.Item>
-
-              <Form.Item name="bio" label="Bio">
-                <Input.TextArea rows={4} placeholder="Tell us about yourself" />
-              </Form.Item>
-
-              <Form.Item>
-                <Button
-                  htmlType="submit"
-                  loading={loading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
-                >
-                  Save Changes
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "3",
-      label: (
-        <span>
-          <NotificationOutlined />
-          Notifications
-        </span>
-      ),
-      children: (
-        <div className="space-y-6 text-black dark:text-white">
-          <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-            <div>
-              <h3 className="font-medium">Email Notifications</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                Receive email notifications about your courses and account
-              </p>
-            </div>
-            <Switch defaultChecked onChange={handleNotificationChange} />
-          </div>
-
-          <div className="flex justify-between items-center p-4 border-b">
-            <div>
-              <h3 className="font-medium">Course Updates</h3>
-              <p className="text-gray-500 text-sm">
-                Get notified when new content is added to your courses
-              </p>
-            </div>
-            <Switch defaultChecked onChange={handleNotificationChange} />
-          </div>
-
-          <div className="flex justify-between items-center p-4 border-b">
-            <div>
-              <h3 className="font-medium">Promotional Emails</h3>
-              <p className="text-gray-500 text-sm">
-                Receive special offers and updates
-              </p>
-            </div>
-            <Switch onChange={handleNotificationChange} />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "4",
-      label: (
-        <span>
-          <GlobalOutlined />
-          Preferences
-        </span>
-      ),
-      children: (
-        <div className="space-y-6 text-black dark:text-white">
-          <Form.Item label="Language" name="language" className="max-w-xs">
-            <Select
-              defaultValue="en"
-              placeholder="Select language"
-              className="dark:[&_.ant-select-selector]:bg-[#001529] dark:[&_.ant-select-selector]:text-white"
-            >
-              <Option value="en">English</Option>
-              <Option value="es">Spanish</Option>
-              <Option value="fr">French</Option>
-              <Option value="de">German</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item label="Time Zone" name="timezone" className="max-w-xs">
-            <Select
-              defaultValue="UTC+05:30"
-              placeholder="Select timezone"
-              className="dark:[&_.ant-select-selector]:bg-[#001529] dark:[&_.ant-select-selector]:text-white"
-            >
-              <Option value="UTC">UTC</Option>
-              <Option value="UTC+05:30">(UTC+05:30) India</Option>
-              <Option value="UTC-05:00">
-                (UTC-05:00) Eastern Time (US & Canada)
-              </Option>
-              <Option value="UTC+01:00">(UTC+01:00) London</Option>
-            </Select>
-          </Form.Item>
-
-          <div className="pt-4">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded">
-              Save Preferences
-            </Button>
-          </div>
-        </div>
-      ),
-    },
-  ];
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-black">Settings</h1>
-      <Card className="bg-gray-200 dark:bg-[#001525] text-black dark:text-white">
-        <Tabs
-          defaultActiveKey="1"
-          items={items}
-          className="
-    [&_.ant-tabs-tab-btn]:text-black
-    dark:[&_.ant-tabs-tab-btn]:text-white
-    [&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:text-blue-600
-    dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:text-blue-400
-  "
-        />
-      </Card>
+    <div className="max-w-7xl mx-auto transition-colors duration-300">
+      <header className="mb-8">
+        <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">
+          Settings
+        </h1>
+        <p className="t text-sm">
+          Manage your account settings and preferences.
+        </p>
+      </header>
+
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+        {/* Custom Tabs Navigation */}
+        <div className="flex overflow-x-auto border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+          {["profile", "notifications", "preferences"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-8 py-4 text-sm font-bold uppercase tracking-widest transition-all border-b-2 whitespace-nowrap ${
+                activeTab === tab
+                  ? "border-blue-600 text-blue-600 bg-white dark:bg-slate-900"
+                  : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-6 sm:p-10">
+          {/* Profile Tab */}
+          {activeTab === "profile" && (
+            <div className="flex flex-col lg:flex-row gap-12">
+              <form onSubmit={handleSave} className="flex-1 space-y-6">
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <label className="block text-xs font-black uppercase t mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase t mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      disabled
+                      className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase t mb-2">
+                      Bio
+                    </label>
+                    <textarea
+                      name="bio"
+                      rows="4"
+                      value={formData.bio}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all dark:text-white resize-none"
+                    ></textarea>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50"
+                >
+                  {loading ? "Saving..." : "Save Profile Changes"}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Notifications Tab */}
+          {activeTab === "notifications" && (
+            <div className="space-y-4">
+              {[
+                {
+                  id: "email",
+                  title: "Email Notifications",
+                  desc: "Receive updates about account activity.",
+                },
+                {
+                  id: "updates",
+                  title: "Course Updates",
+                  desc: "Get notified when new lessons are added.",
+                },
+                {
+                  id: "promo",
+                  title: "Promotional Content",
+                  desc: "Special offers and newsletter updates.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"
+                >
+                  <div>
+                    <h4 className="font-bold text-slate-800 dark:text-white">
+                      {item.title}
+                    </h4>
+                    <p className="text-sm t">{item.desc}</p>
+                  </div>
+                  {/* Custom Toggle Switch */}
+                  <button
+                    onClick={() => toggleNotification(item.id)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${notifications[item.id] ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-700"}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${notifications[item.id] ? "translate-x-6" : "translate-x-1"}`}
+                    />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Preferences Tab */}
+          {activeTab === "preferences" && (
+            <div className="max-w-md space-y-8">
+              <div>
+                <label className="block text-xs font-black uppercase t mb-3">
+                  Preferred Language
+                </label>
+                <select className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none dark:text-white appearance-none">
+                  <option value="en">English (US)</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-black uppercase t mb-3">
+                  Time Zone
+                </label>
+                <select className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none dark:text-white appearance-none">
+                  <option value="IST">India (GMT+5:30)</option>
+                  <option value="UTC">Universal Time (UTC)</option>
+                  <option value="EST">Eastern Time (EST)</option>
+                </select>
+              </div>
+              <button className="px-8 py-3 bg-slate-800 dark:bg-blue-600 text-white font-bold rounded-xl hover:bg-slate-700 dark:hover:bg-blue-700 transition-all shadow-lg">
+                Update Preferences
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

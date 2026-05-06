@@ -1,38 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Tabs, Button, List, Tag, Space, Typography, message, Spin, Empty, Select } from 'antd';
-import { RocketOutlined, CheckCircleOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
-import { formatDistanceToNow } from 'date-fns';
-
-const { Title, Text } = Typography;
-const { TabPane } = Tabs;
-const { Option } = Select;
+import { formatDistanceToNow } from "date-fns";
 
 const Career = () => {
   const [loading, setLoading] = useState(true);
   const [jobListings, setJobListings] = useState([]);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("available"); // 'available' or 'applied'
   const [filters, setFilters] = useState({
-    jobType: null,
-    location: '',
-    course: null
+    jobType: "",
+    course: "",
   });
   const [courses, setCourses] = useState([]);
   const { user } = useAuth();
 
-  // Fetch job listings and applied jobs
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch all open job listings
         const [jobsRes, appliedRes, coursesRes] = await Promise.all([
-          axios.get('/api/careers?status=Open'),
-          user ? axios.get(`/api/users/${user.id}/applications`) : Promise.resolve({ data: [] }),
-          axios.get('/api/courses')
+          axios.get("/api/careers?status=Open"),
+          user
+            ? axios.get(`/api/users/${user.id}/applications`)
+            : Promise.resolve({ data: [] }),
+          axios.get("/api/courses"),
         ]);
 
         setJobListings(jobsRes.data);
@@ -40,365 +34,250 @@ const Career = () => {
         setAppliedJobs(appliedRes.data || []);
         setCourses(coursesRes.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
-        message.error('Failed to load job listings');
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [user]);
 
-  // Apply filters and search
   useEffect(() => {
     let result = [...jobListings];
-    
-    // Apply search
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(job => 
-        job.title.toLowerCase().includes(term) || 
-        job.description.toLowerCase().includes(term) ||
-        job.requirements.some(req => req.toLowerCase().includes(term))
+      result = result.filter(
+        (job) =>
+          job.title.toLowerCase().includes(term) ||
+          job.description.toLowerCase().includes(term),
       );
     }
-
-    // Apply filters
-    if (filters.jobType) {
-      result = result.filter(job => job.jobType === filters.jobType);
-    }
-    
-    if (filters.location) {
-      result = result.filter(job => 
-        job.location.toLowerCase().includes(filters.location.toLowerCase())
-      );
-    }
-    
-    if (filters.course) {
-      result = result.filter(job => job.courseId._id === filters.course);
-    }
-
+    if (filters.jobType)
+      result = result.filter((job) => job.jobType === filters.jobType);
+    if (filters.course)
+      result = result.filter((job) => job.courseId?._id === filters.course);
     setFilteredJobs(result);
   }, [searchTerm, filters, jobListings]);
 
   const handleApply = async (jobId) => {
-    if (!user) {
-      message.warning('Please login to apply for jobs');
-      return;
-    }
-
+    if (!user) return alert("Please login to apply");
     try {
-      setLoading(true);
-      await axios.post('/api/applications', { jobId, studentId: user.id });
-      
-      // Update UI optimistically
-      const job = jobListings.find(j => j._id === jobId);
-      if (job) {
-        setAppliedJobs([...appliedJobs, { ...job, status: 'applied', appliedAt: new Date() }]);
-        message.success(`Successfully applied for ${job.title}`);
-      }
+      await axios.post("/api/applications", { jobId, studentId: user.id });
+      const job = jobListings.find((j) => j._id === jobId);
+      setAppliedJobs([
+        ...appliedJobs,
+        { ...job, status: "applied", appliedAt: new Date() },
+      ]);
     } catch (error) {
-      console.error('Error applying for job:', error);
-      message.error('Failed to apply for job. Please try again.');
-    } finally {
-      setLoading(false);
+      console.error(error);
     }
   };
 
-  const isApplied = (jobId) => {
-    return appliedJobs.some(job => job._id === jobId || job.jobId === jobId);
-  };
-
-  const getApplicationStatus = (jobId) => {
-    const application = appliedJobs.find(app => app._id === jobId || app.jobId === jobId);
-    return application?.status || 'not_applied';
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return formatDistanceToNow(date, { addSuffix: true });
-  };
+  const isApplied = (jobId) =>
+    appliedJobs.some((job) => job._id === jobId || job.jobId === jobId);
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto min-h-screen">
-      <div className="mb-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <div>
-            <Title level={3} className="flex items-center gap-2 mb-1">
-              <RocketOutlined />
-              <span>Career Opportunities</span>
-            </Title>
-            <Text className="text-gray-600">
-              Find your dream job through Eklabya's career portal
-            </Text>
-          </div>
-          
-          <div className="w-full md:w-96">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <SearchOutlined className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white dark:bg-gray-800 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-white"
-                placeholder="Search jobs by title, skills, or company"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+    <div className="max-w-7xl mx-auto min-h-screen transition-colors">
+      {/* Header & Search */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
+        <div>
+          <h1 className="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+            <span className="p-2 bg-blue-600 rounded-xl">
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </span>
+            Career Hub
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">
+            Explore roles that match your skills and growth.
+          </p>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <Select
-            placeholder="Job Type"
-            className="w-full sm:w-48"
-            allowClear
-            onChange={(value) => setFilters({...filters, jobType: value})}
+        <div className="relative w-full lg:w-96">
+          <input
+            type="text"
+            placeholder="Search roles, skills..."
+            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all dark:text-white"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <svg
+            className="w-5 h-5 absolute left-4 top-3.5 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <Option value="Full-time">Full-time</Option>
-            <Option value="Part-time">Part-time</Option>
-            <Option value="Contract">Contract</Option>
-            <Option value="Internship">Internship</Option>
-            <Option value="Freelance">Freelance</Option>
-          </Select>
-          
-          <Select
-            placeholder="Course"
-            className="w-full sm:w-56"
-            allowClear
-            onChange={(value) => setFilters({...filters, course: value})}
-          >
-            {courses.map(course => (
-              <Option key={course._id} value={course._id}>
-                {course.title}
-              </Option>
-            ))}
-          </Select>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
         </div>
       </div>
 
-      <Card className="bg-white dark:bg-gray-800 shadow-sm">
-        <Tabs defaultActiveKey="1" className="dark:text-white">
-          <TabPane tab={<span className="dark:text-white">Available Jobs</span>} key="1">
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Spin size="large" />
-              </div>
-            ) : filteredJobs.length > 0 ? (
-              <List
-                itemLayout="vertical"
-                dataSource={filteredJobs}
-                renderItem={(job) => (
-                  <List.Item
+      {/* Custom Tabs */}
+      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl w-fit mb-8">
+        <button
+          onClick={() => setActiveTab("available")}
+          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "available" ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"}`}
+        >
+          Available Jobs
+        </button>
+        <button
+          onClick={() => setActiveTab("applied")}
+          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "applied" ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"}`}
+        >
+          My Applications ({appliedJobs.length})
+        </button>
+      </div>
+
+      {/* Main Content Area */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-48 bg-slate-100 dark:bg-slate-800 rounded-3xl"
+            ></div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {activeTab === "available" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredJobs.length > 0 ? (
+                filteredJobs.map((job) => (
+                  <div
                     key={job._id}
-                    className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors mb-4"
-                    actions={[
-                      <Space size="middle" className="dark:text-gray-300">
-                        <Tag color="blue" className="dark:border-blue-400">{job.jobType}</Tag>
-                        <Text className="dark:text-gray-300">{job.location}</Text>
-                        {job.salary && (
-                          <Text strong className="dark:text-white">{job.salary}</Text>
-                        )}
-                        {job.courseId && (
-                          <Tag color="purple" className="dark:border-purple-400">
-                            {job.courseId.title}
-                          </Tag>
-                        )}
-                      </Space>,
-                    ]}
-                    extra={[
-                      <Button
-                        onClick={() => handleApply(job._id)}
-                        disabled={isApplied(job._id)}
-                        icon={isApplied(job._id) ? <CheckCircleOutlined /> : null}
-                        className={`${
-                          isApplied(job._id)
-                            ? 'bg-green-600 hover:bg-green-700'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                        } text-white`}
-                        loading={loading}
-                      >
-                        {isApplied(job._id) ? 'Applied' : 'Apply Now'}
-                      </Button>,
-                    ]}
+                    className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-3xl hover:shadow-2xl hover:shadow-blue-500/5 transition-all group"
                   >
-                    <List.Item.Meta
-                      className="p-2"
-                      title={
-                        <div className="flex flex-col">
-                          <Title level={5} className="dark:text-white mb-1">
-                            {job.title}
-                          </Title>
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {job.requirements.slice(0, 3).map((req, index) => (
-                              <Tag
-                                key={index}
-                                className="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
-                              >
-                                {req}
-                              </Tag>
-                            ))}
-                            {job.requirements.length > 3 && (
-                              <Tag className="dark:border-gray-600 dark:bg-gray-700">
-                                +{job.requirements.length - 3} more
-                              </Tag>
-                            )}
-                          </div>
-                        </div>
-                      }
-                      description={
-                        <div className="mt-2">
-                          <Text className="dark:text-gray-400 line-clamp-3">
-                            {job.description}
-                          </Text>
-                        </div>
-                      }
-                    />
-                    <div className="flex justify-between items-center mt-4 px-2">
-                      <Text className="text-xs text-gray-500 dark:text-gray-400">
-                        Posted {formatDate(job.createdAt)}
-                        {job.applicationDeadline && (
-                          <span className="ml-2">• Apply by {new Date(job.applicationDeadline).toLocaleDateString()}</span>
-                        )}
-                      </Text>
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-white group-hover:text-blue-600 transition-colors">
+                          {job.title}
+                        </h3>
+                        <p className="text-slate-400 text-sm font-medium">
+                          {job.location} • {job.jobType}
+                        </p>
+                      </div>
+                      <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        {job.salary || "Competitive"}
+                      </span>
                     </div>
-                  </List.Item>
-                )}
-              />
-            ) : (
-              <Empty
-                description={
-                  <span className="dark:text-gray-400">
-                    No jobs found matching your criteria
-                  </span>
-                }
-                className="py-12"
-              />
-            )}
-          </TabPane>
-          
-          <TabPane 
-            tab={
-              <div className="flex items-center">
-                <span className="dark:text-white">My Applications</span>
-                {appliedJobs.length > 0 && (
-                  <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full dark:bg-blue-200 dark:text-blue-800">
-                    {appliedJobs.length}
-                  </span>
-                )}
-              </div>
-            } 
-            key="2"
-          >
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Spin size="large" />
-              </div>
-            ) : appliedJobs.length > 0 ? (
-              <List
-                itemLayout="vertical"
-                dataSource={appliedJobs}
-                renderItem={(application) => {
-                  const job = application.jobId || application; // Handle both direct job objects and populated references
-                  const status = application.status || 'applied';
-                  
-                  return (
-                    <List.Item
-                      className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors mb-4"
-                      actions={[
-                        <div key="status" className="flex items-center gap-2">
-                          <Tag 
-                            color={
-                              status === 'hired' ? 'success' : 
-                              status === 'rejected' ? 'error' : 
-                              'processing'
-                            }
-                            className="dark:border-opacity-50"
-                          >
-                            {status === 'hired' ? 'Hired' : 
-                             status === 'rejected' ? 'Not Selected' : 
-                             status === 'interview' ? 'Interview Scheduled' :
-                             'Application Submitted'}
-                          </Tag>
-                          {application.appliedAt && (
-                            <Text className="text-sm text-gray-500 dark:text-gray-400">
-                              Applied {formatDate(application.appliedAt)}
-                            </Text>
-                          )}
-                        </div>
-                      ]}
+
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-2 leading-relaxed">
+                      {job.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {job.requirements.slice(0, 3).map((req, i) => (
+                        <span
+                          key={i}
+                          className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-100 dark:border-slate-700"
+                        >
+                          {req}
+                        </span>
+                      ))}
+                    </div>
+
+                    <button
+                      disabled={isApplied(job._id)}
+                      onClick={() => handleApply(job._id)}
+                      className={`w-full py-3 rounded-2xl font-bold text-sm transition-all ${isApplied(job._id) ? "bg-emerald-50 text-emerald-600 cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20"}`}
                     >
-                      <List.Item.Meta
-                        title={
-                          <div className="flex flex-col">
-                            <Title level={5} className="dark:text-white mb-1">
-                              {job.title}
-                            </Title>
-                            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                              {job.company && <span>{job.company}</span>}
-                              {job.location && <span>• {job.location}</span>}
-                              {job.jobType && (
-                                <Tag color="blue" className="dark:border-blue-400">
-                                  {job.jobType}
-                                </Tag>
-                              )}
-                            </div>
-                          </div>
-                        }
-                        description={
-                          <div className="mt-2">
-                            {application.coverLetter && (
-                              <div className="mb-2">
-                                <Text strong className="dark:text-gray-300">Your Note:</Text>
-                                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                                  {application.coverLetter}
-                                </p>
-                              </div>
-                            )}
-                            {application.notes && status !== 'applied' && (
-                              <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900 dark:bg-opacity-30 rounded-md">
-                                <Text strong className="dark:text-blue-300">
-                                  {status === 'hired' ? 'Congratulations!' : 
-                                   status === 'rejected' ? 'Update:' : 
-                                   'Latest Update:'}
-                                </Text>
-                                <p className="text-gray-700 dark:text-gray-300 mt-1">
-                                  {application.notes}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  );
-                }}
-              />
-            ) : (
-              <Empty
-                description={
-                  <div className="flex flex-col items-center">
-                    <Text className="dark:text-gray-400 mb-4">
-                      You haven't applied to any jobs yet
-                    </Text>
-                    <Button 
-                      type="primary" 
-                      onClick={() => document.querySelector('.ant-tabs-tab:first-child').click()}
-                    >
-                      Browse Jobs
-                    </Button>
+                      {isApplied(job._id)
+                        ? "✓ Application Sent"
+                        : "Apply for this Role"}
+                    </button>
                   </div>
-                }
-                className="py-12"
-              />
-            )}
-          </TabPane>
-        </Tabs>
-      </Card>
+                ))
+              ) : (
+                <div className="col-span-full py-20 text-center text-slate-400">
+                  No jobs match your current search.
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Applied Jobs Tab Content */
+            <div className="space-y-4">
+              {appliedJobs.length > 0 ? (
+                appliedJobs.map((app) => {
+                  const job = app.jobId || app;
+                  return (
+                    <div
+                      key={app._id}
+                      className="flex flex-col md:flex-row md:items-center justify-between bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-3xl gap-6"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 font-bold">
+                          {job.title?.charAt(0)}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-slate-800 dark:text-white">
+                            {job.title}
+                          </h4>
+                          <p className="text-xs text-slate-400 uppercase font-bold tracking-tighter">
+                            Applied{" "}
+                            {formatDistanceToNow(
+                              new Date(app.appliedAt || new Date()),
+                              { addSuffix: true },
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-6">
+                        <div className="text-right hidden lg:block">
+                          <p className="text-xs font-bold text-slate-400 uppercase mb-1">
+                            Status
+                          </p>
+                          <span
+                            className={`px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest ${app.status === "hired" ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700"}`}
+                          >
+                            {app.status || "Under Review"}
+                          </span>
+                        </div>
+                        <button className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 hover:text-blue-600">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-20 text-center text-slate-400">
+                  You haven't submitted any applications yet.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
