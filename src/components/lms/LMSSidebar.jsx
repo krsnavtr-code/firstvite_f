@@ -67,37 +67,28 @@ const LMSSidebar = ({ collapsed, theme: themeProp }) => {
       trigger={null}
       collapsible
       collapsed={collapsed}
-      width={180}
+      width={160}
       collapsedWidth={60}
-      style={{
-        height: "100%",
-        overflow: "hidden",
-        position: "relative",
-        color: themeProp === "dark" ? "black" : "white",
-        background: themeProp === "dark" ? "#001529" : "#fff",
-        borderRight: themeProp === "light" ? "1px solid #f0f0f0" : "none",
-      }}
+      className={`h-full relative transition-colors duration-300
+        ${
+          themeProp === "dark"
+            ? "bg-[#001529] border-none"
+            : "bg-white border-r border-gray-100"
+        }
+      `}
     >
       <Menu
         mode="inline"
         theme={themeProp === "dark" ? "dark" : "light"}
         selectedKeys={[selectedKey]}
-        style={{
-          background: "transparent",
-          borderRight: "none",
-          padding: "8px 4px",
-          color: themeProp === "dark" ? "black" : "white",
-        }}
-        items={menuItems.map((item) => ({
-          ...item,
-          style: {
-            margin: "4px 0",
-            borderRadius: "6px",
-          },
-          title: collapsed ? item.label : "",
-        }))}
         onSelect={({ key }) => setSelectedKey(key)}
         inlineCollapsed={collapsed}
+        className="bg-transparent border-none py-2 px-1"
+        items={menuItems.map((item) => ({
+          ...item,
+          className: "my-1 rounded-md", // Tailwind for menu items
+          title: collapsed ? item.label : "",
+        }))}
       />
     </Sider>
   );

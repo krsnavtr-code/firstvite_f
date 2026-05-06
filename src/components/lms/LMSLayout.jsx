@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import { Layout, Button, theme } from 'antd';
-import LMSNavbar from './LMSNavbar';
-import LMSSidebar from './LMSSidebar';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-
-const { Content } = Layout;
+import React, { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import { Layout } from "antd";
+import LMSNavbar from "./LMSNavbar";
+import LMSSidebar from "./LMSSidebar";
 
 const LMSLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState(
-    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
+    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light",
   );
+
   const element = document.documentElement;
-  
+
   useEffect(() => {
     if (theme === "dark") {
       element.classList.add("dark");
@@ -24,72 +22,40 @@ const LMSLayout = () => {
       localStorage.setItem("theme", "light");
       document.body.classList.remove("dark");
     }
-  }, [theme]);
+  }, [theme, element]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="flex flex-col min-h-screen">
       {/* Navbar at the very top */}
-      <div style={{ position: 'fixed', width: '100%', zIndex: 1000 }}>
+      <header className="fixed top-0 left-0 w-full z-[1000]">
         <LMSNavbar theme={theme} onThemeChange={setTheme} />
-      </div>
-      
-      {/* Main content area with sidebar and page content */}
-      <div style={{ display: 'flex', marginTop: '40px', flex: 1 }}>
+      </header>
+
+      {/* Main content area */}
+      <div className="flex mt-10 flex-1">
         {/* Sidebar */}
-        <div style={{
-          width: collapsed ? '60px' : '160px',
-          flexShrink: 0,
-          position: 'fixed',
-          left: 0,
-          top: '40px',
-          bottom: 0,
-          zIndex: 900,
-          transition: 'width 0.2s',
-          overflow: 'hidden',
-          boxShadow: '2px 0 8px 0 rgba(29, 35, 41, 0.05)'
-        }}>
-          <LMSSidebar 
-            collapsed={collapsed} 
+        <aside
+          className={`fixed left-0 top-10 bottom-0 z-[900] transition-all duration-200 overflow-hidden shadow-md
+            ${collapsed ? "w-[60px]" : "w-[160px]"}`}
+        >
+          <LMSSidebar
+            collapsed={collapsed}
             theme={theme}
-            onCollapse={setCollapsed} 
+            onCollapse={setCollapsed}
           />
-        </div>
+        </aside>
 
         {/* Page Content */}
-        <div style={{
-          marginLeft: collapsed ? '60px' : '160px',
-          flex: 1,
-          padding: '5px',
-          transition: 'margin-left 0.2s',
-          minHeight: 'calc(100vh - 40px)',
-          backgroundColor: '#001529',
-          position: 'relative'
-        }}>
-          <div style={{ 
-            background: '#fff',
-            borderRadius: '8px',
-            padding: '5px',
-            minHeight: '100%',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)'
-          }}>
-            {/* <div style={{ position: 'absolute', top: '0px', left: '0px' }}>
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                style={{
-                  fontSize: '18px', 
-                  width: 48,
-                  height: 48,
-                }}
-                className="hover:text-blue-600"
-              />
-            </div> */}
+        <main
+          className={`flex-1 p-1 transition-all duration-200 min-h-[calc(100vh-40px)] bg-[#001529] dark:bg-slate-900
+            ${collapsed ? "ml-[60px]" : "ml-[160px]"}`}
+        >
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-1 min-h-full shadow-sm">
             <div className="lms-container">
               <Outlet />
             </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
