@@ -12,6 +12,7 @@ import {
   FaCheck,
   FaExclamationCircle,
   FaChevronDown,
+  FaChevronRight,
   FaPhoneAlt,
   FaEnvelope,
   FaCreditCard,
@@ -563,6 +564,89 @@ function Navbar() {
             </div>
           )}
 
+          {/* Small Screen Payment option */}
+          <div className="mb-4">
+            <button
+              onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+              className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <FaCreditCard size={14} /> Make Payment
+              </span>
+              <FaChevronDown
+                size={10}
+                className={`transition-transform ${showPaymentDropdown ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {showPaymentDropdown && (
+              <div className="mt-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <button
+                  onClick={() => {
+                    setShowPaymentForm(true);
+                    setShowPaymentDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-3 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"
+                >
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                    Pay Using <span className="text-orange-600">RazorPay</span>
+                  </span>
+                  <FaChevronRight size={12} className="text-gray-400" />
+                </button>
+
+                <div className="px-4 py-4">
+                  <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">
+                    Pay Using Bank Transfer
+                  </h3>
+
+                  <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                    <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Bank Name
+                      </span>
+                      <span className="font-medium">ICICI Bank</span>
+                    </div>
+
+                    <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Account Number
+                      </span>
+                      <span className="font-medium">2530 5010 216</span>
+                    </div>
+
+                    <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        IFSC Code
+                      </span>
+                      <span className="font-medium">ICIC0000253</span>
+                    </div>
+
+                    <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Branch
+                      </span>
+                      <span className="font-medium">Noida</span>
+                    </div>
+
+                    <div className="flex justify-between py-2">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        UPI Number
+                      </span>
+                      <span className="font-medium">9891030303</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                    <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                      After payment, please share your transaction ID or payment
+                      screenshot for verification.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Navigation Links */}
           <div className="space-y-1 mb-6">
             <Link
@@ -624,16 +708,6 @@ function Navbar() {
               {theme === "dark"
                 ? "Switch to Light Mode"
                 : "Switch to Dark Mode"}
-            </button>
-
-            <button
-              onClick={() => {
-                setIsMobileMenuOpen(false);
-                setShowPaymentForm(true);
-              }}
-              className="flex items-center gap-3 text-gray-600 dark:text-gray-400 font-medium text-sm w-full"
-            >
-              <FaCreditCard /> Make a Payment
             </button>
 
             {isAuthenticated && (
