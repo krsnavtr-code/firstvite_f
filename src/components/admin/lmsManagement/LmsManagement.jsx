@@ -1,167 +1,206 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const Card = ({ to, title, desc, icon, color = "indigo" }) => (
-  <Link
-    to={to}
-    className={`group relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-${color}-500/40`}
+// Standardized Icon Component to reduce boilerplate
+const AdminIcon = ({ children, bgColor, textColor, ringColor }) => (
+  <div
+    className={`rounded-2xl p-3 ${bgColor} ${textColor} ${ringColor} ring-1 transition-all duration-300 group-hover:scale-110 shadow-sm`}
   >
-    <div className="flex items-start gap-4">
-      <div
-        className={`rounded-lg p-2.5 text-${color}-600 bg-${color}-50 ring-1 ring-${color}-100 group-hover:bg-${color}-100 transition`}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-        {desc && (
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2">{desc}</p>
-        )}
-      </div>
-    </div>
-    <div className="mt-4 flex items-center gap-1 text-sm font-medium text-gray-600">
-      <span className="transition group-hover:text-gray-900">Open</span>
-      <svg
-        className="h-4 w-4 transition group-hover:translate-x-0.5"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path
-          fillRule="evenodd"
-          d="M10.293 3.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 11-1.414-1.414L13.586 10H4a1 1 0 110-2h9.586l-3.293-3.293a1 1 0 010-1.414z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </div>
-  </Link>
+    {children}
+  </div>
 );
 
-const Icon = {
-  Flag: (
-    <svg
-      className="h-6 w-6"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
+const ManagementCard = ({ to, title, desc, icon, theme }) => {
+  // Map themes to specific Tailwind classes for reliability
+  const themes = {
+    indigo: {
+      bg: "bg-indigo-50",
+      text: "text-indigo-600",
+      ring: "ring-indigo-100",
+      hover: "group-hover:border-indigo-300",
+    },
+    emerald: {
+      bg: "bg-emerald-50",
+      text: "text-emerald-600",
+      ring: "ring-emerald-100",
+      hover: "group-hover:border-emerald-300",
+    },
+    blue: {
+      bg: "bg-blue-50",
+      text: "text-blue-600",
+      ring: "ring-blue-100",
+      hover: "group-hover:border-blue-300",
+    },
+  };
+
+  const style = themes[theme] || themes.indigo;
+
+  return (
+    <Link
+      to={to}
+      className={`group relative rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 ${style.hover}`}
     >
-      <path d="M4 3a1 1 0 011-1h10.382a1 1 0 01.894.553l.724 1.447H21a1 1 0 01.894 1.447l-2 4A1 1 0 0119 10h-3.382l-.724-1.447A1 1 0 0014 8H6v13a1 1 0 11-2 0V3z" />
-    </svg>
-  ),
-  Course: (
-    <svg
-      className="h-6 w-6"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M3 5a2 2 0 012-2h9a2 2 0 012 2v1h2a2 2 0 012 2v11a1 1 0 01-1.447.894L16 18.118l-3.553 1.776A1 1 0 0111 19V6H5a2 2 0 01-2-2z" />
-    </svg>
-  ),
-  Users: (
-    <svg
-      className="h-6 w-6"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1zM17 11a4 4 0 110-8 4 4 0 010 8zM3 22a6 6 0 0112 0H3z" />
-    </svg>
-  ),
-  Media: (
-    <svg
-      className="h-6 w-6"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M4 5a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H9l-5 3V5z" />
-    </svg>
-  ),
-  Check: (
-    <svg
-      className="h-6 w-6"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  ),
-  Arrow: (
-    <svg
-      className="h-6 w-6"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z" />
-    </svg>
-  ),
+      <div className="flex items-start gap-5">
+        <AdminIcon
+          bgColor={style.bg}
+          textColor={style.text}
+          ringColor={style.ring}
+        >
+          {icon}
+        </AdminIcon>
+        <div className="flex-1">
+          <h3 className="text-lg font-bold text-slate-800 transition-colors group-hover:text-blue-600">
+            {title}
+          </h3>
+          <p className="mt-2 text-sm text-slate-500 leading-relaxed">{desc}</p>
+        </div>
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
+        <span className="text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-600 transition-colors">
+          Manage Section
+        </span>
+        <svg
+          className="w-5 h-5 text-slate-300 group-hover:text-blue-600 transition-all transform group-hover:translate-x-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M13 7l5 5m0 0l-5 5m5-5H6"
+          />
+        </svg>
+      </div>
+    </Link>
+  );
 };
 
 const LmsManagement = () => {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 transition-colors">
+      {/* Page Header */}
+      <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider mb-4">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+            </span>
+            Admin Control Center
+          </div>
+          <h1 className="text-4xl font-black tracking-tight text-slate-800">
             LMS Management
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-gray-600">
-            Configure sprints and manage learning content for your courses. Use
-            the quick links below to jump into common admin tasks.
+          <p className="mt-4 text-lg text-slate-500 leading-relaxed">
+            Design learning paths, configure sprints, and manage career
+            listings. Jump into specific modules below to update content.
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-3">
-          <Link
-            to="/smart-board/dashboard"
-            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-black"
-            title="Preview the LMS as a learner"
+
+        <Link
+          to="/smart-board/dashboard"
+          className="inline-flex items-center gap-3 rounded-2xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:scale-105 transition-all active:scale-95"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            Preview LMS
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden
-            >
-              <path
-                fillRule="evenodd"
-                d="M10.293 3.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 11-1.414-1.414L13.586 10H4a1 1 0 110-2h9.586l-3.293-3.293a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </Link>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
+          </svg>
+          Preview Learner Mode
+        </Link>
       </div>
 
-      {/* LMS Administration */}
+      {/* Main Grid */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-700">Administration</h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card
+        <div className="flex items-center gap-4 mb-8">
+          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+            Core Administration
+          </h2>
+          <div className="h-px flex-1 bg-slate-100"></div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ManagementCard
             to="/admin/lms/create-sprint"
-            title="Sprint Management"
-            desc="Create and manage sprints, sessions, and tasks for each course."
-            icon={Icon.Flag}
-            color="indigo"
+            title="Sprint Architecture"
+            desc="Construct curriculum sprints, define daily sessions, and assign specific learner tasks."
+            theme="indigo"
+            icon={
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
+                />
+              </svg>
+            }
           />
-          <Card
+
+          <ManagementCard
             to="/admin/lms/assessment"
-            title="Assessment Management"
-            desc="View, create, and edit assessment connected to the LMS."
-            icon={Icon.Course}
-            color="emerald"
+            title="Assesment Lab"
+            desc="Design quiz banks, interactive assessments, and final exams for course certification."
+            theme="emerald"
+            icon={
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
+              </svg>
+            }
           />
-          {/* Career  */}
-          <Card
+
+          <ManagementCard
             to="/admin/lms/career"
-            title="Career Management"
-            desc="Manage career opportunities and job listings for your courses."
-            icon={Icon.Users}
-            color="blue"
+            title="Career Portal"
+            desc="Publish job openings, manage internships, and connect learners with recruitment partners."
+            theme="blue"
+            icon={
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            }
           />
         </div>
       </section>

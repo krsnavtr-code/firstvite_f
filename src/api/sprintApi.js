@@ -1,4 +1,4 @@
-import api from './axios';
+import api from "./axios";
 
 /**
  * Get all sprints
@@ -6,10 +6,10 @@ import api from './axios';
  */
 export const getAllSprints = async () => {
   try {
-    const response = await api.get('/v1/sprints');
+    const response = await api.get("/v1/sprints");
     return response.data;
   } catch (error) {
-    console.error('Error fetching all sprints:', error);
+    console.error("Error fetching all sprints:", error);
     throw error;
   }
 };
@@ -21,10 +21,10 @@ export const getAllSprints = async () => {
  */
 export const createSprint = async (sprintData) => {
   try {
-    const response = await api.post('/v1/sprints', sprintData);
+    const response = await api.post("/v1/sprints", sprintData);
     return response.data;
   } catch (error) {
-    console.error('Error creating sprint:', error);
+    console.error("Error creating sprint:", error);
     throw error;
   }
 };
@@ -39,7 +39,7 @@ export const getSprintsByCourse = async (courseId) => {
     const response = await api.get(`/v1/sprints/course/${courseId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching sprints:', error);
+    console.error("Error fetching sprints:", error);
     throw error;
   }
 };
@@ -55,7 +55,22 @@ export const updateSprint = async (sprintId, updates) => {
     const response = await api.patch(`/v1/sprints/${sprintId}`, updates);
     return response.data;
   } catch (error) {
-    console.error('Error updating sprint:', error);
+    console.error("Error updating sprint:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get a sprint by ID
+ * @param {string} sprintId - ID of the sprint
+ * @returns {Promise<Object>} - Sprint data
+ */
+export const getSprintById = async (sprintId) => {
+  try {
+    const response = await api.get(`/v1/sprints/${sprintId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sprint by ID:", error);
     throw error;
   }
 };
@@ -70,7 +85,7 @@ export const deleteSprint = async (sprintId) => {
     const response = await api.delete(`/v1/sprints/${sprintId}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting sprint:', error);
+    console.error("Error deleting sprint:", error);
     throw error;
   }
 };

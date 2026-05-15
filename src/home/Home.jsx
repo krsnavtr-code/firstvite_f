@@ -11,6 +11,7 @@ import ContactSection from "../components/home/ContactSection";
 import WhyLearnWithEklabya from "../components/home/WhyLearnWithFirstVITE";
 import HowWillYourTrainingWork from "../components/home/HowWillYourTrainingWork";
 import Content from "../components/home/Content";
+import StudentPlacements from "../components/home/StudentPlacements";
 
 function Home() {
   return (
@@ -50,6 +51,9 @@ function Home() {
 
         {/* Stats Section */}
         <Stats />
+
+        {/* Student Placements Section */}
+        <StudentPlacements />
 
         {/* Content */}
         <Content />
