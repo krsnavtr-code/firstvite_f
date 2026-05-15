@@ -214,19 +214,59 @@ function Navbar() {
                 <FaChevronDown size={8} />
               </button>
               {showPaymentDropdown && (
-                <div className="absolute right-0 top-6 w-40 bg-white text-gray-800 rounded shadow-xl border border-gray-100 z-50">
+                <div className="absolute right-0 top-6 w-80 bg-white text-gray-800 rounded shadow-xl border border-gray-100 z-50">
                   <button
                     onClick={() => {
                       setShowPaymentForm(true);
                       setShowPaymentDropdown(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-lg hover:bg-gray-50 flex items-center justify-between"
+                    className="text-left px-3 py-2 bg-blue-200 rounded m-4 text-lg hover:bg-blue-50 flex items-center justify-between"
                   >
                     <span>
                       Pay Using{" "}
                       <span className="text-orange-600">RazorPay</span>
                     </span>
                   </button>
+
+                  <div className="bg-white border-t border-gray-200 px-6 py-2 shadow-sm">
+                    <h2 className="text-lg font-bold text-gray-800 mb-2">
+                      Pay Using Bank Transfer
+                    </h2>
+
+                    <div className="space-y-2 text-gray-700">
+                      <div className="flex justify-between border-y py-2">
+                        <span className="font-medium">Bank Name</span>
+                        <strong>ICICI Bank</strong>
+                      </div>
+
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium">Account Number</span>
+                        <strong>2530 5010 216</strong>
+                      </div>
+
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium">IFSC Code</span>
+                        <strong>ICIC0000253</strong>
+                      </div>
+
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium">Branch</span>
+                        <strong>Noida</strong>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="font-medium">UPI Number</span>
+                        <strong>9891030303</strong>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 bg-yellow-50 border border-yellow-200 rounded-xl p-2">
+                      <p className="text-sm text-yellow-700">
+                        After payment, please share your transaction ID or
+                        payment screenshot for verification.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
