@@ -277,6 +277,14 @@ function Footer() {
                   Blog
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/testimonials"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+                >
+                  Testimonials
+                </Link>
+              </li>
             </ul>
           </div>
 

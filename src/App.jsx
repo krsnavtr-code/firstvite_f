@@ -51,6 +51,7 @@ import EmailRecords from "./pages/admin/EmailRecords";
 import TestQAPage from "./pages/admin/TestQAPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
+import TestimonialsPage from "./pages/TestimonialsPage";
 import CareerManagement from "./pages/admin/career/CareerManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import lmsRoutes from "./routes/lmsRoutes";
@@ -273,6 +274,15 @@ function App() {
             element={
               <MainLayout>
                 <FAQPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/testimonials"
+            element={
+              <MainLayout>
+                <TestimonialsPage />
               </MainLayout>
             }
           />
