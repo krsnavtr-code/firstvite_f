@@ -11,7 +11,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [categoryCourses, setCategoryCourses] = useState({});
   const [isLoadingCourses, setIsLoadingCourses] = useState({});
-  const [dropdownPosition, setDropdownPosition] = useState('bottom'); // 'top' or 'bottom'
+  const [dropdownPosition, setDropdownPosition] = useState("bottom"); // 'top' or 'bottom'
   const menuRef = useRef(null);
   const dropdownRefs = useRef({});
 
@@ -41,7 +41,6 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
           } else if (response.docs && Array.isArray(response.docs)) {
             categoriesData = response.docs;
           }
-
 
           // If no categories found, try one more time with different parameters
           if (categoriesData.length === 0) {
@@ -191,21 +190,23 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
   const handleCategoryHover = (categoryId, event) => {
     if (!isMobile) {
       setActiveCategory(categoryId);
-      
+
       // Calculate available space below the menu item
       if (event && event.currentTarget) {
         const rect = event.currentTarget.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom;
         const spaceAbove = rect.top;
-        setDropdownPosition(spaceBelow < 400 && spaceBelow < spaceAbove ? 'top' : 'bottom');
+        setDropdownPosition(
+          spaceBelow < 400 && spaceBelow < spaceAbove ? "top" : "bottom",
+        );
       }
-      
+
       if (!categoryCourses[categoryId]) {
         fetchCategoryCourses(categoryId);
       }
     }
   };
-  
+
   // Set dropdown ref for a category
   const setDropdownRef = (element, categoryId) => {
     if (element) {
@@ -216,7 +217,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
   // ... (previous imports remain the same)
 
   return (
-    <div className={`relative ${isMobile ? "w-full" : ""}`} ref={menuRef}>
+    <div className={`relative mb-5 ${isMobile ? "w-full" : ""}`} ref={menuRef}>
       {/* Main Menu Button - Only show in desktop or as a toggle in mobile */}
       {!isMobile && (
         <button
@@ -224,7 +225,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
-          className="flex items-center text-sm px-1 py-1 text-blue-900 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded transition-colors duration-200 font-medium"
+          className="flex items-center text-sm px-1 py-1 lg:mt-5 text-blue-900 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded transition-colors duration-200 font-medium"
           aria-expanded={isOpen}
           aria-haspopup="true"
           aria-controls="course-menu-dropdown"
@@ -264,7 +265,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
           <div className="sticky top-0 z-40 bg-white dark:bg-gray-800 px-2 py-2 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h3 className="text-md font-semibold text-gray-800 dark:text-white">
-                Browse Categories & Courses
+                Browse Courses
               </h3>
               <button
                 onClick={(e) => {
@@ -322,7 +323,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
                 .map((category) => (
                   <div
                     key={category.id}
-                    className={`relative group ${isMobile ? "py-2" : "py-1"}`}
+                    className={`relative group ${isMobile ? "py-0.5" : "py-1"}`}
                   >
                     <div
                       ref={(el) => setDropdownRef(el, category.id)}
@@ -332,7 +333,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
                       }
                       className={`cursor-pointer flex items-center justify-between rounded-lg transition-colors ${
                         isMobile
-                          ? "px-3 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          ? "pl-1 py-1 hover:bg-gray-100 dark:hover:bg-gray-700"
                           : "px-2 py-1 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                       }`}
                     >
@@ -374,10 +375,12 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
                         className={`${
                           !isMobile
                             ? `absolute left-full ml-1 w-[400px] max-h-[80vh] overflow-y-auto ${
-                                dropdownPosition === 'top' ? 'bottom-0' : 'top-0'
+                                dropdownPosition === "top"
+                                  ? "bottom-0"
+                                  : "top-0"
                               }`
                             : "w-full mt-2"
-                        } bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50`}
+                        } bg-white dark:bg-gray-800 shadow-lg z-50`}
                         onMouseEnter={() =>
                           !isMobile && handleCategoryHover(category.id)
                         }
@@ -391,14 +394,14 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
                               category.slug ||
                               category.name.toLowerCase().replace(/\s+/g, "-")
                             }`}
-                            className="block px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-t"
+                            className="block py-0.5 text-sm font-medium text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-t"
                             onClick={() => {
                               setIsOpen(false);
                               setActiveCategory(null);
                               if (onItemClick) onItemClick();
                             }}
                           >
-                            View all {category.name} courses
+                            {category.name} courses
                           </Link>
 
                           {isLoadingCourses[category.id] ? (
@@ -411,7 +414,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
                                 <Link
                                   key={course._id}
                                   to={`/course/${course.slug || course._id}`}
-                                  className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded"
+                                  className="block py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded"
                                   onClick={() => {
                                     setIsOpen(false);
                                     setActiveCategory(null);

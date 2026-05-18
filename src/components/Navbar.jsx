@@ -154,7 +154,7 @@ function Navbar() {
   ];
 
   return (
-    <div className="flex flex-col w-full sticky top-0 z-50">
+    <div className="flex flex-col w-full sticky top-0 z-50 text-black dark:text-white">
       {/* ==================================================================
           PART 1: TOP BAR (Utilities)
           Hidden on mobile, visible on desktop. Dark background.
@@ -513,13 +513,13 @@ function Navbar() {
       ></div>
 
       <div
-        className={`md:hidden fixed top-0 left-0 bottom-0 w-[80%] max-w-sm bg-white dark:bg-gray-900 z-50 shadow-2xl transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`md:hidden fixed top-0 left-0 bottom-0 w-[85%] max-w-[350px] bg-white dark:bg-gray-900 z-50 shadow-2xl transform transition-transform duration-300 ease-in-out overflow-y-auto ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-5">
+        <div className="pt-1 pb-5 px-3">
           {/* Mobile Header */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-3">
             <span className="text-xl font-bold">
               <span style={{ color: "#1E90FF" }}>e</span>
               <span style={{ color: "#F47C26" }}>KLABYA</span>
@@ -534,15 +534,10 @@ function Navbar() {
 
           {/* User Info (Mobile) */}
           {isAuthenticated ? (
-            <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                {currentUser?.name?.charAt(0)}
-              </div>
+            <div className="mb-3 px-2 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center gap-3">
               <div>
-                <p className="font-bold text-sm text-gray-900 dark:text-white">
-                  {currentUser?.name}
-                </p>
-                <p className="text-xs text-gray-500">{currentUser?.email}</p>
+                <p className="font-bold text-sm">{currentUser?.fullname}</p>
+                <p className="text-xs">{currentUser?.email}</p>
               </div>
             </div>
           ) : (
@@ -565,7 +560,7 @@ function Navbar() {
           )}
 
           {/* Small Screen Payment option */}
-          <div className="mb-4">
+          <div className="mb-1" ref={paymentDropdownRef}>
             <button
               onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
               className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -580,7 +575,7 @@ function Navbar() {
             </button>
 
             {showPaymentDropdown && (
-              <div className="mt-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <button
                   onClick={() => {
                     setShowPaymentForm(true);
@@ -652,11 +647,11 @@ function Navbar() {
             <Link
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block px-3 py-2.5 text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              className="block py-2 font-medium bg-gray-800 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
             >
               Home
             </Link>
-            <div className="px-3 py-1">
+            <div className="">
               <CourseMenu
                 isMobile={true}
                 onItemClick={() => setIsMobileMenuOpen(false)}
@@ -667,7 +662,7 @@ function Navbar() {
                 key={link.to}
                 to={link.to}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-3 py-2.5 font-medium rounded-lg ${
+                className={`flex items-center font-medium rounded-lg bg-gray-800 px-2 py-2 ${
                   link.isSpecial
                     ? "text-blue-600 bg-blue-50"
                     : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -683,33 +678,32 @@ function Navbar() {
                 <Link
                   to="/my-learning"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2.5 text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 rounded-lg"
+                  className="block px-3 py-2 bg-gray-800 font-medium hover:bg-gray-50 rounded-lg"
                 >
                   My Learning
                 </Link>
                 <Link
                   to="/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2.5 text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 rounded-lg"
+                  className="block px-3 py-2 bg-gray-800 font-medium hover:bg-gray-50 rounded-lg"
                 >
                   My Profile
                 </Link>
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="flex items-center gap-3 px-3 py-2 bg-gray-800 font-medium rounded-lg text-sm w-full"
+                >
+                  {theme === "dark" ? <FaSun /> : <FaMoon />}
+                  {theme === "dark"
+                    ? "Switch to Light Mode"
+                    : "Switch to Dark Mode"}
+                </button>
               </>
             )}
           </div>
 
           {/* Mobile Footer Actions (From Top Bar) */}
-          <div className="border-t border-gray-100 dark:border-gray-800 pt-6 space-y-4">
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex items-center gap-3 text-gray-600 dark:text-gray-400 font-medium text-sm w-full"
-            >
-              {theme === "dark" ? <FaSun /> : <FaMoon />}
-              {theme === "dark"
-                ? "Switch to Light Mode"
-                : "Switch to Dark Mode"}
-            </button>
-
+          <div className="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
             {isAuthenticated && (
               <button
                 onClick={() => {
