@@ -45,11 +45,11 @@ const Settings = () => {
 
   return (
     <div className="max-w-7xl mx-auto transition-colors duration-300">
-      <header className="mb-8">
-        <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">
+      <header className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
           Settings
         </h1>
-        <p className="t text-sm">
+        <p className="text-xs sm:text-sm">
           Manage your account settings and preferences.
         </p>
       </header>

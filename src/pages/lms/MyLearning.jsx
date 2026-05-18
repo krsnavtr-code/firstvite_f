@@ -46,10 +46,10 @@ const Dashboard = () => {
   if (enrollments.length === 0) {
     return (
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-slate-900 dark:text-white">
           My Learning
         </h1>
-        <div className="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-700 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-12 text-center border border-slate-100 dark:border-slate-700 shadow-sm">
           <div className="mb-6 flex justify-center">
             <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-full">
               <svg

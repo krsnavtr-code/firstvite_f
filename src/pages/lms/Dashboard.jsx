@@ -70,19 +70,19 @@ const Dashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto transition-colors duration-300">
-      <header className="mb-2">
-        <h1 className="text-2xl font-bold">Learning Progress</h1>
-        <p className="text-sm">
+      <header className="mb-4 px-1">
+        <h1 className="text-xl sm:text-2xl font-bold">Learning Progress</h1>
+        <p className="text-xs sm:text-sm">
           Welcome back! Here is what's happening with your courses.
         </p>
       </header>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-slate-800 px-3 py-2 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center space-x-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-white dark:bg-slate-800 px-3 py-2 sm:px-4 sm:py-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center space-x-3 sm:space-x-4">
           <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
             <svg
-              className="w-6 h-6 text-blue-600"
+              className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -90,21 +90,23 @@ const Dashboard = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
+                strokeWidth={2}
                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
               ></path>
             </svg>
           </div>
           <div>
-            <p className="text-sm ">Enrolled Course</p>
-            <p className="text-2xl font-bold">{dashboardStats.totalCourses}</p>
+            <p className="text-xs sm:text-sm">Enrolled Course</p>
+            <p className="text-xl sm:text-2xl font-bold">
+              {dashboardStats.totalCourses}
+            </p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 px-3 py-2 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center space-x-4">
+        <div className="bg-white dark:bg-slate-800 px-3 py-2 sm:px-4 sm:py-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center space-x-3 sm:space-x-4">
           <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-xl">
             <svg
-              className="w-6 h-6 text-green-600"
+              className="w-5 h-5 sm:w-6 sm:h-6 text-green-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -112,26 +114,28 @@ const Dashboard = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
+                strokeWidth={2}
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
           </div>
           <div>
-            <p className="text-sm ">Completed</p>
-            <p className="text-2xl font-bold">{dashboardStats.completed}</p>
+            <p className="text-xs sm:text-sm">Completed</p>
+            <p className="text-xl sm:text-2xl font-bold">
+              {dashboardStats.completed}
+            </p>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 px-3 py-2 rounded-2xl shadow-lg text-white flex flex-col justify-center relative overflow-hidden">
+        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 px-3 py-2 sm:px-4 sm:py-3 rounded-2xl shadow-lg text-white flex flex-col justify-center relative overflow-hidden">
           <Link to="/smart-board/refer-and-earn" className="relative z-10">
-            <h3 className="font-bold text-lg">Refer & Earn 🎉</h3>
-            <p className="text-blue-100 text-xs mb-1">
+            <h3 className="font-bold text-sm sm:text-lg">Refer & Earn 🎉</h3>
+            <p className="text-blue-100 text-[10px] sm:text-xs mb-1">
               Invite friends & earn rewards together.
             </p>
           </Link>
           <svg
-            className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10"
+            className="absolute -right-4 -bottom-4 w-20 h-20 sm:w-24 sm:h-24 text-white/10"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -141,19 +145,19 @@ const Dashboard = () => {
       </div>
 
       {/* Welcome section */}
-      <section className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800/50 dark:to-indigo-900/20 rounded-2xl p-4 border border-blue-100 dark:border-slate-700">
-        <div className="flex flex-col md:flex-row items-center justify-between">
-          <div className="mb-6 md:mb-0 md:mr-8">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
+      <section className="mt-6 sm:mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800/50 dark:to-indigo-900/20 rounded-2xl p-4 sm:p-6 border border-blue-100 dark:border-slate-700">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="w-full md:w-auto md:mr-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
               Welcome back to your learning journey! 🚀
             </h2>
-            <p className="text-slate-600 dark:text-slate-300 max-w-2xl">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl">
               You're making great progress! Keep up the momentum and continue
               building your skills. Every lesson brings you closer to your
               goals.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <div className="flex items-center space-x-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm">
+            <div className="mt-3 sm:mt-4 flex flex-wrap gap-2 sm:gap-3">
+              <div className="flex items-center space-x-2 bg-white dark:bg-slate-800 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-sm">
                 <svg
                   className="w-4 h-4 text-blue-600"
                   fill="currentColor"
@@ -161,11 +165,11 @@ const Dashboard = () => {
                 >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
                   {dashboardStats.completed} courses completed
                 </span>
               </div>
-              <div className="flex items-center space-x-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm">
+              <div className="flex items-center space-x-2 bg-white dark:bg-slate-800 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-sm">
                 <svg
                   className="w-4 h-4 text-green-600"
                   fill="currentColor"
@@ -177,17 +181,17 @@ const Dashboard = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
                   {dashboardStats.totalCourses - dashboardStats.completed} in
                   progress
                 </span>
               </div>
             </div>
           </div>
-          <div className="flex-shrink-0">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
+          <div className="flex-shrink-0 w-full md:w-auto">
+            <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1 sm:mb-2">
                   {Math.round(
                     (dashboardStats.completed /
                       Math.max(dashboardStats.totalCourses, 1)) *
@@ -195,7 +199,7 @@ const Dashboard = () => {
                   )}
                   %
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                   Overall Progress
                 </p>
               </div>
@@ -205,9 +209,9 @@ const Dashboard = () => {
       </section>
 
       {/* Course Grid */}
-      <section className="mt-8">
+      <section className="mt-6 sm:mt-8">
         {enrollments.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {enrollments
               .filter((e) => e?.course)
               .map((enrollment) => {
@@ -229,22 +233,22 @@ const Dashboard = () => {
                         alt={course.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-3 right-3">
+                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                         <span
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm ${progress === 100 ? "bg-green-500 text-white" : "bg-blue-600 text-white"}`}
+                          className={`px-2 sm:px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wider shadow-sm ${progress === 100 ? "bg-green-500 text-white" : "bg-blue-600 text-white"}`}
                         >
                           {progress === 100 ? "Completed" : `${progress}% Done`}
                         </span>
                       </div>
                     </div>
 
-                    <div className="px-3 py-2 bg-slate-200 dark:bg-slate-700">
-                      <h3 className="font-bold leading-snug mb-2 line-clamp-2 h-10">
+                    <div className="px-3 py-2 sm:px-3 sm:py-2 bg-slate-200 dark:bg-slate-700">
+                      <h3 className="font-bold text-sm sm:text-base leading-snug mb-2 line-clamp-2 h-8 sm:h-10">
                         {course.title}
                       </h3>
 
                       {/* Custom Progress Bar */}
-                      <div className="w-full bg-white dark:bg-gray-200 h-1.5 rounded-full my-4">
+                      <div className="w-full bg-white dark:bg-gray-200 h-1.5 rounded-full my-3 sm:my-4">
                         <div
                           className="bg-blue-600 h-full rounded-full transition-all duration-500"
                           style={{ width: `${progress}%` }}
@@ -253,7 +257,7 @@ const Dashboard = () => {
 
                       <button
                         onClick={() => handleContinueLearning(course._id)}
-                        className="w-full py-2.5 bg-white dark:bg-gray-200 hover:bg-blue-600 text-blue-600 font-bold text-xs rounded-xl transition-all duration-200 border border-transparent hover:border-blue-600"
+                        className="w-full py-2 sm:py-2.5 bg-white dark:bg-gray-200 hover:bg-blue-600 text-blue-600 font-bold text-[10px] sm:text-xs rounded-xl transition-all duration-200 border border-transparent hover:border-blue-600"
                       >
                         {progress === 0
                           ? "Start Learning"
@@ -265,10 +269,10 @@ const Dashboard = () => {
               })}
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-700">
-            <div className="w-20 h-20 bg-slate-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-700">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
-                className="w-10 h-10 text-slate-300"
+                className="w-8 h-8 sm:w-10 sm:h-10 text-slate-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -276,18 +280,20 @@ const Dashboard = () => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth={2}
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                 ></path>
               </svg>
             </div>
-            <h3 className="text-lg font-bold mb-2">No courses yet</h3>
-            <p className=" text-sm mb-6 max-w-xs mx-auto">
+            <h3 className="text-base sm:text-lg font-bold mb-2">
+              No courses yet
+            </h3>
+            <p className="text-xs sm:text-sm mb-4 sm:mb-6 max-w-xs mx-auto">
               Explore our catalog and start your learning journey today.
             </p>
             <button
               onClick={() => navigate("/smart-board/courses")}
-              className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"
+              className="bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-2xl font-bold text-xs sm:text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"
             >
               Browse Catalog
             </button>
@@ -296,22 +302,22 @@ const Dashboard = () => {
       </section>
 
       {/* Explore how eklabya can help you build a stellar profile! */}
-      <section className="mt-8 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-slate-800/50 dark:via-purple-900/20 dark:to-blue-900/20 rounded-2xl p-8 border border-purple-100 dark:border-slate-700">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+      <section className="mt-6 sm:mt-8 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-slate-800/50 dark:via-purple-900/20 dark:to-blue-900/20 rounded-2xl p-4 sm:p-6 lg:p-8 border border-purple-100 dark:border-slate-700">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-4">
             Build Your Stellar Profile with Eklabya! 🌟
           </h2>
-          <p className="text-slate-600 dark:text-slate-300 max-w-4xl mx-auto">
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-4xl mx-auto px-4">
             Unlock your potential and showcase your skills to the world. Here's
             how Eklabya empowers your professional journey.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -324,19 +330,19 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
+            <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2">
               Verified Certificates
             </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm">
               Earn industry-recognized certificates that validate your skills
               and boost your resume credibility.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
               <svg
-                className="w-6 h-6 text-green-600"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -349,19 +355,19 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
+            <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2">
               Skill Badges
             </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm">
               Collect digital badges for completed courses and showcase your
               expertise to potential employers.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
               <svg
-                className="w-6 h-6 text-purple-600"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -374,19 +380,19 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
+            <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2">
               Progress Tracking
             </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm">
               Monitor your learning journey with detailed analytics and share
               your achievements with your network.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
               <svg
-                className="w-6 h-6 text-orange-600"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -399,19 +405,19 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
+            <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2">
               Community Network
             </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm">
               Connect with peers, mentors, and industry experts to expand your
               professional network.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
               <svg
-                className="w-6 h-6 text-red-600"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-red-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -424,19 +430,19 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
+            <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2">
               Portfolio Projects
             </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm">
               Build real-world projects that demonstrate your skills and create
               an impressive portfolio.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
               <svg
-                className="w-6 h-6 text-indigo-600"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -449,10 +455,10 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
+            <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2">
               Expert Instructors
             </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm">
               Learn from industry professionals and gain insights that go beyond
               traditional education.
             </p>

@@ -117,11 +117,11 @@ const Assignments = () => {
 
   return (
     <div className="max-w-7xl mx-auto min-h-screen transition-colors">
-      <header className="mb-8">
-        <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
+      <header className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight">
           Review Assignments
         </h1>
-        <p className=" text-sm">
+        <p className="text-xs sm:text-sm">
           Track your progress and submit your session tasks.
         </p>
       </header>

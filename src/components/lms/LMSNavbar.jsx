@@ -5,7 +5,12 @@ import LiveChatWidget from "./LiveChatWidget";
 
 const logoImg = "http://eklabya.com/api/upload/file/eKlabya-fit-logo-8874.png";
 
-const LMSNavbar = ({ theme, onThemeChange }) => {
+const LMSNavbar = ({
+  theme,
+  onThemeChange,
+  onMobileMenuToggle,
+  mobileMenuOpen,
+}) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
@@ -55,14 +60,54 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
 
   return (
     <>
-      <header className="flex h-12 items-center justify-between px-6 transition-colors duration-300 shadow-sm border-b sticky top-0 z-40 dark:bg-slate-900 bg-white dark:border-slate-800 border-gray-100">
-        {/* Left: Logo */}
-        <Link to="/smart-board" className="flex items-center">
-          <img src={logoImg} alt="Logo" className="h-8 w-auto rounded" />
-        </Link>
+      <header className="flex h-12 items-center justify-between px-4 sm:px-6 transition-colors duration-300 shadow-sm border-b sticky top-0 z-40 dark:bg-slate-900 bg-white dark:border-slate-800 border-gray-100">
+        {/* Left: Logo & Mobile Menu Toggle */}
+        <div className="flex items-center gap-3">
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={onMobileMenuToggle}
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            )}
+          </button>
+          <Link to="/smart-board" className="flex items-center">
+            <img src={logoImg} alt="Logo" className="h-8 w-auto rounded" />
+          </Link>
+        </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center space-x-5">
+        <div className="flex items-center space-x-3 sm:space-x-5">
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
@@ -101,17 +146,18 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
             )}
           </button>
 
-          {/* Live Chat */}
-          <div className="relative">
+          {/* Live Chat - Hide on very small screens */}
+          <div className="relative hidden sm:block">
             <button
               onClick={() => {
                 localStorage.setItem("lms_chat_unread", "0");
                 setUnread(0);
                 setChatOpen(true);
               }}
-              className="text-xs font-semibold px-4 py-1.5 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all dark:border-blue-500 dark:text-blue-400"
+              className="text-xs font-semibold px-3 sm:px-4 py-1.5 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all dark:border-blue-500 dark:text-blue-400"
             >
-              Live Chat
+              <span className="hidden sm:inline">Live Chat</span>
+              <span className="sm:hidden">Chat</span>
             </button>
             {unread > 0 && (
               <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
@@ -145,7 +191,7 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
           {/* User Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <div
-              className="flex items-center space-x-3 cursor-pointer group"
+              className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <div className="text-right hidden sm:block">
@@ -164,10 +210,10 @@ const LMSNavbar = ({ theme, onThemeChange }) => {
                   <img
                     src={currentUser.avatar}
                     alt="User"
-                    className="w-9 h-9 rounded-full border border-gray-200 dark:border-slate-700 object-cover"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-gray-200 dark:border-slate-700 object-cover"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
