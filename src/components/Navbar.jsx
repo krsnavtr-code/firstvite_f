@@ -148,7 +148,8 @@ function Navbar() {
   const navLinks = [
     { to: "/courses", label: "All Course" },
     { to: "/categories", label: "Categories" },
-    { to: "/free-course", label: "Free Courses" },
+    // { to: "/free-course", label: "Free Courses" },
+    { to: "/testimonials", label: "Testimonials" },
     { to: "/scholarship-test", label: "Scholarship" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ];
@@ -159,20 +160,42 @@ function Navbar() {
           PART 1: TOP BAR (Utilities)
           Hidden on mobile, visible on desktop. Dark background.
       ================================================================== */}
-      <div className="hidden md:block bg-gray-900 text-gray-300 text-xs py-1 px-4 border-b border-gray-800">
+      <div className="bg-gray-900 text-gray-300 text-xs py-1 px-4 border-b border-gray-800">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           {/* Left Side: Contact / Info */}
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
+          <div className="hidden md:inline-flex items-center gap-4">
+            <a
+              href="mailto:info@eklabya.com"
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
               <FaEnvelope size={10} /> Mail Us
-            </span>
-            <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
+            </a>
+            <a
+              href="tel:+919891030303"
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
               <FaPhoneAlt size={10} /> +91 9891030303
-            </span>
+            </a>
+          </div>
+
+          {/* Mobile */}
+          <div className="md:hidden flex items-center gap-4">
+            <a
+              href="mailto:info@eklabya.com"
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
+              <FaEnvelope size={10} />
+            </a>
+            <a
+              href="tel:+919891030303"
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
+              <FaPhoneAlt size={10} />
+            </a>
           </div>
 
           {/* Right Side: Actions (Theme, Pay, Agent, Auth) */}
-          <div className="flex items-center gap-2">
+          <div className="hidden md:inline-flex items-center gap-2">
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -331,6 +354,157 @@ function Navbar() {
               </Link>
             )}
           </div>
+
+          {/* mobile Right Side: Actions (Theme, Pay, Agent, Auth) */}
+          <div className="md:hidden flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
+              {theme === "dark" ? <FaSun size={12} /> : <FaMoon size={12} />}
+              <span>{theme === "dark" ? "" : ""}</span>
+            </button>
+
+            <div className="h-3 w-px bg-gray-700"></div>
+
+            {/* Agent Register */}
+            <a
+              href="https://genlead.in/agent/register"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              Agent Register
+            </a>
+
+            <div className="h-3 w-px bg-gray-700"></div>
+
+            {/* Payment Dropdown (Small Version) */}
+            <div className="relative" ref={paymentDropdownRef}>
+              <button
+                onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                className="flex items-center gap-1 hover:text-white transition-colors"
+              >
+                <FaCreditCard size={12} /> Pay <FaChevronDown size={8} />
+              </button>
+              {showPaymentDropdown && (
+                <div className="absolute right-[-20px] top-6 w-64 bg-white text-gray-800 rounded shadow-xl border border-gray-100 z-50">
+                  <button
+                    onClick={() => {
+                      setShowPaymentForm(true);
+                      setShowPaymentDropdown(false);
+                    }}
+                    className="text-left px-3 py-2 bg-blue-200 rounded m-4 text-lg hover:bg-blue-50 flex items-center justify-between"
+                  >
+                    <span>
+                      Pay Using{" "}
+                      <span className="text-orange-600">RazorPay</span>
+                    </span>
+                  </button>
+
+                  <div className="bg-white border-t border-gray-200 px-6 py-2 shadow-sm">
+                    <h2 className="text-sm font-bold text-gray-800 mb-2">
+                      Pay Using Bank & UPI
+                    </h2>
+
+                    <div className="space-y-2 text-gray-700">
+                      <div className="flex justify-between border-y py-2">
+                        <span className="font-medium">Bank Name</span>
+                        <strong>ICICI Bank</strong>
+                      </div>
+
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium">Account Number</span>
+                        <strong>2530 5010 216</strong>
+                      </div>
+
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium">IFSC Code</span>
+                        <strong>ICIC0000253</strong>
+                      </div>
+
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium">Branch</span>
+                        <strong>Noida</strong>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="font-medium">UPI Number</span>
+                        <strong>9891030303</strong>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 bg-yellow-50 border border-yellow-200 rounded-xl p-2">
+                      <p className="text-sm text-yellow-700">
+                        After payment, please share your transaction ID or
+                        payment screenshot for verification.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="h-3 w-px bg-gray-700 mx-1"></div>
+
+            {/* Auth Section */}
+            {isAuthenticated ? (
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="flex items-center gap-2 hover:text-white font-semibold"
+                >
+                  <FaUser size={10} />
+                  {currentUser?.name?.split(" ")[0] || ""}
+                </button>
+
+                {/* Profile Dropdown */}
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 py-2 text-sm text-gray-700 dark:text-gray-200 z-50 animate-fade-in-down">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                      <p className="font-semibold">{currentUser?.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {currentUser?.email}
+                      </p>
+                    </div>
+                    <Link
+                      to="/my-learning"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      My Learning
+                    </Link>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      Profile Settings
+                    </Link>
+                    <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsProfileMenuOpen(false);
+                        navigate("/");
+                      }}
+                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1 text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors"
+              >
+                <FaSignInAlt size={10} /> Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
@@ -367,7 +541,7 @@ function Navbar() {
             </div>
 
             {/* 2. Navigation Links (Desktop) */}
-            <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
+            <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
               <div className="relative group">
                 <CourseMenu />
               </div>
@@ -400,7 +574,7 @@ function Navbar() {
             <div className="flex items-center gap-3">
               {/* Desktop Search */}
               <div
-                className="hidden lg:block relative w-72"
+                className="hidden lg:block relative w-52"
                 ref={searchContainerRef}
               >
                 <form onSubmit={handleSearchSubmit} className="relative">
@@ -581,7 +755,7 @@ function Navbar() {
                     setShowPaymentForm(true);
                     setShowPaymentDropdown(false);
                   }}
-                  className="w-full text-left px-4 py-3 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"
+                  className="w-full text-left px-2 py-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"
                 >
                   <span className="font-medium text-gray-800 dark:text-gray-200">
                     Pay Using <span className="text-orange-600">RazorPay</span>
@@ -589,7 +763,7 @@ function Navbar() {
                   <FaChevronRight size={12} className="text-gray-400" />
                 </button>
 
-                <div className="px-4 py-4">
+                <div className="px-2 py-3">
                   <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">
                     Pay Using Bank Transfer
                   </h3>
@@ -647,7 +821,7 @@ function Navbar() {
             <Link
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block py-2 font-medium bg-gray-800 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              className="block py-2 font-medium bg-gray-200 dark:bg-gray-800 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
             >
               Home
             </Link>
@@ -662,10 +836,10 @@ function Navbar() {
                 key={link.to}
                 to={link.to}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center font-medium rounded-lg bg-gray-800 px-2 py-2 ${
+                className={`flex items-center font-medium rounded-lg bg-gray-200 dark:bg-gray-800 px-2 py-2 ${
                   link.isSpecial
                     ? "text-blue-600 bg-blue-50"
-                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    : "hover:bg-gray-50 dark:hover:bg-gray-800"
                 }`}
               >
                 {link.label}
@@ -678,26 +852,25 @@ function Navbar() {
                 <Link
                   to="/my-learning"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 bg-gray-800 font-medium hover:bg-gray-50 rounded-lg"
+                  className="block px-3 py-2 bg-gray-200 dark:bg-gray-800 font-medium hover:bg-gray-50 rounded-lg"
                 >
                   My Learning
                 </Link>
                 <Link
                   to="/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 bg-gray-800 font-medium hover:bg-gray-50 rounded-lg"
+                  className="block px-3 py-2 bg-gray-200 dark:bg-gray-800 font-medium hover:bg-gray-50 rounded-lg"
                 >
                   My Profile
                 </Link>
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="flex items-center gap-3 px-3 py-2 bg-gray-800 font-medium rounded-lg text-sm w-full"
+                <a
+                  href="https://genlead.in/agent/register"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-3 py-2 bg-gray-200 dark:bg-gray-800 font-medium hover:bg-gray-50 rounded-lg"
                 >
-                  {theme === "dark" ? <FaSun /> : <FaMoon />}
-                  {theme === "dark"
-                    ? "Switch to Light Mode"
-                    : "Switch to Dark Mode"}
-                </button>
+                  Agent Register
+                </a>
               </>
             )}
           </div>

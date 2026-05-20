@@ -225,7 +225,7 @@ const CourseMenu = ({ isMobile = false, onItemClick = () => {} }) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
-          className="flex items-center text-sm px-1 py-1 lg:mt-5 text-blue-900 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded transition-colors duration-200 font-medium"
+          className="flex items-center text-sm px-1 py-1 md:mt-5 text-blue-900 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 bg-blue-200 dark:bg-blue-900/30 rounded transition-colors duration-200 font-medium"
           aria-expanded={isOpen}
           aria-haspopup="true"
           aria-controls="course-menu-dropdown"
