@@ -11,7 +11,7 @@ const ALL_TESTIMONIALS = [
     email: "krishnaavtar955@gmail.com",
     category: "Get Jobs",
     image:
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&auto=format&fit=crop",
+      "http://www.eklabya.com/api/upload/file/Krishna-4629.png",
     content:
       "I recently completed AI & ML course and I must admit that they have done an awesome job at creating premium and meaningful content. Amazing courses and superb faculty of Harappa. I look forward to keep learning on Harappa and also recommend it.",
     rating: 5,
@@ -23,7 +23,7 @@ const ALL_TESTIMONIALS = [
     email: "manikagahloat91@gmail.com",
     category: "Upskilling",
     image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
+      "http://www.eklabya.com/api/upload/file/wo-4953.png",
     content:
       "The teaching style of faculty is unique and the courses are not at all boring.  I would highly recommend you to learn and develop yourself by the courses on Harappa Platform. ",
     rating: 5,
@@ -35,7 +35,7 @@ const ALL_TESTIMONIALS = [
     email: "ankitdhanka037@gmail.com",
     category: "Students",
     image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
+      "http://www.eklabya.com/api/upload/file/Adarsh-3832.png",
     content:
       "Its a great education platform, The faculty is experienced and the content was also very premium. I am satisfied with the overall experience.",
     rating: 5,
@@ -47,7 +47,7 @@ const ALL_TESTIMONIALS = [
     email: "yadavvinay999790@gmail.com",
     category: "Upskilling",
     image:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+      "http://www.eklabya.com/api/upload/file/dar-0262.png",
     content:
       "After my Course Complete I had bad experience with their interview process. Making Decision course has been proved to be really benificial for me. I am very thankful to Harappa Education for providing such content.",
     rating: 5,
@@ -59,7 +59,7 @@ const ALL_TESTIMONIALS = [
     email: "devendratrivedi871@gmail.com",
     category: "Get Jobs",
     image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
+      "http://www.eklabya.com/api/upload/file/df-3710.png",
     content:
       "This platform is giving great opportunities to one who wants to upskill and learn new things. I can now identify my strenght and weakness and it also helped me in overcoming my weaknesses. Its a great platform!",
     rating: 5,
@@ -71,7 +71,7 @@ const ALL_TESTIMONIALS = [
     email: "sriadarsh04@gmail.com",
     category: "Upskilling",
     image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
+      "http://www.eklabya.com/api/upload/file/1777960745027-1855.png",
     content:
       "The courses are available in Hindi language also which is very rare on other platforms. Its easy to understand, I am totally satisfied with the whole experience and definitely recommend it to everyone.",
     rating: 5,
