@@ -206,26 +206,22 @@ const SprintDetails = () => {
   if (loading) return <Skeleton active />;
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <Button
+    <div className="max-w-7xl mx-auto">
+      <button
         type="text"
-        icon={<ArrowLeftOutlined />}
         onClick={() => navigate(`/smart-board/courses/${courseId}`)}
-        className="mb-4 text-black dark:text-black"
+        className="gap-3"
       >
-        Back to Course
-      </Button>
+        <ArrowLeftOutlined />
+        Back to Sprint
+      </button>
 
       <div className="flex justify-between items-center mb-6">
-        <Title level={3} className="mb-0 text-black dark:text-black">
-          Sprint Sessions
-        </Title>
+        <h4 className="mb-0 text-xl font-semibold">Sprint Sessions</h4>
         {sessions.length > 0 && (
           <div className="flex items-center">
-            <span className="mr-2 text-sm text-black">
-              {getSprintStatus().status === "completed"
-                ? "Completed"
-                : "In Progress"}
+            <span className="mr-2 text-sm">
+              {getSprintStatus().status === "completed" ? "" : ""}
             </span>
             <Progress
               type="circle"
@@ -236,7 +232,8 @@ const SprintDetails = () => {
               status={
                 getSprintStatus().status === "completed" ? "success" : "active"
               }
-              className="ml-2"
+              // Antd ke text aur trail ko target karne ke liye custom utility classes
+              className="ml-2 [& Rose-text-class-override]:text-black dark:[&_.ant-progress-text]:text-white"
             />
           </div>
         )}
@@ -252,7 +249,7 @@ const SprintDetails = () => {
               className="border border-[#001529] dark:border-gray-600 bg-[#001529] rounded-lg overflow-hidden hover:shadow-md transition-shadow"
             >
               <div
-                className={`p-4 flex justify-between items-center transition-colors ${
+                className={`p-2 md:p-4 flex justify-between items-center transition-colors ${
                   isSessionUnlocked(
                     sessions.findIndex((s) => s._id === session._id),
                     sessions,
@@ -320,12 +317,12 @@ const SprintDetails = () => {
                     }
 
                     return (
-                      <div className="flex items-start justify-between w-full">
-                        <div className="flex items-start gap-3 flex-1">
-                          {icon}
+                      <div className="grid grid-col-2">
+                        <div className="flex items-start">
+                          <div className="hidden md:block">{icon}</div>
                           <div className="flex-1">
                             <div className="font-medium flex items-center">
-                              {session.name}
+                              <span className="text-sm">{session.name}</span>
                               {sessionTasksList.length > 0 && (
                                 <Tag
                                   color={
@@ -345,22 +342,22 @@ const SprintDetails = () => {
                                 </Tag>
                               )}
                             </div>
-                            <div className="text-black dark:text-white text-sm">
-                              {session.description || "No description"}
-                            </div>
+                            {/* <div className="text-black dark:text-white text-sm">
+                              {session.content || "No content"}
+                            </div> */}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 mt-2">
                           {session.zoomMeetingLink && (
                             <a
                               href={session.zoomMeetingLink}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-xl shadow hover:bg-blue-700 transition whitespace-nowrap"
+                              className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-sm shadow hover:bg-blue-700 transition whitespace-nowrap"
                             >
                               <VideoCameraOutlined />
-                              Join Meeting
+                              Go Live
                             </a>
                           )}
 
@@ -371,7 +368,7 @@ const SprintDetails = () => {
                                 setCurrentVideoUrl(session.videoUrl);
                                 setVideoModalVisible(true);
                               }}
-                              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-xl shadow hover:bg-blue-100 transition whitespace-nowrap"
+                              className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-sm shadow hover:bg-blue-100 transition whitespace-nowrap"
                             >
                               <PlayCircleOutlined />
                               Watch
@@ -388,17 +385,28 @@ const SprintDetails = () => {
                             destroyOnClose
                           >
                             <div className="w-full aspect-video">
-                              <iframe
-                                src={currentVideoUrl.replace(
-                                  "/view?usp=sharing",
-                                  "/preview",
-                                )}
-                                width="100%"
-                                height="100%"
-                                allow="autoplay"
-                                frameBorder="0"
-                                allowFullScreen
-                              />
+                              {currentVideoUrl.includes(".mp4") || 
+                               currentVideoUrl.includes(".mov") ||
+                               currentVideoUrl.includes(".webm") ? (
+                                <video
+                                  src={currentVideoUrl}
+                                  controls
+                                  autoPlay
+                                  className="w-full h-full"
+                                  controlsList="nodownload"
+                                />
+                              ) : (
+                                <iframe
+                                  src={currentVideoUrl.includes("drive.google.com") 
+                                    ? currentVideoUrl.replace("/view?usp=sharing", "/preview").replace("/view", "/preview")
+                                    : currentVideoUrl}
+                                  width="100%"
+                                  height="100%"
+                                  allow="autoplay; fullscreen"
+                                  allowFullScreen
+                                  frameBorder="0"
+                                />
+                              )}
                             </div>
                           </Modal>
 
@@ -414,7 +422,7 @@ const SprintDetails = () => {
                               {currentQuestions.map((question, index) => (
                                 <div
                                   key={index}
-                                  className="p-4 border rounded-lg"
+                                  className="p-2 md:p-4 border rounded-lg"
                                 >
                                   <div className="font-medium mb-2">
                                     {index + 1}. {question.question}
@@ -487,9 +495,9 @@ const SprintDetails = () => {
                       : ""
                   }
                 >
-                  <div className="border-t border-gray-100 bg-gray-50 p-4">
+                  <div className="border-t border-gray-100 bg-gray-50 dark:bg-gray-800 p-1.5 md:p-4">
                     <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-black">
+                      <h4 className="font-medium text-black dark:text-white">
                         <FileTextOutlined className="mr-2" />
                         Tasks
                       </h4>
@@ -669,7 +677,7 @@ const SprintDetails = () => {
                                   </Tag>
                                 )}
                                 {isUnlocked && !isTaskCompleted(task) && (
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs">
                                     Click to start
                                   </span>
                                 )}

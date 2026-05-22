@@ -28,7 +28,16 @@ const LMSLayout = () => {
   // Close mobile sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (mobileSidebarOpen && !event.target.closest(".lms-sidebar")) {
+      if (!mobileSidebarOpen) return;
+      
+      const clickedInsideSidebar = event.target.closest(".lms-sidebar");
+      const clickedToggleBtn = event.target.closest("[data-mobile-toggle]");
+      const clickedOverlay = event.target.closest(".mobile-overlay");
+      
+      // Allow clicking the toggle button and overlay to close
+      if (clickedToggleBtn || clickedOverlay) return;
+      
+      if (!clickedInsideSidebar) {
         setMobileSidebarOpen(false);
       }
     };
@@ -50,9 +59,12 @@ const LMSLayout = () => {
 
       {/* Mobile sidebar overlay */}
       {mobileSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-[899] md:hidden"
-          onClick={() => setMobileSidebarOpen(false)}
+        <div 
+          className="fixed inset-0 bg-black/50 z-[899] md:hidden mobile-overlay"
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            setMobileSidebarOpen(false);
+          }}
         />
       )}
 

@@ -350,7 +350,7 @@ function Navbar() {
                 to="/login"
                 className="flex items-center gap-1 text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors"
               >
-                <FaSignInAlt size={10} /> Login
+                <FaSignInAlt size={10} />Login
               </Link>
             )}
           </div>
@@ -386,7 +386,7 @@ function Navbar() {
                 onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
                 className="flex items-center gap-1 hover:text-white transition-colors"
               >
-                <FaCreditCard size={12} /> Pay <FaChevronDown size={8} />
+                Pay <FaChevronDown size={8} />
               </button>
               {showPaymentDropdown && (
                 <div className="absolute right-[-20px] top-6 w-64 bg-white text-gray-800 rounded shadow-xl border border-gray-100 z-50">
@@ -501,7 +501,7 @@ function Navbar() {
                 to="/login"
                 className="flex items-center gap-1 text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors"
               >
-                <FaSignInAlt size={10} /> Login
+                <FaSignInAlt size={10} /> <span className="hidden md:inline">Login</span>
               </Link>
             )}
           </div>

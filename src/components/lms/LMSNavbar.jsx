@@ -64,11 +64,13 @@ const LMSNavbar = ({
         {/* Left: Logo & Mobile Menu Toggle */}
         <div className="flex items-center gap-3">
           {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={onMobileMenuToggle}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
-            aria-label="Toggle menu"
-          >
+<button
+             onPointerDown={(e) => e.stopPropagation()}
+             onClick={onMobileMenuToggle}
+             className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+             aria-label="Toggle menu"
+             data-mobile-toggle
+           >
             {mobileMenuOpen ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"

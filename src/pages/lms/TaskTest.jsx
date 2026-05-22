@@ -23,78 +23,124 @@ const QuestionCard = ({
   );
 
   return (
-    <Card
+    <div
       key={index}
-      title={
-        <span className="text-black dark:text-white">{`Question ${index + 1} (${
-          question.points || 1
-        } point${(question.points || 1) > 1 ? "s" : ""})`}</span>
-      }
-      className="mb-6 bg-gray-200 dark:bg-[#001525] text-black dark:text-white"
+      className="mb-6 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-200 dark:bg-[#001525] text-black dark:text-white shadow-sm overflow-hidden"
     >
-      <p className="text-lg mb-4 dark:text-white">{question.question}</p>
-
-      <div className="space-y-2">
-        {question.options.map((option, optIndex) => {
-          const isSelected =
-            question.questionType === "true_false"
-              ? answer === option.text
-              : answer?.includes(option.text);
-
-          return (
-            <div
-              key={optIndex}
-              className={`p-3 border rounded-md cursor-pointer transition-colors ${
-                isSelected
-                  ? "border-blue-500 bg-blue-50 text-black"
-                  : "border-gray-200 hover:border-blue-300"
-              }`}
-              onClick={() =>
-                onAnswerSelect(
-                  index,
-                  option.text,
-                  question.questionType !== "true_false",
-                )
-              }
-            >
-              <div className="flex items-center">
-                <div
-                  className={`w-5 h-5 rounded-full border mr-3 flex items-center justify-center ${
-                    isSelected
-                      ? "bg-blue-500 border-blue-500"
-                      : "border-gray-400"
-                  }`}
-                >
-                  {isSelected && <div className="w-2 h-2 rounded-full"></div>}
-                </div>
-                <span>{option.text}</span>
-              </div>
-            </div>
-          );
-        })}
+      {/* Card Header (Title Section) */}
+      <div className="p-2 md:p-4 border-b border-gray-300 dark:border-gray-800">
+        <span className="font-semibold text-base text-black dark:text-white">
+          {`Question ${index + 1} (${question.points || 1} point${(question.points || 1) > 1 ? "s" : ""})`}
+        </span>
       </div>
 
-      {showResults && (
-        <div className="mt-4 p-3 bg-gray-200 rounded-md dark:bg-[#001525]">
-          <p className="font-medium mb-2">
-            {isCorrect ? (
-              <span className="text-green-600 flex items-center">
-                <CheckCircleOutlined className="mr-2" /> Correct Answer
-              </span>
-            ) : (
-              <span className="text-red-600 flex items-center">
-                <CloseCircleOutlined className="mr-2" /> Incorrect Answer
-              </span>
-            )}
-          </p>
-          {question.explanation && (
-            <p className="text-gray-600 text-sm">
-              <strong>Explanation:</strong> {question.explanation}
-            </p>
-          )}
+      {/* Card Body */}
+      <div className="p-2 md:p-6">
+        {/* Question Text */}
+        <p className="text-lg mb-4 text-black dark:text-white font-medium">
+          {question.question}
+        </p>
+
+        {/* Options List */}
+        <div className="space-y-2">
+          {question.options.map((option, optIndex) => {
+            const isSelected =
+              question.questionType === "true_false"
+                ? answer === option.text
+                : answer?.includes(option.text);
+
+            return (
+              <div
+                key={optIndex}
+                className={`p-3 border rounded-md cursor-pointer transition-colors ${
+                  isSelected
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200"
+                    : "border-gray-300 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-800 bg-white dark:bg-[#001c32]"
+                }`}
+                onClick={() =>
+                  onAnswerSelect(
+                    index,
+                    option.text,
+                    question.questionType !== "true_false",
+                  )
+                }
+              >
+                <div className="flex items-center">
+                  {/* Custom Radio/Checkbox Circle */}
+                  <div
+                    className={`w-5 h-5 rounded-full border mr-3 flex items-center justify-center shrink-0 transition-colors ${
+                      isSelected
+                        ? "bg-blue-500 border-blue-500"
+                        : "border-gray-400 dark:border-gray-500 bg-white dark:bg-transparent"
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="w-2 h-2 rounded-full bg-white"></div>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium">{option.text}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      )}
-    </Card>
+
+        {/* Results / Explanation Section */}
+        {showResults && (
+          <div className="mt-4 p-4 bg-gray-300 rounded-md dark:bg-[#001c32] border border-gray-400/20 dark:border-gray-700">
+            <p className="font-semibold mb-2 text-sm">
+              {isCorrect ? (
+                <span className="text-green-600 dark:text-green-400 flex items-center">
+                  {/* SVGs used instead of AntD Icons */}
+                  <svg
+                    className="w-5 h-5 mr-2 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  Correct Answer
+                </span>
+              ) : (
+                <span className="text-red-600 dark:text-red-400 flex items-center">
+                  <svg
+                    className="w-5 h-5 mr-2 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  Incorrect Answer
+                </span>
+              )}
+            </p>
+
+            {question.explanation && (
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                <strong className="text-gray-900 dark:text-white">
+                  Explanation:
+                </strong>{" "}
+                {question.explanation}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -295,27 +341,24 @@ const TaskTest = () => {
   const progress = ((currentIndex + 1) / task.questions.length) * 100;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="max-w-7xl mx-auto text-black dark:text-white">
       <div className="flex justify-between items-center mb-6">
-        <Button
-          type="text"
-          icon={<ArrowLeftOutlined />}
+        <button
           onClick={() =>
-            navigate(
-              `/smart-board/courses/${courseId}/sprints/${sprintId}/sessions/${sessionId}`,
-            )
+            navigate(`/smart-board/courses/${courseId}/sprints/${sprintId}`)
           }
         >
+          <ArrowLeftOutlined />
           Back
-        </Button>
-        <span className="text-red-600">
+        </button>
+        <span className="text-green-600">
           ⏱ {Math.floor(timeSpent / 60)}:
           {(timeSpent % 60).toString().padStart(2, "0")}
         </span>
       </div>
 
       <div className="mb-4">
-        <div className="flex justify-between mb-1 text-sm font-medium text-black">
+        <div className="flex justify-between mb-1 text-sm font-medium">
           <span>
             Question {currentIndex + 1} of {task.questions.length}
           </span>
@@ -324,7 +367,7 @@ const TaskTest = () => {
         <Progress percent={progress} showInfo={false} />
       </div>
 
-      <h1 className="text-2xl font-bold mb-6 text-black">{task.title}</h1>
+      <p className="text-2xl font-bold mb-2">{task.title}</p>
 
       <QuestionCard
         question={currentQ}
@@ -335,15 +378,15 @@ const TaskTest = () => {
       />
 
       <div className="flex justify-between mt-8">
-        <Button
+        <button
           disabled={currentIndex === 0}
           onClick={() => setCurrentIndex((i) => i - 1)}
-          className="text-red-600 font-bold border-2 border-red-600"
+          className="font-bold bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded"
         >
           Previous
-        </Button>
+        </button>
         {currentIndex === task.questions.length - 1 ? (
-          <Button
+          <button
             loading={submitting}
             onClick={() =>
               Modal.confirm({
@@ -358,17 +401,17 @@ const TaskTest = () => {
                 okType: "success",
               })
             }
-            className="text-green-600 font-bold border-2 border-green-600"
+            className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
           >
             Submit
-          </Button>
+          </button>
         ) : (
-          <Button
+          <button
             onClick={() => setCurrentIndex((i) => i + 1)}
-            className="text-blue-600 font-bold border-2 border-blue-600"
+            className="font-bold bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded"
           >
             Next
-          </Button>
+          </button>
         )}
       </div>
     </div>

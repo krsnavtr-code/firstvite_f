@@ -6,79 +6,79 @@ import { Link } from "react-router-dom";
 const ALL_TESTIMONIALS = [
   {
     id: 1,
-    name: "Aarav Sharma",
-    role: "Full Stack Developer",
-    company: "TechMahindra",
-    category: "Career Transition",
+    name: "Krishna Avtar",
+    role: "MLOps Engineer",
+    email: "krishnaavtar955@gmail.com",
+    category: "Get Jobs",
     image:
       "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&auto=format&fit=crop",
     content:
-      "I had done two other basic coding courses before, but all they gave me was a generic certificate and zero confidence. This certification program was completely different. The MERN stack capstone projects weren't just copied from YouTube tutorials; we built unique, complex apps. Adding this verified credential to my resume and LinkedIn completely changed how recruiters responded to my off-campus applications.",
+      "I recently completed AI & ML course and I must admit that they have done an awesome job at creating premium and meaningful content. Amazing courses and superb faculty of Harappa. I look forward to keep learning on Harappa and also recommend it.",
     rating: 5,
   },
   {
     id: 2,
-    name: "Priya Patel",
-    role: "Data Analyst",
-    company: "Deloitte",
+    name: "Manika Gahloat",
+    role: "Robotics Engineer",
+    email: "manikagahloat91@gmail.com",
     category: "Upskilling",
     image:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
     content:
-      "Most online certificates are just a checkbox, but the curriculum here gave me actual talking points for my interviews. The Power BI and Advanced SQL modules focused strictly on corporate case studies. When the Deloitte hiring manager looked at my course certification project, they spent 15 minutes asking how I handled the messy data pipeline. That’s when I knew this course was worth every rupee.",
+      "The teaching style of faculty is unique and the courses are not at all boring.  I would highly recommend you to learn and develop yourself by the courses on Harappa Platform. ",
     rating: 5,
   },
   {
     id: 3,
-    name: "Rohan Das",
-    role: "Software Engineer",
-    company: "Swiggy",
+    name: "Ankit Kumar",
+    role: "Generative AI Engineer",
+    email: "ankitdhanka037@gmail.com",
     category: "Students",
     image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
     content:
-      "Our tier-3 college didn't have big product companies coming for placements. I needed a professional certification that could clear industry ATS filters. This course didn't just give me a PDF certificate; the community support, resume-building sessions, and mock interview prep helped me bridge the gap. I used my course projects to showcase my Git and Docker skills, which helped me land my Swiggy offer.",
+      "Its a great education platform, The faculty is experienced and the content was also very premium. I am satisfied with the overall experience.",
     rating: 5,
   },
   {
     id: 4,
-    name: "Ananya Iyer",
-    role: "UI/UX Designer",
-    company: "Freelance",
+    name: "Vinay Kumar",
+    role: "Computer Vision Engineer",
+    email: "yadavvinay999790@gmail.com",
     category: "Upskilling",
     image:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
     content:
-      "As a self-taught designer, I lacked a structured portfolio to convince premium clients. This UI/UX certification forced me to stop just copying UI trends and actually build a comprehensive case study from scratch. Having a structured, industry-recognized certificate gave me the professional credibility I needed to pitch to international startups and scale my freelance rates.",
+      "After my Course Complete I had bad experience with their interview process. Making Decision course has been proved to be really benificial for me. I am very thankful to Harappa Education for providing such content.",
     rating: 5,
   },
   {
     id: 5,
-    name: "Vikram Malhotra",
-    role: "DevOps Engineer",
-    company: "Capgemini",
-    category: "Career Transition",
+    name: "Devendra Trivedi",
+    role: "Machine Learning Engineer",
+    email: "devendratrivedi871@gmail.com",
+    category: "Get Jobs",
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
     content:
-      "I was skeptical about online certification courses because I already had a full-time tech support job and very little time. But the self-paced structure combined with weekend doubt-clearing sessions made it manageable. The AWS labs were flawless, and the platform's course completion certificate actually helped me transition internal teams at my company into a core DevOps role.",
+      "This platform is giving great opportunities to one who wants to upskill and learn new things. I can now identify my strenght and weakness and it also helped me in overcoming my weaknesses. Its a great platform!",
     rating: 5,
   },
   {
     id: 6,
-    name: "Sneha Reddy",
-    role: "Associate Product Manager",
-    company: "Jio",
+    name: "Adarsh Srivastava",
+    role: "AI Engineer",
+    email: "sriadarsh04@gmail.com",
     category: "Upskilling",
     image:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
     content:
-      "Transitioning into Product Management without a core tech background is incredibly tough in India. This specific e-learning certificate program came highly recommended by peers on LinkedIn. The technical essentials module translated complex system design and API concepts into business logic. Getting this certificate marked a massive turning point in clearing the product rounds at Jio.",
+      "The courses are available in Hindi language also which is very rare on other platforms. Its easy to understand, I am totally satisfied with the whole experience and definitely recommend it to everyone.",
     rating: 5,
   },
 ];
 
-const CATEGORIES = ["All", "Career Transition", "Upskilling", "Students"];
+const CATEGORIES = ["All", "Get Jobs", "Upskilling", "Students"];
 
 export default function TestimonialsPage() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -103,16 +103,16 @@ export default function TestimonialsPage() {
       />
 
       {/* Hero Section */}
-      <section className="relative py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white overflow-hidden">
+      <section className="relative py-6 md:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <span className="inline-block bg-blue-500/30 text-blue-100 text-sm font-semibold px-4 py-1.5 rounded-full mb-4 uppercase tracking-wider">
             Success Stories
           </span>
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
+          <h1 className="text-lg md:text-4xl lg:text-6xl font-extrabold mb-6 tracking-tight">
             What Our Learners Say
           </h1>
-          <p className="text-lg md:text-xl max-w-4xl mx-auto text-blue-100 font-light leading-relaxed">
+          <p className="text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto text-blue-100 font-light leading-relaxed">
             Real stories from real people who have upskilled, switched
             industries, and transformed their professional trajectories with
             Eklabya.
@@ -121,13 +121,13 @@ export default function TestimonialsPage() {
       </section>
 
       {/* Category Filter Controls */}
-      <section className="pt-12 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {/* <section className="pt-8 pb-2 px-2 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex flex-wrap justify-center gap-3">
           {CATEGORIES.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+              className={`px-2 py-0.5 rounded-full text-sm font-medium transition-all duration-200 ${
                 activeCategory === category
                   ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
                   : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
@@ -137,19 +137,19 @@ export default function TestimonialsPage() {
             </button>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Main Full-Text Testimonials Grid */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredTestimonials.map((item) => (
             <div
               key={item.id}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-200"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-3 md:p-8 border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-200"
             >
               <div>
                 {/* Five Star Rating Row */}
-                <div className="flex text-amber-400 mb-5">
+                <div className="flex text-amber-400 mb-3">
                   {[...Array(item.rating)].map((_, i) => (
                     <svg
                       key={i}
@@ -162,7 +162,7 @@ export default function TestimonialsPage() {
                 </div>
 
                 {/* Full Review Content without Truncation */}
-                <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6 font-normal italic">
+                <p className="text-black dark:text-white text-base leading-relaxed mb-3 font-normal italic">
                   "{item.content}"
                 </p>
               </div>
@@ -180,9 +180,9 @@ export default function TestimonialsPage() {
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {item.role} &middot;{" "}
-                    <span className="text-blue-600 dark:text-blue-400 font-medium">
-                      {item.company}
-                    </span>
+                  </p>
+                  <p className="text-xs md:text-lg text-blue-600 dark:text-blue-400 font-medium">
+                    {item.email}
                   </p>
                 </div>
               </div>

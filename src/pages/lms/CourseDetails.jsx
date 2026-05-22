@@ -48,30 +48,30 @@ const CourseDetails = () => {
         }
         setCourse(currentEnrollment.course);
 
-        const response = await getSprintsByCourse(courseId, {
-          populate: "tasks",
-        });
+const response = await getSprintsByCourse(courseId, {
+           populate: "sessions tasks",
+         });
         let sprintsData = response?.data?.sprints || response || [];
 
         const progressData = {};
         const updatedSprints = [];
 
-        for (const sprint of sprintsData) {
-          let sprintWithTasks = sprint;
-          if (!sprint.tasks || !sprint.tasks.length) {
-            const sessionsResponse = await getSessionsBySprint(sprint._id);
-            const sessions = sessionsResponse?.data?.sessions || [];
-            const allTasks = [];
-            for (const session of sessions) {
-              const tasksResponse = await getTasksBySession(session._id);
-              if (tasksResponse?.data?.tasks)
-                allTasks.push(...tasksResponse.data.tasks);
-            }
-            sprintWithTasks = { ...sprint, tasks: allTasks };
-          }
-          progressData[sprint._id] = calculateSprintProgress(sprintWithTasks);
-          updatedSprints.push(sprintWithTasks);
-        }
+for (const sprint of sprintsData) {
+           let sprintWithTasks = sprint;
+           if (!sprint.tasks || !sprint.tasks.length) {
+             const sessionsResponse = await getSessionsBySprint(sprint._id);
+             const sessions = sessionsResponse?.data?.sessions || [];
+             const allTasks = [];
+             for (const session of sessions) {
+               const tasksResponse = await getTasksBySession(session._id);
+               if (tasksResponse?.data?.tasks)
+                 allTasks.push(...tasksResponse.data.tasks);
+             }
+             sprintWithTasks = { ...sprint, sessions, tasks: allTasks };
+           }
+           progressData[sprint._id] = calculateSprintProgress(sprintWithTasks);
+           updatedSprints.push(sprintWithTasks);
+         }
         setSprintProgress(progressData);
         setSprints(updatedSprints);
       } catch (error) {
@@ -110,7 +110,7 @@ const CourseDetails = () => {
         <div className="flex flex-col lg:flex-row">
           <div className="lg:w-2/5 relative aspect-video lg:aspect-auto">
             <img
-              src={course.thumbnail || "https://via.placeholder.com/600x400"}
+              src={course.thumbnail || ""}
               alt=""
               className="w-full h-full object-cover"
             />
@@ -133,12 +133,9 @@ const CourseDetails = () => {
               </span>
             </div>
 
-            <h1 className="text-3xl font-black text-slate-800 dark:text-white mb-4 leading-tight">
+            <h1 className="text-xl font-black text-slate-800 dark:text-white mb-4 leading-tight">
               {course.title}
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mb-8 line-clamp-3">
-              {course.description}
-            </p>
 
             {/* Course Progress Bar */}
             <div className="space-y-3">
@@ -156,7 +153,7 @@ const CourseDetails = () => {
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-slate-400 text-right font-medium">
+              <p className="text-xs text-right font-medium">
                 {sprints.filter((s) => sprintProgress[s._id] === 100).length} of{" "}
                 {sprints.length} sprints completed
               </p>
@@ -167,7 +164,7 @@ const CourseDetails = () => {
 
       {/* Sprints Section */}
       <div>
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-2 mb-3">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
             <svg
               className="w-6 h-6"
@@ -208,7 +205,7 @@ const CourseDetails = () => {
                       `/smart-board/courses/${courseId}/sprints/${sprint._id}`,
                     )
                   }
-                  className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/5"
+                  className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2 md:p-6 rounded-xl hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/5"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white group-hover:text-blue-600 transition-colors line-clamp-1">
@@ -245,30 +242,14 @@ const CourseDetails = () => {
                     </div>
                   </div>
 
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 line-clamp-2 h-10 leading-relaxed">
-                    {sprint.description ||
+                  <p className="text-sm text-slate-700 dark:text-slate-300 mb-6 line-clamp-2 h-10 leading-relaxed">
+                    {sprint.goal ||
                       "Learn the fundamentals and advanced concepts in this sprint module."}
                   </p>
 
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
                     <div className="flex gap-4">
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        {sprint.duration || 0} Days
-                      </span>
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase">
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">
                         <svg
                           className="w-4 h-4"
                           fill="none"
@@ -282,7 +263,7 @@ const CourseDetails = () => {
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                           />
                         </svg>
-                        {sprint.tasks?.length || 0} Tasks
+                        {sprint.sessions?.length || 0} Sessions
                       </span>
                     </div>
                     {sprint.whatsappGroupLink && (
