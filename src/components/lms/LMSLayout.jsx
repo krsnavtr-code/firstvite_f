@@ -89,11 +89,11 @@ const LMSLayout = () => {
         {/* Page Content */}
         <main
           className={`flex-1 transition-all duration-300 min-h-[calc(100vh-50px)] bg-[#001529] dark:bg-slate-900
-            ${collapsed ? "md:ml-[60px]" : "md:ml-[240px]"}
+            ${collapsed ? "md:ml-[60px]" : "md:ml-[170px]"}
             ml-0`}
         >
           <div className="bg-white dark:bg-slate-800 min-h-full shadow-sm">
-            <div className="lms-container p-4 sm:p-6">
+            <div className="lms-container p-2 sm:p-4">
               <Outlet />
             </div>
           </div>

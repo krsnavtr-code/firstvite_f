@@ -126,7 +126,7 @@ const LMSSidebar = ({
   return (
     <aside
       className={`h-full transition-all duration-300 ease-in-out border-r flex flex-col
-        ${collapsed ? "w-[70px]" : "w-64"}
+        ${collapsed ? "w-[70px]" : "w-44"}
         ${theme === "dark" ? "bg-slate-900 border-slate-800" : "bg-white border-gray-200"}
       `}
     >
