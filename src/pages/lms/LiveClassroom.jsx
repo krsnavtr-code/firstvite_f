@@ -84,7 +84,10 @@ const LiveClassroom = () => {
     // User joined
     socket.current.on("user-joined", ({ userId, role, fullname }) => {
       console.log(`User ${fullname} joined as ${role}`);
-      setParticipants((prev) => [...prev, { userId, role, fullname }]);
+      // Don't add current user to participants list
+      if (userId !== currentUser._id) {
+        setParticipants((prev) => [...prev, { userId, role, fullname }]);
+      }
 
       // Create peer connection based on roles
       // Teacher connects to new students
@@ -111,7 +114,11 @@ const LiveClassroom = () => {
 
     // Participants list
     socket.current.on("participants-list", (participantsList) => {
-      setParticipants(participantsList);
+      // Filter out current user from participants to avoid showing duplicate
+      const otherParticipants = participantsList.filter(
+        (p) => p.userId !== currentUser._id,
+      );
+      setParticipants(otherParticipants);
 
       // Create peer connections for existing participants
       participantsList.forEach((participant) => {
