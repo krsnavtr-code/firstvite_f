@@ -22,10 +22,14 @@ const LiveClassroom = () => {
   const screenSharePeersRef = useRef({}); // Multi-target screen management
   const localStreamRef = useRef(null);
   const screenShareStreamRef = useRef(null);
+  const connectionAttemptsRef = useRef(0);
+  const heartbeatIntervalRef = useRef(null);
+  const participantsListRef = useRef([]); // Deep clone reference for comparison
 
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [connectionState, setConnectionState] = useState("connecting"); // connecting, connected, disconnected, reconnecting
 
   // UI Sync States
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -47,13 +51,34 @@ const LiveClassroom = () => {
     };
   }, [sessionId]);
 
+  // Heartbeat mechanism for connection health
+  useEffect(() => {
+    if (connectionState === "connected" && socket.current) {
+      heartbeatIntervalRef.current = setInterval(() => {
+        socket.current.emit("heartbeat");
+      }, 15000); // Send heartbeat every 15 seconds
+    }
+
+    return () => {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+      }
+    };
+  }, [connectionState]);
+
   const initializeClassroom = async () => {
     try {
+      setConnectionState("connecting");
+      connectionAttemptsRef.current = 0;
+
       const sessionData = await getClassroomSession(sessionId);
       setSession(sessionData?.data || sessionData);
 
       await joinClassroomSession(sessionId);
       socket.current = getSocket();
+
+      // Setup socket listeners BEFORE joining to catch all events
+      setupSocketListeners();
 
       // Get local media stream first and lock it inside Ref immediately
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -69,78 +94,183 @@ const LiveClassroom = () => {
       const role = currentUser?.role || "student";
       socket.current.emit("join-classroom", { sessionId, role });
 
-      setupSocketListeners();
-      setLoading(false);
+      console.log(
+        `[INIT] Classroom initialization started for user ${currentUser._id}`,
+      );
     } catch (err) {
-      console.error("Error initializing classroom:", err);
+      console.error("[ERROR] Failed to initialize classroom:", err);
       setError("Failed to initialize system or camera access denied.");
+      setConnectionState("disconnected");
       setLoading(false);
+
+      // Attempt reconnection
+      if (connectionAttemptsRef.current < 3) {
+        setTimeout(() => {
+          connectionAttemptsRef.current++;
+          console.log(`[RECONNECT] Attempt ${connectionAttemptsRef.current}`);
+          initializeClassroom();
+        }, 2000);
+      }
     }
   };
 
   const setupSocketListeners = () => {
     if (!socket.current) return;
 
-    // User joined
-    socket.current.on("user-joined", ({ userId, role, fullname }) => {
-      if (userId === currentUser._id) return;
+    // Connection state monitoring
+    socket.current.on("connect", () => {
+      console.log(`[SOCKET] Connected with ID ${socket.current.id}`);
+      setConnectionState("connected");
+    });
 
-      console.log(`📡 New participant detected: ${fullname} (${role})`);
+    socket.current.on("disconnect", (reason) => {
+      console.log(`[SOCKET] Disconnected. Reason: ${reason}`);
+      setConnectionState("disconnected");
 
-      // Force strict functional state copy to avoid batching ignore
-      setParticipants((prev) => {
-        const exists = prev.some((p) => p.userId === userId);
-        if (exists) return prev;
-        const updatedList = [...prev, { userId, role, fullname }];
-        console.log("📊 Updated Participants List Count:", updatedList.length);
-        return updatedList;
-      });
-
-      // Teacher establishes connection to naye students
-      if (currentUser?.role === "teacher" && role === "student") {
-        createPeerConnection(userId, true);
+      // Auto-reconnect for certain reasons
+      if (reason === "transport close" || reason === "ping timeout") {
+        if (connectionAttemptsRef.current < 3) {
+          setTimeout(() => {
+            connectionAttemptsRef.current++;
+            console.log(
+              `[RECONNECT] Auto-reconnect attempt ${connectionAttemptsRef.current}`,
+            );
+            socket.current.connect();
+          }, 3000);
+        }
       }
     });
 
-    // Handle existing participants sync safely
-    socket.current.on("participants-list", (participantsList) => {
+    socket.current.on("error", (error) => {
+      console.error(`[SOCKET ERROR]`, error);
+      setError(`Connection error: ${error.message}`);
+    });
+
+    // User joined - with deep cloning to prevent race conditions
+    socket.current.on(
+      "user-joined",
+      ({ userId, role, fullname, timestamp }) => {
+        if (userId === currentUser._id) return;
+
+        console.log(
+          `[USER JOINED] ${fullname} (${role}) at ${new Date(timestamp).toISOString()}`,
+        );
+
+        // Force strict functional state copy with deep cloning
+        setParticipants((prev) => {
+          const exists = prev.some((p) => p.userId === userId);
+          if (exists) {
+            console.log(
+              `[DUPLICATE] User ${userId} already in participants list`,
+            );
+            return prev;
+          }
+          const updatedList = JSON.parse(JSON.stringify(prev)); // Deep clone
+          updatedList.push({ userId, role, fullname, joinedAt: timestamp });
+          console.log(`[PARTICIPANTS] Updated count: ${updatedList.length}`);
+          return updatedList;
+        });
+
+        // STRICT RULE: Only TEACHER initiates connections to prevent dual-initiator collisions
+        if (currentUser?.role === "teacher" && role === "student") {
+          console.log(
+            `[WEBRTC] Teacher initiating connection to student ${userId}`,
+          );
+          // Small delay to ensure socket is fully ready
+          setTimeout(() => createPeerConnection(userId, true), 100);
+        }
+      },
+    );
+
+    // Handle existing participants sync safely with deep cloning
+    socket.current.on("participants-list", ({ participants, timestamp }) => {
       console.log(
-        "📋 Received raw server participants array:",
-        participantsList,
+        `[PARTICIPANTS LIST] Received ${participants.length} participants at ${new Date(timestamp).toISOString()}`,
       );
 
       // Filter out the current user to keep pure peer metrics
-      const otherParticipants = participantsList.filter(
+      const otherParticipants = participants.filter(
         (p) => p.userId !== currentUser._id,
       );
 
+      // Deep clone to prevent race conditions
+      const clonedParticipants = JSON.parse(JSON.stringify(otherParticipants));
+
+      // Update reference for comparison
+      participantsListRef.current = clonedParticipants;
+
       // Directly set the cleaned state slice
-      setParticipants(otherParticipants);
+      setParticipants(clonedParticipants);
 
-      otherParticipants.forEach((participant) => {
-        if (currentUser?.role === "student" && participant.role === "teacher") {
-          createPeerConnection(participant.userId, true);
+      setLoading(false);
+      setConnectionState("connected");
+
+      // STRICT RULE: Students do NOT initiate - they wait for teacher offers
+      // Only create peer connections if we're a student and teacher is present
+      if (currentUser?.role === "student") {
+        const teacher = clonedParticipants.find((p) => p.role === "teacher");
+        if (teacher) {
+          console.log(
+            `[WEBRTC] Student found teacher ${teacher.userId}, waiting for offer`,
+          );
+          // Don't initiate - wait for teacher's offer
         }
-      });
+      }
     });
 
-    // WebRTC Offer
-    socket.current.on("webrtc-offer", async ({ offer, fromUserId }) => {
-      createPeerConnection(fromUserId, false, offer);
-    });
+    // WebRTC Offer - Only students receive offers from teacher
+    socket.current.on(
+      "webrtc-offer",
+      async ({ offer, fromUserId, fromFullname, timestamp }) => {
+        console.log(
+          `[WEBRTC OFFER] Received from ${fromFullname} (${fromUserId}) at ${new Date(timestamp).toISOString()}`,
+        );
 
-    // WebRTC Answer
-    socket.current.on("webrtc-answer", async ({ answer, fromUserId }) => {
-      const peer = peersRef.current[fromUserId];
-      if (peer) peer.signal(answer);
-    });
+        // Check if peer already exists to prevent duplicates
+        if (peersRef.current[fromUserId]) {
+          console.log(
+            `[WEBRTC] Peer for ${fromUserId} already exists, destroying old one`,
+          );
+          peersRef.current[fromUserId].destroy();
+          delete peersRef.current[fromUserId];
+        }
+
+        createPeerConnection(fromUserId, false, offer);
+      },
+    );
+
+    // WebRTC Answer - Only teacher receives answers from students
+    socket.current.on(
+      "webrtc-answer",
+      async ({ answer, fromUserId, timestamp }) => {
+        console.log(
+          `[WEBRTC ANSWER] Received from ${fromUserId} at ${new Date(timestamp).toISOString()}`,
+        );
+
+        const peer = peersRef.current[fromUserId];
+        if (peer) {
+          peer.signal(answer);
+        } else {
+          console.warn(
+            `[WEBRTC] No peer found for ${fromUserId} when receiving answer`,
+          );
+        }
+      },
+    );
 
     // ICE Candidates
     socket.current.on(
       "webrtc-ice-candidate",
-      async ({ candidate, fromUserId }) => {
+      async ({ candidate, fromUserId, timestamp }) => {
         const peer = peersRef.current[fromUserId];
-        if (peer) peer.signal({ candidate });
+        if (peer) {
+          peer.signal({ candidate });
+        } else {
+          // Silently drop - peer might not be ready yet
+          console.log(
+            `[WEBRTC ICE] No peer for ${fromUserId}, dropping candidate`,
+          );
+        }
       },
     );
 
@@ -174,11 +304,18 @@ const LiveClassroom = () => {
       });
     });
 
-    // User Left CleanUp
-    socket.current.on("user-left", ({ userId, fullname }) => {
-      console.log(`🛑 User left the engine node: ${fullname}`);
+    // User Left CleanUp with deep cloning
+    socket.current.on("user-left", ({ userId, fullname, timestamp }) => {
+      console.log(
+        `[USER LEFT] ${fullname} at ${new Date(timestamp).toISOString()}`,
+      );
 
-      setParticipants((prev) => prev.filter((p) => p.userId !== userId));
+      setParticipants((prev) => {
+        const cloned = JSON.parse(JSON.stringify(prev));
+        const filtered = cloned.filter((p) => p.userId !== userId);
+        console.log(`[PARTICIPANTS] After removal: ${filtered.length}`);
+        return filtered;
+      });
 
       // Dynamic state stream pruning
       setRemoteStreams((prev) => {
@@ -189,6 +326,7 @@ const LiveClassroom = () => {
       });
 
       if (peersRef.current[userId]) {
+        console.log(`[WEBRTC] Destroying peer for ${userId}`);
         peersRef.current[userId].destroy();
         delete peersRef.current[userId];
       }
@@ -232,13 +370,20 @@ const LiveClassroom = () => {
     }
   };
 
-  // Stable Core Peer connection setup
+  // Stable Core Peer connection setup with error recovery
   const createPeerConnection = (
     remoteUserId,
     isInitiator,
     incomingOffer = null,
   ) => {
-    if (peersRef.current[remoteUserId]) return;
+    if (peersRef.current[remoteUserId]) {
+      console.log(`[WEBRTC] Peer for ${remoteUserId} already exists, skipping`);
+      return;
+    }
+
+    console.log(
+      `[WEBRTC] Creating peer connection to ${remoteUserId} (initiator: ${isInitiator})`,
+    );
 
     const peer = new SimplePeer({
       initiator: isInitiator,
@@ -248,18 +393,28 @@ const LiveClassroom = () => {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:stun2.l.google.com:19302" },
+          { urls: "stun:stun3.l.google.com:19302" },
         ],
       },
+      allowHalfTrickle: true, // Better for mobile networks
     });
 
     peer.on("signal", (data) => {
+      if (!socket.current || socket.current.disconnected) {
+        console.warn(`[WEBRTC] Socket disconnected, cannot send signal`);
+        return;
+      }
+
       if (data.type === "offer") {
+        console.log(`[WEBRTC SIGNAL] Sending offer to ${remoteUserId}`);
         socket.current.emit("webrtc-offer", {
           sessionId,
           offer: data,
           toUserId: remoteUserId,
         });
       } else if (data.type === "answer") {
+        console.log(`[WEBRTC SIGNAL] Sending answer to ${remoteUserId}`);
         socket.current.emit("webrtc-answer", {
           sessionId,
           answer: data,
@@ -275,19 +430,38 @@ const LiveClassroom = () => {
     });
 
     peer.on("stream", (remoteStream) => {
+      console.log(`[WEBRTC STREAM] Received stream from ${remoteUserId}`);
       setRemoteStreams((prev) => ({
         ...prev,
         [remoteUserId]: remoteStream,
       }));
     });
 
-    peer.on("error", (err) => console.error("Peer pipeline breakdown:", err));
+    peer.on("error", (err) => {
+      console.error(`[WEBRTC ERROR] Peer error for ${remoteUserId}:`, err);
+      // Attempt to recreate peer on error
+      setTimeout(() => {
+        if (peersRef.current[remoteUserId]) {
+          destroyPeer(remoteUserId);
+        }
+        // Only recreate if we're the initiator (teacher)
+        if (currentUser?.role === "teacher") {
+          createPeerConnection(remoteUserId, true);
+        }
+      }, 1000);
+    });
 
     peer.on("close", () => {
+      console.log(`[WEBRTC] Peer closed for ${remoteUserId}`);
       destroyPeer(remoteUserId);
     });
 
+    peer.on("connect", () => {
+      console.log(`[WEBRTC] Peer connected to ${remoteUserId}`);
+    });
+
     if (incomingOffer) {
+      console.log(`[WEBRTC] Processing incoming offer from ${remoteUserId}`);
       peer.signal(incomingOffer);
     }
 
@@ -447,20 +621,52 @@ const LiveClassroom = () => {
   };
 
   const cleanup = () => {
+    console.log(`[CLEANUP] Starting cleanup for session ${sessionId}`);
+
+    // Clear heartbeat
+    if (heartbeatIntervalRef.current) {
+      clearInterval(heartbeatIntervalRef.current);
+      heartbeatIntervalRef.current = null;
+    }
+
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((t) => t.stop());
+      localStreamRef.current = null;
     }
     if (screenShareStreamRef.current) {
       screenShareStreamRef.current.getTracks().forEach((t) => t.stop());
+      screenShareStreamRef.current = null;
     }
 
-    Object.values(peersRef.current).forEach((p) => p.destroy());
-    Object.values(screenSharePeersRef.current).forEach((p) => p.destroy());
+    Object.values(peersRef.current).forEach((p) => {
+      try {
+        p.destroy();
+      } catch (e) {
+        console.error(`[CLEANUP] Error destroying peer:`, e);
+      }
+    });
+    peersRef.current = {};
+
+    Object.values(screenSharePeersRef.current).forEach((p) => {
+      try {
+        p.destroy();
+      } catch (e) {
+        console.error(`[CLEANUP] Error destroying screen share peer:`, e);
+      }
+    });
+    screenSharePeersRef.current = {};
 
     if (socket.current) {
       socket.current.emit("leave-classroom", { sessionId });
+      socket.current.removeAllListeners();
       disconnectSocket();
+      socket.current = null;
     }
+
+    setRemoteStreams({});
+    setParticipants([]);
+
+    console.log(`[CLEANUP] Cleanup complete`);
   };
 
   // Video Renderer Helper Component to link streams dynamically without pipeline leakage
@@ -486,8 +692,18 @@ const LiveClassroom = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-white text-xl animate-pulse">
-          Loading live architecture context...
+        <div className="text-white text-xl animate-pulse flex flex-col items-center gap-4">
+          <div className="text-2xl">🔄</div>
+          <div>
+            {connectionState === "reconnecting"
+              ? "Reconnecting to classroom..."
+              : "Loading live architecture context..."}
+          </div>
+          {connectionAttemptsRef.current > 0 && (
+            <div className="text-sm text-gray-400">
+              Attempt {connectionAttemptsRef.current}/3
+            </div>
+          )}
         </div>
       </div>
     );
@@ -509,6 +725,15 @@ const LiveClassroom = () => {
         {/* Replace your current participant display counter with this */}
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-400 font-semibold bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-750">
+            <span
+              className={`mr-2 ${
+                connectionState === "connected"
+                  ? "text-green-400"
+                  : "text-yellow-400"
+              }`}
+            >
+              {connectionState === "connected" ? "●" : "○"}
+            </span>
             👥 Total Active:{" "}
             <span className="text-blue-400 font-bold">
               {participants.length + 1}
@@ -583,8 +808,12 @@ const LiveClassroom = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-500 bg-gray-900/50">
-                    Connecting encrypted media lines...
+                  <div className="w-full h-full flex flex-col items-center justify-center text-xs text-gray-500 bg-gray-900/50">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mb-2"></div>
+                    <div>Connecting encrypted media lines...</div>
+                    <div className="text-[10px] text-gray-600 mt-1">
+                      {p.connectionState || "connected"}
+                    </div>
                   </div>
                 )}
                 <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-medium">
