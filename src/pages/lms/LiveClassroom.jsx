@@ -85,12 +85,18 @@ const LiveClassroom = () => {
     socket.current.on("user-joined", ({ userId, role, fullname }) => {
       if (userId === currentUser._id) return;
 
+      console.log(`📡 New participant detected: ${fullname} (${role})`);
+
+      // Force strict functional state copy to avoid batching ignore
       setParticipants((prev) => {
-        if (prev.some((p) => p.userId === userId)) return prev;
-        return [...prev, { userId, role, fullname }];
+        const exists = prev.some((p) => p.userId === userId);
+        if (exists) return prev;
+        const updatedList = [...prev, { userId, role, fullname }];
+        console.log("📊 Updated Participants List Count:", updatedList.length);
+        return updatedList;
       });
 
-      // Teacher establishes downstream connection to newly arrived students
+      // Teacher establishes connection to naye students
       if (currentUser?.role === "teacher" && role === "student") {
         createPeerConnection(userId, true);
       }
@@ -98,15 +104,22 @@ const LiveClassroom = () => {
 
     // Handle existing participants sync safely
     socket.current.on("participants-list", (participantsList) => {
+      console.log(
+        "📋 Received raw server participants array:",
+        participantsList,
+      );
+
+      // Filter out the current user to keep pure peer metrics
       const otherParticipants = participantsList.filter(
         (p) => p.userId !== currentUser._id,
       );
+
+      // Directly set the cleaned state slice
       setParticipants(otherParticipants);
 
       otherParticipants.forEach((participant) => {
-        // Students look for the teacher to negotiate the line
         if (currentUser?.role === "student" && participant.role === "teacher") {
-          createPeerConnection(participant.userId, true); // Student calls Teacher
+          createPeerConnection(participant.userId, true);
         }
       });
     });
@@ -162,24 +175,23 @@ const LiveClassroom = () => {
     });
 
     // User Left CleanUp
-    socket.current.on("user-left", ({ userId }) => {
+    socket.current.on("user-left", ({ userId, fullname }) => {
+      console.log(`🛑 User left the engine node: ${fullname}`);
+
       setParticipants((prev) => prev.filter((p) => p.userId !== userId));
 
-      if (peersRef.current[userId]) {
-        peersRef.current[userId].destroy();
-        delete peersRef.current[userId];
-      }
-      if (screenSharePeersRef.current[userId]) {
-        screenSharePeersRef.current[userId].destroy();
-        delete screenSharePeersRef.current[userId];
-      }
-
+      // Dynamic state stream pruning
       setRemoteStreams((prev) => {
         const copy = { ...prev };
         delete copy[userId];
         delete copy[`screen-${userId}`];
         return copy;
       });
+
+      if (peersRef.current[userId]) {
+        peersRef.current[userId].destroy();
+        delete peersRef.current[userId];
+      }
     });
 
     // Chat handling
@@ -494,9 +506,13 @@ const LiveClassroom = () => {
             Live Session
           </p>
         </div>
+        {/* Replace your current participant display counter with this */}
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-400">
-            {participants.length + 1} users in classroom
+          <span className="text-sm text-gray-400 font-semibold bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-750">
+            👥 Total Active:{" "}
+            <span className="text-blue-400 font-bold">
+              {participants.length + 1}
+            </span>
           </span>
           <button
             onClick={leaveClassroom}
