@@ -15,17 +15,15 @@ export const initializeSocket = () => {
 
   console.log(`[SOCKET] Connecting to ${SOCKET_URL}`);
 
+  // --- Inside socketClient.js ---
   socket = io(SOCKET_URL, {
-    auth: {
-      token: token,
-    },
-    transports: ["websocket", "polling"],
+    auth: { token: token },
+    transports: ["websocket"], // Hard fallback block karke direct layer open karein
+    upgrade: false, // In-transit handshakes drop hone se bachaega
     reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionAttempts: 5,
-    timeout: 10000, // 10 second connection timeout
+    reconnectionDelay: 500, // Connection drop hote hi 0.5 sec me reconnect karega
+    reconnectionAttempts: 10,
   });
-
   socket.on("connect", () => {
     console.log("[SOCKET] Connected:", socket.id);
   });

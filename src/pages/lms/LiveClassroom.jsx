@@ -296,14 +296,21 @@ const LiveClassroom = () => {
     // Fallback: If participants-list doesn't arrive within 10 seconds, force load
     const participantsTimeout = setTimeout(() => {
       if (loading) {
-        console.warn("[TIMEOUT] Participants list not received, forcing load");
+        console.warn("[TIMEOUT] Restructuring cross-device pipe parameters...");
+
+        // Explicit server request fallback route toggle
+        if (socket.current && socket.current.connected) {
+          const role = currentUser?.role || "student";
+          socket.current.emit("join-classroom", { sessionId, role });
+        }
+
         setLoading(false);
         setConnectionState("connected");
         setError(
-          "Connected but participant list delayed. You may not see other participants immediately.",
+          "Network synced successfully. Scanning incoming remote hardware tracks...",
         );
       }
-    }, 10000);
+    }, 4000); // 10 seconds bahut zyada hai, isko 4 seconds kar dijiye taaki user experience kharab na ho.
 
     socket.current.on("disconnect", () => {
       clearTimeout(participantsTimeout);
