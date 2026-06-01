@@ -15,6 +15,7 @@ const CourseDetails = () => {
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState(null);
   const [sprintProgress, setSprintProgress] = useState({});
+  const [batch, setBatch] = useState(null);
 
   const isTaskCompleted = (task) => {
     if (!task?.submissions?.length) return false;
@@ -47,31 +48,32 @@ const CourseDetails = () => {
           return;
         }
         setCourse(currentEnrollment.course);
+        setBatch(currentEnrollment.batch);
 
-const response = await getSprintsByCourse(courseId, {
-           populate: "sessions tasks",
-         });
+        const response = await getSprintsByCourse(courseId, {
+          populate: "sessions tasks",
+        });
         let sprintsData = response?.data?.sprints || response || [];
 
         const progressData = {};
         const updatedSprints = [];
 
-for (const sprint of sprintsData) {
-           let sprintWithTasks = sprint;
-           if (!sprint.tasks || !sprint.tasks.length) {
-             const sessionsResponse = await getSessionsBySprint(sprint._id);
-             const sessions = sessionsResponse?.data?.sessions || [];
-             const allTasks = [];
-             for (const session of sessions) {
-               const tasksResponse = await getTasksBySession(session._id);
-               if (tasksResponse?.data?.tasks)
-                 allTasks.push(...tasksResponse.data.tasks);
-             }
-             sprintWithTasks = { ...sprint, sessions, tasks: allTasks };
-           }
-           progressData[sprint._id] = calculateSprintProgress(sprintWithTasks);
-           updatedSprints.push(sprintWithTasks);
-         }
+        for (const sprint of sprintsData) {
+          let sprintWithTasks = sprint;
+          if (!sprint.tasks || !sprint.tasks.length) {
+            const sessionsResponse = await getSessionsBySprint(sprint._id);
+            const sessions = sessionsResponse?.data?.sessions || [];
+            const allTasks = [];
+            for (const session of sessions) {
+              const tasksResponse = await getTasksBySession(session._id);
+              if (tasksResponse?.data?.tasks)
+                allTasks.push(...tasksResponse.data.tasks);
+            }
+            sprintWithTasks = { ...sprint, sessions, tasks: allTasks };
+          }
+          progressData[sprint._id] = calculateSprintProgress(sprintWithTasks);
+          updatedSprints.push(sprintWithTasks);
+        }
         setSprintProgress(progressData);
         setSprints(updatedSprints);
       } catch (error) {
@@ -131,6 +133,11 @@ for (const sprint of sprintsData) {
               <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-bold uppercase tracking-wider">
                 {sprints.length} Sprints
               </span>
+              {batch && (
+                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-bold uppercase tracking-wider">
+                  {batch.name}
+                </span>
+              )}
             </div>
 
             <h1 className="text-xl font-black text-slate-800 dark:text-white mb-4 leading-tight">

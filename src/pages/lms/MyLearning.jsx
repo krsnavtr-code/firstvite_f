@@ -135,6 +135,7 @@ const Dashboard = () => {
           )
           .map((enrollment) => {
             const course = enrollment.course;
+            const batch = enrollment.batch;
             const isCompleted = enrollment.completionStatus === "completed";
 
             return (
@@ -183,6 +184,13 @@ const Dashboard = () => {
                         />
                       </svg>
                       Completed
+                    </div>
+                  )}
+
+                  {/* Batch Badge */}
+                  {batch && (
+                    <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-lg">
+                      {batch.name}
                     </div>
                   )}
                 </div>

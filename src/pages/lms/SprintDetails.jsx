@@ -23,11 +23,13 @@ import {
   LockOutlined,
   CheckOutlined,
   VideoCameraOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { getSessionsBySprint } from "../../api/sessionApi";
 import { getTasksBySession } from "../../api/taskApi";
 import { getTask } from "../../api/taskApi";
 import { useAuth } from "../../contexts/AuthContext";
+import { useLMS } from "../../contexts/LMSContext";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -47,11 +49,18 @@ const SprintDetails = () => {
   const [questionsModalVisible, setQuestionsModalVisible] = useState(false);
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const { currentUser, isAuthenticated } = useAuth();
+  const { enrollments } = useLMS();
 
   // Get user ID safely
   const getUserId = () => {
     const userId = currentUser?._id || localStorage.getItem("userId");
     return userId;
+  };
+
+  // Get batch information from enrollment
+  const getBatch = () => {
+    const enrollment = enrollments.find((e) => e.course._id === courseId);
+    return enrollment?.batch || null;
   };
 
   // Check if task has been attempted by user (locked if any submission exists)
@@ -361,6 +370,19 @@ const SprintDetails = () => {
                             </a>
                           )}
 
+                          {getBatch()?.whatsappGroupLink && (
+                            <a
+                              href={getBatch().whatsappGroupLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-white bg-green-600 rounded-sm shadow hover:bg-green-700 transition whitespace-nowrap"
+                            >
+                              <MessageOutlined />
+                              WhatsApp Group
+                            </a>
+                          )}
+
                           {session.videoUrl && (
                             <button
                               onClick={(e) => {
@@ -385,9 +407,9 @@ const SprintDetails = () => {
                             destroyOnClose
                           >
                             <div className="w-full aspect-video">
-                              {currentVideoUrl.includes(".mp4") || 
-                               currentVideoUrl.includes(".mov") ||
-                               currentVideoUrl.includes(".webm") ? (
+                              {currentVideoUrl.includes(".mp4") ||
+                              currentVideoUrl.includes(".mov") ||
+                              currentVideoUrl.includes(".webm") ? (
                                 <video
                                   src={currentVideoUrl}
                                   controls
@@ -397,9 +419,16 @@ const SprintDetails = () => {
                                 />
                               ) : (
                                 <iframe
-                                  src={currentVideoUrl.includes("drive.google.com") 
-                                    ? currentVideoUrl.replace("/view?usp=sharing", "/preview").replace("/view", "/preview")
-                                    : currentVideoUrl}
+                                  src={
+                                    currentVideoUrl.includes("drive.google.com")
+                                      ? currentVideoUrl
+                                          .replace(
+                                            "/view?usp=sharing",
+                                            "/preview",
+                                          )
+                                          .replace("/view", "/preview")
+                                      : currentVideoUrl
+                                  }
                                   width="100%"
                                   height="100%"
                                   allow="autoplay; fullscreen"

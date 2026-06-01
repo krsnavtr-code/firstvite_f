@@ -74,7 +74,7 @@ const LMSLayout = () => {
         <aside
           className={`lms-sidebar fixed left-0 top-12 bottom-0 z-[900] transition-all duration-300 overflow-hidden shadow-md
             ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-            ${collapsed ? "w-[60px]" : "w-[160px] md:w-[240px]"}
+            ${collapsed ? "w-[60px]" : "w-[60px] md:w-[170px]"}
             ${mobileSidebarOpen ? "w-[240px]" : ""}`}
         >
           <LMSSidebar

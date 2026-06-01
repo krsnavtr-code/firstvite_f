@@ -108,6 +108,12 @@ export const LMSProvider = ({ children }) => {
             ? { _id: enrollment.course }
             : enrollment.course || {};
 
+        // Handle case where batch might be a string ID or an object
+        const batch =
+          typeof enrollment.batch === "string"
+            ? { _id: enrollment.batch }
+            : enrollment.batch || null;
+
         return {
           ...enrollment,
           course: {
@@ -117,6 +123,17 @@ export const LMSProvider = ({ children }) => {
             image: course.image || null,
             ...course,
           },
+          batch: batch
+            ? {
+                _id: batch._id,
+                name: batch.name || "Untitled Batch",
+                code: batch.code || "",
+                status: batch.status || "upcoming",
+                teacher: batch.teacher || null,
+                whatsappGroupLink: batch.whatsappGroupLink || null,
+                ...batch,
+              }
+            : null,
           progress: Math.min(
             100,
             Math.max(0, Number(enrollment.progress) || 0),
