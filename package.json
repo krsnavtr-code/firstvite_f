@@ -46,7 +46,10 @@
         "react-toastify": "^11.0.5",
         "rehype-raw": "^7.0.0",
         "remark-gfm": "^4.0.1",
-        "slick-carousel": "^1.8.1"
+        "simple-peer": "^9.11.1",
+        "slick-carousel": "^1.8.1",
+        "socket.io-client": "^4.8.3",
+        "vite-plugin-node-polyfills": "^0.28.0"
     },
     "devDependencies": {
         "@types/react": "^18.2.64",

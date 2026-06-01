@@ -55,6 +55,7 @@ import TestimonialsPage from "./pages/TestimonialsPage";
 import CareerManagement from "./pages/admin/career/CareerManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import lmsRoutes from "./routes/lmsRoutes";
+import JoinClassroom from "./pages/lms/JoinClassroom";
 
 // Blog Components
 import BlogListPage from "./pages/blog/BlogListPage";
@@ -381,7 +382,7 @@ function App() {
             element={
               <PrivateRoute
                 requireLMS={true}
-                allowedRoles={["student", "admin"]}
+                allowedRoles={["student", "admin", "teacher"]}
               >
                 <MainLayout>
                   <MyLearning />
@@ -395,7 +396,7 @@ function App() {
             element={
               <PrivateRoute
                 requireLMS={true}
-                allowedRoles={["student", "admin"]}
+                allowedRoles={["student", "admin", "teacher"]}
               >
                 <MainLayout>
                   <Courses />
@@ -410,7 +411,7 @@ function App() {
             element={
               <PrivateRoute
                 requireLMS={true}
-                allowedRoles={["student", "admin"]}
+                allowedRoles={["student", "admin", "teacher"]}
               >
                 <Navigate to="/smart-board" replace />
               </PrivateRoute>
@@ -422,7 +423,7 @@ function App() {
             element={
               <PrivateRoute
                 requireLMS={true}
-                allowedRoles={["student", "admin"]}
+                allowedRoles={["student", "admin", "teacher"]}
               >
                 <LMSLayout>
                   <LMS />
@@ -573,6 +574,12 @@ function App() {
 
           {/* Catch-all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
+
+          {/* Public classroom join route */}
+          <Route
+            path="/classroom/join/:inviteCode"
+            element={<JoinClassroom />}
+          />
         </Routes>
         {/* <Cart /> */}
       </CartProvider>

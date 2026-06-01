@@ -11,6 +11,8 @@ import ReferAndEarn from "../pages/lms/ReferAndEarn";
 import Career from "../pages/lms/Career";
 import CallbackRequest from "../pages/lms/CallbackRequest";
 import Batches from "../pages/lms/Batches";
+import ClassroomSessions from "../pages/lms/ClassroomSessions";
+import LiveClassroom from "../pages/lms/LiveClassroom";
 
 const lmsRoutes = [
   {
@@ -36,6 +38,14 @@ const lmsRoutes = [
   {
     path: "batches",
     element: <Batches />,
+  },
+  {
+    path: "classroom-sessions",
+    element: <ClassroomSessions />,
+  },
+  {
+    path: "classroom/:sessionId",
+    element: <LiveClassroom />,
   },
   {
     path: "refer-and-earn",
