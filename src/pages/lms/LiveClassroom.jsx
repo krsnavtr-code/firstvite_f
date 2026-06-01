@@ -67,49 +67,124 @@ const LiveClassroom = () => {
   }, [connectionState]);
 
   const initializeClassroom = async () => {
+    // Set timeout to prevent infinite loading (30 seconds)
+    const initTimeout = setTimeout(() => {
+      console.error("[TIMEOUT] Initialization timeout after 30 seconds");
+      setError(
+        "Connection timeout. Please check your internet connection and try again.",
+      );
+      setLoading(false);
+      setConnectionState("disconnected");
+    }, 30000);
+
     try {
       setConnectionState("connecting");
       connectionAttemptsRef.current = 0;
 
+      console.log(`[INIT] Step 1: Fetching session data for ${sessionId}`);
       const sessionData = await getClassroomSession(sessionId);
       setSession(sessionData?.data || sessionData);
+      console.log(`[INIT] Step 2: Session fetched successfully`);
 
+      console.log(`[INIT] Step 3: Joining classroom session`);
       await joinClassroomSession(sessionId);
+      console.log(`[INIT] Step 4: Getting socket connection`);
       socket.current = getSocket();
 
       // Setup socket listeners BEFORE joining to catch all events
+      console.log(`[INIT] Step 5: Setting up socket listeners`);
       setupSocketListeners();
 
-      // Get local media stream first and lock it inside Ref immediately
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      // Get local media stream with Android-specific fallbacks
+      console.log(`[INIT] Step 6: Requesting media access`);
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "user",
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+          },
+          audio: true,
+        });
+        console.log(`[INIT] Step 7: Media access granted`);
+      } catch (mediaError) {
+        console.error(`[MEDIA ERROR] Failed to get camera/mic:`, mediaError);
+
+        // Android fallback: Try audio only
+        try {
+          console.log(`[INIT] Step 7b: Trying audio-only fallback`);
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: true,
+          });
+          console.log(`[INIT] Step 7c: Audio-only access granted`);
+        } catch (audioError) {
+          console.error(`[AUDIO ERROR] Failed to get audio:`, audioError);
+
+          // Final fallback: Join without media (audio/video disabled)
+          console.log(`[INIT] Step 7d: Continuing without media access`);
+          stream = null;
+
+          // Show warning to user
+          setError(
+            "Camera/microphone access denied. Joining with audio/video disabled.",
+          );
+        }
+      }
+
       localStreamRef.current = stream;
 
-      if (localVideoRef.current) {
+      if (stream && localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
 
       const role = currentUser?.role || "student";
+      console.log(`[INIT] Step 8: Emitting join-classroom as ${role}`);
       socket.current.emit("join-classroom", { sessionId, role });
 
       console.log(
-        `[INIT] Classroom initialization started for user ${currentUser._id}`,
+        `[INIT] Classroom initialization completed for user ${currentUser._id}`,
       );
+
+      // Clear timeout on success
+      clearTimeout(initTimeout);
     } catch (err) {
+      clearTimeout(initTimeout);
       console.error("[ERROR] Failed to initialize classroom:", err);
-      setError("Failed to initialize system or camera access denied.");
+      console.error("[ERROR] Error details:", {
+        message: err.message,
+        name: err.name,
+        stack: err.stack,
+      });
+
+      // Check for HTTPS requirement
+      if (
+        window.location.protocol !== "https:" &&
+        window.location.hostname !== "localhost"
+      ) {
+        setError(
+          "Camera access requires HTTPS. Please use a secure connection.",
+        );
+      } else {
+        setError(`Failed to initialize: ${err.message}`);
+      }
+
       setConnectionState("disconnected");
       setLoading(false);
 
-      // Attempt reconnection
-      if (connectionAttemptsRef.current < 3) {
-        setTimeout(() => {
-          connectionAttemptsRef.current++;
-          console.log(`[RECONNECT] Attempt ${connectionAttemptsRef.current}`);
-          initializeClassroom();
-        }, 2000);
+      // Don't auto-reconnect on permission errors (will just keep failing)
+      if (
+        err.name !== "NotAllowedError" &&
+        err.name !== "PermissionDeniedError"
+      ) {
+        if (connectionAttemptsRef.current < 3) {
+          setTimeout(() => {
+            connectionAttemptsRef.current++;
+            console.log(`[RECONNECT] Attempt ${connectionAttemptsRef.current}`);
+            initializeClassroom();
+          }, 2000);
+        }
       }
     }
   };
@@ -216,6 +291,22 @@ const LiveClassroom = () => {
           // Don't initiate - wait for teacher's offer
         }
       }
+    });
+
+    // Fallback: If participants-list doesn't arrive within 10 seconds, force load
+    const participantsTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn("[TIMEOUT] Participants list not received, forcing load");
+        setLoading(false);
+        setConnectionState("connected");
+        setError(
+          "Connected but participant list delayed. You may not see other participants immediately.",
+        );
+      }
+    }, 10000);
+
+    socket.current.on("disconnect", () => {
+      clearTimeout(participantsTimeout);
     });
 
     // WebRTC Offer - Only students receive offers from teacher
@@ -692,7 +783,7 @@ const LiveClassroom = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-white text-xl animate-pulse flex flex-col items-center gap-4">
+        <div className="text-white text-xl animate-pulse flex flex-col items-center gap-4 max-w-md text-center px-4">
           <div className="text-2xl">🔄</div>
           <div>
             {connectionState === "reconnecting"
@@ -704,6 +795,14 @@ const LiveClassroom = () => {
               Attempt {connectionAttemptsRef.current}/3
             </div>
           )}
+          {error && (
+            <div className="text-sm text-red-400 bg-red-900/20 px-4 py-2 rounded-lg border border-red-800">
+              {error}
+            </div>
+          )}
+          <div className="text-xs text-gray-500 mt-2">
+            Check browser console for detailed logs
+          </div>
         </div>
       </div>
     );
@@ -711,6 +810,19 @@ const LiveClassroom = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-yellow-900/30 border-b border-yellow-700 px-6 py-3 text-sm text-yellow-300 flex items-center justify-between">
+          <span>⚠️ {error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="text-yellow-400 hover:text-yellow-200"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-gray-800 px-6 py-4 flex items-center justify-between border-b border-gray-700">
         <div>

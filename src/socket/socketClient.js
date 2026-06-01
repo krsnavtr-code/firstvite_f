@@ -9,9 +9,11 @@ export const initializeSocket = () => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    console.error("No token found for socket connection");
+    console.error("[SOCKET] No token found for socket connection");
     return null;
   }
+
+  console.log(`[SOCKET] Connecting to ${SOCKET_URL}`);
 
   socket = io(SOCKET_URL, {
     auth: {
@@ -21,19 +23,28 @@ export const initializeSocket = () => {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionAttempts: 5,
+    timeout: 10000, // 10 second connection timeout
   });
 
   socket.on("connect", () => {
-    console.log("Socket connected:", socket.id);
+    console.log("[SOCKET] Connected:", socket.id);
   });
 
   socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error);
+    console.error("[SOCKET] Connection error:", error.message);
+    console.error("[SOCKET] Error details:", error);
   });
 
   socket.on("disconnect", (reason) => {
-    console.log("Socket disconnected:", reason);
+    console.log("[SOCKET] Disconnected:", reason);
   });
+
+  // Add connection timeout warning
+  setTimeout(() => {
+    if (socket && !socket.connected) {
+      console.warn("[SOCKET] Connection taking longer than expected...");
+    }
+  }, 5000);
 
   return socket;
 };
