@@ -10,6 +10,7 @@ import MyLearning from "../pages/lms/MyLearning";
 import ReferAndEarn from "../pages/lms/ReferAndEarn";
 import Career from "../pages/lms/Career";
 import CallbackRequest from "../pages/lms/CallbackRequest";
+import Batches from "../pages/lms/Batches";
 
 const lmsRoutes = [
   {
@@ -31,6 +32,10 @@ const lmsRoutes = [
   {
     path: "assignments",
     element: <Assignments />,
+  },
+  {
+    path: "batches",
+    element: <Batches />,
   },
   {
     path: "refer-and-earn",

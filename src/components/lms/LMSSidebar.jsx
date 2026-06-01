@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LMSSidebar = ({
   collapsed,
@@ -9,6 +10,7 @@ const LMSSidebar = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser } = useAuth();
 
   const menuItems = [
     {
@@ -75,6 +77,27 @@ const LMSSidebar = ({
       ),
     },
     {
+      key: "batches",
+      label: "Batches",
+      path: "/smart-board/batches",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 5.471m0 0a9.09 9.09 0 0 0-3.741.479c0 1.328.265 2.594.741 3.751"
+          />
+        </svg>
+      ),
+    },
+    {
       key: "career",
       label: "Career",
       path: "/smart-board/career",
@@ -131,19 +154,27 @@ const LMSSidebar = ({
       `}
     >
       <div className="flex-1 py-4 px-1 space-y-2">
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+        {menuItems
+          .filter((item) => {
+            // Only show Batches menu item for admin users
+            if (item.key === "batches") {
+              return currentUser?.role === "admin";
+            }
+            return true;
+          })
+          .map((item) => {
+            const isActive = location.pathname === item.path;
 
-          return (
-            <button
-              key={item.key}
-              onClick={() => {
-                navigate(item.path);
-                if (isMobile && onCloseMobile) {
-                  onCloseMobile();
-                }
-              }}
-              className={`w-full flex items-center group relative px-2 py-1 rounded-lg transition-colors duration-200
+            return (
+              <button
+                key={item.key}
+                onClick={() => {
+                  navigate(item.path);
+                  if (isMobile && onCloseMobile) {
+                    onCloseMobile();
+                  }
+                }}
+                className={`w-full flex items-center group relative px-2 py-1 rounded-lg transition-colors duration-200
                 ${collapsed ? "justify-center" : "justify-start gap-1.5"}
                 ${
                   isActive
@@ -155,29 +186,29 @@ const LMSSidebar = ({
                       : "hover:bg-gray-100"
                 }
               `}
-              title={collapsed ? item.label : ""}
-            >
-              <div
-                className={`${isActive ? "text-current" : "text-gray-400 group-hover:text-current"}`}
+                title={collapsed ? item.label : ""}
               >
-                {item.icon}
-              </div>
-
-              {!collapsed && (
-                <span className="font-medium text-sm truncate whitespace-nowrap">
-                  {item.label}
-                </span>
-              )}
-
-              {/* Collapsed Tooltip Simulation (Optional) */}
-              {collapsed && (
-                <div className="absolute left-14 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all bg-gray-800 text-white text-xs rounded py-1 px-2 z-50 whitespace-nowrap">
-                  {item.label}
+                <div
+                  className={`${isActive ? "text-current" : "text-gray-400 group-hover:text-current"}`}
+                >
+                  {item.icon}
                 </div>
-              )}
-            </button>
-          );
-        })}
+
+                {!collapsed && (
+                  <span className="font-medium text-sm truncate whitespace-nowrap">
+                    {item.label}
+                  </span>
+                )}
+
+                {/* Collapsed Tooltip Simulation (Optional) */}
+                {collapsed && (
+                  <div className="absolute left-14 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all bg-gray-800 text-white text-xs rounded py-1 px-2 z-50 whitespace-nowrap">
+                    {item.label}
+                  </div>
+                )}
+              </button>
+            );
+          })}
       </div>
     </aside>
   );
