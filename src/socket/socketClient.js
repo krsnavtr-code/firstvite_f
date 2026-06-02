@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 
-const SOCKET_URL = import.meta.env.VITE_API_BASE_URL;
+const SOCKET_URL = "https://www.eklabya.com";
 
 let socket = null;
 
