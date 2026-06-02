@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:4002";
+const SOCKET_URL = import.meta.env.VITE_API_BASE_URL;
 
 let socket = null;
 
