@@ -42,7 +42,7 @@ export const useClassroomMedia = (socket, sessionId, peersRef) => {
             localStreamRef.current.addTrack(newVideoTrack);
 
             Object.values(peersRef.current).forEach((peer) => {
-              if (peer.streams[0]) {
+              if (peer.streams[0] && peer.streams[0].getVideoTracks()[0]) {
                 peer.replaceTrack(
                   peer.streams[0].getVideoTracks()[0],
                   newVideoTrack,
