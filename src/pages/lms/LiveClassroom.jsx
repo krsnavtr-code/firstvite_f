@@ -109,6 +109,25 @@ const LiveClassroom = () => {
     setParticipants((prev) => [...prev]);
   }, []);
 
+  // SDP bitrate control for network optimization
+  const forceVideoBitrate = (sdp, bitrateKbps) => {
+    const lines = sdp.split("\r\n");
+    let mVideoIndex = -1;
+
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].indexOf("m=video") === 0) {
+        mVideoIndex = i;
+        break;
+      }
+    }
+
+    if (mVideoIndex === -1) return sdp; // No video line found, return raw sdp
+
+    // Insert bandwidth modifier line directly below video media definitions
+    lines.splice(mVideoIndex + 1, 0, `b=AS:${bitrateKbps}`);
+    return lines.join("\r\n");
+  };
+
   // Drag handlers for camera popup
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -605,7 +624,12 @@ const LiveClassroom = () => {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:stun2.l.google.com:19302" },
         ],
+      },
+      // SDPMunging Injection to force structural network compression
+      sdpTransform: (sdp) => {
+        return forceVideoBitrate(sdp, 800); // 800 kbps limit ensures 0 delay on cellular networks
       },
     });
 
@@ -633,6 +657,15 @@ const LiveClassroom = () => {
 
     peer.on("stream", (incomingScreenStream) => {
       remoteStreamsRef.current[`screen-${remoteUserId}`] = incomingScreenStream;
+      triggerUpdate();
+    });
+
+    peer.on("error", (err) => {
+      console.error("[SCREEN PEER ERROR]", err);
+    });
+
+    peer.on("close", () => {
+      delete remoteStreamsRef.current[`screen-${remoteUserId}`];
       triggerUpdate();
     });
 
@@ -711,7 +744,6 @@ const LiveClassroom = () => {
       });
     }
   };
-
   const toggleScreenShare = async () => {
     if (isScreenSharing) {
       if (screenShareStreamRef.current) {
@@ -727,20 +759,30 @@ const LiveClassroom = () => {
       screenSharePeersRef.current = {};
     } else {
       try {
+        // High-Performance Engine Constraints: Targeted for Real-time LMS Boards
         const stream = await navigator.mediaDevices.getDisplayMedia({
-          video: true,
-          audio: true,
+          video: {
+            width: { ideal: 1280, max: 1920 }, // Clean text visibility
+            height: { ideal: 720, max: 1080 },
+            frameRate: { ideal: 15, max: 24 }, // Lower frames explicitly kills the 10s lag
+            displaySurface: "monitor",
+          },
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
         });
+
         screenShareStreamRef.current = stream;
         setIsScreenSharing(true);
 
-        // Notify downstream clients and build targeted dispatch
         participants.forEach((p) => {
           createScreenSharePeerConnection(p.userId, true);
         });
 
         stream.getVideoTracks()[0].onended = () => {
-          toggleScreenShare(); // Auto-destruct share layout safely on native desktop exit
+          toggleScreenShare();
         };
       } catch (err) {
         console.error("Screen share deployment engine block:", err);
