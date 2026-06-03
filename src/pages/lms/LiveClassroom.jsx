@@ -190,7 +190,7 @@ const LiveClassroom = () => {
       clearTimeout(initTimeout);
     } catch (err) {
       clearTimeout(initTimeout);
-      console.error("[ERROR] Failed to initialize classroom:", err);
+      // console.error("[ERROR] Failed to initialize classroom:", err);
       console.error("[ERROR] Error details:", {
         message: err.message,
         name: err.name,
@@ -579,12 +579,53 @@ const LiveClassroom = () => {
     }
   };
 
-  const toggleVideo = () => {
+  const toggleVideo = async () => {
     if (localStreamRef.current) {
       const currentState = !isVideoEnabled;
-      localStreamRef.current
-        .getVideoTracks()
-        .forEach((t) => (t.enabled = currentState));
+
+      if (currentState) {
+        // Enable video - need to get new video track
+        try {
+          const videoTrack = localStreamRef.current.getVideoTracks()[0];
+          if (videoTrack) {
+            videoTrack.enabled = true;
+          } else {
+            // No video track exists, need to get new stream
+            const newStream = await navigator.mediaDevices.getUserMedia({
+              video: {
+                facingMode: "user",
+                width: { ideal: 640 },
+                height: { ideal: 480 },
+              },
+              audio: false,
+            });
+            const newVideoTrack = newStream.getVideoTracks()[0];
+            localStreamRef.current.addTrack(newVideoTrack);
+            // Update local video element
+            if (localVideoRef.current) {
+              localVideoRef.current.srcObject = localStreamRef.current;
+            }
+            // Update all peer connections with new stream
+            Object.values(peersRef.current).forEach((peer) => {
+              peer.replaceTrack(
+                peer.streams[0].getVideoTracks()[0],
+                newVideoTrack,
+                peer.streams[0],
+              );
+            });
+          }
+        } catch (err) {
+          console.error("[VIDEO ERROR] Failed to enable camera:", err);
+          return;
+        }
+      } else {
+        // Disable video - stop the video track completely
+        localStreamRef.current.getVideoTracks().forEach((track) => {
+          track.stop();
+          localStreamRef.current.removeTrack(track);
+        });
+      }
+
       setIsVideoEnabled(currentState);
       socket.current.emit("toggle-video", {
         sessionId,
@@ -718,18 +759,18 @@ const LiveClassroom = () => {
               {error}
             </div>
           )}
-          <div className="text-xs text-gray-500 mt-2">
+          {/* <div className="text-xs text-gray-500 mt-2">
             Check browser console for detailed logs
-          </div>
+          </div> */}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+    <div className="bg-white dark:bg-gray-800 text-black dark:text-white flex flex-col">
       {/* Error Banner */}
-      {error && (
+      {/* {error && (
         <div className="bg-yellow-900/30 border-b border-yellow-700 px-6 py-3 text-sm text-yellow-300 flex items-center justify-between">
           <span>⚠️ {error}</span>
           <button
@@ -739,22 +780,22 @@ const LiveClassroom = () => {
             ✕
           </button>
         </div>
-      )}
+      )} */}
 
       {/* Header */}
-      <div className="bg-gray-800 px-6 py-4 flex items-center justify-between border-b border-gray-700">
+      <div className="px-6 pb-2 flex items-center justify-between border-b border-gray-700">
         <div>
-          <h1 className="text-xl font-bold">
-            {session?.batch?.name || "LMS Virtual Engine"}
+          <h1 className="text-sm flex items-center gap-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-green-500 animate-ping"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+            </span>
+            Session {session?.batch?.name || "LMS Virtual Engine"}
           </h1>
-          <p className="text-sm text-green-400 flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-green-500 animate-ping" />{" "}
-            Live Session
-          </p>
         </div>
-        {/* Replace your current participant display counter with this */}
+
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-400 font-semibold bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-750">
+          <span className="text-sm font-semibold">
             <span
               className={`mr-2 ${
                 connectionState === "connected"
@@ -764,26 +805,26 @@ const LiveClassroom = () => {
             >
               {connectionState === "connected" ? "●" : "○"}
             </span>
-            👥 Total Active:{" "}
-            <span className="text-blue-400 font-bold">
+            Active:{" "}
+            <span className="text-blue-800 dark:text-blue-300 font-bold">
               {participants.length + 1}
             </span>
           </span>
           <button
             onClick={leaveClassroom}
-            className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition-all text-sm font-semibold"
+            className="px-4 py-1.5 text-white bg-red-600 rounded hover:bg-red-700 transition-all text-sm font-semibold"
           >
-            Leave Room
+            Leave
           </button>
         </div>
       </div>
 
-      <div className="flex flex-1 h-[calc(100vh-73px)] overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative h-full">
         {/* Main Communications View */}
-        <div className="flex-1 flex flex-col p-4 overflow-y-auto space-y-4">
+        <div className="flex-1 flex flex-col p-4 overflow-y-auto space-y-4 pb-24 h-full">
           {/* Active Broadcast Screen Layout */}
           {isScreenSharing && screenShareStreamRef.current && (
-            <div className="bg-black rounded-xl overflow-hidden aspect-video max-h-[50vh] border border-blue-500/30 shadow-lg mx-auto">
+            <div className="rounded-xl overflow-hidden aspect-video max-h-[50vh] border border-blue-500/30 shadow-lg mx-auto">
               <VideoRenderer
                 stream={screenShareStreamRef.current}
                 muted
@@ -798,7 +839,7 @@ const LiveClassroom = () => {
             .map((key) => (
               <div
                 key={key}
-                className="bg-black rounded-xl overflow-hidden aspect-video max-h-[50vh] border border-purple-500/30 shadow-lg mx-auto"
+                className="rounded-xl overflow-hidden aspect-video max-h-[50vh] border border-purple-500/30 shadow-lg mx-auto"
               >
                 <VideoRenderer
                   stream={remoteStreamsRef.current[key]}
@@ -810,7 +851,7 @@ const LiveClassroom = () => {
           {/* Grid View */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-max">
             {/* Owner Camera Window */}
-            <div className="relative bg-gray-950 rounded-xl overflow-hidden aspect-video border border-gray-800 shadow-md">
+            <div className="relative rounded-xl overflow-hidden aspect-video border border-gray-800 shadow-md">
               <VideoRenderer
                 stream={localStreamRef.current}
                 muted
@@ -830,7 +871,7 @@ const LiveClassroom = () => {
             {participants.map((p) => (
               <div
                 key={p.userId}
-                className="relative bg-gray-950 rounded-xl overflow-hidden aspect-video border border-gray-800 shadow-md"
+                className="relative rounded-xl overflow-hidden aspect-video border border-gray-800 shadow-md"
               >
                 {remoteStreamsRef.current[p.userId] ? (
                   <VideoRenderer
@@ -852,87 +893,300 @@ const LiveClassroom = () => {
               </div>
             ))}
           </div>
-
-          {/* Interactive Bottom Deck Panel Controls */}
-          <div className="mt-auto pt-4 flex items-center justify-center gap-3 bg-gray-950/40 backdrop-blur-md py-3 rounded-xl border border-gray-800">
-            <button
-              onClick={toggleAudio}
-              className={`p-3.5 rounded-xl transition-all ${isAudioEnabled ? "bg-gray-800 hover:bg-gray-700 text-white" : "bg-red-600 hover:bg-red-500 text-white"}`}
-            >
-              {isAudioEnabled ? "Mute Mic" : "Unmute Mic"}
-            </button>
-
-            <button
-              onClick={toggleVideo}
-              className={`p-3.5 rounded-xl transition-all ${isVideoEnabled ? "bg-gray-800 hover:bg-gray-700 text-white" : "bg-red-600 hover:bg-red-500 text-white"}`}
-            >
-              {isVideoEnabled ? "Stop Cam" : "Start Cam"}
-            </button>
-
-            <button
-              onClick={toggleScreenShare}
-              className={`p-3.5 rounded-xl transition-all ${isScreenSharing ? "bg-blue-600 hover:bg-blue-500" : "bg-gray-800 hover:bg-gray-700"}`}
-            >
-              {isScreenSharing ? "Stop Share" : "Share Screen"}
-            </button>
-
-            {currentUser?.role === "student" && (
-              <button
-                onClick={toggleHandRaise}
-                className={`p-3.5 rounded-xl transition-all ${isHandRaised ? "bg-yellow-600 hover:bg-yellow-500" : "bg-gray-800 hover:bg-gray-700"}`}
-              >
-                Hand {isHandRaised ? "Down" : "Raise"}
-              </button>
-            )}
-
-            <button
-              onClick={() => setShowChat(!showChat)}
-              className={`p-3.5 rounded-xl transition-all ${showChat ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-300"}`}
-            >
-              Toggle Chat
-            </button>
-          </div>
         </div>
 
-        {/* Messaging Box Panel */}
+        {/* Messaging Box Panel (Bottom-to-Top Popup Drawer) */}
         {showChat && (
-          <div className="w-80 bg-gray-800 border-l border-gray-700 flex flex-col h-full">
-            <div className="p-4 border-b border-gray-700 bg-gray-850">
-              <h3 className="font-bold text-sm tracking-wide text-gray-200">
-                Classroom Feed
-              </h3>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {chatMessages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex flex-col ${msg.sender === currentUser._id ? "items-end" : "items-start"}`}
+          <div className="fixed z-50 bottom-12 right-4 w-96 h-[500px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] rounded-2xl border border-gray-200 dark:border-gray-700 flex flex-col shadow-2xl overflow-hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-md animate-slide-up">
+            {/* Header */}
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <h3 className="font-bold text-sm tracking-wide text-gray-800 dark:text-gray-200">
+                  Classroom Feed
+                </h3>
+              </div>
+
+              {/* Close button inside popup */}
+              <button
+                onClick={() => setShowChat(false)}
+                className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="w-4 h-4"
                 >
-                  <span className="text-[10px] text-gray-400 mb-1 px-1">
-                    {msg.senderFullname}
-                  </span>
-                  <div
-                    className={`max-w-[85%] px-3 py-2 rounded-xl text-sm ${msg.sender === currentUser._id ? "bg-blue-600 text-white rounded-tr-none" : "bg-gray-700 text-gray-100 rounded-tl-none"}`}
-                  >
-                    {msg.message}
-                  </div>
-                </div>
-              ))}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </button>
             </div>
+
+            {/* Chat Messages Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30 dark:bg-gray-950/10">
+              {chatMessages.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-8 h-8 text-gray-400 mb-2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a.596.596 0 0 1-.73-.73 5.972 5.972 0 0 1 1.058-2.006C4.037 16.243 2 14.333 2 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
+                    />
+                  </svg>
+                  <p className="text-xs text-gray-400">
+                    No messages yet. Say hello to the class!
+                  </p>
+                </div>
+              ) : (
+                chatMessages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex flex-col ${msg.sender === currentUser._id ? "items-end" : "items-start"}`}
+                  >
+                    <span className="text-[10px] mb-1 px-1 text-gray-500 dark:text-gray-400 font-medium">
+                      {msg.sender === currentUser._id
+                        ? "You"
+                        : msg.senderFullname}
+                    </span>
+                    <div
+                      className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm shadow-sm leading-relaxed ${
+                        msg.sender === currentUser._id
+                          ? "bg-blue-600 text-white rounded-tr-none"
+                          : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700/50 rounded-tl-none"
+                      }`}
+                    >
+                      {msg.message}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Form Input Deck */}
             <form
               onSubmit={sendChatMessage}
-              className="p-4 border-t border-gray-700 bg-gray-850"
+              className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
             >
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Message all members..."
-                className="w-full px-4 py-2.5 bg-gray-900 border border-gray-750 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-200"
-              />
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Message all members..."
+                  className="w-full pl-4 pr-12 py-2.5 bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-gray-200 dark:focus:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm text-gray-900 dark:text-gray-100 transition-all"
+                />
+                <button
+                  type="submit"
+                  disabled={!chatInput.trim()}
+                  className="absolute right-1.5 p-1.5 bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-gray-800 text-white disabled:text-gray-400 dark:disabled:text-gray-600 rounded-lg transition-all hover:bg-blue-700"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                    />
+                  </svg>
+                </button>
+              </div>
             </form>
           </div>
         )}
+      </div>
+
+      {/* Fixed Bottom Controls */}
+      <div className="fixed bottom-0 left-0 right-0 flex items-center justify-center gap-2 md:gap-4 py-1 border-t border-gray-200 dark:border-gray-900 z-50 shadow-xl">
+        {/* Audio Control (Mic) */}
+        <button
+          onClick={toggleAudio}
+          title={isAudioEnabled ? "Mute Mic" : "Unmute Mic"}
+          className={`p-2 rounded-xl transition-all shadow-sm flex items-center justify-center ${
+            isAudioEnabled
+              ? "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+              : "bg-red-600 text-white hover:bg-red-500 animate-pulse-slow"
+          }`}
+        >
+          {isAudioEnabled ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v6a3 3 0 0 0 3 3Z"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636M12 15.75a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v6a3 3 0 0 0 3 3Z"
+              />
+            </svg>
+          )}
+        </button>
+
+        {/* Video Control (Camera) */}
+        <button
+          onClick={toggleVideo}
+          title={isVideoEnabled ? "Stop Camera" : "Start Camera"}
+          className={`p-2 rounded-xl transition-all shadow-sm flex items-center justify-center ${
+            isVideoEnabled
+              ? "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+              : "bg-red-600 text-white hover:bg-red-500"
+          }`}
+        >
+          {isVideoEnabled ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 4.5 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 19.5h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 8.25v9a2.25 2.25 0 0 0 2.25 2.25Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m3 3 18 18"
+              />
+            </svg>
+          )}
+        </button>
+
+        {/* Screen Share Control */}
+        <button
+          onClick={toggleScreenShare}
+          title={isScreenSharing ? "Stop Sharing" : "Share Screen"}
+          className={`p-2 rounded-xl transition-all shadow-sm flex items-center justify-center ${
+            isScreenSharing
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12v10.5a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15.75V5.25A2.25 2.25 0 0 1 5.25 3h13.5A2.25 2.25 0 0 1 21 5.25Z"
+            />
+          </svg>
+        </button>
+
+        {/* Student Hand Raise Control */}
+        {currentUser?.role === "student" && (
+          <button
+            onClick={toggleHandRaise}
+            title={isHandRaised ? "Lower Hand" : "Raise Hand"}
+            className={`p-2 rounded-xl transition-all shadow-sm flex items-center justify-center ${
+              isHandRaised
+                ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.05 4.575a1.5 1.5 0 1 1 3 0V9.75M4.5 10.5a1.5 1.5 0 1 1 3 0v5.625M7.5 7.875a1.5 1.5 0 1 1 3 0v6.75m6.75-3a1.5 1.5 0 0 1 3 0v3.375c0 4.349-4.03 7.875-9 7.875a11.96 11.96 0 0 1-7.5-2.656V16.5A1.5 1.5 0 0 1 10.05 15"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* Chat Panel Toggle Control */}
+        <button
+          onClick={() => setShowChat(!showChat)}
+          title="Toggle Chat"
+          className={`p-2 rounded-xl transition-all shadow-sm flex items-center justify-center ${
+            showChat
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );
