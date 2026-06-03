@@ -627,9 +627,9 @@ const LiveClassroom = () => {
           { urls: "stun:stun2.l.google.com:19302" },
         ],
       },
-      // SDPMunging Injection to force structural network compression
+      // 🔥 BITRATE EXTENDED UPTO 2000kbps (2Mbps) FOR CRYSTAL CLEAR TEXT
       sdpTransform: (sdp) => {
-        return forceVideoBitrate(sdp, 800); // 800 kbps limit ensures 0 delay on cellular networks
+        return forceVideoBitrate(sdp, 2000);
       },
     });
 
@@ -744,6 +744,7 @@ const LiveClassroom = () => {
       });
     }
   };
+
   const toggleScreenShare = async () => {
     if (isScreenSharing) {
       if (screenShareStreamRef.current) {
@@ -759,20 +760,24 @@ const LiveClassroom = () => {
       screenSharePeersRef.current = {};
     } else {
       try {
-        // High-Performance Engine Constraints: Targeted for Real-time LMS Boards
         const stream = await navigator.mediaDevices.getDisplayMedia({
           video: {
-            width: { ideal: 1280, max: 1920 }, // Clean text visibility
-            height: { ideal: 720, max: 1080 },
-            frameRate: { ideal: 15, max: 24 }, // Lower frames explicitly kills the 10s lag
+            width: { ideal: 1920, max: 1920 }, // Standard Full HD for clear board text
+            height: { ideal: 1080, max: 1080 },
+            frameRate: { ideal: 20, max: 30 }, // 20-30 fps controls the delay balance
             displaySurface: "monitor",
           },
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
-            autoGainControl: true,
           },
         });
+
+        // 🔥 CRITICAL FIX: Browser ko force karein text sharp render karne ke liye
+        const videoTrack = stream.getVideoTracks()[0];
+        if (videoTrack && "contentHint" in videoTrack) {
+          videoTrack.contentHint = "detail"; // This prioritizes text clarity over camera motion blurring
+        }
 
         screenShareStreamRef.current = stream;
         setIsScreenSharing(true);
