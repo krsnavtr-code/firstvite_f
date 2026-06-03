@@ -168,16 +168,21 @@ const LiveClassroom = () => {
             : [...prev, { userId, role, fullname, joinedAt: timestamp }],
         );
 
-        if (currentUser?.role === "teacher" && role === "student") {
-          setTimeout(() => createPeerConnection(userId, true), 100);
-        }
+        setTimeout(() => createPeerConnection(userId, true), 100);
       },
     );
 
     socket.current.on("participants-list", ({ participants }) => {
-      setParticipants(participants.filter((p) => p.userId !== currentUser._id));
+      const otherParticipants = participants.filter(
+        (p) => p.userId !== currentUser._id,
+      );
+      setParticipants(otherParticipants);
       setLoading(false);
       setConnectionState("connected");
+
+      otherParticipants.forEach((p) => {
+        setTimeout(() => createPeerConnection(p.userId, true), 100);
+      });
     });
 
     socket.current.on("webrtc-offer", async ({ offer, fromUserId }) => {
