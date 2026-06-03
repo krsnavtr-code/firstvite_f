@@ -70,6 +70,8 @@ const LiveClassroom = () => {
   const socket = useRef(null);
   const localVideoRef = useRef(null);
   const screenShareRef = useRef(null);
+  const screenShareContainerRef = useRef(null);
+  const remoteScreenContainerRef = useRef(null); // Remote screens ke liye alag ref
   const peersRef = useRef({}); // { userId: peerInstance }
   const screenSharePeersRef = useRef({}); // { userId: peerInstance }
   const localStreamRef = useRef(null);
@@ -92,11 +94,87 @@ const LiveClassroom = () => {
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [showChat, setShowChat] = useState(true);
+  const [isCameraPopupMinimized, setIsCameraPopupMinimized] = useState(false);
+  const [cameraPopupPosition, setCameraPopupPosition] = useState({
+    x: 20,
+    y: 20,
+  });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Force re-render helper
   const triggerUpdate = useCallback(() => {
     forceUpdateRef.current += 1;
     setParticipants((prev) => [...prev]);
+  }, []);
+
+  // Drag handlers for camera popup
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (isDragging) {
+        setCameraPopupPosition({
+          x: e.clientX - dragOffset.x,
+          y: e.clientY - dragOffset.y,
+        });
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
+
+  // Fullscreen toggle for screen share
+  const toggleFullscreen = (targetRef) => {
+    if (!targetRef.current) return;
+
+    if (!document.fullscreenElement) {
+      if (targetRef.current.requestFullscreen) {
+        targetRef.current.requestFullscreen();
+      } else if (targetRef.current.webkitRequestFullscreen) {
+        targetRef.current.webkitRequestFullscreen();
+      } else if (targetRef.current.msRequestFullscreen) {
+        targetRef.current.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  // Handle fullscreen change events
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("msfullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange,
+      );
+      document.removeEventListener(
+        "msfullscreenchange",
+        handleFullscreenChange,
+      );
+    };
   }, []);
 
   useEffect(() => {
@@ -824,48 +902,134 @@ const LiveClassroom = () => {
         <div className="flex-1 flex flex-col p-4 overflow-y-auto space-y-4 pb-24 h-full">
           {/* Active Broadcast Screen Layout */}
           {isScreenSharing && screenShareStreamRef.current && (
-            <div className="rounded-xl overflow-hidden aspect-video max-h-[50vh] border border-blue-500/30 shadow-lg mx-auto">
+            <div
+              ref={screenShareContainerRef}
+              className="relative rounded-xl overflow-hidden border border-blue-500/30 shadow-lg mx-auto aspect-video max-h-[50vh] bg-black w-full flex items-center justify-center 
+               fullscreen:max-h-none fullscreen:w-screen fullscreen:h-screen fullscreen:rounded-none"
+            >
               <VideoRenderer
                 stream={screenShareStreamRef.current}
                 muted
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain fullscreen:w-screen fullscreen:h-screen"
               />
+
+              {/* Fullscreen Toggle Button */}
+              <button
+                onClick={() => toggleFullscreen(screenShareContainerRef)}
+                className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-2.5 rounded-xl hover:bg-black/80 transition-all z-[200] border border-white/10"
+              >
+                {isFullscreen ? (
+                  /* Exit Fullscreen Icon */
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-5 h-5 text-white"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9V4.5M15 9h4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5M15 15l5.25 5.25"
+                    />
+                  </svg>
+                ) : (
+                  /* Fullscreen Icon */
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-5 h-5 text-white"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+                    />
+                  </svg>
+                )}
+              </button>
             </div>
           )}
 
-          {/* Incoming Global Screens Stream Box - Using ref-buffered streams */}
+          {/* 2. Incoming Global Screens Stream Box (Remote Screen Share) */}
           {Object.keys(remoteStreamsRef.current)
             .filter((k) => k.startsWith("screen-"))
             .map((key) => (
               <div
                 key={key}
-                className="rounded-xl overflow-hidden aspect-video max-h-[50vh] border border-purple-500/30 shadow-lg mx-auto"
+                ref={remoteScreenContainerRef}
+                className="relative rounded-xl overflow-hidden border border-purple-500/30 shadow-lg mx-auto aspect-video max-h-[50vh] bg-black w-full"
               >
                 <VideoRenderer
                   stream={remoteStreamsRef.current[key]}
                   className="w-full h-full object-contain"
                 />
+
+                {/* Remote Screen Fullscreen Button */}
+                <button
+                  onClick={() => toggleFullscreen(remoteScreenContainerRef)}
+                  className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-2.5 rounded-xl hover:bg-black/80 transition-all z-50 border border-white/10"
+                  title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                >
+                  {isFullscreen ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="w-5 h-5 text-white"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9V4.5M15 9h4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5M15 15l5.25 5.25"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="w-5 h-5 text-white"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+                      />
+                    </svg>
+                  )}
+                </button>
               </div>
             ))}
 
           {/* Grid View */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-max">
-            {/* Owner Camera Window */}
-            <div className="relative rounded-xl overflow-hidden aspect-video border border-gray-800 shadow-md">
-              <VideoRenderer
-                stream={localStreamRef.current}
-                muted
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-medium">
-                You ({currentUser?.fullname})
-              </div>
-              {!isAudioEnabled && (
-                <div className="absolute top-2 right-2 bg-red-600 p-1.5 rounded-md shadow-md">
-                  Muted
+            {/* Owner Camera Window - Hide when screen sharing */}
+            {!isScreenSharing && (
+              <div className="relative rounded-xl overflow-hidden aspect-video border border-gray-800 shadow-md">
+                <VideoRenderer
+                  stream={localStreamRef.current}
+                  muted
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-medium">
+                  You ({currentUser?.fullname})
                 </div>
-              )}
-            </div>
+                {!isAudioEnabled && (
+                  <div className="absolute top-2 right-2 bg-red-600 p-1.5 rounded-md shadow-md">
+                    Muted
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Remote Peer Iteration Panels - Using ref-buffered streams */}
             {participants.map((p) => (
@@ -1188,6 +1352,120 @@ const LiveClassroom = () => {
           </svg>
         </button>
       </div>
+
+      {/* Floating Camera Popup - Shows when screen sharing */}
+      {isScreenSharing && localStreamRef.current && (
+        <div
+          className={`fixed z-50 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 ${
+            isCameraPopupMinimized ? "w-12 h-12" : "w-48 h-36"
+          }`}
+          style={{
+            left: cameraPopupPosition.x,
+            top: cameraPopupPosition.y,
+          }}
+          onMouseDown={(e) => {
+            if (!isCameraPopupMinimized) {
+              setIsDragging(true);
+              setDragOffset({
+                x: e.clientX - cameraPopupPosition.x,
+                y: e.clientY - cameraPopupPosition.y,
+              });
+            }
+          }}
+        >
+          {/* Header with minimize button */}
+          <div className="absolute top-0 left-0 right-0 bg-black/50 backdrop-blur-sm p-1 flex justify-between items-center z-10 cursor-move">
+            {!isCameraPopupMinimized && (
+              <span className="text-white text-xs px-2">You</span>
+            )}
+            <button
+              onClick={() => setIsCameraPopupMinimized(!isCameraPopupMinimized)}
+              className="text-white hover:bg-white/20 rounded p-1 transition-colors"
+            >
+              {isCameraPopupMinimized ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19.5 12h-15m0 0l7.5-7.5M4.5 12l7.5 7.5"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+
+          {/* Video content */}
+          {!isCameraPopupMinimized && (
+            <VideoRenderer
+              stream={localStreamRef.current}
+              muted
+              className="w-full h-full object-cover"
+            />
+          )}
+
+          {/* Muted indicator */}
+          {!isAudioEnabled && !isCameraPopupMinimized && (
+            <div className="absolute top-8 right-2 bg-red-600 p-1 rounded-md shadow-md">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-3 h-3 text-white"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"
+                />
+              </svg>
+            </div>
+          )}
+
+          {/* Camera off indicator */}
+          {!isVideoEnabled && !isCameraPopupMinimized && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-8 h-8 text-gray-400"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 10.5l4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
