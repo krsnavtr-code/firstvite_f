@@ -169,23 +169,34 @@ const LiveClassroom = () => {
         );
 
         if (isMeTeacher && !isRemoteTeacher(role)) {
-          setTimeout(() => createPeerConnection(userId, true), 100);
+          setTimeout(() => {
+            createPeerConnection(userId, true);
+
+            if (screenShareStreamRef.current) {
+              createScreenSharePeerConnection(userId, true);
+            }
+          }, 100);
         }
       },
     );
 
     socket.current.on("participants-list", ({ participants }) => {
-      const otherParticipants = participants.filter(
-        (p) => p.userId !== currentUser._id,
-      );
+      const otherParticipants = participants.filter((p) => p.userId !== currentUser._id);
       setParticipants(otherParticipants);
       setLoading(false);
       setConnectionState("connected");
 
       if (isMeTeacher) {
         otherParticipants.forEach((p) => {
-          if (!isRemoteTeacher(p.role))
-            setTimeout(() => createPeerConnection(p.userId, true), 100);
+          if (!isRemoteTeacher(p.role)) {
+            setTimeout(() => {
+              createPeerConnection(p.userId, true);
+              
+              if (screenShareStreamRef.current) {
+                createScreenSharePeerConnection(p.userId, true);
+              }
+            }, 100);
+          }
         });
       }
     });
