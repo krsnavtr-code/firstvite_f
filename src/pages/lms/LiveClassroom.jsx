@@ -28,6 +28,8 @@ const LiveClassroom = () => {
   const screenShareStreamRef = useRef(null);
   const remoteStreamsRef = useRef({});
   const forceUpdateRef = useRef(0);
+  const heartbeatTimerRef = useRef(null); // Heartbeat track karne ke liye
+  const [peerStatus, setPeerStatus] = useState({}); // Connection establish hua ya nahi track karne ke liye
 
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -136,6 +138,14 @@ const LiveClassroom = () => {
 
   const setupSocketListeners = () => {
     if (!socket.current) return;
+
+    // 🔥 FIX 1: KEEP CONNECTION ALIVE (No more 45-second drops)
+    if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
+    heartbeatTimerRef.current = setInterval(() => {
+      if (socket.current?.connected) {
+        socket.current.emit("heartbeat");
+      }
+    }, 15000); // Har 15 second me server ko signal jayega
 
     socket.current.on("connect", () => setConnectionState("connected"));
     socket.current.on("disconnect", () => setConnectionState("disconnected"));
@@ -303,23 +313,37 @@ const LiveClassroom = () => {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
-          { urls: "stun:global.stun.twilio.com:3478" }, // 🔥 Extra reliable mobile fallback
+          { urls: "stun:global.stun.twilio.com:3478" }, // Robust mobile fallback
         ],
       },
     });
 
+    // 🔥 FIX 2: TRACK SUCCESSFUL TUNNEL CONNECTION
+    peer.on("connect", () => {
+      setPeerStatus((prev) => ({ ...prev, [remoteUserId]: "connected" }));
+    });
+
+    // 🔥 FIX 3: PREVENT SIGNALING PAYLOAD CRASHES
     peer.on("signal", (data) => {
-      const type =
-        data.type === "offer"
-          ? "webrtc-offer"
-          : data.type === "answer"
-            ? "webrtc-answer"
-            : "webrtc-ice-candidate";
-      socket.current?.emit(type, {
-        sessionId,
-        [data.type || "candidate"]: data.type ? data : data.candidate,
-        toUserId: remoteUserId,
-      });
+      if (data.type === "offer") {
+        socket.current?.emit("webrtc-offer", {
+          sessionId,
+          offer: data,
+          toUserId: remoteUserId,
+        });
+      } else if (data.type === "answer") {
+        socket.current?.emit("webrtc-answer", {
+          sessionId,
+          answer: data,
+          toUserId: remoteUserId,
+        });
+      } else {
+        socket.current?.emit("webrtc-ice-candidate", {
+          sessionId,
+          candidate: data,
+          toUserId: remoteUserId,
+        });
+      }
     });
 
     peer.on("stream", (remoteStream) => {
@@ -618,17 +642,11 @@ const LiveClassroom = () => {
 
             {/* 🔥 FIX 4: SMART ROLE FILTER (Case-Insensitive) */}
             {participants
-              .filter((p) => {
-                const isMeTeacher =
-                  currentUser?.role?.toLowerCase() === "teacher" ||
-                  currentUser?.role?.toLowerCase() === "admin";
-                const isPeerTeacher =
-                  p.role?.toLowerCase() === "teacher" ||
-                  p.role?.toLowerCase() === "admin";
-
-                // Teacher sees students (!isPeerTeacher), Student sees Teacher (isPeerTeacher)
-                return isMeTeacher ? !isPeerTeacher : isPeerTeacher;
-              })
+              .filter((p) =>
+                currentUser?.role === "teacher"
+                  ? p.role === "student"
+                  : p.role === "teacher",
+              )
               .map((p) => (
                 <div
                   key={p.userId}
@@ -639,15 +657,25 @@ const LiveClassroom = () => {
                       stream={remoteStreamsRef.current[p.userId]}
                       className="w-full h-full object-cover"
                     />
+                  ) : peerStatus[p.userId] === "connected" ? (
+                    // 🔥 FIX 4: SHOW THIS IF CONNECTED BUT NO CAMERA/MIC
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
+                      <div className="h-16 w-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2 shadow-inner uppercase">
+                        {p.fullname.charAt(0)}
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        Mic / Cam Off
+                      </span>
+                    </div>
                   ) : (
+                    // SHOW SPINNER ONLY WHILE ESTABLISHING TUNNEL
                     <div className="w-full h-full flex flex-col items-center justify-center text-xs text-blue-400 bg-gray-900">
                       <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mb-2"></span>
                       Connecting Securely...
                     </div>
                   )}
                   <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
-                    {p.fullname}{" "}
-                    {p.role?.toLowerCase() === "teacher" ? "(Host)" : ""}
+                    {p.fullname}
                   </div>
                 </div>
               ))}
