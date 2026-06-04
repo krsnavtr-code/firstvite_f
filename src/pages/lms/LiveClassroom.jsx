@@ -8,10 +8,10 @@ import {
   leaveClassroomSession,
 } from "../../api/classroomApi";
 import { useAuth } from "../../contexts/AuthContext";
-import { useClassroomMedia } from "../../hooks/useClassroomMedia";
-import VideoRenderer from "./VideoRenderer";
-import ChatPanel from "./ChatPanel";
-import ControlDeck from "./ControlDeck";
+import { useClassroomMedia } from "./hooks/useClassroomMedia";
+import VideoRenderer from "./components/VideoRenderer";
+import ChatPanel from "./components/ChatPanel";
+import ControlDeck from "./components/ControlDeck";
 
 const LiveClassroom = () => {
   const { sessionId } = useParams();
@@ -36,18 +36,14 @@ const LiveClassroom = () => {
   const [participants, setParticipants] = useState([]);
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
+
+  // Screen Share & Approval States
   const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [screenShareRequests, setScreenShareRequests] = useState([]);
+
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  const [isCameraPopupMinimized, setIsCameraPopupMinimized] = useState(false);
-  const [cameraPopupPosition, setCameraPopupPosition] = useState({
-    x: 20,
-    y: 20,
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const {
     isAudioEnabled,
@@ -69,27 +65,6 @@ const LiveClassroom = () => {
     lines.splice(mVideoIndex + 1, 0, `b=AS:${bitrateKbps}`);
     return lines.join("\r\n");
   };
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (isDragging) {
-        setCameraPopupPosition({
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y,
-        });
-      }
-    };
-    const handleMouseUp = () => setIsDragging(false);
-
-    if (isDragging) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
 
   const toggleFullscreen = (targetRef) => {
     if (!targetRef.current) return;
@@ -212,7 +187,6 @@ const LiveClassroom = () => {
             ? fromUserRole === "student"
             : fromUserRole === "teacher";
         if (!shouldAccept) return;
-
         if (peersRef.current[fromUserId])
           peersRef.current[fromUserId].destroy();
         createPeerConnection(fromUserId, false, offer);
@@ -230,6 +204,20 @@ const LiveClassroom = () => {
       },
     );
 
+    // Screen Share Approval & Pipeline Events
+    socket.current.on("screen-share-requested", ({ studentId, fullname }) => {
+      if (currentUser?.role === "teacher") {
+        setScreenShareRequests((prev) => {
+          if (prev.find((req) => req.studentId === studentId)) return prev;
+          return [...prev, { studentId, fullname }];
+        });
+      }
+    });
+
+    socket.current.on("screen-share-approved", () => {
+      startScreenShareProcess();
+    });
+
     socket.current.on(
       "screen-share-offer",
       async ({ offer, fromUserId, fromUserRole }) => {
@@ -238,10 +226,10 @@ const LiveClassroom = () => {
             ? fromUserRole === "student"
             : fromUserRole === "teacher";
         if (!shouldAccept) return;
-
         createScreenSharePeerConnection(fromUserId, false, offer);
       },
     );
+
     socket.current.on("screen-share-answer", async ({ answer, fromUserId }) =>
       screenSharePeersRef.current[fromUserId]?.signal(answer),
     );
@@ -362,41 +350,76 @@ const LiveClassroom = () => {
     screenSharePeersRef.current[remoteUserId] = peer;
   };
 
-  const toggleScreenShare = async () => {
+  // Modified Screen Share Entry Point
+  const toggleScreenShare = () => {
     if (isScreenSharing) {
-      screenShareStreamRef.current?.getTracks().forEach((t) => t.stop());
-      screenShareStreamRef.current = null;
-      setIsScreenSharing(false);
-      socket.current.emit("stop-screen-share", { sessionId });
-      Object.keys(screenSharePeersRef.current).forEach((id) =>
-        screenSharePeersRef.current[id].destroy(),
-      );
-      screenSharePeersRef.current = {};
+      stopScreenShareProcess();
     } else {
-      try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-            frameRate: { ideal: 20, max: 30 },
-          },
+      if (currentUser?.role === "student") {
+        socket.current.emit("request-screen-share", {
+          sessionId,
+          userId: currentUser._id,
+          fullname: currentUser.fullname,
         });
-        if (stream.getVideoTracks()[0])
-          stream.getVideoTracks()[0].contentHint = "detail";
-        screenShareStreamRef.current = stream;
-        setIsScreenSharing(true);
-        participants
-          .filter((p) =>
-            currentUser?.role === "teacher"
-              ? p.role === "student"
-              : p.role === "teacher",
-          )
-          .forEach((p) => createScreenSharePeerConnection(p.userId, true));
-        stream.getVideoTracks()[0].onended = () => toggleScreenShare();
-      } catch (err) {
-        console.error(err);
+        alert(
+          "Screen share request sent to the teacher. Please wait for approval.",
+        );
+      } else {
+        startScreenShareProcess();
       }
     }
+  };
+
+  const stopScreenShareProcess = () => {
+    screenShareStreamRef.current?.getTracks().forEach((t) => t.stop());
+    screenShareStreamRef.current = null;
+    setIsScreenSharing(false);
+    socket.current.emit("stop-screen-share", { sessionId });
+    Object.keys(screenSharePeersRef.current).forEach((id) =>
+      screenSharePeersRef.current[id].destroy(),
+    );
+    screenSharePeersRef.current = {};
+  };
+
+  const startScreenShareProcess = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 20, max: 30 },
+        },
+      });
+      if (stream.getVideoTracks()[0])
+        stream.getVideoTracks()[0].contentHint = "detail";
+      screenShareStreamRef.current = stream;
+      setIsScreenSharing(true);
+
+      participants
+        .filter((p) =>
+          currentUser?.role === "teacher"
+            ? p.role === "student"
+            : p.role === "teacher",
+        )
+        .forEach((p) => createScreenSharePeerConnection(p.userId, true));
+
+      stream.getVideoTracks()[0].onended = () => stopScreenShareProcess();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Teacher Modals for Approval
+  const approveScreenShare = (studentId) => {
+    socket.current.emit("approve-screen-share", { sessionId, studentId });
+    setScreenShareRequests((prev) =>
+      prev.filter((r) => r.studentId !== studentId),
+    );
+  };
+  const rejectScreenShare = (studentId) => {
+    setScreenShareRequests((prev) =>
+      prev.filter((r) => r.studentId !== studentId),
+    );
   };
 
   const toggleHandRaise = () => {
@@ -433,7 +456,9 @@ const LiveClassroom = () => {
     navigate("/lms/classroom-sessions");
   };
 
-  const sendChatMessage = () => {
+  // Chat Form Fix
+  const sendChatMessage = (e) => {
+    e.preventDefault(); // 🔥 FIX: Prevents page reload on chat submission
     if (!chatInput.trim()) return;
     const messageData = {
       sessionId,
@@ -456,15 +481,49 @@ const LiveClassroom = () => {
 
   return (
     <div className="bg-white dark:bg-gray-800 text-black dark:text-white flex flex-col min-h-screen">
+      {/* Teacher Screen Share Notifications Overlay */}
+      {currentUser?.role === "teacher" && screenShareRequests.length > 0 && (
+        <div className="fixed top-20 right-4 z-[99] flex flex-col gap-2">
+          {screenShareRequests.map((req) => (
+            <div
+              key={req.studentId}
+              className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-2xl border border-blue-500/30 flex flex-col gap-3 animate-slide-up"
+            >
+              <p className="text-sm font-semibold">
+                {req.fullname} wants to share their screen.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => approveScreenShare(req.studentId)}
+                  className="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => rejectScreenShare(req.studentId)}
+                  className="bg-gray-200 dark:bg-gray-700 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Header Pipeline - Student Clean View */}
       <div className="px-6 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-sm font-bold">Session: {session?.batch?.name}</h1>
         <div className="flex items-center gap-4">
-          <span className="text-sm font-semibold">
-            Active Members: {participants.length + 1}
-          </span>
+          {currentUser?.role === "teacher" && (
+            <span className="text-sm font-semibold bg-gray-100 dark:bg-gray-900 px-3 py-1 rounded-lg">
+              Active Members:{" "}
+              <span className="text-blue-500">{participants.length + 1}</span>
+            </span>
+          )}
           <button
             onClick={leaveClassroom}
-            className="px-4 py-1.5 text-white bg-red-600 rounded text-sm font-semibold"
+            className="px-4 py-1.5 text-white bg-red-600 hover:bg-red-700 transition-colors rounded text-sm font-semibold"
           >
             Leave
           </button>
@@ -481,7 +540,7 @@ const LiveClassroom = () => {
               <VideoRenderer
                 stream={screenShareStreamRef.current}
                 muted
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain fullscreen:w-screen fullscreen:h-screen"
               />
               <button
                 onClick={() => toggleFullscreen(screenShareContainerRef)}
@@ -506,11 +565,11 @@ const LiveClassroom = () => {
               <div
                 key={key}
                 ref={remoteScreenContainerRef}
-                className="relative rounded-xl overflow-hidden bg-black w-full aspect-video max-h-[50vh]"
+                className="relative rounded-xl overflow-hidden bg-black w-full aspect-video max-h-[50vh] fullscreen:w-screen fullscreen:h-screen"
               >
                 <VideoRenderer
                   stream={remoteStreamsRef.current[key]}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain fullscreen:w-screen fullscreen:h-screen"
                 />
                 <button
                   onClick={() => toggleFullscreen(remoteScreenContainerRef)}
@@ -523,7 +582,7 @@ const LiveClassroom = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {!isScreenSharing && (
-              <div className="relative rounded-xl overflow-hidden aspect-video bg-gray-900">
+              <div className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm">
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -531,7 +590,7 @@ const LiveClassroom = () => {
                   muted
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
                   You
                 </div>
               </div>
@@ -546,7 +605,7 @@ const LiveClassroom = () => {
               .map((p) => (
                 <div
                   key={p.userId}
-                  className="relative rounded-xl overflow-hidden aspect-video bg-gray-900"
+                  className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm"
                 >
                   {remoteStreamsRef.current[p.userId] ? (
                     <VideoRenderer
@@ -558,7 +617,7 @@ const LiveClassroom = () => {
                       Connecting...
                     </div>
                   )}
-                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
                     {p.fullname}
                   </div>
                 </div>
