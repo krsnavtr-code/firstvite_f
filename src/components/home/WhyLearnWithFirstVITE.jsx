@@ -137,8 +137,8 @@ const WhyLearnWithFirstVITE = () => {
         isVisible ? "opacity-100 visible" : "opacity-0"
       }`}
     >
-      <div className="text-center mb-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
+      <div className="md:text-center mb-12">
+        <h2 className="text-xl md:text-3xl font-bold text-black dark:text-white text-center">
           Why Learn with Eklabya?
         </h2>
         <p className="mt-4">

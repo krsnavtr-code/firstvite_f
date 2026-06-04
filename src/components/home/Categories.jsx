@@ -66,13 +66,13 @@ const Categories = () => {
               } catch (err) {
                 console.error(
                   `Error fetching courses for category ${category.name}:`,
-                  err
+                  err,
                 );
                 return { ...category, courseCount: 0 };
               }
             }
             return category;
-          })
+          }),
         );
 
         // Sort by course count and limit to 6 categories
@@ -142,14 +142,6 @@ const Categories = () => {
     return (
       <section className="py-16 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-black dark:text-white">
-              Online Learning Categories
-            </h2>
-            <p className="mt-4 text-black dark:text-white">
-            Choose from a wide range of expertly designed online courses that help you learn, grow, and succeed at your own pace. Our <strong>Online Learning Courses Categories</strong> are carefully organized by subject, making it easy to find the right course that matches your interests and career goals. Whether you want to improve professional skills, explore creative fields, or gain technical knowledge, each category offers high-quality content created by experienced instructors. Learn anytime, anywhere with flexible lessons that fit your schedule. Start your learning journey today and take a confident step toward a smarter and more successful future with structured, reliable, and accessible online education.
-          </p>
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
               <div
@@ -187,12 +179,22 @@ const Categories = () => {
   return (
     <section className="py-16 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-lg-mobile text-xl-tablet text-xl-desktop font-bold text-black dark:text-white text-thin-bold">
+        <div className="md:text-center mb-12">
+          <h2 className="text-lg-mobile text-lg md:text-xl-tablet text-xl-desktop font-bold text-black dark:text-white text-thin-bold">
             Online Learning Courses Categories
           </h2>
           <p className="mt-4 text-black dark:text-white">
-            Choose from a wide range of expertly designed online courses that help you learn, grow, and succeed at your own pace. Our <strong>Online Learning Courses Categories</strong> are carefully organized by subject, making it easy to find the right course that matches your interests and career goals. Whether you want to improve professional skills, explore creative fields, or gain technical knowledge, each category offers high-quality content created by experienced instructors. Learn anytime, anywhere with flexible lessons that fit your schedule. Start your learning journey today and take a confident step toward a smarter and more successful future with structured, reliable, and accessible online education.
+            Choose from a wide range of expertly designed online courses that
+            help you learn, grow, and succeed at your own pace. Our{" "}
+            <strong>Online Learning Courses Categories</strong> are carefully
+            organized by subject, making it easy to find the right course that
+            matches your interests and career goals. Whether you want to improve
+            professional skills, explore creative fields, or gain technical
+            knowledge, each category offers high-quality content created by
+            experienced instructors. Learn anytime, anywhere with flexible
+            lessons that fit your schedule. Start your learning journey today
+            and take a confident step toward a smarter and more successful
+            future with structured, reliable, and accessible online education.
           </p>
         </div>
 
@@ -205,7 +207,7 @@ const Categories = () => {
                   .toLowerCase()
                   .replace(/\s+/g, "-")}`}
                 className={`block p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${getCardBgColor(
-                  category
+                  category,
                 )}`}
               >
                 <div className="flex items-center space-x-4">
@@ -224,9 +226,7 @@ const Categories = () => {
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-black dark:text-white">
-              No categories found.
-            </p>
+            <p className="text-black dark:text-white">No categories found.</p>
           </div>
         )}
 

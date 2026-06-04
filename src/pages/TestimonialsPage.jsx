@@ -10,10 +10,9 @@ const ALL_TESTIMONIALS = [
     role: "MLOps Engineer",
     email: "krishnaavtar955@gmail.com",
     category: "Get Jobs",
-    image:
-      "http://www.eklabya.com/api/upload/file/Krishna-4629.png",
+    image: "http://www.eklabya.com/api/upload/file/Krishna-4629.png",
     content:
-      "I recently completed AI & ML course and I must admit that they have done an awesome job at creating premium and meaningful content. Amazing courses and superb faculty of Harappa. I look forward to keep learning on Harappa and also recommend it.",
+      "Before joining this course, I had very little knowledge of Data Science and Machine Learning, and I was unsure about how to grow my career in this field. After joining Eklabya Centre of Excellence, I gained a strong understanding of data science and ML concepts through practical learning and real-world projects. The step-by-step lessons and assignments helped me build confidence and improve my skills. One of the things I appreciated most was the career support provided throughout the program.",
     rating: 5,
   },
   {
@@ -22,10 +21,9 @@ const ALL_TESTIMONIALS = [
     role: "Robotics Engineer",
     email: "manikagahloat91@gmail.com",
     category: "Upskilling",
-    image:
-      "http://www.eklabya.com/api/upload/file/wo-4953.png",
+    image: "http://www.eklabya.com/api/upload/file/wo-4953.png",
     content:
-      "The teaching style of faculty is unique and the courses are not at all boring.  I would highly recommend you to learn and develop yourself by the courses on Harappa Platform. ",
+      "I enrolled in the SAP MM training after a friend's recommendation. What I liked most was the practical approach and real-time examples. Whenever I had doubts, the trainer was available to help. The course gave me a clear understanding of SAP MM processes and improved my confidence during interviews.",
     rating: 5,
   },
   {
@@ -34,10 +32,9 @@ const ALL_TESTIMONIALS = [
     role: "Generative AI Engineer",
     email: "ankitdhanka037@gmail.com",
     category: "Students",
-    image:
-      "http://www.eklabya.com/api/upload/file/Adarsh-3832.png",
+    image: "http://www.eklabya.com/api/upload/file/Adarsh-3832.png",
     content:
-      "Its a great education platform, The faculty is experienced and the content was also very premium. I am satisfied with the overall experience.",
+      "After joining the Database Management course at Eklabya Centre of Excellence to strengthen my understanding of databases and data handling. The course covered both theoretical concepts and practical exercises, making it easy to understand topics like database design, normalization, and data security. The assignments helped me apply what I learned. By the end of the course, I felt more confident managing and working with databases.",
     rating: 5,
   },
   {
@@ -46,10 +43,9 @@ const ALL_TESTIMONIALS = [
     role: "Computer Vision Engineer",
     email: "yadavvinay999790@gmail.com",
     category: "Upskilling",
-    image:
-      "http://www.eklabya.com/api/upload/file/dar-0262.png",
+    image: "http://www.eklabya.com/api/upload/file/dar-0262.png",
     content:
-      "After my Course Complete I had bad experience with their interview process. Making Decision course has been proved to be really benificial for me. I am very thankful to Harappa Education for providing such content.",
+      "The SAP PP course exceeded my expectations. I was initially nervous because I came from a different background, but the Eklabya trainer made the topics easy to understand. The support I received throughout the training helped me learn faster and apply the concepts in practical scenarios.",
     rating: 5,
   },
   {
@@ -58,10 +54,9 @@ const ALL_TESTIMONIALS = [
     role: "Machine Learning Engineer",
     email: "devendratrivedi871@gmail.com",
     category: "Get Jobs",
-    image:
-      "http://www.eklabya.com/api/upload/file/df-3710.png",
+    image: "http://www.eklabya.com/api/upload/file/df-3710.png",
     content:
-      "This platform is giving great opportunities to one who wants to upskill and learn new things. I can now identify my strenght and weakness and it also helped me in overcoming my weaknesses. Its a great platform!",
+      "I was working in a non-technical role and wanted to learn AI, but I didn't know where to start. The trainers at Eklabya Centre of Excellence explained the concepts in a simple way and helped me stay motivated throughout the course. Building my first AI project was a great experience, and now I feel much more confident exploring opportunities in this field.",
     rating: 5,
   },
   {
@@ -70,10 +65,9 @@ const ALL_TESTIMONIALS = [
     role: "AI Engineer",
     email: "sriadarsh04@gmail.com",
     category: "Upskilling",
-    image:
-      "http://www.eklabya.com/api/upload/file/1777960745027-1855.png",
+    image: "http://www.eklabya.com/api/upload/file/1777960745027-1855.png",
     content:
-      "The courses are available in Hindi language also which is very rare on other platforms. Its easy to understand, I am totally satisfied with the whole experience and definitely recommend it to everyone.",
+      "I already knew basic SQL, but after completing the  MySQL Database Development course on Eklabya online training platform helped me go much deeper. Learning stored procedures and query optimization was especially useful. Now I can build and manage databases with much more confidence.",
     rating: 5,
   },
 ];
@@ -110,7 +104,7 @@ export default function TestimonialsPage() {
             Success Stories
           </span>
           <h1 className="text-lg md:text-4xl lg:text-6xl font-extrabold mb-6 tracking-tight">
-            What Our Learners Say
+            What Our Clients Say
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto text-blue-100 font-light leading-relaxed">
             Real stories from real people who have upskilled, switched

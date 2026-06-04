@@ -20,11 +20,11 @@ const Assessment = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* --- Section Header --- */}
-        <div className="text-center max-w-7xl mx-auto mb-16">
+        <div className="md:text-center max-w-7xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 text-sm font-semibold mb-4 border border-indigo-200 dark:border-indigo-800">
             <TrophyOutlined /> Scholarship Program 2026
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
+          <h2 className="text-xl md:text-3xl font-bold text-black dark:text-white md:text-center">
             Unlock Your Future with eklabya
           </h2>
           <p className="text-black dark:text-white leading-relaxed">
@@ -47,9 +47,9 @@ const Assessment = () => {
         </div>
 
         {/* --- Two Column Feature Grid --- */}
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-8 mb-16">
           {/* Column 1: Eligibility */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm dark:shadow-none border border-gray-100 dark:border-gray-700 hover:shadow-xl dark:hover:shadow-lg dark:hover:bg-gray-750 transition-all duration-300 group">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 md:p-8 shadow-sm dark:shadow-none border border-gray-100 dark:border-gray-700 hover:shadow-xl dark:hover:shadow-lg dark:hover:bg-gray-750 transition-all duration-300 group">
             <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 text-2xl mb-6 group-hover:scale-110 transition-transform">
               <GlobalOutlined />
             </div>
@@ -76,7 +76,7 @@ const Assessment = () => {
           </div>
 
           {/* Column 2: Evaluation */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm dark:shadow-none border border-gray-100 dark:border-gray-700 hover:shadow-xl dark:hover:shadow-lg dark:hover:bg-gray-750 transition-all duration-300 group">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 md:p-8 shadow-sm dark:shadow-none border border-gray-100 dark:border-gray-700 hover:shadow-xl dark:hover:shadow-lg dark:hover:bg-gray-750 transition-all duration-300 group">
             <div className="w-14 h-14 bg-purple-50 dark:bg-purple-900/30 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-400 text-2xl mb-6 group-hover:scale-110 transition-transform">
               <SafetyCertificateFilled />
             </div>
@@ -127,7 +127,7 @@ const Assessment = () => {
           {/* Background Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-700 opacity-90 dark:opacity-80"></div>
 
-          <div className="relative z-10 px-6 py-12 md:py-16 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+          <div className="relative z-10 px-4 py-8 md:py-16 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
             <div className="max-w-2xl">
               <h3 className="text-2xl md:text-3xl font-bold mb-2 text-white">
                 Ready to prove your potential?
