@@ -29,8 +29,8 @@ const LiveClassroom = () => {
   const remoteStreamsRef = useRef({});
   const forceUpdateRef = useRef(0);
   const heartbeatTimerRef = useRef(null);
-  const [peerStatus, setPeerStatus] = useState({});
 
+  const [peerStatus, setPeerStatus] = useState({});
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,15 +39,18 @@ const LiveClassroom = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
 
-  const [remoteVideoStates, setRemoteVideoStates] = useState({}); // Track who turned off camera
-
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [screenShareRequests, setScreenShareRequests] = useState([]);
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // 🔥 FIX: Smart Role Handlers to prevent Case-Sensitive Bugs
+  // 🔥 FIX 1: Stale Closure Reference Guard
+  const participantsRef = useRef([]);
+  useEffect(() => {
+    participantsRef.current = participants;
+  }, [participants]);
+
   const isMeTeacher =
     currentUser?.role?.toLowerCase() === "teacher" ||
     currentUser?.role?.toLowerCase() === "admin";
@@ -98,19 +101,15 @@ const LiveClassroom = () => {
     return () => cleanup();
   }, [sessionId]);
 
-  // 🔥 FIX: Smart Local Video Attachment Logic
   useEffect(() => {
-    // Jab bhi Loading khatam ho ya Camera wapas ON ho, stream dobara bind karo
-    if (isVideoEnabled && localVideoRef.current && localStreamRef.current) {
-      // Browser Hack: Stream ko ek baar null karke wapas lagana zaroori hai 
-      // taaki browser naye tracks ko pehchan sake.
+    if (isVideoEnabled && localStreamRef.current && localVideoRef.current) {
       localVideoRef.current.srcObject = null;
       localVideoRef.current.srcObject = localStreamRef.current;
       localVideoRef.current
         .play()
         .catch((err) => console.error("Video play error:", err));
     }
-  }, [isVideoEnabled, loading]); // 🔥 Dependency Update ki gayi hai
+  }, [isVideoEnabled, loading]);
 
   const initializeClassroom = async () => {
     try {
@@ -153,9 +152,7 @@ const LiveClassroom = () => {
 
     if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
     heartbeatTimerRef.current = setInterval(() => {
-      if (socket.current?.connected) {
-        socket.current.emit("heartbeat");
-      }
+      if (socket.current?.connected) socket.current.emit("heartbeat");
     }, 15000);
 
     socket.current.on("connect", () => setConnectionState("connected"));
@@ -187,9 +184,8 @@ const LiveClassroom = () => {
 
       if (isMeTeacher) {
         otherParticipants.forEach((p) => {
-          if (!isRemoteTeacher(p.role)) {
+          if (!isRemoteTeacher(p.role))
             setTimeout(() => createPeerConnection(p.userId, true), 100);
-          }
         });
       }
     });
@@ -197,9 +193,14 @@ const LiveClassroom = () => {
     socket.current.on(
       "webrtc-offer",
       async ({ offer, fromUserId, fromUserRole }) => {
+        // 🔥 FIX 2: Prevent undefined role rejections using participantsRef
+        const senderRole =
+          fromUserRole ||
+          participantsRef.current.find((p) => p.userId === fromUserId)?.role ||
+          "teacher";
         const shouldAccept = isMeTeacher
-          ? !isRemoteTeacher(fromUserRole)
-          : isRemoteTeacher(fromUserRole);
+          ? !isRemoteTeacher(senderRole)
+          : isRemoteTeacher(senderRole);
         if (!shouldAccept) return;
 
         if (
@@ -222,18 +223,13 @@ const LiveClassroom = () => {
       }
     });
 
-    socket.current.on("user-video-toggled", ({ userId, isVideoOff }) => {
-      setRemoteVideoStates((prev) => ({ ...prev, [userId]: isVideoOff }));
-      triggerUpdate();
-    });
+    socket.current.on("user-video-toggled", () => triggerUpdate());
 
     socket.current.on(
       "webrtc-ice-candidate",
       async ({ candidate, fromUserId }) => {
         const peer = peersRef.current[fromUserId];
-        if (peer && !peer.destroyed) {
-          peer.signal(candidate);
-        }
+        if (peer && !peer.destroyed) peer.signal(candidate);
       },
     );
 
@@ -250,39 +246,28 @@ const LiveClassroom = () => {
       startScreenShareProcess();
     });
 
-    socket.current.on(
-      "screen-share-offer",
-      async ({ offer, fromUserId, fromUserRole }) => {
-        const shouldAccept = isMeTeacher
-          ? !isRemoteTeacher(fromUserRole)
-          : isRemoteTeacher(fromUserRole);
-        if (!shouldAccept) return;
-
-        if (
-          screenSharePeersRef.current[fromUserId] &&
-          !screenSharePeersRef.current[fromUserId].destroyed
-        ) {
-          screenSharePeersRef.current[fromUserId].signal(offer);
-        } else {
-          createScreenSharePeerConnection(fromUserId, false, offer);
-        }
-      },
-    );
+    // 🔥 FIX 3: Removed strict role block for screen sharing incoming offers
+    socket.current.on("screen-share-offer", async ({ offer, fromUserId }) => {
+      if (
+        screenSharePeersRef.current[fromUserId] &&
+        !screenSharePeersRef.current[fromUserId].destroyed
+      ) {
+        screenSharePeersRef.current[fromUserId].signal(offer);
+      } else {
+        createScreenSharePeerConnection(fromUserId, false, offer);
+      }
+    });
 
     socket.current.on("screen-share-answer", async ({ answer, fromUserId }) => {
       const peer = screenSharePeersRef.current[fromUserId];
-      if (peer && !peer.destroyed) {
-        peer.signal(answer);
-      }
+      if (peer && !peer.destroyed) peer.signal(answer);
     });
 
     socket.current.on(
       "screen-share-ice-candidate",
       async ({ candidate, fromUserId }) => {
         const peer = screenSharePeersRef.current[fromUserId];
-        if (peer && !peer.destroyed) {
-          peer.signal(candidate);
-        }
+        if (peer && !peer.destroyed) peer.signal(candidate);
       },
     );
 
@@ -336,9 +321,9 @@ const LiveClassroom = () => {
       },
     });
 
-    peer.on("connect", () => {
-      setPeerStatus((prev) => ({ ...prev, [remoteUserId]: "connected" }));
-    });
+    peer.on("connect", () =>
+      setPeerStatus((prev) => ({ ...prev, [remoteUserId]: "connected" })),
+    );
 
     peer.on("signal", (data) => {
       if (data.type === "offer") {
@@ -459,7 +444,8 @@ const LiveClassroom = () => {
       screenShareStreamRef.current = stream;
       setIsScreenSharing(true);
 
-      participants
+      // 🔥 FIX 4: Used participantsRef.current instead of stale participants state
+      participantsRef.current
         .filter((p) =>
           isMeTeacher ? !isRemoteTeacher(p.role) : isRemoteTeacher(p.role),
         )
@@ -477,6 +463,7 @@ const LiveClassroom = () => {
       prev.filter((r) => r.studentId !== studentId),
     );
   };
+
   const rejectScreenShare = (studentId) => {
     setScreenShareRequests((prev) =>
       prev.filter((r) => r.studentId !== studentId),
@@ -603,7 +590,7 @@ const LiveClassroom = () => {
               />
               <button
                 onClick={() => toggleFullscreen(screenShareContainerRef)}
-                className="absolute top-3 right-3 bg-black/60 p-2 rounded-xl text-white"
+                className="absolute top-3 right-3 bg-black/60 p-2 rounded-xl text-white z-[60]"
               >
                 Full
               </button>
@@ -612,14 +599,7 @@ const LiveClassroom = () => {
 
           {Object.keys(remoteStreamsRef.current)
             .filter((k) => k.startsWith("screen-"))
-            .filter((key) => {
-              const userId = key.replace("screen-", "");
-              const participant = participants.find((p) => p.userId === userId);
-              if (!participant) return false;
-              return isMeTeacher
-                ? !isRemoteTeacher(participant.role)
-                : isRemoteTeacher(participant.role);
-            })
+            // 🔥 FIX 5: Extra strict filter removed so valid streams are never blocked by state mismatch
             .map((key) => (
               <div
                 key={key}
@@ -632,7 +612,7 @@ const LiveClassroom = () => {
                 />
                 <button
                   onClick={() => toggleFullscreen(remoteScreenContainerRef)}
-                  className="absolute top-3 right-3 bg-black/60 p-2 rounded-xl text-white"
+                  className="absolute top-3 right-3 bg-black/60 p-2 rounded-xl text-white z-[60]"
                 >
                   Full
                 </button>
@@ -640,11 +620,16 @@ const LiveClassroom = () => {
             ))}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* LOCAL VIDEO (Your View) */}
             {!isScreenSharing && (
               <div className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm">
                 {isVideoEnabled ? (
-                  <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
                     <div className="h-16 w-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2 shadow-inner uppercase">
@@ -659,21 +644,30 @@ const LiveClassroom = () => {
               </div>
             )}
 
-            {/* REMOTE VIDEOS (Students/Teacher View) */}
             {participants
-              .filter((p) => isMeTeacher ? !isRemoteTeacher(p.role) : isRemoteTeacher(p.role))
+              .filter((p) =>
+                isMeTeacher
+                  ? !isRemoteTeacher(p.role)
+                  : isRemoteTeacher(p.role),
+              )
               .map((p) => (
-                <div key={p.userId} className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm">
-                  
-                  {remoteStreamsRef.current[p.userId] && !remoteVideoStates[p.userId] ? (
-                    <VideoRenderer stream={remoteStreamsRef.current[p.userId]} className="w-full h-full object-cover" />
+                <div
+                  key={p.userId}
+                  className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm"
+                >
+                  {remoteStreamsRef.current[p.userId] ? (
+                    <VideoRenderer
+                      stream={remoteStreamsRef.current[p.userId]}
+                      className="w-full h-full object-cover"
+                    />
                   ) : peerStatus[p.userId] === "connected" ? (
-                    // 🔥 SHOW THIS WHEN CAMERA IS TURNED OFF BY THE USER
                     <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
                       <div className="h-16 w-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2 shadow-inner uppercase">
                         {p.fullname.charAt(0)}
                       </div>
-                      <span className="text-xs text-gray-400">Camera Off</span>
+                      <span className="text-xs text-gray-400">
+                        Mic / Cam Off
+                      </span>
                     </div>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-xs text-blue-400 bg-gray-900">
@@ -681,7 +675,6 @@ const LiveClassroom = () => {
                       Connecting Securely...
                     </div>
                   )}
-
                   <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
                     {p.fullname}
                   </div>
