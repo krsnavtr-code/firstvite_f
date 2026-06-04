@@ -8,10 +8,10 @@ import {
   leaveClassroomSession,
 } from "../../api/classroomApi";
 import { useAuth } from "../../contexts/AuthContext";
-import { useClassroomMedia } from "./hooks/useClassroomMedia";
-import VideoRenderer from "./components/VideoRenderer";
-import ChatPanel from "./components/ChatPanel";
-import ControlDeck from "./components/ControlDeck";
+import { useClassroomMedia } from "../../hooks/useClassroomMedia";
+import VideoRenderer from "./VideoRenderer";
+import ChatPanel from "./ChatPanel";
+import ControlDeck from "./ControlDeck";
 
 const LiveClassroom = () => {
   const { sessionId } = useParams();
