@@ -222,14 +222,24 @@ const LiveClassroom = () => {
       },
     );
 
+    // --- 1. WEBRTC ANSWER FIX ---
     socket.current.on("webrtc-answer", async ({ answer, fromUserId }) => {
-      peersRef.current[fromUserId]?.signal(answer);
+      const peer = peersRef.current[fromUserId];
+      // 🔥 FIX: Check if peer exists and is not destroyed
+      if (peer && !peer.destroyed) {
+        peer.signal(answer);
+      }
     });
 
+    // --- 2. WEBRTC ICE CANDIDATE FIX ---
     socket.current.on(
       "webrtc-ice-candidate",
       async ({ candidate, fromUserId }) => {
-        peersRef.current[fromUserId]?.signal({ candidate });
+        const peer = peersRef.current[fromUserId];
+        if (peer && !peer.destroyed) {
+          // 🔥 FIX: Removed extra {} wrappers around candidate
+          peer.signal(candidate);
+        }
       },
     );
 
@@ -259,13 +269,24 @@ const LiveClassroom = () => {
       },
     );
 
-    socket.current.on("screen-share-answer", async ({ answer, fromUserId }) =>
-      screenSharePeersRef.current[fromUserId]?.signal(answer),
-    );
+    // --- 3. SCREEN SHARE ANSWER FIX ---
+    socket.current.on("screen-share-answer", async ({ answer, fromUserId }) => {
+      const peer = screenSharePeersRef.current[fromUserId];
+      if (peer && !peer.destroyed) {
+        peer.signal(answer);
+      }
+    });
+
+    // --- 4. SCREEN SHARE ICE CANDIDATE FIX ---
     socket.current.on(
       "screen-share-ice-candidate",
-      async ({ candidate, fromUserId }) =>
-        screenSharePeersRef.current[fromUserId]?.signal({ candidate }),
+      async ({ candidate, fromUserId }) => {
+        const peer = screenSharePeersRef.current[fromUserId];
+        if (peer && !peer.destroyed) {
+          // 🔥 FIX: Removed extra {} wrappers
+          peer.signal(candidate);
+        }
+      },
     );
 
     socket.current.on("stop-screen-share", ({ fromUserId }) => {
