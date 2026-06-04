@@ -98,14 +98,19 @@ const LiveClassroom = () => {
     return () => cleanup();
   }, [sessionId]);
 
+  // 🔥 FIX: Smart Local Video Attachment Logic
   useEffect(() => {
-    if (localStreamRef.current && localVideoRef.current) {
+    // Jab bhi Loading khatam ho ya Camera wapas ON ho, stream dobara bind karo
+    if (isVideoEnabled && localVideoRef.current && localStreamRef.current) {
+      // Browser Hack: Stream ko ek baar null karke wapas lagana zaroori hai 
+      // taaki browser naye tracks ko pehchan sake.
+      localVideoRef.current.srcObject = null;
       localVideoRef.current.srcObject = localStreamRef.current;
       localVideoRef.current
         .play()
         .catch((err) => console.error("Video play error:", err));
     }
-  }, [localStreamRef.current]);
+  }, [isVideoEnabled, loading]); // 🔥 Dependency Update ki gayi hai
 
   const initializeClassroom = async () => {
     try {
