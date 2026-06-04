@@ -140,6 +140,7 @@ const LiveClassroom = () => {
     socket.current.on("connect", () => setConnectionState("connected"));
     socket.current.on("disconnect", () => setConnectionState("disconnected"));
 
+    // --- 1. USER JOINED LOGIC ---
     socket.current.on(
       "user-joined",
       ({ userId, role, fullname, timestamp }) => {
@@ -150,16 +151,21 @@ const LiveClassroom = () => {
             : [...prev, { userId, role, fullname, joinedAt: timestamp }],
         );
 
-        const shouldConnect =
-          currentUser?.role === "teacher"
-            ? role === "student"
-            : role === "teacher";
-        if (shouldConnect) {
+        // 🔥 FIX 1: ONLY TEACHER INITIATES THE CALL
+        const isMeTeacher =
+          currentUser?.role?.toLowerCase() === "teacher" ||
+          currentUser?.role?.toLowerCase() === "admin";
+        const isNewUserStudent =
+          role?.toLowerCase() !== "teacher" && role?.toLowerCase() !== "admin";
+
+        if (isMeTeacher && isNewUserStudent) {
+          // Teacher is calling the new student
           setTimeout(() => createPeerConnection(userId, true), 100);
         }
       },
     );
 
+    // --- 2. PARTICIPANTS LIST LOGIC ---
     socket.current.on("participants-list", ({ participants }) => {
       const otherParticipants = participants.filter(
         (p) => p.userId !== currentUser._id,
@@ -168,28 +174,41 @@ const LiveClassroom = () => {
       setLoading(false);
       setConnectionState("connected");
 
-      otherParticipants.forEach((p) => {
-        const shouldConnect =
-          currentUser?.role === "teacher"
-            ? p.role === "student"
-            : p.role === "teacher";
-        if (shouldConnect) {
-          setTimeout(() => createPeerConnection(p.userId, true), 100);
-        }
-      });
+      // 🔥 FIX 2: ONLY TEACHER INITIATES CALLS TO EXISTING STUDENTS
+      const isMeTeacher =
+        currentUser?.role?.toLowerCase() === "teacher" ||
+        currentUser?.role?.toLowerCase() === "admin";
+
+      if (isMeTeacher) {
+        otherParticipants.forEach((p) => {
+          const isPeerStudent =
+            p.role?.toLowerCase() !== "teacher" &&
+            p.role?.toLowerCase() !== "admin";
+          if (isPeerStudent) {
+            setTimeout(() => createPeerConnection(p.userId, true), 100);
+          }
+        });
+      }
     });
 
+    // --- 3. WEBRTC OFFER RECEIVER LOGIC ---
     socket.current.on(
       "webrtc-offer",
       async ({ offer, fromUserId, fromUserRole }) => {
-        const shouldAccept =
-          currentUser?.role === "teacher"
-            ? fromUserRole === "student"
-            : fromUserRole === "teacher";
-        if (!shouldAccept) return;
+        // 🔥 FIX 3: STUDENT ACCEPTS THE CALL FROM TEACHER
+        const isMeStudent =
+          currentUser?.role?.toLowerCase() !== "teacher" &&
+          currentUser?.role?.toLowerCase() !== "admin";
+        const isFromTeacher =
+          fromUserRole?.toLowerCase() === "teacher" ||
+          fromUserRole?.toLowerCase() === "admin";
+
+        // Sirf tabhi accept karein jab Student ko Teacher call kare (ya Teacher ko Screen share karni ho)
+        if (isMeStudent && !isFromTeacher) return;
+
         if (peersRef.current[fromUserId])
           peersRef.current[fromUserId].destroy();
-        createPeerConnection(fromUserId, false, offer);
+        createPeerConnection(fromUserId, false, offer); // isInitiator = false
       },
     );
 
@@ -284,6 +303,7 @@ const LiveClassroom = () => {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:global.stun.twilio.com:3478" }, // 🔥 Extra reliable mobile fallback
         ],
       },
     });
@@ -580,7 +600,7 @@ const LiveClassroom = () => {
               </div>
             ))}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {!isScreenSharing && (
               <div className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm">
                 <video
@@ -596,12 +616,19 @@ const LiveClassroom = () => {
               </div>
             )}
 
+            {/* 🔥 FIX 4: SMART ROLE FILTER (Case-Insensitive) */}
             {participants
-              .filter((p) =>
-                currentUser?.role === "teacher"
-                  ? p.role === "student"
-                  : p.role === "teacher",
-              )
+              .filter((p) => {
+                const isMeTeacher =
+                  currentUser?.role?.toLowerCase() === "teacher" ||
+                  currentUser?.role?.toLowerCase() === "admin";
+                const isPeerTeacher =
+                  p.role?.toLowerCase() === "teacher" ||
+                  p.role?.toLowerCase() === "admin";
+
+                // Teacher sees students (!isPeerTeacher), Student sees Teacher (isPeerTeacher)
+                return isMeTeacher ? !isPeerTeacher : isPeerTeacher;
+              })
               .map((p) => (
                 <div
                   key={p.userId}
@@ -613,12 +640,14 @@ const LiveClassroom = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
-                      Connecting...
+                    <div className="w-full h-full flex flex-col items-center justify-center text-xs text-blue-400 bg-gray-900">
+                      <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mb-2"></span>
+                      Connecting Securely...
                     </div>
                   )}
                   <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
-                    {p.fullname}
+                    {p.fullname}{" "}
+                    {p.role?.toLowerCase() === "teacher" ? "(Host)" : ""}
                   </div>
                 </div>
               ))}
