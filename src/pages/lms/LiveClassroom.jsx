@@ -181,7 +181,9 @@ const LiveClassroom = () => {
     );
 
     socket.current.on("participants-list", ({ participants }) => {
-      const otherParticipants = participants.filter((p) => p.userId !== currentUser._id);
+      const otherParticipants = participants.filter(
+        (p) => p.userId !== currentUser._id,
+      );
       setParticipants(otherParticipants);
       setLoading(false);
       setConnectionState("connected");
@@ -191,7 +193,7 @@ const LiveClassroom = () => {
           if (!isRemoteTeacher(p.role)) {
             setTimeout(() => {
               createPeerConnection(p.userId, true);
-              
+
               if (screenShareStreamRef.current) {
                 createScreenSharePeerConnection(p.userId, true);
               }
@@ -204,7 +206,6 @@ const LiveClassroom = () => {
     socket.current.on(
       "webrtc-offer",
       async ({ offer, fromUserId, fromUserRole }) => {
-        // 🔥 FIX 2: Prevent undefined role rejections using participantsRef
         const senderRole =
           fromUserRole ||
           participantsRef.current.find((p) => p.userId === fromUserId)?.role ||
@@ -257,7 +258,6 @@ const LiveClassroom = () => {
       startScreenShareProcess();
     });
 
-    // 🔥 FIX 3: Removed strict role block for screen sharing incoming offers
     socket.current.on("screen-share-offer", async ({ offer, fromUserId }) => {
       if (
         screenSharePeersRef.current[fromUserId] &&
@@ -519,14 +519,12 @@ const LiveClassroom = () => {
   const sendChatMessage = (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
-    const messageData = {
-      sessionId,
-      userId: currentUser._id,
-      fullname: currentUser.fullname,
+
+    socket.current.emit("send-chat", {
+      sessionId: sessionId,
       message: chatInput,
-      timestamp: new Date().toISOString(),
-    };
-    socket.current.emit("chat-message", messageData);
+    });
+
     setChatInput("");
   };
 
