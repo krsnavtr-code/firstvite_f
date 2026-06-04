@@ -28,8 +28,8 @@ const LiveClassroom = () => {
   const screenShareStreamRef = useRef(null);
   const remoteStreamsRef = useRef({});
   const forceUpdateRef = useRef(0);
-  const heartbeatTimerRef = useRef(null); // Heartbeat track karne ke liye
-  const [peerStatus, setPeerStatus] = useState({}); // Connection establish hua ya nahi track karne ke liye
+  const heartbeatTimerRef = useRef(null);
+  const [peerStatus, setPeerStatus] = useState({});
 
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,13 +39,18 @@ const LiveClassroom = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
 
-  // Screen Share & Approval States
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [screenShareRequests, setScreenShareRequests] = useState([]);
-
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // 🔥 FIX: Smart Role Handlers to prevent Case-Sensitive Bugs
+  const isMeTeacher =
+    currentUser?.role?.toLowerCase() === "teacher" ||
+    currentUser?.role?.toLowerCase() === "admin";
+  const isRemoteTeacher = (role) =>
+    role?.toLowerCase() === "teacher" || role?.toLowerCase() === "admin";
 
   const {
     isAudioEnabled,
@@ -139,18 +144,16 @@ const LiveClassroom = () => {
   const setupSocketListeners = () => {
     if (!socket.current) return;
 
-    // 🔥 FIX 1: KEEP CONNECTION ALIVE (No more 45-second drops)
     if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
     heartbeatTimerRef.current = setInterval(() => {
       if (socket.current?.connected) {
         socket.current.emit("heartbeat");
       }
-    }, 15000); // Har 15 second me server ko signal jayega
+    }, 15000);
 
     socket.current.on("connect", () => setConnectionState("connected"));
     socket.current.on("disconnect", () => setConnectionState("disconnected"));
 
-    // --- 1. USER JOINED LOGIC ---
     socket.current.on(
       "user-joined",
       ({ userId, role, fullname, timestamp }) => {
@@ -161,21 +164,12 @@ const LiveClassroom = () => {
             : [...prev, { userId, role, fullname, joinedAt: timestamp }],
         );
 
-        // 🔥 FIX 1: ONLY TEACHER INITIATES THE CALL
-        const isMeTeacher =
-          currentUser?.role?.toLowerCase() === "teacher" ||
-          currentUser?.role?.toLowerCase() === "admin";
-        const isNewUserStudent =
-          role?.toLowerCase() !== "teacher" && role?.toLowerCase() !== "admin";
-
-        if (isMeTeacher && isNewUserStudent) {
-          // Teacher is calling the new student
+        if (isMeTeacher && !isRemoteTeacher(role)) {
           setTimeout(() => createPeerConnection(userId, true), 100);
         }
       },
     );
 
-    // --- 2. PARTICIPANTS LIST LOGIC ---
     socket.current.on("participants-list", ({ participants }) => {
       const otherParticipants = participants.filter(
         (p) => p.userId !== currentUser._id,
@@ -184,68 +178,59 @@ const LiveClassroom = () => {
       setLoading(false);
       setConnectionState("connected");
 
-      // 🔥 FIX 2: ONLY TEACHER INITIATES CALLS TO EXISTING STUDENTS
-      const isMeTeacher =
-        currentUser?.role?.toLowerCase() === "teacher" ||
-        currentUser?.role?.toLowerCase() === "admin";
-
       if (isMeTeacher) {
         otherParticipants.forEach((p) => {
-          const isPeerStudent =
-            p.role?.toLowerCase() !== "teacher" &&
-            p.role?.toLowerCase() !== "admin";
-          if (isPeerStudent) {
+          if (!isRemoteTeacher(p.role)) {
             setTimeout(() => createPeerConnection(p.userId, true), 100);
           }
         });
       }
     });
 
-    // --- 3. WEBRTC OFFER RECEIVER LOGIC ---
     socket.current.on(
       "webrtc-offer",
       async ({ offer, fromUserId, fromUserRole }) => {
-        // 🔥 FIX 3: STUDENT ACCEPTS THE CALL FROM TEACHER
-        const isMeStudent =
-          currentUser?.role?.toLowerCase() !== "teacher" &&
-          currentUser?.role?.toLowerCase() !== "admin";
-        const isFromTeacher =
-          fromUserRole?.toLowerCase() === "teacher" ||
-          fromUserRole?.toLowerCase() === "admin";
+        const shouldAccept = isMeTeacher
+          ? !isRemoteTeacher(fromUserRole)
+          : isRemoteTeacher(fromUserRole);
+        if (!shouldAccept) return;
 
-        // Sirf tabhi accept karein jab Student ko Teacher call kare (ya Teacher ko Screen share karni ho)
-        if (isMeStudent && !isFromTeacher) return;
-
-        if (peersRef.current[fromUserId])
-          peersRef.current[fromUserId].destroy();
-        createPeerConnection(fromUserId, false, offer); // isInitiator = false
+        if (
+          peersRef.current[fromUserId] &&
+          !peersRef.current[fromUserId].destroyed
+        ) {
+          peersRef.current[fromUserId].signal(offer);
+        } else {
+          createPeerConnection(fromUserId, false, offer);
+        }
       },
     );
 
-    // --- 1. WEBRTC ANSWER FIX ---
     socket.current.on("webrtc-answer", async ({ answer, fromUserId }) => {
-      const peer = peersRef.current[fromUserId];
-      // 🔥 FIX: Check if peer exists and is not destroyed
-      if (peer && !peer.destroyed) {
-        peer.signal(answer);
+      if (
+        peersRef.current[fromUserId] &&
+        !peersRef.current[fromUserId].destroyed
+      ) {
+        peersRef.current[fromUserId].signal(answer);
       }
     });
 
-    // --- 2. WEBRTC ICE CANDIDATE FIX ---
+    socket.current.on("user-video-toggled", ({ userId, isVideoOff }) => {
+      triggerUpdate();
+    });
+
     socket.current.on(
       "webrtc-ice-candidate",
       async ({ candidate, fromUserId }) => {
         const peer = peersRef.current[fromUserId];
         if (peer && !peer.destroyed) {
-          // 🔥 FIX: Removed extra {} wrappers around candidate
           peer.signal(candidate);
         }
       },
     );
 
-    // Screen Share Approval & Pipeline Events
     socket.current.on("screen-share-requested", ({ studentId, fullname }) => {
-      if (currentUser?.role === "teacher") {
+      if (isMeTeacher) {
         setScreenShareRequests((prev) => {
           if (prev.find((req) => req.studentId === studentId)) return prev;
           return [...prev, { studentId, fullname }];
@@ -260,16 +245,22 @@ const LiveClassroom = () => {
     socket.current.on(
       "screen-share-offer",
       async ({ offer, fromUserId, fromUserRole }) => {
-        const shouldAccept =
-          currentUser?.role === "teacher"
-            ? fromUserRole === "student"
-            : fromUserRole === "teacher";
+        const shouldAccept = isMeTeacher
+          ? !isRemoteTeacher(fromUserRole)
+          : isRemoteTeacher(fromUserRole);
         if (!shouldAccept) return;
-        createScreenSharePeerConnection(fromUserId, false, offer);
+
+        if (
+          screenSharePeersRef.current[fromUserId] &&
+          !screenSharePeersRef.current[fromUserId].destroyed
+        ) {
+          screenSharePeersRef.current[fromUserId].signal(offer);
+        } else {
+          createScreenSharePeerConnection(fromUserId, false, offer);
+        }
       },
     );
 
-    // --- 3. SCREEN SHARE ANSWER FIX ---
     socket.current.on("screen-share-answer", async ({ answer, fromUserId }) => {
       const peer = screenSharePeersRef.current[fromUserId];
       if (peer && !peer.destroyed) {
@@ -277,13 +268,11 @@ const LiveClassroom = () => {
       }
     });
 
-    // --- 4. SCREEN SHARE ICE CANDIDATE FIX ---
     socket.current.on(
       "screen-share-ice-candidate",
       async ({ candidate, fromUserId }) => {
         const peer = screenSharePeersRef.current[fromUserId];
         if (peer && !peer.destroyed) {
-          // 🔥 FIX: Removed extra {} wrappers
           peer.signal(candidate);
         }
       },
@@ -315,7 +304,7 @@ const LiveClassroom = () => {
     );
     socket.current.on(
       "all-muted",
-      () => currentUser?.role === "student" && handleRemoteMuteAction(true),
+      () => !isMeTeacher && handleRemoteMuteAction(true),
     );
   };
 
@@ -334,17 +323,15 @@ const LiveClassroom = () => {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
-          { urls: "stun:global.stun.twilio.com:3478" }, // Robust mobile fallback
+          { urls: "stun:global.stun.twilio.com:3478" },
         ],
       },
     });
 
-    // 🔥 FIX 2: TRACK SUCCESSFUL TUNNEL CONNECTION
     peer.on("connect", () => {
       setPeerStatus((prev) => ({ ...prev, [remoteUserId]: "connected" }));
     });
 
-    // 🔥 FIX 3: PREVENT SIGNALING PAYLOAD CRASHES
     peer.on("signal", (data) => {
       if (data.type === "offer") {
         socket.current?.emit("webrtc-offer", {
@@ -368,6 +355,11 @@ const LiveClassroom = () => {
     });
 
     peer.on("stream", (remoteStream) => {
+      remoteStreamsRef.current[remoteUserId] = remoteStream;
+      triggerUpdate();
+    });
+
+    peer.on("track", (track, remoteStream) => {
       remoteStreamsRef.current[remoteUserId] = remoteStream;
       triggerUpdate();
     });
@@ -415,12 +407,11 @@ const LiveClassroom = () => {
     screenSharePeersRef.current[remoteUserId] = peer;
   };
 
-  // Modified Screen Share Entry Point
   const toggleScreenShare = () => {
     if (isScreenSharing) {
       stopScreenShareProcess();
     } else {
-      if (currentUser?.role === "student") {
+      if (!isMeTeacher) {
         socket.current.emit("request-screen-share", {
           sessionId,
           userId: currentUser._id,
@@ -462,9 +453,7 @@ const LiveClassroom = () => {
 
       participants
         .filter((p) =>
-          currentUser?.role === "teacher"
-            ? p.role === "student"
-            : p.role === "teacher",
+          isMeTeacher ? !isRemoteTeacher(p.role) : isRemoteTeacher(p.role),
         )
         .forEach((p) => createScreenSharePeerConnection(p.userId, true));
 
@@ -474,7 +463,6 @@ const LiveClassroom = () => {
     }
   };
 
-  // Teacher Modals for Approval
   const approveScreenShare = (studentId) => {
     socket.current.emit("approve-screen-share", { sessionId, studentId });
     setScreenShareRequests((prev) =>
@@ -503,6 +491,7 @@ const LiveClassroom = () => {
   };
 
   const cleanup = () => {
+    if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
     if (localStreamRef.current)
       localStreamRef.current.getTracks().forEach((t) => t.stop());
     if (screenShareStreamRef.current)
@@ -521,9 +510,8 @@ const LiveClassroom = () => {
     navigate("/lms/classroom-sessions");
   };
 
-  // Chat Form Fix
   const sendChatMessage = (e) => {
-    e.preventDefault(); // 🔥 FIX: Prevents page reload on chat submission
+    e.preventDefault();
     if (!chatInput.trim()) return;
     const messageData = {
       sessionId,
@@ -546,8 +534,7 @@ const LiveClassroom = () => {
 
   return (
     <div className="bg-white dark:bg-gray-800 text-black dark:text-white flex flex-col min-h-screen">
-      {/* Teacher Screen Share Notifications Overlay */}
-      {currentUser?.role === "teacher" && screenShareRequests.length > 0 && (
+      {isMeTeacher && screenShareRequests.length > 0 && (
         <div className="fixed top-20 right-4 z-[99] flex flex-col gap-2">
           {screenShareRequests.map((req) => (
             <div
@@ -576,11 +563,10 @@ const LiveClassroom = () => {
         </div>
       )}
 
-      {/* Header Pipeline - Student Clean View */}
       <div className="px-6 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-sm font-bold">Session: {session?.batch?.name}</h1>
         <div className="flex items-center gap-4">
-          {currentUser?.role === "teacher" && (
+          {isMeTeacher && (
             <span className="text-sm font-semibold bg-gray-100 dark:bg-gray-900 px-3 py-1 rounded-lg">
               Active Members:{" "}
               <span className="text-blue-500">{participants.length + 1}</span>
@@ -622,9 +608,9 @@ const LiveClassroom = () => {
               const userId = key.replace("screen-", "");
               const participant = participants.find((p) => p.userId === userId);
               if (!participant) return false;
-              return currentUser?.role === "teacher"
-                ? participant.role === "student"
-                : participant.role === "teacher";
+              return isMeTeacher
+                ? !isRemoteTeacher(participant.role)
+                : isRemoteTeacher(participant.role);
             })
             .map((key) => (
               <div
@@ -661,12 +647,11 @@ const LiveClassroom = () => {
               </div>
             )}
 
-            {/* 🔥 FIX 4: SMART ROLE FILTER (Case-Insensitive) */}
             {participants
               .filter((p) =>
-                currentUser?.role === "teacher"
-                  ? p.role === "student"
-                  : p.role === "teacher",
+                isMeTeacher
+                  ? !isRemoteTeacher(p.role)
+                  : isRemoteTeacher(p.role),
               )
               .map((p) => (
                 <div
@@ -679,7 +664,6 @@ const LiveClassroom = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : peerStatus[p.userId] === "connected" ? (
-                    // 🔥 FIX 4: SHOW THIS IF CONNECTED BUT NO CAMERA/MIC
                     <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
                       <div className="h-16 w-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2 shadow-inner uppercase">
                         {p.fullname.charAt(0)}
@@ -689,7 +673,6 @@ const LiveClassroom = () => {
                       </span>
                     </div>
                   ) : (
-                    // SHOW SPINNER ONLY WHILE ESTABLISHING TUNNEL
                     <div className="w-full h-full flex flex-col items-center justify-center text-xs text-blue-400 bg-gray-900">
                       <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mb-2"></span>
                       Connecting Securely...
