@@ -114,6 +114,15 @@ const LiveClassroom = () => {
     return () => cleanup();
   }, [sessionId]);
 
+  useEffect(() => {
+    if (localStreamRef.current && localVideoRef.current) {
+      localVideoRef.current.srcObject = localStreamRef.current;
+      localVideoRef.current
+        .play()
+        .catch((err) => console.error("Video play error:", err));
+    }
+  }, [localStreamRef.current]);
+
   const initializeClassroom = async () => {
     try {
       setConnectionState("connecting");
@@ -140,8 +149,6 @@ const LiveClassroom = () => {
         );
 
       localStreamRef.current = stream;
-      if (stream && localVideoRef.current)
-        localVideoRef.current.srcObject = stream;
 
       const role = currentUser?.role || "student";
       socket.current.emit("join-classroom", { sessionId, role });
