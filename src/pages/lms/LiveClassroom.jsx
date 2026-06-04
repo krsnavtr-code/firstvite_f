@@ -168,7 +168,13 @@ const LiveClassroom = () => {
             : [...prev, { userId, role, fullname, joinedAt: timestamp }],
         );
 
-        setTimeout(() => createPeerConnection(userId, true), 100);
+        const shouldConnect =
+          currentUser?.role === "teacher"
+            ? role === "student"
+            : role === "teacher";
+        if (shouldConnect) {
+          setTimeout(() => createPeerConnection(userId, true), 100);
+        }
       },
     );
 
@@ -181,14 +187,30 @@ const LiveClassroom = () => {
       setConnectionState("connected");
 
       otherParticipants.forEach((p) => {
-        setTimeout(() => createPeerConnection(p.userId, true), 100);
+        const shouldConnect =
+          currentUser?.role === "teacher"
+            ? p.role === "student"
+            : p.role === "teacher";
+        if (shouldConnect) {
+          setTimeout(() => createPeerConnection(p.userId, true), 100);
+        }
       });
     });
 
-    socket.current.on("webrtc-offer", async ({ offer, fromUserId }) => {
-      if (peersRef.current[fromUserId]) peersRef.current[fromUserId].destroy();
-      createPeerConnection(fromUserId, false, offer);
-    });
+    socket.current.on(
+      "webrtc-offer",
+      async ({ offer, fromUserId, fromUserRole }) => {
+        const shouldAccept =
+          currentUser?.role === "teacher"
+            ? fromUserRole === "student"
+            : fromUserRole === "teacher";
+        if (!shouldAccept) return;
+
+        if (peersRef.current[fromUserId])
+          peersRef.current[fromUserId].destroy();
+        createPeerConnection(fromUserId, false, offer);
+      },
+    );
 
     socket.current.on("webrtc-answer", async ({ answer, fromUserId }) => {
       peersRef.current[fromUserId]?.signal(answer);
@@ -201,8 +223,17 @@ const LiveClassroom = () => {
       },
     );
 
-    socket.current.on("screen-share-offer", async ({ offer, fromUserId }) =>
-      createScreenSharePeerConnection(fromUserId, false, offer),
+    socket.current.on(
+      "screen-share-offer",
+      async ({ offer, fromUserId, fromUserRole }) => {
+        const shouldAccept =
+          currentUser?.role === "teacher"
+            ? fromUserRole === "student"
+            : fromUserRole === "teacher";
+        if (!shouldAccept) return;
+
+        createScreenSharePeerConnection(fromUserId, false, offer);
+      },
     );
     socket.current.on("screen-share-answer", async ({ answer, fromUserId }) =>
       screenSharePeersRef.current[fromUserId]?.signal(answer),
@@ -347,9 +378,13 @@ const LiveClassroom = () => {
           stream.getVideoTracks()[0].contentHint = "detail";
         screenShareStreamRef.current = stream;
         setIsScreenSharing(true);
-        participants.forEach((p) =>
-          createScreenSharePeerConnection(p.userId, true),
-        );
+        participants
+          .filter((p) =>
+            currentUser?.role === "teacher"
+              ? p.role === "student"
+              : p.role === "teacher",
+          )
+          .forEach((p) => createScreenSharePeerConnection(p.userId, true));
         stream.getVideoTracks()[0].onended = () => toggleScreenShare();
       } catch (err) {
         console.error(err);
@@ -452,6 +487,14 @@ const LiveClassroom = () => {
 
           {Object.keys(remoteStreamsRef.current)
             .filter((k) => k.startsWith("screen-"))
+            .filter((key) => {
+              const userId = key.replace("screen-", "");
+              const participant = participants.find((p) => p.userId === userId);
+              if (!participant) return false;
+              return currentUser?.role === "teacher"
+                ? participant.role === "student"
+                : participant.role === "teacher";
+            })
             .map((key) => (
               <div
                 key={key}
@@ -487,26 +530,32 @@ const LiveClassroom = () => {
               </div>
             )}
 
-            {participants.map((p) => (
-              <div
-                key={p.userId}
-                className="relative rounded-xl overflow-hidden aspect-video bg-gray-900"
-              >
-                {remoteStreamsRef.current[p.userId] ? (
-                  <VideoRenderer
-                    stream={remoteStreamsRef.current[p.userId]}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
-                    Connecting...
+            {participants
+              .filter((p) =>
+                currentUser?.role === "teacher"
+                  ? p.role === "student"
+                  : p.role === "teacher",
+              )
+              .map((p) => (
+                <div
+                  key={p.userId}
+                  className="relative rounded-xl overflow-hidden aspect-video bg-gray-900"
+                >
+                  {remoteStreamsRef.current[p.userId] ? (
+                    <VideoRenderer
+                      stream={remoteStreamsRef.current[p.userId]}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                      Connecting...
+                    </div>
+                  )}
+                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                    {p.fullname}
                   </div>
-                )}
-                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                  {p.fullname}
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
 
