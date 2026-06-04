@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 const ChatPanel = ({
   showChat,
@@ -9,6 +9,17 @@ const ChatPanel = ({
   sendChatMessage,
   currentUserId,
 }) => {
+  // 🔥 Naya Feature: Chat me naya message aane par auto-scroll
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages, showChat]);
+
   if (!showChat) return null;
 
   return (
@@ -25,43 +36,81 @@ const ChatPanel = ({
           onClick={() => setShowChat(false)}
           className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+            />
           </svg>
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30 dark:bg-gray-950/10">
+      <div className="flex-1 overflow-y-auto p-4 bg-gray-50/30 dark:bg-gray-950/10">
         {chatMessages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6">
-            <p className="text-xs text-gray-400">No messages yet. Say hello to the class!</p>
+            <p className="text-xs text-gray-400">
+              No messages yet. Say hello to the class!
+            </p>
           </div>
         ) : (
-          chatMessages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex flex-col ${msg.sender === currentUserId ? "items-end" : "items-start"}`}
-            >
-              <span className="text-[10px] mb-1 px-1 text-gray-500 dark:text-gray-400 font-medium">
-                {msg.sender === currentUserId ? "You" : msg.senderFullname}
-              </span>
+          chatMessages.map((msg, idx) => {
+            // 🔥 LOGIC: Check agar pichla message bhi isi user ne bheja tha
+            const isConsecutive =
+              idx > 0 && chatMessages[idx - 1].sender === msg.sender;
+
+            return (
               <div
-                className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm shadow-sm leading-relaxed ${
-                  msg.sender === currentUserId
-                    ? "bg-blue-600 text-white rounded-tr-none"
-                    : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700/50 rounded-tl-none"
-                }`}
+                key={idx}
+                className={`flex flex-col ${
+                  msg.sender === currentUserId ? "items-end" : "items-start"
+                } ${isConsecutive ? "mt-1" : "mt-4"} ${idx === 0 ? "!mt-0" : ""}`}
               >
-                {msg.message}
+                {/* Agar lagataar message nahi hai, tabhi naam dikhao */}
+                {!isConsecutive && (
+                  <span className="text-[10px] mb-1 px-1 text-gray-500 dark:text-gray-400 font-medium">
+                    {msg.sender === currentUserId ? "You" : msg.senderFullname}
+                  </span>
+                )}
+                <div
+                  className={`max-w-[85%] px-3 py-2 text-sm shadow-sm leading-relaxed ${
+                    msg.sender === currentUserId
+                      ? "bg-blue-600 text-white"
+                      : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700/50"
+                  } ${
+                    // Chat Bubble Corners Logic (WhatsApp jaisa)
+                    isConsecutive
+                      ? msg.sender === currentUserId
+                        ? "rounded-2xl rounded-tr-sm"
+                        : "rounded-2xl rounded-tl-sm"
+                      : msg.sender === currentUserId
+                        ? "rounded-2xl rounded-tr-none"
+                        : "rounded-2xl rounded-tl-none"
+                  }`}
+                >
+                  {msg.message}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
+        {/* Niche scroll karne ke liye invisible div */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Form */}
-      <form onSubmit={sendChatMessage} className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <form
+        onSubmit={sendChatMessage}
+        className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+      >
         <div className="relative flex items-center">
           <input
             type="text"
@@ -73,10 +122,21 @@ const ChatPanel = ({
           <button
             type="submit"
             disabled={!chatInput.trim()}
-            className="absolute right-1.5 p-1.5 bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-gray-800 text-white rounded-lg"
+            className="absolute right-1.5 p-1.5 bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-gray-800 text-white rounded-lg transition-all"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+              />
             </svg>
           </button>
         </div>
