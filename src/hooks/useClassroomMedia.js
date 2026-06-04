@@ -1,10 +1,13 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 
-export const useClassroomMedia = (socket, sessionId, peersRef) => {
+export const useClassroomMedia = (
+  socket,
+  sessionId,
+  peersRef,
+  localStreamRef,
+) => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-
-  const localStreamRef = useRef(null);
 
   const toggleAudio = () => {
     if (localStreamRef.current) {
@@ -80,7 +83,6 @@ export const useClassroomMedia = (socket, sessionId, peersRef) => {
   };
 
   return {
-    localStreamRef,
     isAudioEnabled,
     isVideoEnabled,
     toggleAudio,

@@ -20,6 +20,7 @@ const LiveClassroom = () => {
 
   const socket = useRef(null);
   const localVideoRef = useRef(null);
+  const localStreamRef = useRef(null);
   const screenShareContainerRef = useRef(null);
   const remoteScreenContainerRef = useRef(null);
   const peersRef = useRef({});
@@ -49,13 +50,12 @@ const LiveClassroom = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const {
-    localStreamRef,
     isAudioEnabled,
     isVideoEnabled,
     toggleAudio,
     toggleVideo,
     handleRemoteMuteAction,
-  } = useClassroomMedia(socket, sessionId, peersRef);
+  } = useClassroomMedia(socket, sessionId, peersRef, localStreamRef);
 
   const triggerUpdate = useCallback(() => {
     forceUpdateRef.current += 1;
