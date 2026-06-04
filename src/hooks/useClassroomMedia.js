@@ -29,14 +29,11 @@ export const useClassroomMedia = (
 
       if (currentState) {
         try {
-          // Camera on karne ki koshish (Check karein kya pehle se track hai)
-          let videoTrack = localStreamRef.current.getVideoTracks()[0];
-          
-          if (videoTrack && videoTrack.readyState === "live") {
-            // Agar track exist karta hai aur zinda hai, toh bas enable kardo
-            videoTrack.enabled = true;
+          let oldVideoTrack = localStreamRef.current.getVideoTracks()[0];
+
+          if (oldVideoTrack && oldVideoTrack.readyState === "live") {
+            oldVideoTrack.enabled = true;
           } else {
-            // Agar track stop ho chuka tha ya permission hi nahi di thi, naya laao
             const newStream = await navigator.mediaDevices.getUserMedia({
               video: {
                 facingMode: "user",
@@ -46,44 +43,41 @@ export const useClassroomMedia = (
               audio: false,
             });
             const newVideoTrack = newStream.getVideoTracks()[0];
-            
-            // Purana band ya kharab track remove kardo
-            if (videoTrack) {
-                localStreamRef.current.removeTrack(videoTrack);
+
+            if (oldVideoTrack) {
+              localStreamRef.current.removeTrack(oldVideoTrack);
             }
-            // Naya fresh track local stream me add kardo
             localStreamRef.current.addTrack(newVideoTrack);
 
-            // 🔥 FIX: Check karein ki peer pipeline me replace karna hai ya add
+            // 🔥 FIX: Correctly replacing the SENT track, NOT the received track
             Object.values(peersRef.current).forEach((peer) => {
-              if (peer && !peer.destroyed && peer.streams[0]) {
-                const oldPeerTrack = peer.streams[0].getVideoTracks()[0];
-                
-                if (oldPeerTrack) {
-                  // Agar WebRTC connection pipeline me track tha, toh safely replace karo
+              if (peer && !peer.destroyed) {
+                if (oldVideoTrack) {
                   try {
-                    peer.replaceTrack(oldPeerTrack, newVideoTrack, peer.streams[0]);
+                    // 1st arg: purana bheja hua track, 2nd: Naya track, 3rd: Humari local stream
+                    peer.replaceTrack(
+                      oldVideoTrack,
+                      newVideoTrack,
+                      localStreamRef.current,
+                    );
                   } catch (e) {
-                    // Fallback for "Cannot replace track that was never added"
-                    peer.addTrack(newVideoTrack, peer.streams[0]);
+                    peer.addTrack(newVideoTrack, localStreamRef.current);
                   }
                 } else {
-                  // Agar pipeline me track gaya hi nahi tha, toh seedhe naya add karo
-                  peer.addTrack(newVideoTrack, peer.streams[0]);
+                  peer.addTrack(newVideoTrack, localStreamRef.current);
                 }
               }
             });
           }
         } catch (err) {
           console.error("[VIDEO HOOK ERROR] Cannot enable camera:", err);
-          return; // Early exit so state doesnt update if camera fails
+          return;
         }
       } else {
-        // Camera band karne par
         localStreamRef.current.getVideoTracks().forEach((track) => {
-          track.enabled = false; // Soft stop (maintain track object to avoid replaceTrack error later)
+          track.enabled = false;
           setTimeout(() => {
-              track.stop(); // Hard stop hardware light after a delay
+            track.stop();
           }, 100);
         });
       }
@@ -91,7 +85,7 @@ export const useClassroomMedia = (
       setIsVideoEnabled(currentState);
       socket.current?.emit("toggle-video", {
         sessionId,
-        isVideoOff: !currentState,
+        isVideoOff: !currentState, // false means video is ON, true means OFF
       });
     }
   };

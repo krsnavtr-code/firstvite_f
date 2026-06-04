@@ -39,6 +39,8 @@ const LiveClassroom = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
 
+  const [remoteVideoStates, setRemoteVideoStates] = useState({}); // Track who turned off camera
+
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [screenShareRequests, setScreenShareRequests] = useState([]);
   const [isHandRaised, setIsHandRaised] = useState(false);
@@ -216,6 +218,7 @@ const LiveClassroom = () => {
     });
 
     socket.current.on("user-video-toggled", ({ userId, isVideoOff }) => {
+      setRemoteVideoStates((prev) => ({ ...prev, [userId]: isVideoOff }));
       triggerUpdate();
     });
 
@@ -632,45 +635,40 @@ const LiveClassroom = () => {
             ))}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* LOCAL VIDEO (Your View) */}
             {!isScreenSharing && (
               <div className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm">
-                <video
-                  ref={localVideoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover"
-                />
+                {isVideoEnabled ? (
+                  <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
+                    <div className="h-16 w-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2 shadow-inner uppercase">
+                      {currentUser?.fullname.charAt(0)}
+                    </div>
+                    <span className="text-xs text-gray-400">Camera Off</span>
+                  </div>
+                )}
                 <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
                   You
                 </div>
               </div>
             )}
 
+            {/* REMOTE VIDEOS (Students/Teacher View) */}
             {participants
-              .filter((p) =>
-                isMeTeacher
-                  ? !isRemoteTeacher(p.role)
-                  : isRemoteTeacher(p.role),
-              )
+              .filter((p) => isMeTeacher ? !isRemoteTeacher(p.role) : isRemoteTeacher(p.role))
               .map((p) => (
-                <div
-                  key={p.userId}
-                  className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm"
-                >
-                  {remoteStreamsRef.current[p.userId] ? (
-                    <VideoRenderer
-                      stream={remoteStreamsRef.current[p.userId]}
-                      className="w-full h-full object-cover"
-                    />
+                <div key={p.userId} className="relative rounded-xl overflow-hidden aspect-video bg-gray-900 border border-gray-800 shadow-sm">
+                  
+                  {remoteStreamsRef.current[p.userId] && !remoteVideoStates[p.userId] ? (
+                    <VideoRenderer stream={remoteStreamsRef.current[p.userId]} className="w-full h-full object-cover" />
                   ) : peerStatus[p.userId] === "connected" ? (
+                    // 🔥 SHOW THIS WHEN CAMERA IS TURNED OFF BY THE USER
                     <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
                       <div className="h-16 w-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2 shadow-inner uppercase">
                         {p.fullname.charAt(0)}
                       </div>
-                      <span className="text-xs text-gray-400">
-                        Mic / Cam Off
-                      </span>
+                      <span className="text-xs text-gray-400">Camera Off</span>
                     </div>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-xs text-blue-400 bg-gray-900">
@@ -678,6 +676,7 @@ const LiveClassroom = () => {
                       Connecting Securely...
                     </div>
                   )}
+
                   <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
                     {p.fullname}
                   </div>
