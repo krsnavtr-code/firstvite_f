@@ -73,7 +73,7 @@ const CustomEmailSender = () => {
     </div>
     
     <div style="text-align: center; margin: 30px 0;">
-      <a href="https://www.eklabya.com//register" 
+      <a href="https://www.eklabya.com/register" 
          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                 color: white; 
                 padding: 12px 30px; 
