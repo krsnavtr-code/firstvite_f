@@ -48,6 +48,7 @@ import PaymentDetails from "./pages/admin/PaymentDetails";
 import SendBrochure from "./pages/admin/SendBrochure";
 import SendProposal from "./pages/admin/SendProposal";
 import EmailRecords from "./pages/admin/EmailRecords";
+import CustomEmailSender from "./pages/admin/CustomEmailSender";
 import TestQAPage from "./pages/admin/TestQAPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
@@ -529,6 +530,7 @@ function App() {
             <Route path="/admin/email-records" element={<EmailRecords />} />
             <Route path="/admin/send-brochure" element={<SendBrochure />} />
             <Route path="/admin/send-proposal" element={<SendProposal />} />
+            <Route path="/admin/custom-email" element={<CustomEmailSender />} />
 
             {/* LMS Routes */}
             <Route path="/admin/lms-management" element={<LmsManagement />} />
