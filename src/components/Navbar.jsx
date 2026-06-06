@@ -54,6 +54,8 @@ function Navbar() {
   const searchContainerRef = useRef(null);
   const profileMenuRef = useRef(null);
   const paymentDropdownRef = useRef(null);
+  const mobileProfileMenuRef = useRef(null);
+  const mobilePaymentDropdownRef = useRef(null);
 
   // --- Effects ---
   useEffect(() => {
@@ -70,18 +72,26 @@ function Navbar() {
   // Click Outside Handler
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        profileMenuRef.current &&
-        !profileMenuRef.current.contains(event.target)
-      ) {
+      const isInsideProfileMenu =
+        (profileMenuRef.current &&
+          profileMenuRef.current.contains(event.target)) ||
+        (mobileProfileMenuRef.current &&
+          mobileProfileMenuRef.current.contains(event.target));
+
+      const isInsidePaymentDropdown =
+        (paymentDropdownRef.current &&
+          paymentDropdownRef.current.contains(event.target)) ||
+        (mobilePaymentDropdownRef.current &&
+          mobilePaymentDropdownRef.current.contains(event.target));
+
+      if (!isInsideProfileMenu) {
         setIsProfileMenuOpen(false);
       }
-      if (
-        paymentDropdownRef.current &&
-        !paymentDropdownRef.current.contains(event.target)
-      ) {
+
+      if (!isInsidePaymentDropdown) {
         setShowPaymentDropdown(false);
       }
+
       if (
         searchContainerRef.current &&
         !searchContainerRef.current.contains(event.target)
@@ -350,7 +360,8 @@ function Navbar() {
                 to="/login"
                 className="flex items-center gap-1 text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors"
               >
-                <FaSignInAlt size={10} />Login
+                <FaSignInAlt size={10} />
+                Login
               </Link>
             )}
           </div>
@@ -381,7 +392,7 @@ function Navbar() {
             <div className="h-3 w-px bg-gray-700"></div>
 
             {/* Payment Dropdown (Small Version) */}
-            <div className="relative" ref={paymentDropdownRef}>
+            <div className="relative" ref={mobilePaymentDropdownRef}>
               <button
                 onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
                 className="flex items-center gap-1 hover:text-white transition-colors"
@@ -450,7 +461,7 @@ function Navbar() {
 
             {/* Auth Section */}
             {isAuthenticated ? (
-              <div className="relative" ref={profileMenuRef}>
+              <div className="relative" ref={mobileProfileMenuRef}>
                 <button
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center gap-2 hover:text-white font-semibold"
@@ -501,7 +512,8 @@ function Navbar() {
                 to="/login"
                 className="flex items-center gap-1 text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors"
               >
-                <FaSignInAlt size={10} /> <span className="hidden md:inline">Login</span>
+                <FaSignInAlt size={10} />{" "}
+                <span className="hidden md:inline">Login</span>
               </Link>
             )}
           </div>
@@ -734,7 +746,7 @@ function Navbar() {
           )}
 
           {/* Small Screen Payment option */}
-          <div className="mb-1" ref={paymentDropdownRef}>
+          <div className="mb-1" ref={mobilePaymentDropdownRef}>
             <button
               onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
               className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
