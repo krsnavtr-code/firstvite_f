@@ -19,7 +19,7 @@ function Footer() {
       courses: [
         {
           name: "LLMOps Large Language Model Operations",
-          url: "https://www.eklabya.com/course/llmops-large-language-model-operations-mastery",
+          url: "https://www.eklabya.com/course/large-language-model-operations",
         },
         {
           name: "Machine Learning & AI Certification",
@@ -27,15 +27,15 @@ function Footer() {
         },
         {
           name: "MLOps Certification Training",
-          url: "https://www.eklabya.com/course/mlops-machine-learning-operations-certification-training",
+          url: "https://www.eklabya.com/course/machine-learning-operations-training",
         },
         {
           name: "Data Science & Analytics Certification",
-          url: "https://www.eklabya.com/course/data-science-data-analytics-certification-training",
+          url: "https://www.eklabya.com/course/data-science-and-data-analytics-course",
         },
         {
           name: "Data Science Eklabya Program",
-          url: "https://www.eklabya.com/course/data-science-data-analytics-certification-eklabya-program",
+          url: "https://www.eklabya.com/course/data-analytics-certification-program",
         },
       ],
     },
@@ -44,23 +44,23 @@ function Footer() {
       courses: [
         {
           name: "SAP ABAP Certification Training",
-          url: "https://www.eklabya.com/course/sap-abap-certification-training-syntax-s4hana",
+          url: "https://www.eklabya.com/course/sap-abap-certification-training",
         },
         {
           name: "SAP FICO Financial Accounting",
-          url: "https://www.eklabya.com/course/sap-fico-financial-accounting-management-certification",
+          url: "https://www.eklabya.com/course/sap-fico-online-training",
         },
         {
           name: "SAP PP Production Planning",
-          url: "https://www.eklabya.com/course/sap-pp-production-planning-certification-training",
+          url: "https://www.eklabya.com/course/sap-pp-online-traning",
         },
         {
           name: "SAP SD Sales & Distribution",
-          url: "https://www.eklabya.com/course/sap-sd-sales-and-distribution-certification-training",
+          url: "https://www.eklabya.com/course/sap-sd-certification-training",
         },
         {
           name: "SAP MM Materials Management",
-          url: "https://www.eklabya.com/course/sap-mm-materials-management-certification-training",
+          url: "https://www.eklabya.com/course/sap-mm-online-training",
         },
       ],
     },
@@ -95,18 +95,6 @@ function Footer() {
           name: "Core Java Professional Training",
           url: "https://www.eklabya.com/course/core-java-mastery-professional-training",
         },
-        // {
-        //   name: "React.js Professional Frontend",
-        //   url: "https://www.eklabya.com/course/react-js-mastery-professional-frontend",
-        // },
-        // {
-        //   name: "Python Full Stack Django",
-        //   url: "https://www.eklabya.com/course/python-full-stack-developer-django-mastery",
-        // },
-        // {
-        //   name: "Backend Development Node Express",
-        //   url: "https://www.eklabya.com/course/backend-development-mastery-node-express",
-        // },
       ],
     },
     {
@@ -134,28 +122,12 @@ function Footer() {
         },
         {
           name: "Frontend Mastery HTML CSS JS React",
-          url: "https://www.eklabya.com/course/frontend-web-development-mastery-html-css-js-react",
+          url: "https://www.eklabya.com/course/frontend-web-development",
         },
         {
           name: "Microsoft .NET Full Stack",
           url: "https://www.eklabya.com/course/microsoft-dotnet-full-stack-developer-mastery",
         },
-        // {
-        //   name: "React Full Stack MERN Mastery",
-        //   url: "https://www.eklabya.com/course/react-full-stack-mern-mastery",
-        // },
-        // {
-        //   name: "Django Full Stack Mastery",
-        //   url: "https://www.eklabya.com/course/django-full-stack-developer-mastery",
-        // },
-        // {
-        //   name: "Java Full Stack DSA AI",
-        //   url: "https://www.eklabya.com/course/java-full-stack-dsa-ai-mastery",
-        // },
-        // {
-        //   name: "PHP Full Stack Laravel",
-        //   url: "https://www.eklabya.com/course/php-full-stack-developer-mastery-laravel",
-        // },
       ],
     },
   ];
@@ -171,9 +143,7 @@ function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {courseCategories.map((category, index) => (
               <div key={index}>
-                <h4 className="text-sm font-semibold mb-4">
-                  {category.title}
-                </h4>
+                <h4 className="text-sm font-semibold mb-4">{category.title}</h4>
                 <ul className="space-y-2">
                   {category.courses.map((course, courseIndex) => (
                     <li key={courseIndex}>
