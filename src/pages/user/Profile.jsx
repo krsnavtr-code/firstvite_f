@@ -149,7 +149,7 @@ const Profile = () => {
 
   const ProfileInput = ({ icon, label, name, type = "text", disabled }) => (
     <div className="relative group">
-      <label className="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">
+      <label className="block text-sm font-semibold mb-1.5 ml-1">
         {label}
       </label>
       <div className="relative">
@@ -165,8 +165,8 @@ const Profile = () => {
           className={`w-full pl-10 pr-4 py-2.5 rounded-lg border transition-all duration-200 
             ${
               !isEditing
-                ? "bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-white border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                ? "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 cursor-not-allowed"
+                : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
             }`}
         />
       </div>
@@ -187,15 +187,15 @@ const Profile = () => {
   // --- Main Render ---
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-12">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-900 pb-12 text-gray-900 dark:text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold">
               Account Overview
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="mt-1">
               Manage your personal information and learning progress
             </p>
           </div>
@@ -430,9 +430,9 @@ const Profile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Personal Info Form */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-8">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-8">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold">
                   Personal Details
                 </h3>
                 <button
@@ -509,7 +509,7 @@ const Profile = () => {
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center gap-2 mb-2">
               <BookOutlined className="text-xl text-indigo-600" />
-              <h2 className="text-xl font-bold text-gray-900">My Learning</h2>
+              <h2 className="text-xl font-bold">My Learning</h2>
             </div>
 
             {loading ? (
@@ -527,10 +527,10 @@ const Profile = () => {
                     <div
                       key={enrollment._id}
                       onClick={() => handleCourseClick(course._id)}
-                      className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col h-full"
+                      className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col h-full"
                     >
                       {/* Thumbnail */}
-                      <div className="relative h-48 bg-gray-100 overflow-hidden">
+                      <div className="relative h-48 bg-gray-100 dark:bg-gray-700 overflow-hidden">
                         {course.thumbnail ? (
                           <img
                             src={course.thumbnail}
@@ -587,9 +587,9 @@ const Profile = () => {
               </div>
             ) : (
               /* Empty State for Courses */
-              <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
-                <BookOutlined className="text-4xl text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 p-12 text-center">
+                <BookOutlined className="text-4xl text-gray-300 dark:text-gray-600 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   No courses yet
                 </h3>
                 <p className="text-gray-500 mt-1 mb-6">
