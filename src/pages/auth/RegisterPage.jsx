@@ -10,7 +10,7 @@ const RegisterPage = () => {
   const handleSuccess = () => {
     navigate("/login", {
       state: {
-        message: "Registration successful! Please wait for admin approval.",
+        message: "Registration successful! LogIn Now.",
       },
     });
   };
