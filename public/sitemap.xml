@@ -151,18 +151,6 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/blog/e-learning-courses-vs-traditional-learning-firstvite</loc>
-    <lastmod>2026-05-01T19:05:42.504Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.eklabya.com/blog/top-sap-certification-courses-in-2025-firstvite</loc>
-    <lastmod>2026-05-01T19:05:25.775Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://www.eklabya.com/blog/top-sap-courses-in-2025-why-sap-skills-are-in-high-demand</loc>
     <lastmod>2026-05-01T19:05:09.216Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -199,44 +187,56 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/sap-mm-materials-management-certification-training</loc>
-    <lastmod>2026-05-01T19:01:25.148Z</lastmod>
+    <loc>https://www.eklabya.com/blog/why-are-e-learning-courses-the-future-of-education</loc>
+    <lastmod>2026-05-22T11:41:45.099Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.eklabya.com/blog/best-skill-development-courses-to-boost-your-career-in-2026</loc>
+    <lastmod>2026-05-28T08:48:15.465Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.eklabya.com/course/sap-mm-online-training</loc>
+    <lastmod>2026-05-30T11:53:26.747Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/sap-sd-sales-and-distribution-certification-training</loc>
-    <lastmod>2026-05-01T19:01:12.264Z</lastmod>
+    <loc>https://www.eklabya.com/course/sap-sd-certification-training</loc>
+    <lastmod>2026-06-04T07:02:26.582Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/sap-pp-production-planning-certification-training</loc>
-    <lastmod>2026-05-01T18:59:57.105Z</lastmod>
+    <loc>https://www.eklabya.com/course/sap-pp-online-traning</loc>
+    <lastmod>2026-06-02T12:10:49.123Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/sap-fico-financial-accounting-management-certification</loc>
-    <lastmod>2026-05-01T18:59:31.593Z</lastmod>
+    <loc>https://www.eklabya.com/course/sap-fico-online-training</loc>
+    <lastmod>2026-06-02T09:40:44.764Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/mongodb-developer-administrator-certification-training</loc>
-    <lastmod>2026-05-01T18:58:58.617Z</lastmod>
+    <loc>https://www.eklabya.com/course/mongodb-training-certification</loc>
+    <lastmod>2026-06-02T11:48:37.614Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/mysql-database-development-administration-certification</loc>
-    <lastmod>2026-05-01T18:58:25.376Z</lastmod>
+    <loc>https://www.eklabya.com/course/mysql-database-development</loc>
+    <lastmod>2026-06-02T11:47:53.235Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/postgresql-advanced-database-development-administration</loc>
-    <lastmod>2026-05-01T18:58:05.801Z</lastmod>
+    <loc>https://www.eklabya.com/course/postgresql-database-certification-training</loc>
+    <lastmod>2026-06-02T11:47:21.503Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -295,14 +295,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/sap-abap-certification-training-syntax-s4hana</loc>
-    <lastmod>2026-05-01T18:57:05.722Z</lastmod>
+    <loc>https://www.eklabya.com/course/sap-abap-certification-training</loc>
+    <lastmod>2026-06-04T07:20:09.713Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/cyber-security-ethical-hacking-certification-training</loc>
-    <lastmod>2026-05-01T18:17:42.429Z</lastmod>
+    <loc>https://www.eklabya.com/course/cyber-security-and-ethical-hacking</loc>
+    <lastmod>2026-05-30T12:18:42.119Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -314,13 +314,13 @@
   </url>
   <url>
     <loc>https://www.eklabya.com/course/machine-learning-artificial-intelligence-certification</loc>
-    <lastmod>2026-05-01T17:12:21.709Z</lastmod>
+    <lastmod>2026-05-28T04:54:09.053Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/backend-development-mastery-node-express</loc>
-    <lastmod>2026-05-02T06:31:28.346Z</lastmod>
+    <loc>https://www.eklabya.com/course/backend-development-mastery</loc>
+    <lastmod>2026-06-03T09:04:29.090Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -343,8 +343,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/data-science-data-analytics-certification-training</loc>
-    <lastmod>2026-05-01T18:53:39.645Z</lastmod>
+    <loc>https://www.eklabya.com/course/data-science-and-data-analytics-course</loc>
+    <lastmod>2026-05-30T12:22:02.159Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -356,7 +356,7 @@
   </url>
   <url>
     <loc>https://www.eklabya.com/course/full-stack-web-development-mastery-mern-stack</loc>
-    <lastmod>2026-05-01T17:47:47.893Z</lastmod>
+    <lastmod>2026-06-02T07:15:05.744Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -367,14 +367,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/data-science-data-analytics-certification-eklabya-program</loc>
-    <lastmod>2026-05-01T18:53:14.908Z</lastmod>
+    <loc>https://www.eklabya.com/course/data-science-and-power-bi</loc>
+    <lastmod>2026-06-04T12:11:25.106Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/frontend-web-development-mastery-html-css-js-react</loc>
-    <lastmod>2026-04-28T09:09:36.425Z</lastmod>
+    <loc>https://www.eklabya.com/course/frontend-web-development</loc>
+    <lastmod>2026-06-03T09:02:03.159Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -385,14 +385,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/digital-marketing-strategy-mastery-certification</loc>
-    <lastmod>2026-05-02T06:06:49.826Z</lastmod>
+    <loc>https://www.eklabya.com/course/best-digital-marketing-training-centre</loc>
+    <lastmod>2026-06-02T11:49:23.636Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/artificial-intelligence-generative-ai-mastery</loc>
-    <lastmod>2026-05-01T17:10:21.867Z</lastmod>
+    <loc>https://www.eklabya.com/course/ai-generative-mastery-training</loc>
+    <lastmod>2026-06-05T06:28:30.301Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -403,20 +403,20 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/ai-powered-data-analytics-certification-training</loc>
-    <lastmod>2026-05-01T18:36:13.465Z</lastmod>
+    <loc>https://www.eklabya.com/course/ai-powered-data-analytics-training</loc>
+    <lastmod>2026-06-05T09:42:19.199Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/aws-certified-cloud-practitioner-training-program</loc>
-    <lastmod>2026-05-01T18:17:22.766Z</lastmod>
+    <loc>https://www.eklabya.com/course/aws-certified-cloud-practitioner</loc>
+    <lastmod>2026-05-30T12:12:00.905Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/aws-certified-solutions-architect-associate-training</loc>
-    <lastmod>2026-05-01T18:11:49.437Z</lastmod>
+    <loc>https://www.eklabya.com/course/aws-certified-solutions-architect-training</loc>
+    <lastmod>2026-05-30T12:11:09.905Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -427,38 +427,38 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/aws-certified-devops-engineer-professional-training</loc>
-    <lastmod>2026-05-01T17:47:34.308Z</lastmod>
+    <loc>https://www.eklabya.com/course/aws-certified-devops-online-training</loc>
+    <lastmod>2026-06-05T09:49:05.200Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/aws-solutions-architect-certification-training-saa-c03</loc>
-    <lastmod>2026-05-01T18:52:57.995Z</lastmod>
+    <loc>https://www.eklabya.com/course/aws-solutions-architect-training-saa-c03</loc>
+    <lastmod>2026-05-30T12:15:43.276Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/cloud-architect-certification-training-multi-cloud-mastery</loc>
-    <lastmod>2026-05-01T18:33:42.197Z</lastmod>
+    <loc>https://www.eklabya.com/course/cloud-architect-certification-training</loc>
+    <lastmod>2026-05-30T12:15:04.875Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/llmops-large-language-model-operations-mastery</loc>
-    <lastmod>2026-05-02T09:52:26.195Z</lastmod>
+    <loc>https://www.eklabya.com/course/large-language-model-operations</loc>
+    <lastmod>2026-06-04T09:39:00.752Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/microsoft-fabric-certification-training-dp-600</loc>
-    <lastmod>2026-05-01T18:13:07.874Z</lastmod>
+    <loc>https://www.eklabya.com/course/microsoft-fabric-certification-training</loc>
+    <lastmod>2026-05-30T12:13:24.910Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eklabya.com/course/mlops-machine-learning-operations-certification-training</loc>
-    <lastmod>2026-05-01T17:48:01.012Z</lastmod>
+    <loc>https://www.eklabya.com/course/machine-learning-operations-training</loc>
+    <lastmod>2026-06-04T09:38:08.378Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -697,6 +697,36 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.eklabya.com/course/microsoft-excel-word-mastery-from-basics-to-advanced</loc>
+    <lastmod>2026-05-06T02:29:17.932Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.eklabya.com/course/canva-design-school-graphic-design-mastery-from-beginner-to-pro</loc>
+    <lastmod>2026-05-06T02:31:47.465Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.eklabya.com/course/html-css-mastery-build-modern-websites</loc>
+    <lastmod>2026-06-01T06:40:37.760Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.eklabya.com/course/computer-basics-complete-beginner-s-guide-to-digital-skills</loc>
+    <lastmod>2026-05-06T02:30:43.063Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.eklabya.com/course/ai-tools-basics-learn-smart-automation-productivity-tools</loc>
+    <lastmod>2026-06-06T05:58:36.851Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.eklabya.com/courses/erp-academy</loc>
     <lastmod>2026-05-01T19:02:20.465Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -716,7 +746,7 @@
   </url>
   <url>
     <loc>https://www.eklabya.com/courses/artificial-intelligence</loc>
-    <lastmod>2026-05-02T07:39:12.404Z</lastmod>
+    <lastmod>2026-05-17T08:51:47.282Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
