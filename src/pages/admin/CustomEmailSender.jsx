@@ -27,6 +27,149 @@ const CustomEmailSender = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [viewEmail, setViewEmail] = useState(null);
   const [showHistory, setShowHistory] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState("custom");
+
+  // Email templates
+  const emailTemplates = {
+    custom: {
+      name: "Custom",
+      subject: "",
+      body: "",
+    },
+    portalInvite: {
+      name: "Portal Register Invite",
+      subject: "Invitation to Join Eklabya Learning Portal",
+      body: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Next Step: Register on Eklabya Learning Portal</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h1 style="color: #667eea; margin: 0; font-size: 28px;">Welcome to Eklabya!</h1>
+    </div>
+    
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+      Dear User,
+    </p>
+    
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+      We are thrilled to have you with us! To take the next step and officially kickstart your learning journey, you just need to complete a quick registration on our portal. 
+    </p>
+    
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="color: #667eea; margin-top: 0;">Here is how to get started:</h3>
+      <ol style="color: #333; line-height: 1.8; padding-left: 20px;">
+        <li><strong>Enter your details</strong> on our registration page.</li>
+        <li><strong>Verify your email</strong> using the One-Time Password (OTP) sent to your inbox.</li>
+        <li><strong>Registration complete!</strong> You are now officially enrolled.</li>
+      </ol>
+      <p style="color: #333; font-size: 15px; margin-top: 15px;">
+        <em>Once your registration is done, simply log in to check your profile and start exploring your learning dashboard.</em>
+      </p>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="http://localhost:5173/register" 
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                color: white; 
+                padding: 12px 30px; 
+                text-decoration: none; 
+                border-radius: 5px; 
+                font-weight: bold;
+                display: inline-block;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+        Complete Registration
+      </a>
+    </div>
+    
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+      If you face any issues or have any questions, feel free to reach out to our support team. We are here to help!
+    </p>
+    
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #666; font-size: 14px;">
+      <p style="margin: 0;">Best regards,</p>
+      <p style="margin: 5px 0 0 0; font-weight: bold;">The Eklabya Team</p>
+      <p style="margin: 5px 0 0 0;">www.eklabya.com</p>
+    </div>
+  </div>
+</body>
+</html>`,
+    },
+    paymentConfirmation: {
+      name: "Payment Confirmation",
+      subject: "Payment Confirmation - Eklabya",
+      body: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Confirmation</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+        <svg style="width: 30px; height: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h1 style="color: #667eea; margin: 0; font-size: 28px;">Payment Successful!</h1>
+    </div>
+    
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+      Dear User,
+    </p>
+    
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+      We're pleased to confirm that your payment has been successfully processed. Thank you for choosing Eklabya for your learning journey!
+    </p>
+    
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="color: #667eea; margin-top: 0;">Payment Details:</h3>
+      <p style="color: #333; margin: 5px 0;"><strong>Transaction ID:</strong> [TRANSACTION_ID]</p>
+      <p style="color: #333; margin: 5px 0;"><strong>Amount:</strong> [AMOUNT]</p>
+      <p style="color: #333; margin: 5px 0;"><strong>Date:</strong> [DATE]</p>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/profile" 
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                color: white; 
+                padding: 12px 30px; 
+                text-decoration: none; 
+                border-radius: 5px; 
+                font-weight: bold;
+                display: inline-block;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+        View Your Courses
+      </a>
+    </div>
+    
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+      You can now access your enrolled courses and start learning immediately. If you have any questions or need assistance, please don't hesitate to contact our support team.
+    </p>
+    
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #666; font-size: 14px;">
+      <p style="margin: 0;">Best regards,</p>
+      <p style="margin: 5px 0 0 0; font-weight: bold;">The Eklabya Team</p>
+      <p style="margin: 5px 0 0 0;">www.eklabya.com</p>
+    </div>
+  </div>
+</body>
+</html>`,
+    },
+  };
+
+  const handleTemplateChange = (templateKey) => {
+    setSelectedTemplate(templateKey);
+    const template = emailTemplates[templateKey];
+    setSubject(template.subject);
+    setBody(template.body);
+  };
 
   useEffect(() => {
     fetchEmailHistory();
@@ -177,6 +320,27 @@ const CustomEmailSender = () => {
               Compose Email
             </h2>
             <form onSubmit={handleSendEmail} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Template
+                </label>
+                <select
+                  value={selectedTemplate}
+                  onChange={(e) => handleTemplateChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  {Object.entries(emailTemplates).map(([key, template]) => (
+                    <option key={key} value={key}>
+                      {template.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select a template to pre-fill the email content (all templates
+                  are editable)
+                </p>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Recipients *
