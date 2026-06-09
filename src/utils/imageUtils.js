@@ -37,7 +37,7 @@ export const getImageUrl = (path) => {
   
   // If it's already a full URL
   if (path.startsWith('http')) {
-    // If it's from our own domain or firstvite.com, return as is
+    // If it's from our own domain or eklabya.com, return as is
     if (path.includes(window.location.hostname) || path.includes('eklabya.com')) {
       return path;
     }

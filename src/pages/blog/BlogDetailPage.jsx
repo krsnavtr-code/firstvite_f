@@ -169,7 +169,7 @@ export default function BlogDetailPage() {
   const seoTitle = post ? `${post.title} | Eklabya Blog` : 'Blog Post | Eklabya';
   const seoDescription = post?.excerpt || 'Read this article on Eklabya';
   const seoKeywords = post?.tags?.join(', ') || 'blog, article, education, learning';
-  const canonicalUrl = post ? `https://firstvite.com/blog/${post.slug}` : 'https://firstvite.com/blog';
+  const canonicalUrl = post ? `https://eklabya.com/blog/${post.slug}` : 'https://eklabya.com/blog';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
