@@ -277,6 +277,30 @@ const AdminLayout = () => {
                 </Link>
               )}
 
+              {/* Document Verification */}
+              {hasPermission("document-verification") && (
+                <Link
+                  to="/admin/document-verification"
+                  className="flex items-center px-6 py-3 text-indigo-100 hover:bg-indigo-700"
+                >
+                  <svg
+                    className="h-5 w-5 mr-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Document Verification
+                </Link>
+              )}
+
               {/* Candidates */}
               {hasPermission("candidates") && (
                 <Link

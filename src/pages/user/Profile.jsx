@@ -23,6 +23,7 @@ import {
   CheckOutlined,
   CloseOutlined as CloseCircleOutlined,
   InfoCircleOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 
 const Profile = () => {
@@ -149,9 +150,7 @@ const Profile = () => {
 
   const ProfileInput = ({ icon, label, name, type = "text", disabled }) => (
     <div className="relative group">
-      <label className="block text-sm font-semibold mb-1.5 ml-1">
-        {label}
-      </label>
+      <label className="block text-sm font-semibold mb-1.5 ml-1">{label}</label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
           {icon}
@@ -192,13 +191,20 @@ const Profile = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">
-              Account Overview
-            </h1>
+            <h1 className="text-3xl font-bold">Account Overview</h1>
             <p className="mt-1">
               Manage your personal information and learning progress
             </p>
           </div>
+          {enrollments && enrollments.length > 0 && (
+            <button
+              onClick={() => navigate("/document-submission")}
+              className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <FileTextOutlined className="mr-2" />
+              Submit Documents
+            </button>
+          )}
         </div>
 
         {/* 1. Scholarship Result Section */}
@@ -432,9 +438,7 @@ const Profile = () => {
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-8">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold">
-                  Personal Details
-                </h3>
+                <h3 className="text-lg font-bold">Personal Details</h3>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
                   className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5

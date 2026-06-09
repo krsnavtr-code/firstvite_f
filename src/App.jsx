@@ -36,6 +36,7 @@ import CourseForm from "./components/admin/courses/CourseForm";
 import MediaGallery from "./pages/admin/MediaGallery";
 import { CartProvider } from "./contexts/CartContext";
 import Profile from "./pages/user/Profile";
+import DocumentSubmission from "./pages/user/DocumentSubmission";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useContactFormPopup from "./hooks/useContactFormPopup.jsx";
@@ -50,6 +51,7 @@ import SendProposal from "./pages/admin/SendProposal";
 import EmailRecords from "./pages/admin/EmailRecords";
 import CustomEmailSender from "./pages/admin/CustomEmailSender";
 import RedirectManagement from "./pages/admin/RedirectManagement";
+import DocumentVerification from "./pages/admin/DocumentVerification";
 import TestQAPage from "./pages/admin/TestQAPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
@@ -370,9 +372,24 @@ function App() {
           <Route
             path="/profile"
             element={
-              <PrivateRoute allowedRoles={["admin", "user", "student"]}>
+              <PrivateRoute
+                allowedRoles={["admin", "user", "student", "teacher"]}
+              >
                 <MainLayout>
                   <Profile />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/document-submission"
+            element={
+              <PrivateRoute
+                allowedRoles={["admin", "user", "student", "teacher"]}
+              >
+                <MainLayout>
+                  <DocumentSubmission />
                 </MainLayout>
               </PrivateRoute>
             }
@@ -535,6 +552,12 @@ function App() {
 
             {/* Redirect Management */}
             <Route path="/admin/redirects" element={<RedirectManagement />} />
+
+            {/* Document Verification */}
+            <Route
+              path="/admin/document-verification"
+              element={<DocumentVerification />}
+            />
 
             {/* LMS Routes */}
             <Route path="/admin/lms-management" element={<LmsManagement />} />
