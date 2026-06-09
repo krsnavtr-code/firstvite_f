@@ -561,7 +561,7 @@ const Profile = () => {
 
                       {/* Content */}
                       <div className="p-5 flex-1 flex flex-col">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
                           {course?.title || "Untitled Course"}
                         </h3>
 
