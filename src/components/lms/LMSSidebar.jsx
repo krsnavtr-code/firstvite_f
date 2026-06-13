@@ -188,7 +188,7 @@ const LMSSidebar = ({
             }
             // Only show Live Classroom menu item for teacher users
             if (item.key === "classroom-sessions") {
-              return currentUser?.role === "teacher";
+              return currentUser?.role === "admin" || currentUser?.role === "teacher";
             }
             return true;
           })
