@@ -126,6 +126,21 @@ const DocumentVerification = () => {
     }
   };
 
+  const getFileUrl = (filePath) => {
+    if (!filePath) return "";
+    // If the path is already a full URL, return it as is
+    if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
+      return filePath;
+    }
+    // Otherwise, construct the full URL using the base URL (without /api)
+    const baseUrl =
+      import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ||
+      "https://www.eklabya.com";
+    // Remove leading slash if present to avoid double slashes
+    const cleanPath = filePath.startsWith("/") ? filePath.slice(1) : filePath;
+    return `${baseUrl}/${cleanPath}`;
+  };
+
   const filteredDocuments = documents.filter((doc) => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -301,7 +316,10 @@ const DocumentVerification = () => {
                           </button>
                           <button
                             onClick={() =>
-                              window.open(document.filePath, "_blank")
+                              window.open(
+                                getFileUrl(document.filePath),
+                                "_blank",
+                              )
                             }
                             className="text-indigo-600 hover:text-indigo-700"
                             title="Download Document"
@@ -408,7 +426,10 @@ const DocumentVerification = () => {
                     </div>
                     <button
                       onClick={() =>
-                        window.open(selectedDocument.filePath, "_blank")
+                        window.open(
+                          getFileUrl(selectedDocument.filePath),
+                          "_blank",
+                        )
                       }
                       className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
                     >
@@ -416,9 +437,10 @@ const DocumentVerification = () => {
                     </button>
                   </div>
                   <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                    {selectedDocument.mimetype.startsWith("image/") ? (
+                    {selectedDocument.mimetype &&
+                    selectedDocument.mimetype.startsWith("image/") ? (
                       <img
-                        src={selectedDocument.filePath}
+                        src={getFileUrl(selectedDocument.filePath)}
                         alt={selectedDocument.originalName}
                         className="max-w-full max-h-96 mx-auto rounded"
                       />
@@ -433,7 +455,10 @@ const DocumentVerification = () => {
                         </p>
                         <button
                           onClick={() =>
-                            window.open(selectedDocument.filePath, "_blank")
+                            window.open(
+                              getFileUrl(selectedDocument.filePath),
+                              "_blank",
+                            )
                           }
                           className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                         >
