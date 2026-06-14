@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "./home/Home";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { checkRedirect } from "./utils/redirectUtils";
 import Courses from "./components/Courses";
 import LoginPage from "./pages/auth/LoginPage";
 import FreeCourses from "./pages/FreeCourses";
@@ -82,6 +83,35 @@ import LmsManagement from "./components/admin/lmsManagement/LmsManagement.jsx";
 import Assessment from "./components/admin/lmsManagement/Assessment.jsx";
 import CandidatesPage from "./pages/admin/CandidatesPage.jsx";
 
+// Redirect Handler Component
+const RedirectHandler = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleRedirect = async () => {
+      // Skip redirect check for API routes and static assets
+      if (
+        location.pathname.startsWith("/api") ||
+        location.pathname.startsWith("/uploads") ||
+        location.pathname.startsWith("/pdfs") ||
+        location.pathname.startsWith("/candidate_profile")
+      ) {
+        return;
+      }
+
+      const redirect = await checkRedirect(location.pathname);
+      if (redirect && redirect.targetUrl) {
+        // Perform the redirect using window.location for a full page reload
+        window.location.href = redirect.targetUrl;
+      }
+    };
+
+    handleRedirect();
+  }, [location.pathname]);
+
+  return null;
+};
+
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
   const location = useLocation();
@@ -150,6 +180,7 @@ function App() {
           draggable
           pauseOnHover
         />
+        <RedirectHandler />
         <Routes>
           {/* Account Status Pages */}
           <Route path="/suspended" element={<SuspendedAccount />} />

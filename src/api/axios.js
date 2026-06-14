@@ -39,6 +39,7 @@ api.interceptors.request.use(
       "/auth/forgot-password",
       "/auth/reset-password",
       "/categories", // Add public endpoints that don't require auth
+      "/redirects/check", // Public redirect check endpoint
     ];
 
     // Don't modify the config for public endpoints
