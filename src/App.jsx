@@ -56,6 +56,7 @@ import TestQAPage from "./pages/admin/TestQAPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
 import TestimonialsPage from "./pages/TestimonialsPage";
+import DataScience from "./pages/landingpages/DataScience.jsx";
 import CareerManagement from "./pages/admin/career/CareerManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import lmsRoutes from "./routes/lmsRoutes";
@@ -288,6 +289,15 @@ function App() {
             element={
               <MainLayout>
                 <TestimonialsPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/landingpage/data-science"
+            element={
+              <MainLayout>
+                <DataScience />
               </MainLayout>
             }
           />
