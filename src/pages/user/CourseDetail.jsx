@@ -103,8 +103,15 @@ const CourseDetail = () => {
         }
       } catch (error) {
         console.error("Error fetching course:", error);
-        toast.error(error.message || "Failed to load course details");
-        navigate("/courses");
+        if (error.response?.status === 404) {
+          toast.error(`Course not found: ${id}`, {
+            duration: 5000,
+          });
+        } else {
+          toast.error(error.message || "Failed to load course details");
+        }
+        // Don't auto-redirect, let the user see the error message
+        setCourse(null);
       } finally {
         setLoading(false);
       }

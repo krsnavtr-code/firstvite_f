@@ -7,7 +7,20 @@ import api from "../api/axios";
  */
 export const checkRedirect = async (path) => {
   try {
-    const response = await api.get(`/redirects/check?path=${encodeURIComponent(path)}`);
+    // Skip redirect check for dynamic routes that contain IDs
+    // This prevents redirect checks from interfering with course/:id, etc.
+    if (path.includes("/:") || path.match(/\/[a-f0-9]{24}$/)) {
+      return null;
+    }
+
+    // Also skip redirect check for course and free-course routes to avoid conflicts
+    if (path.startsWith("/course/") || path.startsWith("/free-course/")) {
+      return null;
+    }
+
+    const response = await api.get(
+      `/redirects/check?path=${encodeURIComponent(path)}`,
+    );
     if (response.data && response.data.success && response.data.data) {
       return response.data.data;
     }
