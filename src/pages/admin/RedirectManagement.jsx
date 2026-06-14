@@ -83,11 +83,22 @@ const RedirectManagement = () => {
     e.preventDefault();
 
     try {
+      // Normalize URLs to store just the path if full URL is provided
+      const normalizedData = {
+        ...formData,
+        sourceUrl: formData.sourceUrl.replace(/^https?:\/\/[^\/]+/, ""), // Remove domain from source
+        targetUrl: formData.targetUrl.startsWith("http")
+          ? formData.targetUrl
+          : formData.targetUrl.startsWith("/")
+            ? `${window.location.origin}${formData.targetUrl}`
+            : `${window.location.origin}/${formData.targetUrl}`,
+      };
+
       if (editingRedirect) {
-        await api.patch(`/redirects/${editingRedirect._id}`, formData);
+        await api.patch(`/redirects/${editingRedirect._id}`, normalizedData);
         toast.success("Redirect updated successfully");
       } else {
-        await api.post("/redirects", formData);
+        await api.post("/redirects", normalizedData);
         toast.success("Redirect created successfully");
       }
 
@@ -352,12 +363,13 @@ const RedirectManagement = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, sourceUrl: e.target.value })
                       }
-                      placeholder="/old-path"
+                      placeholder="/old-path or https://www.eklabya.com/old-path"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      The path to redirect from (e.g., /old-page)
+                      The path to redirect from (e.g., /old-page). Full URLs
+                      will be automatically converted to paths.
                     </p>
                   </div>
 
@@ -376,7 +388,8 @@ const RedirectManagement = () => {
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      The path or full URL to redirect to
+                      The path or full URL to redirect to (relative paths will
+                      use current domain)
                     </p>
                   </div>
 

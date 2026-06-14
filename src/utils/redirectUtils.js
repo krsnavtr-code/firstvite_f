@@ -14,16 +14,44 @@ export const checkRedirect = async (path) => {
     }
 
     // Also skip redirect check for course and free-course routes to avoid conflicts
+    // UNLESS the path looks like a slug (not a MongoDB ObjectId)
     if (path.startsWith("/course/") || path.startsWith("/free-course/")) {
-      return null;
+      // Allow redirect check for slugs, but skip for ObjectIds
+      if (!path.match(/\/[a-f0-9]{24}$/)) {
+        // This is a slug, allow redirect check
+      } else {
+        return null;
+      }
     }
 
-    const response = await api.get(
+    // Try with just the path first
+    let response = await api.get(
       `/redirects/check?path=${encodeURIComponent(path)}`,
     );
     if (response.data && response.data.success && response.data.data) {
       return response.data.data;
     }
+
+    // If not found, try with full URL
+    const fullUrl = `${window.location.origin}${path}`;
+    response = await api.get(
+      `/redirects/check?path=${encodeURIComponent(fullUrl)}`,
+    );
+    if (response.data && response.data.success && response.data.data) {
+      return response.data.data;
+    }
+
+    // If still not found, try with www prefix if not present
+    if (!window.location.host.startsWith("www.")) {
+      const wwwUrl = `${window.location.protocol}//www.${window.location.host}${path}`;
+      response = await api.get(
+        `/redirects/check?path=${encodeURIComponent(wwwUrl)}`,
+      );
+      if (response.data && response.data.success && response.data.data) {
+        return response.data.data;
+      }
+    }
+
     return null;
   } catch (error) {
     // If the endpoint doesn't exist or there's an error, just return null
