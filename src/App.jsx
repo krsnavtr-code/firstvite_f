@@ -127,14 +127,25 @@ const MainLayout = ({ children }) => {
     location.pathname.startsWith("/reset-password") ||
     location.pathname.startsWith("/jobfair") ||
     location.pathname.startsWith("/scholarship-test");
+  // Check if the current route is a landing page
+  const landingPageUrls = ["/landingpage/data-science"];
+  const isLandingPage = landingPageUrls.some((url) =>
+    location.pathname.startsWith(url),
+  );
 
   return (
     <div className="dark:bg-slate-900 dark:text-white min-h-screen flex flex-col">
       <ScrollToTop />
-      {!isAdminRoute && !isLMSRoute && !isAuthRoute && <Navbar />}
+      {!isAdminRoute && !isLMSRoute && !isAuthRoute && !isLandingPage && (
+        <Navbar />
+      )}
       <main className="flex-grow bg-gray-50 dark:bg-gray-900">{children}</main>
-      {!isAdminRoute && !isLMSRoute && !isAuthRoute && <Footer />}
-      {!isAdminRoute && !isLMSRoute && !isAuthRoute && <ChatButton />}
+      {!isAdminRoute && !isLMSRoute && !isAuthRoute && !isLandingPage && (
+        <Footer />
+      )}
+      {!isAdminRoute && !isLMSRoute && !isAuthRoute && !isLandingPage && (
+        <ChatButton />
+      )}
     </div>
   );
 };

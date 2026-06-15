@@ -335,9 +335,9 @@ export default function DataScienceLanding() {
             >
               Apply Now
             </button>
-            <button className="px-8 py-4 border-2 border-white/30 hover:bg-white/10 text-white text-lg font-bold rounded-lg transition-all flex items-center justify-center">
+            {/* <button className="px-8 py-4 border-2 border-white/30 hover:bg-white/10 text-white text-lg font-bold rounded-lg transition-all flex items-center justify-center">
               <FaDownload className="mr-2" /> Download Brochure
-            </button>
+            </button> */}
           </div>
         </div>
       </section>
@@ -425,9 +425,9 @@ export default function DataScienceLanding() {
               >
                 Apply Now
               </button>
-              <button className="px-8 py-4 border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white text-lg font-bold rounded-lg transition-all">
+              {/* <button className="px-8 py-4 border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white text-lg font-bold rounded-lg transition-all">
                 Book Free Counselling
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
