@@ -23,6 +23,7 @@ import {
   FaGraduationCap,
   FaHandshake,
   FaDownload,
+  FaBookOpen,
 } from "react-icons/fa";
 
 export default function DataScienceLanding() {
