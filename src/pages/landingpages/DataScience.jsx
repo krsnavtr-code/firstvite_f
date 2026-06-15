@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-// Agar SEO component apke paas hai toh uncomment karein, warna next.js/react-helmet use karein
-// import SEO from "../../components/SEO";
 import { submitContactForm } from "../../api/contactApi";
 import { toast } from "react-toastify";
 import {
-  FaGraduationCap,
-  FaChartLine,
-  FaBrain,
   FaCheckCircle,
   FaStar,
   FaUsers,
@@ -14,15 +9,23 @@ import {
   FaLaptopCode,
   FaArrowRight,
   FaPhone,
-  FaEnvelope,
-  FaUserTie,
   FaClock,
   FaFileAlt,
   FaQuestionCircle,
-  FaTags,
+  FaBriefcase,
+  FaChartLine,
+  FaBrain,
+  FaRobot,
+  FaDatabase,
+  FaCode,
+  FaTools,
+  FaAward,
+  FaGraduationCap,
+  FaHandshake,
+  FaDownload,
 } from "react-icons/fa";
 
-export default function MetaAdsLanding() {
+export default function DataScienceLanding() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -38,17 +41,16 @@ export default function MetaAdsLanding() {
     setIsSubmitting(true);
 
     try {
-      // Prepare data for API
       const contactData = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        message: `Data Science Landing Page Form Submission\n\nExperience Level: ${formData.experience}\n\nUser is interested in the Data Science, Data Analysis & AI Masterclass course.`,
-        subject: "Data Science Course Inquiry - Landing Page",
-        courseTitle: "Data Science, Data Analysis & AI Masterclass",
+        message: `Data Science Analytics and AI Programme Landing Page Form Submission\n\nExperience Level: ${formData.experience}\n\nUser is interested in the Data Science Analytics and AI Programme.`,
+        subject:
+          "Data Science Analytics and AI Programme Inquiry - Landing Page",
+        courseTitle: "Data Science Analytics and AI Programme",
       };
 
-      // Submit to API
       const response = await submitContactForm(contactData);
 
       if (response.success) {
@@ -61,7 +63,6 @@ export default function MetaAdsLanding() {
           },
         );
 
-        // Reset form after success
         setTimeout(() => {
           setFormSubmitted(false);
           setFormData({ name: "", email: "", phone: "", experience: "" });
@@ -86,7 +87,6 @@ export default function MetaAdsLanding() {
     }
   };
 
-  // Smooth Scroll function for CTA buttons
   const scrollToForm = (e) => {
     e.preventDefault();
     document
@@ -94,450 +94,593 @@ export default function MetaAdsLanding() {
       .scrollIntoView({ behavior: "smooth" });
   };
 
-  const curriculum = [
+  const programmeHighlights = [
+    { icon: FaLaptopCode, text: "Live Instructor-Led Training" },
+    { icon: FaBriefcase, text: "30+ Real-World Projects" },
+    { icon: FaCertificate, text: "Industry-Recognized Certification" },
+    { icon: FaRobot, text: "AI & Generative AI Modules" },
+    { icon: FaHandshake, text: "Career Support & Interview Preparation" },
+    { icon: FaGraduationCap, text: "Beginner-Friendly Learning Path" },
+  ];
+
+  const impactStats = [
+    { value: "510+", label: "Learners Trained" },
+    { value: "30+", label: "Industry Projects" },
+    { value: "200+", label: "Hiring Opportunities" },
+    { value: "4.8+", label: "Learner Rating" },
+    { value: "100%", label: "Practical Learning Approach" },
+  ];
+
+  const whyChooseFeatures = [
     {
-      icon: FaChartLine,
-      title: "Module 1: Data Analysis Pro",
-      topics: [
-        "Advanced Excel & SQL",
-        "Power BI & Tableau",
-        "Data Visualization",
-        "Business Statistics",
-      ],
+      icon: FaBookOpen,
+      title: "Industry-Relevant Curriculum",
+      desc: "Designed by industry experts",
     },
     {
-      icon: FaGraduationCap,
-      title: "Module 2: Data Science Foundation",
-      topics: [
-        "Python Programming",
-        "Exploratory Data Analysis",
-        "Machine Learning Algorithms",
-        "Predictive Modeling",
-      ],
+      icon: FaBriefcase,
+      title: "Project-Based Learning",
+      desc: "Hands-on experience",
+    },
+    {
+      icon: FaUsers,
+      title: "Expert Mentorship",
+      desc: "Learn from professionals",
+    },
+    {
+      icon: FaChartLine,
+      title: "Career-Focused Training",
+      desc: "Job-ready skills",
     },
     {
       icon: FaBrain,
-      title: "Module 3: AI & Deep Learning",
-      topics: [
-        "Neural Networks",
-        "NLP & Computer Vision",
-        "TensorFlow & PyTorch",
-        "Generative AI Basics",
-      ],
+      title: "AI-Driven Skill Development",
+      desc: "Future-proof learning",
+    },
+    {
+      icon: FaTools,
+      title: "Hands-On Practice with Industry Tools",
+      desc: "Real-world tools",
     },
   ];
 
-  const targetAudience = [
+  const careerPaths = [
     {
-      title: "IT Professionals",
-      desc: "Looking to upgrade skills and get a high-paying salary hike.",
+      title: "Data Analyst",
+      desc: "Transform raw data into actionable business insights and support strategic decision-making.",
     },
     {
-      title: "Non-IT Background",
-      desc: "Want to switch to the booming tech industry with zero coding experience.",
+      title: "Business Analyst",
+      desc: "Bridge business objectives and data-driven solutions through analysis and reporting.",
     },
     {
-      title: "Freshers & Students",
-      desc: "Aiming to start their career in Data Science & AI directly.",
+      title: "Data Scientist",
+      desc: "Develop predictive models and uncover opportunities using advanced analytical techniques.",
     },
+    {
+      title: "Machine Learning Engineer",
+      desc: "Design intelligent systems capable of learning and improving from data.",
+    },
+    {
+      title: "AI Specialist",
+      desc: "Implement Artificial Intelligence solutions to automate and optimize business processes.",
+    },
+    {
+      title: "Business Intelligence Analyst",
+      desc: "Create dashboards and reports that help organizations monitor performance effectively.",
+    },
+  ];
+
+  const curriculum = [
+    {
+      title: "Data Analytics Fundamentals",
+      desc: "Learn data analysis techniques, business reporting, data cleaning, and practical problem-solving using real datasets.",
+      icon: FaChartLine,
+    },
+    {
+      title: "SQL & Database Management",
+      desc: "Master SQL queries, database concepts, data extraction, filtering, joins, and business data management.",
+      icon: FaDatabase,
+    },
+    {
+      title: "Data Visualization with Power BI",
+      desc: "Create interactive dashboards, visualize business metrics, and communicate insights through powerful reports.",
+      icon: FaChartLine,
+    },
+    {
+      title: "Python for Data Science",
+      desc: "Use Python for data manipulation, automation, analysis, and practical data science applications.",
+      icon: FaCode,
+    },
+    {
+      title: "Statistics & Business Analytics",
+      desc: "Understand statistical methods, probability concepts, and data-driven decision-making techniques.",
+      icon: FaChartLine,
+    },
+    {
+      title: "Machine Learning",
+      desc: "Build predictive models using classification, regression, clustering, and model evaluation techniques.",
+      icon: FaBrain,
+    },
+    {
+      title: "Artificial Intelligence",
+      desc: "Explore AI concepts, intelligent systems, automation, and real-world business applications.",
+      icon: FaRobot,
+    },
+    {
+      title: "Generative AI & Prompt Engineering",
+      desc: "Learn prompt engineering, AI tools, large language models, and AI-powered workflows.",
+      icon: FaRobot,
+    },
+  ];
+
+  const tools = [
+    "Python",
+    "SQL",
+    "Power BI",
+    "Excel",
+    "Pandas",
+    "NumPy",
+    "Scikit-Learn",
+    "Machine Learning",
+    "Generative AI Tools",
+    "Artificial Intelligence Platforms",
+  ];
+
+  const projects = [
+    "Customer Churn Prediction",
+    "Sales Forecasting Dashboard",
+    "Business Intelligence Reporting",
+    "AI-Powered Chatbot",
+    "Recommendation System",
+    "Customer Segmentation Analysis",
+    "Market Trend Analysis",
+    "Predictive Analytics Project",
+  ];
+
+  const careerServices = [
+    "Resume Building",
+    "LinkedIn Profile Optimization",
+    "Mock Interviews",
+    "Portfolio Development",
+    "Career Mentorship",
+    "Interview Preparation",
+    "Placement Assistance",
+  ];
+
+  const certificationBenefits = [
+    "Showcase Your Skills",
+    "Strengthen Your Resume",
+    "Enhance Career Opportunities",
+    "Validate Industry Knowledge",
   ];
 
   const faqs = [
     {
-      q: "Do I need coding experience?",
-      a: "No, we teach everything from scratch. Basic math knowledge is enough.",
+      q: "Do I need coding experience to join this programme?",
+      a: "No. The programme is designed for beginners and gradually progresses to advanced concepts.",
     },
     {
-      q: "Do you provide job assistance?",
-      a: "Yes, we offer 100% placement assistance, resume building, and mock interviews.",
+      q: "Who can enroll in this programme?",
+      a: "Students, graduates, working professionals, career switchers, and entrepreneurs can enroll.",
     },
     {
-      q: "Is this a live or recorded course?",
-      a: "It's a mix of live interactive classes and recorded sessions for lifetime access.",
+      q: "What tools will I learn during the programme?",
+      a: "You will learn Python, SQL, Power BI, Machine Learning, Data Analytics, and Generative AI tools.",
+    },
+    {
+      q: "Will I work on real projects?",
+      a: "Yes. The programme includes multiple industry projects and hands-on assignments.",
+    },
+    {
+      q: "Is career support included?",
+      a: "Yes. Learners receive resume support, interview preparation, mentorship, and career guidance.",
+    },
+    {
+      q: "Will I receive a certification?",
+      a: "Yes. An industry-recognized certification is awarded after successful programme completion.",
+    },
+    {
+      q: "What job roles can I apply for after completion?",
+      a: "You can pursue roles such as Data Analyst, Business Analyst, Data Scientist, AI Specialist, and Machine Learning Engineer.",
+    },
+    {
+      q: "How are the classes conducted?",
+      a: "Classes are delivered through instructor-led sessions combined with practical assignments and project work.",
     },
   ];
 
-  const partners = ["Google", "Microsoft", "Amazon", "IBM", "Meta", "Deloitte"];
-
   return (
-    <div className="min-h-screen bg-gray-50 pb-16 md:pb-0 font-sans">
-      {/* Mobile Sticky CTA */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-4 z-50 flex justify-between items-center">
-        <div>
-          <p className="text-xs text-gray-500">Combo Offer Ends Soon</p>
-          <p className="text-lg font-bold text-blue-900">
-            ₹46,000{" "}
-            <span className="line-through text-sm text-gray-400">₹75,000</span>
-          </p>
-        </div>
-        <button
-          onClick={scrollToForm}
-          className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg font-bold animate-pulse"
-        >
-          Book Free Demo
-        </button>
-      </div>
-
+    <div className="min-h-screen bg-white font-sans">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 overflow-hidden pt-12 pb-20">
+      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 overflow-hidden pt-16 pb-24">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Hero Content */}
-            <div className="lg:col-span-7 text-white">
-              <div className="inline-flex items-center px-4 py-2 bg-yellow-400/20 text-yellow-300 rounded-full mb-6 border border-yellow-400/30">
-                <FaStar className="mr-2" />
-                <span className="text-sm font-semibold">
-                  India's #1 Most Comprehensive Course
-                </span>
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-                Master{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                  Data Science, Analysis & AI
-                </span>{" "}
-                in One Program
-              </h1>
-              <p className="text-lg text-blue-100 mb-8 max-w-2xl">
-                Stop buying separate courses! Get our 3-in-1 Masterclass with
-                15+ live projects, guaranteed internships, and 100% placement
-                assistance.
-              </p>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-blue-800/50 p-3 rounded-lg border border-blue-700">
-                  <FaClock className="text-cyan-400 text-xl mb-2" />
-                  <p className="text-sm font-semibold">4 Months</p>
-                  <p className="text-xs text-blue-200">Duration</p>
-                </div>
-                <div className="bg-blue-800/50 p-3 rounded-lg border border-blue-700">
-                  <FaLaptopCode className="text-cyan-400 text-xl mb-2" />
-                  <p className="text-sm font-semibold">11+ Projects</p>
-                  <p className="text-xs text-blue-200">Hands-on</p>
-                </div>
-                <div className="bg-blue-800/50 p-3 rounded-lg border border-blue-700">
-                  <FaCertificate className="text-cyan-400 text-xl mb-2" />
-                  <p className="text-sm font-semibold">3 Certs</p>
-                  <p className="text-xs text-blue-200">Industry Valid</p>
-                </div>
-                <div className="bg-blue-800/50 p-3 rounded-lg border border-blue-700">
-                  <FaUserTie className="text-cyan-400 text-xl mb-2" />
-                  <p className="text-sm font-semibold">Job Support</p>
-                  <p className="text-xs text-blue-200">100% Assured</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Hero Form */}
-            <div id="enroll-form" className="lg:col-span-5 relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl blur opacity-30"></div>
-              <div className="bg-white rounded-2xl shadow-2xl p-8 relative">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    Book Your Free Demo Class
-                  </h3>
-                  <p className="text-gray-500 text-sm mt-1">
-                    Fill the form to unlock a{" "}
-                    <span className="text-red-500 font-bold">
-                      Flat 60% Discount
-                    </span>
-                  </p>
-                </div>
-
-                {formSubmitted ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FaCheckCircle className="h-8 w-8 text-green-500" />
-                    </div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">
-                      Registration Successful!
-                    </h4>
-                    <p className="text-gray-600">
-                      Our career counselor will call you within 15 minutes.
-                    </p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleFormSubmit} className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Full Name *"
-                      required
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email Address *"
-                      required
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
-                    />
-                    <input
-                      type="tel"
-                      placeholder="WhatsApp Number *"
-                      required
-                      pattern="[0-9]{10}"
-                      title="Please enter a valid 10-digit mobile number"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
-                    />
-                    <select
-                      required
-                      value={formData.experience}
-                      onChange={(e) =>
-                        setFormData({ ...formData, experience: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none text-gray-700"
-                    >
-                      <option value="">Current Experience Level *</option>
-                      <option value="student">Student / Fresher</option>
-                      <option value="1-3-years">1-3 Years Experience</option>
-                      <option value="3-plus-years">3+ Years Experience</option>
-                      <option value="non-it">Non-IT Professional</option>
-                    </select>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className={`w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-bold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                        isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center">
-                          <svg
-                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          Submitting...
-                        </span>
-                      ) : (
-                        "Get Syllabus & Discount Offer"
-                      )}
-                    </button>
-                    <p className="text-xs text-gray-400 text-center flex items-center justify-center mt-2">
-                      <FaCheckCircle className="mr-1 text-green-500" /> Your
-                      data is 100% secure with us
-                    </p>
-                  </form>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust & Stats Bar */}
-      <section className="bg-white border-b border-gray-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-center">
-            <div>
-              <p className="text-2xl font-bold text-blue-900">10k+</p>
-              <p className="text-sm text-gray-500">Learners</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-900">4.8/5</p>
-              <p className="text-sm text-gray-500">Google Rating</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-900">12 LPA+</p>
-              <p className="text-sm text-gray-500">Avg. Package</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-900">150+</p>
-              <p className="text-sm text-gray-500">Hiring Partners</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Curriculum Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="text-blue-600 font-semibold tracking-wider uppercase text-sm">
-              Course Curriculum
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-4">
-              3 Powerful Domains, 1 Master Program
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We take you from absolute basics to advanced AI implementations.
-              No prior coding experience required.
+          <div className="text-center text-white mb-12">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+              Data Science Analytics and AI Programme
+            </h1>
+            <p className="text-2xl md:text-3xl font-semibold text-cyan-300 mb-4">
+              Become a Job-Ready Data & AI Professional
+            </p>
+            <p className="text-lg text-blue-100 max-w-3xl mx-auto">
+              Master Data Science, Data Analytics, Machine Learning, Artificial
+              Intelligence, and Generative AI through hands-on projects,
+              industry-focused training, and career support.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {curriculum.map((module, index) => {
-              const Icon = module.icon;
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
+            {programmeHighlights.map((item, index) => {
+              const Icon = item.icon;
               return (
                 <div
                   key={index}
-                  className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:-translate-y-2 transition-transform duration-300"
+                  className="bg-blue-800/50 p-4 rounded-lg border border-blue-700 text-center"
                 >
-                  <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                    <Icon className="h-7 w-7 text-blue-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">
-                    {module.title}
-                  </h3>
-                  <ul className="space-y-3 mb-8">
-                    {module.topics.map((topic, i) => (
-                      <li key={i} className="flex items-start">
-                        <FaCheckCircle className="text-green-500 mt-1 mr-3 flex-shrink-0" />
-                        <span className="text-gray-600">{topic}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <Icon className="text-cyan-400 text-2xl mb-2 mx-auto" />
+                  <p className="text-sm font-semibold text-white">
+                    {item.text}
+                  </p>
                 </div>
               );
             })}
           </div>
 
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={scrollToForm}
+              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-bold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              Apply Now
+            </button>
+            <button className="px-8 py-4 border-2 border-white/30 hover:bg-white/10 text-white text-lg font-bold rounded-lg transition-all flex items-center justify-center">
+              <FaDownload className="mr-2" /> Download Brochure
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Trusted by Future Data & AI Professionals
+            </h2>
+          </div>
+          <div className="text-center mb-8">
+            <p className="text-lg font-semibold text-blue-900 mb-2">
+              Our Impact
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            {impactStats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <p className="text-3xl md:text-4xl font-bold text-blue-900 mb-1">
+                  {stat.value}
+                </p>
+                <p className="text-sm text-gray-600">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Why Choose the Data Science Analytics and AI Programme?
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Today's organizations need professionals who can analyze data,
+              build predictive models, and leverage AI for business growth. This
+              programme combines Data Analytics, Data Science, Machine Learning,
+              and Artificial Intelligence into one career-focused learning
+              journey.
+            </p>
+          </div>
+
+          <div className="text-center mb-12">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              What Makes This Programme Different?
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {whyChooseFeatures.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition-shadow"
+                >
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <Icon className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">
+                    {feature.title}
+                  </h4>
+                  <p className="text-gray-600">{feature.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-12 text-center bg-blue-50 p-8 rounded-2xl">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Transform Your Career in Data Science & AI?
+            </h3>
+            <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+              Join the Data Science Analytics and AI Programme and develop the
+              skills employers are actively hiring for.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={scrollToForm}
+                className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-bold rounded-lg transition-all shadow-lg"
+              >
+                Apply Now
+              </button>
+              <button className="px-8 py-4 border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white text-lg font-bold rounded-lg transition-all">
+                Book Free Counselling
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Career Opportunities Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Career Opportunities After Completion
+            </h2>
+            <p className="text-lg text-gray-600">
+              Build skills for high-demand roles across industries.
+            </p>
+          </div>
+
+          <div className="text-center mb-12">
+            <h3 className="text-2xl font-bold text-gray-900 mb-8">
+              Career Paths
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {careerPaths.map((path, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <FaBriefcase className="h-6 w-6 text-blue-600" />
+                </div>
+                <h4 className="text-lg font-bold text-gray-900 mb-2">
+                  {path.title}
+                </h4>
+                <p className="text-gray-600 text-sm">{path.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Curriculum Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Our Course Curriculum
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {curriculum.map((module, index) => {
+              const Icon = module.icon;
+              return (
+                <div
+                  key={index}
+                  className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition-shadow"
+                >
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <Icon className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">
+                    {module.title}
+                  </h4>
+                  <p className="text-gray-600 text-sm">{module.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-12 text-center bg-gradient-to-r from-blue-900 to-indigo-900 p-8 rounded-2xl text-white">
+            <h3 className="text-2xl font-bold mb-4">
+              Join Our Success Community with 100% Placement Assistance
+            </h3>
+            <p className="text-lg mb-6">
+              Be part of most successful data science/data analytics marketing
+              community
+            </p>
+            <button
+              onClick={scrollToForm}
+              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-bold rounded-lg transition-all shadow-lg"
+            >
+              Apply Now
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Tools Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Tools & Technologies You'll Master
+            </h2>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4">
+            {tools.map((tool, index) => (
+              <span
+                key={index}
+                className="px-6 py-3 bg-white rounded-full border border-gray-200 text-gray-700 font-semibold hover:shadow-md transition-shadow"
+              >
+                {tool}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Projects Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Work on Industry Projects
+            </h2>
+            <p className="text-lg text-gray-600">
+              Gain practical experience through real-world projects designed to
+              strengthen your portfolio.
+            </p>
+          </div>
+
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">
+              Project Portfolio
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {projects.map((project, index) => (
+              <div
+                key={index}
+                className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center"
+              >
+                <p className="font-semibold text-gray-900">{project}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Career Support Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Career Support & Placement Assistance
+            </h2>
+            <p className="text-lg text-gray-600">
+              We help learners become job-ready through structured career
+              guidance.
+            </p>
+          </div>
+
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">
+              Career Services
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 gap-4">
+            {careerServices.map((service, index) => (
+              <div
+                key={index}
+                className="bg-white p-4 rounded-lg border border-gray-200 text-center hover:shadow-md transition-shadow"
+              >
+                <p className="font-semibold text-gray-900">{service}</p>
+              </div>
+            ))}
+          </div>
+
           <div className="mt-12 text-center">
             <button
               onClick={scrollToForm}
-              className="inline-flex items-center px-8 py-4 bg-blue-900 text-white font-bold rounded-lg hover:bg-blue-800 transition-colors shadow-lg"
+              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-bold rounded-lg transition-all shadow-lg"
             >
-              <FaFileAlt className="mr-2" /> Download Complete Syllabus
+              Schedule Career Consultation
             </button>
           </div>
         </div>
       </section>
 
-      {/* Target Audience Section */}
+      {/* Certification Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Who Is This Masterclass For?
-              </h2>
-              <div className="space-y-6">
-                {targetAudience.map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex p-4 rounded-xl border border-gray-100 shadow-sm bg-gray-50"
-                  >
-                    <div className="mt-1 bg-blue-100 p-3 rounded-full h-min">
-                      <FaUsers className="text-blue-600" />
-                    </div>
-                    <div className="ml-4">
-                      <h4 className="text-lg font-bold text-gray-900">
-                        {item.title}
-                      </h4>
-                      <p className="text-gray-600 mt-1">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="relative">
-              <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Students learning"
-                className="rounded-2xl shadow-2xl"
-              />
-              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-xl border border-gray-100">
-                <div className="flex items-center space-x-2 text-yellow-400 text-xl mb-2">
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Earn Your Certification
+            </h2>
+            <p className="text-lg text-gray-600">
+              Receive an industry-recognized Data Science Analytics and AI
+              Programme Certification upon successful completion.
+            </p>
+          </div>
+
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">
+              Certification Benefits
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {certificationBenefits.map((benefit, index) => (
+              <div
+                key={index}
+                className="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaAward className="h-6 w-6 text-blue-600" />
                 </div>
-                <p className="font-bold text-gray-900">"Highly Recommended!"</p>
-                <p className="text-sm text-gray-500">- 5000+ Alumni</p>
+                <p className="font-semibold text-gray-900">{benefit}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing / Special Offer Section */}
-      <section className="py-20 bg-blue-900 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 text-blue-800 opacity-20">
-          <FaTags size={300} />
-        </div>
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Limited Time Combo Offer!
-          </h2>
-          <p className="text-xl text-blue-200 mb-8">
-            Enroll today and get 3 Premium Courses for the price of 1, plus Free
-            Bonuses worth ₹10,000.
-          </p>
-
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 max-w-2xl mx-auto mb-8">
-            <p className="text-lg text-blue-200 mb-2">
-              Total Value: <span className="line-through">₹75,000</span>
-            </p>
-            <p className="text-5xl font-extrabold text-yellow-400 mb-6">
-              ₹46,000{" "}
-              <span className="text-lg text-white font-normal">only</span>
-            </p>
-            <div className="text-left space-y-3 mb-8 max-w-md mx-auto">
-              <p className="flex items-center">
-                <FaCheckCircle className="text-green-400 mr-3" /> Lifetime
-                Course Access
-              </p>
-              <p className="flex items-center">
-                <FaCheckCircle className="text-green-400 mr-3" /> 1-on-1 Mentor
-                Support
-              </p>
-              <p className="flex items-center">
-                <FaCheckCircle className="text-green-400 mr-3" /> Dedicated
-                Placement Cell
-              </p>
-            </div>
-            <button
-              onClick={scrollToForm}
-              className="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-lg font-bold rounded-lg hover:from-yellow-300 hover:to-orange-400 shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all"
-            >
-              Claim This Offer Now
-            </button>
-            <p className="text-sm text-blue-200 mt-4">
-              *EMI options available starting at ₹1,500/month
+      {/* Student Success Stories Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Student Success Stories
+            </h2>
+            <p className="text-lg text-gray-600">
+              Hear from learners who successfully transitioned into Data
+              Analytics, Data Science, and AI careers.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* Alumni / Partners */}
-      <section className="py-16 bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-xl font-bold text-gray-600 mb-8">
-            Our Alumni Work At Top Companies
-          </h3>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            {partners.map((partner, index) => (
-              <span key={index} className="text-2xl font-black text-gray-800">
-                {partner}
-              </span>
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">
+              Success Highlights
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              "Career Transitions",
+              "Salary Growth",
+              "Job Placements",
+              "Professional Advancement",
+            ].map((highlight, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 rounded-xl border border-gray-200 text-center hover:shadow-lg transition-shadow"
+              >
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaStar className="h-6 w-6 text-green-600" />
+                </div>
+                <p className="font-semibold text-gray-900">{highlight}</p>
+              </div>
             ))}
           </div>
         </div>
@@ -551,14 +694,15 @@ export default function MetaAdsLanding() {
               Frequently Asked Questions
             </h2>
           </div>
-          <div className="space-y-6">
-            {faqs.map((faq, i) => (
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
               <div
-                key={i}
+                key={index}
                 className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
               >
                 <h4 className="flex items-center text-lg font-bold text-gray-900 mb-2">
-                  <FaQuestionCircle className="text-blue-500 mr-3" /> {faq.q}
+                  <FaQuestionCircle className="text-blue-600 mr-3" /> {faq.q}
                 </h4>
                 <p className="text-gray-600 ml-8">{faq.a}</p>
               </div>
@@ -567,29 +711,112 @@ export default function MetaAdsLanding() {
         </div>
       </section>
 
-      {/* Final Bottom CTA */}
-      <section className="py-20 bg-gradient-to-br from-gray-900 to-blue-900 text-white">
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Start Your Journey To A 6-Figure Salary
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Ready to Build Your Career in Data Science & AI?
           </h2>
-          <p className="text-xl text-gray-300 mb-10">
-            Join the top 1% of Data & AI professionals. Next batch starts in 3
-            days!
+          <p className="text-xl text-blue-100 mb-10">
+            Join the Data Science Analytics and AI Programme and develop the
+            skills employers are actively hiring for.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={scrollToForm}
-              className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-colors flex justify-center items-center shadow-lg"
+              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-bold rounded-lg transition-all shadow-lg"
             >
-              Secure Your Seat <FaArrowRight className="ml-2" />
+              Apply Now
             </button>
-            <a
-              href="tel:+919891030303"
-              className="px-8 py-4 border-2 border-white/30 hover:bg-white/10 text-white font-bold rounded-lg transition-colors flex justify-center items-center"
-            >
-              <FaPhone className="mr-2" /> Talk To Counselor
-            </a>
+            <button className="px-8 py-4 border-2 border-white/30 hover:bg-white/10 text-white text-lg font-bold rounded-lg transition-all">
+              Book Free Counselling
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Enrollment Form Section */}
+      <section id="enroll-form" className="py-20 bg-gray-50">
+        <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-2xl p-8">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">Apply Now</h3>
+              <p className="text-gray-500 text-sm mt-1">
+                Fill the form to get started
+              </p>
+            </div>
+
+            {formSubmitted ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaCheckCircle className="h-8 w-8 text-green-500" />
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 mb-2">
+                  Registration Successful!
+                </h4>
+                <p className="text-gray-600">
+                  Our career counselor will call you soon.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleFormSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Full Name *"
+                  required
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
+                />
+                <input
+                  type="email"
+                  placeholder="Email Address *"
+                  required
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone Number *"
+                  required
+                  pattern="[0-9]{10}"
+                  title="Please enter a valid 10-digit mobile number"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
+                />
+                <select
+                  required
+                  value={formData.experience}
+                  onChange={(e) =>
+                    setFormData({ ...formData, experience: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none text-gray-700"
+                >
+                  <option value="">Current Experience Level *</option>
+                  <option value="student">Student / Fresher</option>
+                  <option value="1-3-years">1-3 Years Experience</option>
+                  <option value="3-plus-years">3+ Years Experience</option>
+                  <option value="non-it">Non-IT Professional</option>
+                </select>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-bold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Application"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
