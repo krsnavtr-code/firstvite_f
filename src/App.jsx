@@ -128,7 +128,7 @@ const MainLayout = ({ children }) => {
     location.pathname.startsWith("/jobfair") ||
     location.pathname.startsWith("/scholarship-test");
   // Check if the current route is a landing page
-  const landingPageUrls = ["/landingpage/data-science"];
+  const landingPageUrls = ["/data-science-ai-programme"];
   const isLandingPage = landingPageUrls.some((url) =>
     location.pathname.startsWith(url),
   );
