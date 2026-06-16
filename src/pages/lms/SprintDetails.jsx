@@ -686,11 +686,11 @@ const SprintDetails = () => {
                                       isTaskCompleted(task) ? "green" : "blue"
                                     }
                                     className="cursor-pointer hover:opacity-80 transition"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setCurrentQuestions(task.questions);
-                                      setQuestionsModalVisible(true);
-                                    }}
+                                    // onClick={(e) => {
+                                    //   e.stopPropagation();
+                                    //   setCurrentQuestions(task.questions);
+                                    //   setQuestionsModalVisible(true);
+                                    // }}
                                   >
                                     {task.questions.length} question
                                     {task.questions.length !== 1 ? "s" : ""}
