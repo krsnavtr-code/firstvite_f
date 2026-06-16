@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate, Navigate } from "react-router-dom";
 import SEO from "../../components/SEO";
 import axios from "axios";
 import { getCourseById } from "../../api/courseApi";
+import { checkRedirect } from "../../utils/redirectUtils";
 import { submitContactForm } from "../../api/contactApi";
 import { enrollInCourse } from "../../api/enrollmentApi";
 import { toast } from "react-hot-toast";
@@ -98,12 +99,20 @@ const CourseDetail = () => {
         const response = await getCourseById(id);
         if (response.success && response.data) {
           setCourse(response.data);
+          setLoading(false);
         } else {
           throw new Error(response.message || "Failed to load course");
         }
       } catch (error) {
         console.error("Error fetching course:", error);
         if (error.response?.status === 404) {
+          // Check for redirects before showing error
+          const redirect = await checkRedirect(window.location.pathname);
+          if (redirect && redirect.targetUrl) {
+            window.location.href = redirect.targetUrl;
+            return; // Exit without setting loading to false or toasting
+          }
+
           toast.error(`Course not found: ${id}`, {
             duration: 5000,
           });
@@ -112,7 +121,6 @@ const CourseDetail = () => {
         }
         // Don't auto-redirect, let the user see the error message
         setCourse(null);
-      } finally {
         setLoading(false);
       }
     };
