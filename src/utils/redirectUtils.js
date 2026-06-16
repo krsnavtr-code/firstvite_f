@@ -24,32 +24,13 @@ export const checkRedirect = async (path) => {
       }
     }
 
-    // Try with just the path first
-    let response = await api.get(
+    // Perform only a single optimized API request.
+    // The server is updated to automatically check all candidates (path, fullUrl, and wwwUrl) in a single database query.
+    const response = await api.get(
       `/redirects/check?path=${encodeURIComponent(path)}`,
     );
     if (response.data && response.data.success && response.data.data) {
       return response.data.data;
-    }
-
-    // If not found, try with full URL
-    const fullUrl = `${window.location.origin}${path}`;
-    response = await api.get(
-      `/redirects/check?path=${encodeURIComponent(fullUrl)}`,
-    );
-    if (response.data && response.data.success && response.data.data) {
-      return response.data.data;
-    }
-
-    // If still not found, try with www prefix if not present
-    if (!window.location.host.startsWith("www.")) {
-      const wwwUrl = `${window.location.protocol}//www.${window.location.host}${path}`;
-      response = await api.get(
-        `/redirects/check?path=${encodeURIComponent(wwwUrl)}`,
-      );
-      if (response.data && response.data.success && response.data.data) {
-        return response.data.data;
-      }
     }
 
     return null;
