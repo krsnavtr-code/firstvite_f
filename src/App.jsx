@@ -336,7 +336,7 @@ function App() {
           />
 
           <Route
-            path="/landingpage/data-science"
+            path="/data-science-ai-programme"
             element={
               <MainLayout>
                 <DataScience />
