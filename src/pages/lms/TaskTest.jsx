@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Card, Progress, message, Modal, Spin } from "antd";
+import { Button, Progress, message, Modal, Spin } from "antd";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ArrowLeftOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 import { getTask, submitTaskAnswers } from "../../api/taskApi";
+import { getSprintById } from "../../api/sprintApi";
 
 /** --------------------------
  *  QuestionCard Component
- -------------------------- */
+ * -------------------------- */
 const QuestionCard = ({
   question,
   index,
@@ -25,24 +27,27 @@ const QuestionCard = ({
   return (
     <div
       key={index}
-      className="mb-6 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-200 dark:bg-[#001525] text-black dark:text-white shadow-sm overflow-hidden"
+      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden transition-all duration-300"
     >
       {/* Card Header (Title Section) */}
-      <div className="p-2 md:p-4 border-b border-gray-300 dark:border-gray-800">
-        <span className="font-semibold text-base text-black dark:text-white">
-          {`Question ${index + 1} (${question.points || 1} point${(question.points || 1) > 1 ? "s" : ""})`}
+      <div className="px-5 py-4 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-150 dark:border-slate-800/80 flex flex-wrap justify-between items-center gap-2">
+        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-bold uppercase tracking-wider">
+          Question {index + 1}
+        </span>
+        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          {question.points || 1} point{(question.points || 1) > 1 ? "s" : ""}
         </span>
       </div>
 
       {/* Card Body */}
-      <div className="p-2 md:p-6">
+      <div className="p-5 md:p-6 space-y-5">
         {/* Question Text */}
-        <p className="text-lg mb-4 text-black dark:text-white font-medium">
+        <p className="text-base md:text-lg font-bold text-slate-800 dark:text-white leading-relaxed">
           {question.question}
         </p>
 
         {/* Options List */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {question.options.map((option, optIndex) => {
             const isSelected =
               question.questionType === "true_false"
@@ -52,10 +57,10 @@ const QuestionCard = ({
             return (
               <div
                 key={optIndex}
-                className={`p-3 border rounded-md cursor-pointer transition-colors ${
+                className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between group ${
                   isSelected
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200"
-                    : "border-gray-300 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-800 bg-white dark:bg-[#001c32]"
+                    ? "border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 text-blue-900 dark:text-blue-300 font-semibold shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-blue-300 dark:hover:border-blue-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
                 }`}
                 onClick={() =>
                   onAnswerSelect(
@@ -65,20 +70,32 @@ const QuestionCard = ({
                   )
                 }
               >
-                <div className="flex items-center">
-                  {/* Custom Radio/Checkbox Circle */}
-                  <div
-                    className={`w-5 h-5 rounded-full border mr-3 flex items-center justify-center shrink-0 transition-colors ${
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold leading-none shrink-0 transition-colors ${
                       isSelected
-                        ? "bg-blue-500 border-blue-500"
-                        : "border-gray-400 dark:border-gray-500 bg-white dark:bg-transparent"
+                        ? "bg-blue-500 text-white"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/40 group-hover:text-blue-500"
                     }`}
                   >
-                    {isSelected && (
-                      <div className="w-2 h-2 rounded-full bg-white"></div>
-                    )}
-                  </div>
-                  <span className="text-sm font-medium">{option.text}</span>
+                    {String.fromCharCode(65 + optIndex)}
+                  </span>
+                  <span className="text-sm md:text-base font-medium leading-normal pr-1">
+                    {option.text}
+                  </span>
+                </div>
+
+                {/* Animated indicator on the far right */}
+                <div
+                  className={`w-5 h-5 rounded-full border mr-1 flex items-center justify-center shrink-0 transition-all duration-200 ${
+                    isSelected
+                      ? "bg-blue-500 border-blue-500 scale-110"
+                      : "border-slate-300 dark:border-slate-600 bg-white dark:bg-transparent"
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                  )}
                 </div>
               </div>
             );
@@ -87,55 +104,34 @@ const QuestionCard = ({
 
         {/* Results / Explanation Section */}
         {showResults && (
-          <div className="mt-4 p-4 bg-gray-300 rounded-md dark:bg-[#001c32] border border-gray-400/20 dark:border-gray-700">
-            <p className="font-semibold mb-2 text-sm">
+          <div
+            className={`mt-5 p-5 rounded-2xl border flex flex-col gap-3 ${
+              isCorrect
+                ? "bg-emerald-50/60 dark:bg-emerald-950/15 text-emerald-800 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-900/30"
+                : "bg-rose-50/60 dark:bg-rose-950/15 text-rose-800 dark:text-rose-400 border-rose-200/50 dark:border-rose-900/30"
+            }`}
+          >
+            <div className="font-bold flex items-center gap-2 text-sm">
               {isCorrect ? (
-                <span className="text-green-600 dark:text-green-400 flex items-center">
-                  {/* SVGs used instead of AntD Icons */}
-                  <svg
-                    className="w-5 h-5 mr-2 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                  Correct Answer
-                </span>
+                <>
+                  <CheckCircleOutlined className="text-emerald-500 text-base" />
+                  <span>Correct Answer</span>
+                </>
               ) : (
-                <span className="text-red-600 dark:text-red-400 flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                  Incorrect Answer
-                </span>
+                <>
+                  <CloseCircleOutlined className="text-rose-500 text-base" />
+                  <span>Incorrect Answer</span>
+                </>
               )}
-            </p>
+            </div>
 
             {question.explanation && (
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                <strong className="text-gray-900 dark:text-white">
+              <div className="text-sm leading-relaxed border-t border-slate-200/20 dark:border-slate-700/20 pt-2.5">
+                <strong className="font-bold text-slate-800 dark:text-white block mb-1">
                   Explanation:
                 </strong>{" "}
                 {question.explanation}
-              </p>
+              </div>
             )}
           </div>
         )}
@@ -146,12 +142,13 @@ const QuestionCard = ({
 
 /** --------------------------
  *  Main TaskTest Component
- -------------------------- */
+ * -------------------------- */
 const TaskTest = () => {
   const { courseId, sprintId, sessionId, taskId } = useParams();
   const navigate = useNavigate();
 
   const [task, setTask] = useState(null);
+  const [sprint, setSprint] = useState(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -161,7 +158,7 @@ const TaskTest = () => {
   const [startTime, setStartTime] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  /** Fetch Task */
+  /** Fetch Task and Sprint details */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -184,6 +181,23 @@ const TaskTest = () => {
           console.error("No task data found in response:", res);
           message.error("No task data found");
         }
+
+        // Fetch sprint to check start date
+        try {
+          const sprintResponse = await getSprintById(sprintId);
+          const sprintData =
+            sprintResponse?.data?.sprint ||
+            sprintResponse?.data ||
+            sprintResponse;
+          if (sprintData) {
+            setSprint(sprintData);
+          }
+        } catch (sprintError) {
+          console.error(
+            "Error fetching sprint details in TaskTest:",
+            sprintError,
+          );
+        }
       } catch (error) {
         console.error("Error fetching task:", error);
         message.error(
@@ -200,7 +214,7 @@ const TaskTest = () => {
     return () => {
       clearInterval(timer);
     };
-  }, [taskId]);
+  }, [taskId, sprintId]);
 
   /** Answer Handler */
   const handleAnswerSelect = useCallback((qIndex, ans, isMulti) => {
@@ -264,11 +278,68 @@ const TaskTest = () => {
     }
   };
 
+  // Check if sprint has started based on its start date
+  const isSprintStarted = () => {
+    if (!sprint) return false; // Default to locked until loaded
+    if (!sprint.startDate) return true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(sprint.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    return today >= startDate;
+  };
+
   /** Loader */
   if (loading || !task) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <Spin size="large" />
+      <div className="flex justify-center items-center h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="text-center space-y-3">
+          <Spin size="large" />
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+            Loading assessment...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  /** Sprint Not Started Lock Screen */
+  if (!loading && sprint && !isSprintStarted()) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-12 shadow-sm flex flex-col items-center justify-center space-y-6">
+          <div className="w-16 h-16 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-3xl shadow-sm">
+            <LockOutlined />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white">
+              Assessment Locked
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base leading-relaxed">
+              This assessment belongs to a scheduled sprint that hasn't started
+              yet.
+              {sprint.startDate && (
+                <span className="block mt-2 font-black text-amber-600 dark:text-amber-400">
+                  Starts on:{" "}
+                  {new Date(sprint.startDate).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
+              )}
+            </p>
+          </div>
+          <button
+            onClick={() =>
+              navigate(`/smart-board/courses/${courseId}/sprints/${sprintId}`)
+            }
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl shadow-sm transition-all duration-300"
+          >
+            <ArrowLeftOutlined className="text-xs" />
+            Back to Sessions
+          </button>
+        </div>
       </div>
     );
   }
@@ -277,60 +348,64 @@ const TaskTest = () => {
   if (showResults) {
     const pass = score >= 80;
     return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <div className="text-center py-10">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:py-10 space-y-8">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-12 shadow-sm text-center flex flex-col items-center justify-center space-y-6">
           <Progress
             type="circle"
             percent={score}
-            width={120}
-            strokeColor={pass ? "#52c41a" : "#ff4d4f"}
+            width={130}
+            strokeWidth={10}
+            strokeColor={pass ? "#10b981" : "#f43f5e"}
+            format={(percent) => `${percent}%`}
+            className="[&_.ant-progress-text]:text-slate-800 dark:[&_.ant-progress-text]:text-white [&_.ant-progress-text]:font-black [&_.ant-progress-text]:text-xl"
           />
-          <h1 className="text-2xl text-black font-bold mt-4">
-            {pass ? "🎉 Congratulations!" : "💪 Keep Practicing!"}
-          </h1>
-          <p className="text-gray-600 mb-8">
-            {pass
-              ? `You passed with ${score}%`
-              : `You scored ${score}%. Minimum 80% required.`}
-          </p>
-
-          <div className="flex justify-center gap-4">
-            {/* <Button onClick={() => window.location.reload()} className="text-blue-600 font-bold border-2 border-blue-600">
-              Try Again
-            </Button> */}
-            <Button
-              onClick={() =>
-                navigate(
-                  `/smart-board/courses/${courseId}/sprints/${sprintId}/sessions/${sessionId}`,
-                )
-              }
-              className="text-blue-600 font-bold border-2 border-blue-600"
-            >
-              Back to Session
-            </Button>
+          <div className="space-y-2">
+            <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white leading-tight">
+              {pass ? "🎉 Congratulations! You Passed!" : "💪 Keep Practicing!"}
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base max-w-md mx-auto leading-relaxed">
+              {pass
+                ? `Incredible job! You achieved a score of ${score}% and unlocked subsequent curriculum session modules.`
+                : `You scored ${score}%. A minimum score of 80% is required to pass and unlock subsequent tasks.`}
+            </p>
           </div>
+
+          <button
+            onClick={() =>
+              navigate(`/smart-board/courses/${courseId}/sprints/${sprintId}`)
+            }
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md shadow-blue-600/10 hover:shadow-blue-600/20 active:scale-[0.98] transition-all"
+          >
+            <ArrowLeftOutlined className="text-xs" />
+            Back to Sprint Sessions
+          </button>
         </div>
 
-        <h2 className="text-xl font-semibold text-black mt-10 mb-4">
-          Review Your Answers
-        </h2>
-        {task.questions.map((q, i) => (
-          <QuestionCard
-            key={i}
-            question={q}
-            index={i}
-            answer={answers[i]}
-            onAnswerSelect={handleAnswerSelect}
-            showResults
-          />
-        ))}
+        <div className="space-y-4">
+          <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <CheckCircleOutlined className="text-blue-500 text-lg" />
+            Review Your Answers
+          </h2>
+          <div className="space-y-5">
+            {task.questions.map((q, i) => (
+              <QuestionCard
+                key={i}
+                question={q}
+                index={i}
+                answer={answers[i]}
+                onAnswerSelect={handleAnswerSelect}
+                showResults
+              />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   if (loading || !task?.questions) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex justify-center items-center h-96">
         <Spin size="large" />
       </div>
     );
@@ -341,34 +416,53 @@ const TaskTest = () => {
   const progress = ((currentIndex + 1) / task.questions.length) * 100;
 
   return (
-    <div className="max-w-7xl mx-auto text-black dark:text-white">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-3xl mx-auto px-4 py-6 md:py-10 space-y-6 text-black dark:text-white">
+      {/* Header & Clock Section */}
+      <div className="flex justify-between items-center gap-4">
         <button
           onClick={() =>
             navigate(`/smart-board/courses/${courseId}/sprints/${sprintId}`)
           }
+          className="inline-flex items-center gap-2 px-4 py-2.5 text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl shadow-sm transition-all duration-300"
         >
-          <ArrowLeftOutlined />
-          Back
+          <ArrowLeftOutlined className="text-xs" />
+          Back to Sessions
         </button>
-        <span className="text-green-600">
+
+        <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 rounded-xl font-black text-sm shadow-sm animate-pulse">
           ⏱ {Math.floor(timeSpent / 60)}:
           {(timeSpent % 60).toString().padStart(2, "0")}
         </span>
       </div>
 
-      <div className="mb-4">
-        <div className="flex justify-between mb-1 text-sm font-medium">
+      {/* Progress Section */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 shadow-sm space-y-2.5">
+        <div className="flex justify-between text-xs md:text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           <span>
             Question {currentIndex + 1} of {task.questions.length}
           </span>
-          <span>{Math.round(progress)}%</span>
+          <span>{Math.round(progress)}% Complete</span>
         </div>
-        <Progress percent={progress} showInfo={false} />
+        <Progress
+          percent={progress}
+          showInfo={false}
+          strokeWidth={10}
+          strokeColor="#3b82f6"
+          className="m-0"
+        />
       </div>
 
-      <p className="text-2xl font-bold mb-2">{task.title}</p>
+      {/* Task Description Title */}
+      <div className="space-y-1.5">
+        <p className="text-xs font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider">
+          Active Assessment
+        </p>
+        <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white leading-tight">
+          {task.title}
+        </h2>
+      </div>
 
+      {/* Active QuestionCard */}
       <QuestionCard
         question={currentQ}
         index={currentIndex}
@@ -377,40 +471,55 @@ const TaskTest = () => {
         showResults={false}
       />
 
-      <div className="flex justify-between mt-8">
+      {/* Pagination & Submission Controls */}
+      <div className="flex justify-between items-center pt-2">
         <button
           disabled={currentIndex === 0}
           onClick={() => setCurrentIndex((i) => i - 1)}
-          className="font-bold bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded"
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-200 border flex items-center gap-1.5 ${
+            currentIndex === 0
+              ? "bg-slate-100/50 dark:bg-slate-800/20 text-slate-400 dark:text-slate-600 border-slate-200/50 dark:border-slate-800/50 cursor-not-allowed shadow-none"
+              : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:text-blue-500 active:scale-[0.97]"
+          }`}
         >
-          Previous
+          ← Previous
         </button>
+
         {currentIndex === task.questions.length - 1 ? (
           <button
             loading={submitting}
             onClick={() =>
               Modal.confirm({
                 title: "Submit Test?",
-                content: "Once submitted, you cannot change answers.",
+                content:
+                  "Are you sure you want to finish the assessment? Once submitted, you cannot modify your answers.",
                 onOk: handleSubmit,
                 okButtonProps: {
-                  className: "text-white bg-green-600 hover:bg-green-700",
+                  className:
+                    "text-white bg-green-600 hover:bg-green-700 rounded-lg font-bold border-0 h-10 px-5",
                 },
-                okText: "Submit",
+                cancelButtonProps: {
+                  className:
+                    "rounded-lg font-bold h-10 px-5 border border-slate-200 hover:border-slate-300",
+                },
+                okText: "Submit Test",
                 cancelText: "Cancel",
                 okType: "success",
+                centered: true,
+                className:
+                  "[&_.ant-modal-content]:rounded-2xl dark:[&_.ant-modal-content]:bg-slate-900 dark:[&_.ant-modal-header]:bg-slate-900 dark:[&_.ant-modal-title]:text-white dark:[&_.ant-modal-body]:text-slate-300",
               })
             }
-            className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
+            className="px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-green-600 hover:bg-green-700 shadow-md shadow-green-600/10 hover:shadow-green-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
-            Submit
+            Submit Quiz
           </button>
         ) : (
           <button
             onClick={() => setCurrentIndex((i) => i + 1)}
-            className="font-bold bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded"
+            className="px-5 py-2.5 rounded-xl font-bold text-sm bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:text-blue-500 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 shadow-sm"
           >
-            Next
+            Next →
           </button>
         )}
       </div>

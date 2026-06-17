@@ -28,6 +28,7 @@ import {
 import { getSessionsBySprint } from "../../api/sessionApi";
 import { getTasksBySession } from "../../api/taskApi";
 import { getTask } from "../../api/taskApi";
+import { getSprintById } from "../../api/sprintApi";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLMS } from "../../contexts/LMSContext";
 
@@ -38,6 +39,7 @@ const SprintDetails = () => {
   const { courseId, sprintId } = useParams();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
+  const [sprint, setSprint] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedSessions, setExpandedSessions] = useState({});
   const [sessionTasks, setSessionTasks] = useState({});
@@ -104,8 +106,22 @@ const SprintDetails = () => {
     return { status: "in_progress", progress };
   };
 
+  // Check if sprint has started based on its start date
+  const isSprintStarted = () => {
+    if (!sprint) return false;
+    if (!sprint.startDate) return true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(sprint.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    return today >= startDate;
+  };
+
   // Check if a task should be unlocked
   const isTaskUnlocked = (taskIndex, tasks, sessionIndex, allSessions) => {
+    // If sprint hasn't started yet, all tasks are locked
+    if (!isSprintStarted()) return false;
+
     // First task of the first session is always unlocked
     if (sessionIndex === 0 && taskIndex === 0) return true;
 
@@ -144,6 +160,20 @@ const SprintDetails = () => {
 
         const sessionsData = sessionsResponse.data.sessions;
         setSessions(sessionsData);
+
+        // Fetch sprint details to check start date
+        try {
+          const sprintResponse = await getSprintById(sprintId);
+          const sprintData =
+            sprintResponse?.data?.sprint ||
+            sprintResponse?.data ||
+            sprintResponse;
+          if (sprintData) {
+            setSprint(sprintData);
+          }
+        } catch (sprintError) {
+          console.error("Error fetching sprint details:", sprintError);
+        }
 
         // Then fetch all tasks for all sessions in parallel
         const tasksPromises = sessionsData.map((session) =>
@@ -215,123 +245,157 @@ const SprintDetails = () => {
   if (loading) return <Skeleton active />;
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-2 py-2 md:py-4 space-y-4">
+      {/* Back Button */}
       <button
-        type="text"
         onClick={() => navigate(`/smart-board/courses/${courseId}`)}
-        className="gap-3"
+        className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl shadow-sm transition-all duration-300"
       >
-        <ArrowLeftOutlined />
-        Back to Sprint
+        <ArrowLeftOutlined className="text-xs" />
+        Back to Course Curriculum
       </button>
 
-      <div className="flex justify-between items-center mb-6">
-        <h4 className="mb-0 text-xl font-semibold">Sprint Sessions</h4>
-        {sessions.length > 0 && (
-          <div className="flex items-center">
-            <span className="mr-2 text-sm">
-              {getSprintStatus().status === "completed" ? "" : ""}
+      {/* Hero Sprint Header */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="flex-1 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-bold uppercase tracking-wider">
+              Sprint Dashboard
             </span>
+            {sprint?.startDate && (
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1 border ${
+                  !isSprintStarted()
+                    ? "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/50"
+                    : "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50"
+                }`}
+              >
+                <LockOutlined className="text-xs" />
+                {!isSprintStarted() ? "Scheduled" : "Active"}
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white leading-tight">
+            {sprint?.name || "Sprint Sessions"}
+          </h1>
+          {sprint?.description && (
+            <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed max-w-3xl">
+              {sprint.description}
+            </p>
+          )}
+        </div>
+
+        {sessions.length > 0 && (
+          <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/50 w-full md:w-auto justify-between md:justify-start">
+            <div className="text-right">
+              <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest">
+                Sprint Progress
+              </p>
+              <p className="text-sm font-black text-slate-700 dark:text-white capitalize">
+                {getSprintStatus().status.replace("_", " ")}
+              </p>
+            </div>
             <Progress
               type="circle"
               percent={getSprintStatus().progress}
-              width={36}
-              strokeWidth={12}
+              width={50}
+              strokeWidth={10}
               format={(percent) => `${percent}%`}
               status={
                 getSprintStatus().status === "completed" ? "success" : "active"
               }
-              // Antd ke text aur trail ko target karne ke liye custom utility classes
-              className="ml-2 [& Rose-text-class-override]:text-black dark:[&_.ant-progress-text]:text-white"
+              className="[&_.ant-progress-text]:text-slate-800 dark:[&_.ant-progress-text]:text-white [&_.ant-progress-text]:font-black [&_.ant-progress-text]:text-[10px]"
             />
           </div>
         )}
       </div>
 
+      {/* Sessions Accordion List */}
       {sessions.length === 0 ? (
-        <Empty description="No sessions available" />
+        <div className="text-center py-16 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+          <Empty description="No sessions published yet for this sprint." />
+        </div>
       ) : (
         <div className="space-y-4">
-          {sessions.map((session) => (
-            <div
-              key={session._id}
-              className="border border-[#001529] dark:border-gray-600 bg-[#001529] rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-            >
+          {sessions.map((session) => {
+            const isUnlocked = isSessionUnlocked(
+              sessions.findIndex((s) => s._id === session._id),
+              sessions,
+            );
+
+            return (
               <div
-                className={`p-2 md:p-4 flex justify-between items-center transition-colors ${
-                  isSessionUnlocked(
-                    sessions.findIndex((s) => s._id === session._id),
-                    sessions,
-                  )
-                    ? "bg-gray-200 dark:bg-[#001529] text-black dark:text-white hover:bg-blue-50 dark:hover:bg-[#001550] cursor-pointer border-l-4 border-blue-500"
-                    : "bg-gray-200 dark:bg-[#001529] text-black dark:text-white cursor-not-allowed border-l-4 border-gray-300"
-                }`}
-                onClick={() => {
-                  if (
-                    isSessionUnlocked(
-                      sessions.findIndex((s) => s._id === session._id),
-                      sessions,
-                    )
-                  ) {
-                    toggleSession(session._id);
-                  }
-                }}
+                key={session._id}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 dark:hover:border-blue-500/50 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                <div className="flex items-center">
-                  {(() => {
-                    const sessionTasksList = sessionTasks[session._id] || [];
-                    const completedTasks = sessionTasksList.filter((task) =>
-                      isTaskCompleted(task),
-                    );
-                    const completionPercentage =
-                      sessionTasksList.length > 0
-                        ? Math.round(
-                            (completedTasks.length / sessionTasksList.length) *
-                              100,
-                          )
-                        : 0;
-                    const isCompleted = areAllTasksCompleted(sessionTasksList);
-                    const inProgress =
-                      completedTasks.length > 0 && !isCompleted;
-
-                    // Determine icon to show
-                    let icon = (
-                      <PlayCircleOutlined className="text-blue-500 text-xl mr-3" />
-                    );
-
-                    if (isCompleted) {
-                      icon = (
-                        <CheckCircleOutlined className="text-green-500 text-xl mr-3" />
-                      );
-                    } else if (inProgress) {
-                      icon = (
-                        <div className="relative mr-3">
-                          <PlayCircleOutlined className="text-blue-500 text-xl" />
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs">
-                              {completionPercentage}%
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    } else if (
-                      !isSessionUnlocked(
-                        sessions.findIndex((s) => s._id === session._id),
-                        sessions,
-                      )
-                    ) {
-                      icon = (
-                        <LockOutlined className="text-gray-400 text-xl mr-3" />
-                      );
+                {/* Session Header Card */}
+                <div
+                  className={`p-4 md:p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 transition-colors ${
+                    isUnlocked
+                      ? "bg-white dark:bg-slate-900 text-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer border-l-4 border-l-blue-500"
+                      : "bg-slate-50 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 cursor-not-allowed border-l-4 border-l-slate-200 dark:border-l-slate-800"
+                  }`}
+                  onClick={() => {
+                    if (isUnlocked) {
+                      toggleSession(session._id);
                     }
+                  }}
+                >
+                  <div className="flex items-center gap-4 flex-1 w-full">
+                    {(() => {
+                      const sessionTasksList = sessionTasks[session._id] || [];
+                      const completedTasks = sessionTasksList.filter((task) =>
+                        isTaskCompleted(task),
+                      );
+                      const completionPercentage =
+                        sessionTasksList.length > 0
+                          ? Math.round(
+                              (completedTasks.length /
+                                sessionTasksList.length) *
+                                100,
+                            )
+                          : 0;
+                      const isCompleted =
+                        areAllTasksCompleted(sessionTasksList);
+                      const inProgress =
+                        completedTasks.length > 0 && !isCompleted;
 
-                    return (
-                      <div className="grid grid-col-2">
-                        <div className="flex items-start">
-                          <div className="hidden md:block">{icon}</div>
-                          <div className="flex-1">
-                            <div className="font-medium flex items-center">
-                              <span className="text-sm">{session.name}</span>
+                      // Determine icon to show
+                      let icon = (
+                        <PlayCircleOutlined className="text-blue-500 text-xl" />
+                      );
+
+                      if (isCompleted) {
+                        icon = (
+                          <CheckCircleOutlined className="text-green-500 text-xl" />
+                        );
+                      } else if (inProgress) {
+                        icon = (
+                          <div className="relative flex items-center justify-center">
+                            <PlayCircleOutlined className="text-blue-500 text-xl" />
+                            <div className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] bg-blue-500 rounded-full flex items-center justify-center px-0.5">
+                              <span className="text-white text-[8px] font-black leading-none">
+                                {completionPercentage}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      } else if (!isUnlocked) {
+                        icon = (
+                          <LockOutlined className="text-slate-400 dark:text-slate-500 text-xl" />
+                        );
+                      }
+
+                      return (
+                        <>
+                          <div className="p-3 bg-slate-100 dark:bg-slate-800/60 rounded-xl text-slate-600 dark:text-slate-300">
+                            {icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                              <h3 className="text-base font-bold text-slate-800 dark:text-white line-clamp-1 pr-4">
+                                {session.name}
+                              </h3>
                               {sessionTasksList.length > 0 && (
                                 <Tag
                                   color={
@@ -341,7 +405,7 @@ const SprintDetails = () => {
                                         ? "processing"
                                         : "default"
                                   }
-                                  className="ml-2 text-xs"
+                                  className="text-[10px] font-bold uppercase tracking-wider rounded-full border-0 px-2.5 py-0.5"
                                 >
                                   {isCompleted
                                     ? "Completed"
@@ -351,204 +415,92 @@ const SprintDetails = () => {
                                 </Tag>
                               )}
                             </div>
-                            {/* <div className="text-black dark:text-white text-sm">
-                              {session.content || "No content"}
-                            </div> */}
+                            {session.content && (
+                              <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
+                                {session.content}
+                              </p>
+                            )}
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          {session.zoomMeetingLink && (
-                            <a
-                              href={session.zoomMeetingLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-sm shadow hover:bg-blue-700 transition whitespace-nowrap"
-                            >
-                              <VideoCameraOutlined />
-                              Go Live
-                            </a>
-                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
 
-                          {getBatch()?.whatsappGroupLink && (
-                            <a
-                              href={getBatch().whatsappGroupLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-white bg-green-600 rounded-sm shadow hover:bg-green-700 transition whitespace-nowrap"
-                            >
-                              <MessageOutlined />
-                              WhatsApp Group
-                            </a>
-                          )}
+                  {/* Right Side Controls & Video Playback */}
+                  <div className="flex flex-wrap lg:flex-nowrap items-center gap-2.5 w-full lg:w-auto mt-3 lg:mt-0 justify-between lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100 dark:border-slate-800">
+                    <div className="flex flex-wrap gap-2">
+                      {session.zoomMeetingLink && (
+                        <a
+                          href={session.zoomMeetingLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 border border-indigo-700/10 rounded-lg shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
+                        >
+                          <VideoCameraOutlined className="text-sm" />
+                          Go Live
+                        </a>
+                      )}
 
-                          {session.videoUrl && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setCurrentVideoUrl(session.videoUrl);
-                                setVideoModalVisible(true);
-                              }}
-                              className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-sm shadow hover:bg-blue-100 transition whitespace-nowrap"
-                            >
-                              <PlayCircleOutlined />
-                              Watch
-                            </button>
-                          )}
+                      {getBatch()?.whatsappGroupLink && (
+                        <a
+                          href={getBatch().whatsappGroupLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 border border-emerald-700/10 rounded-lg shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
+                        >
+                          <MessageOutlined className="text-sm" />
+                          Group
+                        </a>
+                      )}
 
-                          {/* Video Modal */}
-                          <Modal
-                            title="Video Player"
-                            open={videoModalVisible}
-                            onCancel={() => setVideoModalVisible(false)}
-                            footer={null}
-                            width={800}
-                            destroyOnClose
-                          >
-                            <div className="w-full aspect-video">
-                              {currentVideoUrl.includes(".mp4") ||
-                              currentVideoUrl.includes(".mov") ||
-                              currentVideoUrl.includes(".webm") ? (
-                                <video
-                                  src={currentVideoUrl}
-                                  controls
-                                  autoPlay
-                                  className="w-full h-full"
-                                  controlsList="nodownload"
-                                />
-                              ) : (
-                                <iframe
-                                  src={
-                                    currentVideoUrl.includes("drive.google.com")
-                                      ? currentVideoUrl
-                                          .replace(
-                                            "/view?usp=sharing",
-                                            "/preview",
-                                          )
-                                          .replace("/view", "/preview")
-                                      : currentVideoUrl
-                                  }
-                                  width="100%"
-                                  height="100%"
-                                  allow="autoplay; fullscreen"
-                                  allowFullScreen
-                                  frameBorder="0"
-                                />
-                              )}
-                            </div>
-                          </Modal>
+                      {session.videoUrl && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentVideoUrl(session.videoUrl);
+                            setVideoModalVisible(true);
+                          }}
+                          className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
+                        >
+                          <PlayCircleOutlined className="text-sm" />
+                          Watch Video
+                        </button>
+                      )}
+                    </div>
 
-                          {/* Questions Modal */}
-                          <Modal
-                            title="Questions & Answers"
-                            open={questionsModalVisible}
-                            onCancel={() => setQuestionsModalVisible(false)}
-                            footer={null}
-                            width={700}
-                          >
-                            <div className="space-y-4">
-                              {currentQuestions.map((question, index) => (
-                                <div
-                                  key={index}
-                                  className="p-2 md:p-4 border rounded-lg"
-                                >
-                                  <div className="font-medium mb-2">
-                                    {index + 1}. {question.question}
-                                  </div>
-                                  <div className="space-y-2">
-                                    {question.options?.map(
-                                      (option, optIndex) => {
-                                        // Handle both string and object options
-                                        const optionText =
-                                          typeof option === "object"
-                                            ? option.text
-                                            : option;
-                                        const isCorrect =
-                                          typeof option === "object"
-                                            ? option.isCorrect
-                                            : question.correctAnswer ===
-                                              optIndex;
-
-                                        return (
-                                          <div
-                                            key={optIndex}
-                                            className={`p-2 rounded ${
-                                              isCorrect
-                                                ? "bg-green-50 text-green-700 border border-green-200"
-                                                : "bg-gray-50"
-                                            }`}
-                                          >
-                                            {String.fromCharCode(65 + optIndex)}
-                                            . {optionText}
-                                          </div>
-                                        );
-                                      },
-                                    )}
-                                  </div>
-                                  {question.explanation && (
-                                    <div className="mt-2 p-2 bg-blue-50 text-blue-700 rounded text-sm">
-                                      <strong>Explanation:</strong>{" "}
-                                      {question.explanation}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </Modal>
-                        </div>
-                      </div>
-                    );
-                  })()}
+                    <div className="p-1.5 text-slate-400 dark:text-slate-500 self-center">
+                      {expandedSessions[session._id] ? (
+                        <DownOutlined className="text-xs font-black" />
+                      ) : (
+                        <RightOutlined className="text-xs font-black" />
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  {session.completed && (
-                    <CheckCircleOutlined className="text-green-500 mr-3" />
-                  )}
-                  {expandedSessions[session._id] ? (
-                    <DownOutlined className="text-black dark:text-white" />
-                  ) : (
-                    <RightOutlined className="text-black dark:text-white" />
-                  )}
-                </div>
-              </div>
 
-              {expandedSessions[session._id] && (
-                <div
-                  className={
-                    !isSessionUnlocked(
-                      sessions.findIndex((s) => s._id === session._id),
-                      sessions,
-                    )
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  }
-                >
-                  <div className="border-t border-gray-100 bg-gray-50 dark:bg-gray-800 p-1.5 md:p-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-black dark:text-white">
-                        <FileTextOutlined className="mr-2" />
-                        Tasks
+                {/* Session expanded tasks area */}
+                {expandedSessions[session._id] && (
+                  <div
+                    className={`border-t border-slate-150 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/40 p-4 md:p-6 transition-all ${
+                      !isUnlocked ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+                      <h4 className="text-xs uppercase font-black text-slate-400 dark:text-slate-500 tracking-wider flex items-center">
+                        <FileTextOutlined className="mr-2 text-slate-400" />
+                        Session Tasks
                       </h4>
                       <Button
                         type="link"
                         size="small"
-                        className="text-blue font-bold"
+                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold text-xs"
                         onClick={async (e) => {
                           e.stopPropagation();
                           try {
                             const userId = getUserId();
                             if (!userId) {
-                              console.error(
-                                "User not authenticated. Auth state:",
-                                {
-                                  isAuthenticated,
-                                  hasUser: !!currentUser,
-                                  userId: currentUser?._id,
-                                  localStorageUser:
-                                    localStorage.getItem("user"),
-                                },
-                              );
                               message.error(
                                 "Please log in to view test results.",
                               );
@@ -556,18 +508,14 @@ const SprintDetails = () => {
                             }
 
                             const tasks = sessionTasks[session._id] || [];
-
                             const results = [];
 
                             // Get submissions for each task
                             for (const task of tasks) {
                               try {
                                 const response = await getTask(task._id);
-
-                                // Handle different response structures
                                 const taskData =
                                   response?.data?.task || response?.task;
-
                                 const submissions = taskData?.submissions || [];
 
                                 if (submissions.length > 0) {
@@ -597,16 +545,8 @@ const SprintDetails = () => {
                               }
                             }
 
-                            if (results.length === 0) {
-                              // Log more details about why no results were found
-                              console.warn(
-                                "No submissions found. Checking task data...",
-                              );
-                              const tasks = sessionTasks[session._id] || [];
-                            }
-
                             setCurrentResults({
-                              sessionTitle: session.title,
+                              sessionTitle: session.name,
                               results,
                             });
                             setResultsModalVisible(true);
@@ -621,13 +561,13 @@ const SprintDetails = () => {
                     </div>
 
                     {loadingTasks[session._id] ? (
-                      <div className="p-4 text-center">
+                      <div className="py-8 text-center">
                         <Skeleton active paragraph={{ rows: 1 }} />
                       </div>
                     ) : sessionTasks[session._id]?.length > 0 ? (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {sessionTasks[session._id]?.map((task, taskIndex) => {
-                          const isUnlocked = isTaskUnlocked(
+                          const isTaskActive = isTaskUnlocked(
                             taskIndex,
                             sessionTasks[session._id],
                             sessions.findIndex((s) => s._id === session._id),
@@ -638,15 +578,15 @@ const SprintDetails = () => {
                           return (
                             <div
                               key={task._id}
-                              className={`p-4 rounded-lg transition-all duration-200 ${
+                              className={`p-4 rounded-xl border transition-all duration-300 ${
                                 isCompleted
-                                  ? "bg-gray-200 dark:bg-[#001529] border-l-4 border-green-500"
-                                  : !isUnlocked
-                                    ? "bg-gray-200 dark:bg-[#001529] border-l-4 border-gray-300 opacity-75"
-                                    : "bg-gray-200 dark:bg-[#001529] border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer shadow-sm hover:shadow-md"
+                                  ? "bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 border-l-4 border-l-green-500 shadow-sm"
+                                  : !isTaskActive
+                                    ? "bg-slate-100/50 dark:bg-slate-800/20 border-slate-200/50 dark:border-slate-800/50 border-l-4 border-l-slate-300 dark:border-l-slate-700 opacity-60 cursor-not-allowed"
+                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 border-l-4 border-l-blue-500 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm hover:shadow-md cursor-pointer hover:bg-blue-50/10 dark:hover:bg-blue-900/5"
                               }`}
                               onClick={
-                                isUnlocked && !isCompleted
+                                isTaskActive && !isCompleted
                                   ? (e) => {
                                       e.stopPropagation();
                                       navigate(
@@ -656,39 +596,38 @@ const SprintDetails = () => {
                                   : undefined
                               }
                             >
-                              <div className="flex justify-between items-start">
-                                <div className="font-medium text-black dark:text-white">
-                                  {task.title}
-                                  {isTaskCompleted(task) && (
-                                    <span className="ml-2 text-green-600 text-sm">
+                              <div className="flex justify-between items-start gap-4">
+                                <div className="font-bold text-slate-800 dark:text-white flex flex-wrap items-center gap-2 text-sm md:text-base">
+                                  <span>{task.title}</span>
+                                  {isCompleted && (
+                                    <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-bold bg-green-50 dark:bg-green-950/20 px-2 py-0.5 rounded-md border border-green-200/20">
                                       <CheckOutlined /> Completed
                                     </span>
                                   )}
                                 </div>
-                                {isTaskCompleted(task) && (
+                                {isCompleted && (
                                   <Tag
                                     color="green"
-                                    className="flex items-center"
+                                    className="flex items-center rounded-full border-0 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm"
                                   >
-                                    <LockOutlined className="mr-1" /> Locked
+                                    <LockOutlined className="mr-1 text-[10px]" />{" "}
+                                    Locked
                                   </Tag>
                                 )}
                               </div>
                               {task.description && (
-                                <div className="text-black dark:text-white text-sm mt-1">
+                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 leading-relaxed">
                                   {task.description}
-                                </div>
+                                </p>
                               )}
-                              <div className="mt-2 flex items-center space-x-2">
+                              <div className="mt-3 flex flex-wrap items-center gap-2">
                                 {task.questions?.length > 0 && (
                                   <Tag
-                                    color={
-                                      isTaskCompleted(task) ? "green" : "blue"
-                                    }
-                                    className="cursor-pointer hover:opacity-80 transition"
+                                    color={isCompleted ? "green" : "blue"}
+                                    className="cursor-pointer hover:opacity-80 transition rounded-full border-0 px-2.5 py-0.5 text-xs font-semibold flex items-center shadow-sm"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      if (isTaskCompleted(task)) {
+                                      if (isCompleted) {
                                         setCurrentQuestions(task.questions);
                                         setQuestionsModalVisible(true);
                                       } else {
@@ -702,18 +641,19 @@ const SprintDetails = () => {
                                     {task.questions.length !== 1 ? "s" : ""}
                                   </Tag>
                                 )}
-                                {!isUnlocked && !isTaskCompleted(task) && (
-                                  <Tag
-                                    color="default"
-                                    className="text-xs bg-gray-100 text-gray-600"
-                                  >
-                                    <LockOutlined className="mr-1" /> Complete
-                                    previous task
-                                  </Tag>
+
+                                {!isTaskActive && !isCompleted && (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full text-xs font-medium border border-slate-200/50 dark:border-slate-700/50">
+                                    <LockOutlined className="text-xs" />{" "}
+                                    {!isSprintStarted() && sprint?.startDate
+                                      ? `Starts on ${new Date(sprint.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                                      : "Complete previous task"}
+                                  </span>
                                 )}
-                                {isUnlocked && !isTaskCompleted(task) && (
-                                  <span className="text-xs">
-                                    Click to start
+
+                                {isTaskActive && !isCompleted && (
+                                  <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-full hover:bg-blue-100 transition shadow-sm border border-blue-100/50 dark:border-blue-900/30">
+                                    Click to Start →
                                   </span>
                                 )}
                               </div>
@@ -722,77 +662,218 @@ const SprintDetails = () => {
                         })}
                       </div>
                     ) : (
-                      <Empty
-                        description="No tasks available"
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        className="py-4"
-                      />
+                      <div className="text-center py-8 bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 border-dashed">
+                        <Empty
+                          description="No tasks available in this session"
+                          image={Empty.PRESENTED_IMAGE_SIMPLE}
+                          className="py-2"
+                        />
+                      </div>
                     )}
                   </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Video Modal */}
+      <Modal
+        title={
+          <span className="font-bold text-slate-800 dark:text-white">
+            Video Player
+          </span>
+        }
+        open={videoModalVisible}
+        onCancel={() => setVideoModalVisible(false)}
+        footer={null}
+        width={800}
+        destroyOnClose
+        centered
+        className="[&_.ant-modal-content]:rounded-2xl dark:[&_.ant-modal-content]:bg-slate-900 dark:[&_.ant-modal-header]:bg-slate-900 dark:[&_.ant-modal-title]:text-white"
+      >
+        <div className="w-full aspect-video rounded-xl overflow-hidden bg-black mt-4">
+          {currentVideoUrl.includes(".mp4") ||
+          currentVideoUrl.includes(".mov") ||
+          currentVideoUrl.includes(".webm") ? (
+            <video
+              src={currentVideoUrl}
+              controls
+              autoPlay
+              className="w-full h-full object-contain"
+              controlsList="nodownload"
+            />
+          ) : (
+            <iframe
+              src={
+                currentVideoUrl.includes("drive.google.com")
+                  ? currentVideoUrl
+                      .replace("/view?usp=sharing", "/preview")
+                      .replace("/view", "/preview")
+                  : currentVideoUrl
+              }
+              width="100%"
+              height="100%"
+              allow="autoplay; fullscreen"
+              allowFullScreen
+              frameBorder="0"
+              className="w-full h-full border-0"
+            />
+          )}
+        </div>
+      </Modal>
+
+      {/* Questions Modal */}
+      <Modal
+        title={
+          <span className="font-bold text-slate-800 dark:text-white text-lg">
+            Questions & Answers
+          </span>
+        }
+        open={questionsModalVisible}
+        onCancel={() => setQuestionsModalVisible(false)}
+        footer={null}
+        width={700}
+        centered
+        className="[&_.ant-modal-content]:rounded-2xl dark:[&_.ant-modal-content]:bg-slate-900 dark:[&_.ant-modal-header]:bg-slate-900 dark:[&_.ant-modal-title]:text-white"
+      >
+        <div className="space-y-6 max-h-[70vh] overflow-y-auto mt-4 pr-1">
+          {currentQuestions.map((question, index) => (
+            <div
+              key={index}
+              className="p-5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl shadow-sm"
+            >
+              <div className="font-bold text-slate-800 dark:text-white mb-4 text-sm md:text-base leading-relaxed">
+                {index + 1}. {question.question}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {question.options?.map((option, optIndex) => {
+                  const optionText =
+                    typeof option === "object" ? option.text : option;
+                  const isCorrect =
+                    typeof option === "object"
+                      ? option.isCorrect
+                      : question.correctAnswer === optIndex;
+
+                  return (
+                    <div
+                      key={optIndex}
+                      className={`p-3.5 rounded-xl border flex items-start gap-2.5 transition ${
+                        isCorrect
+                          ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50"
+                          : "bg-white dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-800"
+                      }`}
+                    >
+                      <span
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold leading-none shrink-0 ${
+                          isCorrect
+                            ? "bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                        }`}
+                      >
+                        {String.fromCharCode(65 + optIndex)}
+                      </span>
+                      <span className="text-sm font-medium leading-normal pr-1">
+                        {optionText}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {question.explanation && (
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 rounded-xl text-sm leading-relaxed">
+                  <strong className="font-bold text-blue-800 dark:text-blue-300 block mb-1">
+                    Explanation:
+                  </strong>{" "}
+                  {question.explanation}
                 </div>
               )}
             </div>
           ))}
         </div>
-      )}
+      </Modal>
+
       {/* Results Modal */}
       <Modal
-        title={`Test Results - ${currentResults?.sessionTitle || ""}`}
+        title={
+          <span className="font-bold text-slate-800 dark:text-white">
+            Test Results - {currentResults?.sessionTitle || ""}
+          </span>
+        }
         open={resultsModalVisible}
         onCancel={() => setResultsModalVisible(false)}
         footer={[
-          <Button key="close" onClick={() => setResultsModalVisible(false)}>
+          <Button
+            key="close"
+            onClick={() => setResultsModalVisible(false)}
+            className="rounded-xl font-semibold border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700"
+          >
             Close
           </Button>,
         ]}
         width={600}
+        centered
+        className="[&_.ant-modal-content]:rounded-2xl dark:[&_.ant-modal-content]:bg-slate-900 dark:[&_.ant-modal-header]:bg-slate-900 dark:[&_.ant-modal-title]:text-white"
       >
         {currentResults?.results?.length > 0 ? (
           <List
             itemLayout="horizontal"
             dataSource={currentResults.results}
+            className="mt-4"
             renderItem={(item) => (
               <List.Item
                 actions={[
                   <span
                     key="score"
-                    className={
+                    className={`font-black text-sm pr-2 ${
                       item.passed
-                        ? "text-green-600 font-medium"
-                        : "text-red-600 font-medium"
-                    }
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
                   >
                     {item.score}%
                   </span>,
                 ]}
+                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 px-3 py-4 rounded-xl transition"
               >
                 <List.Item.Meta
                   title={
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                       {item.passed ? (
-                        <CheckCircleOutlined className="text-green-500 mr-2" />
+                        <CheckCircleOutlined className="text-emerald-500 text-base" />
                       ) : (
-                        <CloseCircleOutlined className="text-red-500 mr-2" />
+                        <CloseCircleOutlined className="text-red-500 text-base" />
                       )}
-                      <span>{item.title}</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-200 text-sm">
+                        {item.title}
+                      </span>
                     </div>
                   }
-                  description={`Submitted on ${item.submittedAt}`}
+                  description={
+                    <span className="text-xs text-slate-400">
+                      Submitted on {item.submittedAt}
+                    </span>
+                  }
                 />
-                <div className="w-32">
+                <div className="w-28 md:w-36 shrink-0 hidden sm:block">
                   <Progress
                     percent={item.score}
                     status={item.passed ? "success" : "exception"}
                     showInfo={false}
                     strokeWidth={8}
+                    className="m-0"
                   />
                 </div>
               </List.Item>
             )}
           />
         ) : (
-          <div className="text-center py-4 text-gray-500">
-            No test results found for this session.
+          <div className="text-center py-12 text-slate-400 dark:text-slate-500">
+            <Empty
+              description="No test results found for this session."
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
           </div>
         )}
       </Modal>

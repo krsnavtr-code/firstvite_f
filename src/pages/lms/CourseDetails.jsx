@@ -93,6 +93,12 @@ const CourseDetails = () => {
       )
     : 0;
 
+  const activeOrUpcomingSprint =
+    sprints
+      .filter((s) => (sprintProgress[s._id] || 0) < 100)
+      .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0] ||
+    sprints[0];
+
   if (loading)
     return (
       <div className="p-6 max-w-5xl mx-auto animate-pulse">
@@ -190,6 +196,28 @@ const CourseDetails = () => {
           <h2 className="text-2xl font-black text-slate-800 dark:text-white">
             Curriculum Sprints
           </h2>
+          {activeOrUpcomingSprint && activeOrUpcomingSprint.startDate && (
+            <span className="ml-auto px-3.5 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm">
+              <svg
+                className="w-4 h-4 animate-pulse"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Next Start:{" "}
+              {new Date(activeOrUpcomingSprint.startDate).toLocaleDateString(
+                "en-US",
+                { month: "short", day: "numeric", year: "numeric" },
+              )}
+            </span>
+          )}
         </div>
 
         {sprints.length === 0 ? (
@@ -272,6 +300,28 @@ const CourseDetails = () => {
                         </svg>
                         {sprint.sessions?.length || 0} Sessions
                       </span>
+                      {sprint.startDate && (
+                        <span className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">
+                          <svg
+                            className="w-4 h-4 text-blue-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          Starts:{" "}
+                          {new Date(sprint.startDate).toLocaleDateString(
+                            "en-US",
+                            { month: "short", day: "numeric", year: "numeric" },
+                          )}
+                        </span>
+                      )}
                     </div>
                     {sprint.whatsappGroupLink && (
                       <button
