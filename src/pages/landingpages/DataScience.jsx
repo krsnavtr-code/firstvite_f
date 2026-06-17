@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { submitContactForm } from "../../api/contactApi";
 
 const DataScienceLanding = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -13,21 +16,68 @@ const DataScienceLanding = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const submitForm = () => {
-    if (!formData.name || !formData.phone) {
-      alert("Please enter your name and phone number.");
+  const submitForm = async () => {
+    if (
+      !formData.name ||
+      !formData.phone ||
+      !formData.email ||
+      !formData.status
+    ) {
+      toast.error(
+        "Please fill in all required fields (Name, Phone, Email, Experience Level).",
+      );
       return;
     }
-    const msg = `Hi Sumit sir, I want to enroll in the Data Science & AI Programme.\nName: ${formData.name}\nPhone: ${formData.phone}\nBackground: ${formData.status}`;
-    window.open(
-      `https://wa.me/919891030303?text=${encodeURIComponent(msg)}`,
-      "_blank",
-    );
-    setIsModalOpen(false);
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const submissionData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: `Background/Experience level: ${formData.status}. I want to enroll in the Data Science & AI Programme. [Ref: ${Date.now()}]`,
+        courseTitle: "Data Science & AI Programme",
+        courseId: "data-science-ai",
+        subject: "Data Science & AI Programme Registration",
+      };
+
+      const result = await submitContactForm(submissionData);
+
+      if (result.success) {
+        toast.success("Application saved successfully!");
+
+        const msg = `Hi Sumit sir, I want to enroll in the Data Science & AI Programme.\nName: ${formData.name}\nPhone: ${formData.phone}\nBackground: ${formData.status}`;
+        window.open(
+          `https://wa.me/919891030303?text=${encodeURIComponent(msg)}`,
+          "_blank",
+        );
+
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          status: "",
+        });
+        setIsModalOpen(false);
+      } else {
+        toast.error(result.message || "Failed to submit. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form to DB:", error);
+      toast.error(error.message || "Failed to submit. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Trainer Image Base64 (Truncated for clean code, replace with actual or keep original)
-  const trainerImg =''
+  const trainerImg = "";
   return (
     <div className="font-['Inter',sans-serif] text-[#1E293B] bg-white overflow-x-hidden scroll-smooth">
       {/* MODAL OVERLAY */}
@@ -126,10 +176,11 @@ const DataScienceLanding = () => {
               </select>
             </div>
             <button
-              className="w-full bg-gradient-to-br from-[#FF5C00] to-[#FF8C42] text-white border-none rounded-xl py-3.5 text-[16px] font-bold cursor-pointer shadow-[0_6px_24px_rgba(255,92,0,0.35)] hover:-translate-y-[1px] transition-transform mb-2.5"
+              className="w-full bg-gradient-to-br from-[#FF5C00] to-[#FF8C42] text-white border-none rounded-xl py-3.5 text-[16px] font-bold cursor-pointer shadow-[0_6px_24px_rgba(255,92,0,0.35)] hover:-translate-y-[1px] transition-transform mb-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={submitForm}
+              disabled={isSubmitting}
             >
-              Apply Now — Secure My Seat 🎯
+              {isSubmitting ? "Submitting..." : "Apply Now — Secure My Seat 🎯"}
             </button>
             <a
               href="https://wa.me/919891030303?text=Hi%20Sumit%20sir%2C%20I%20want%20to%20enroll%20in%20the%20Data%20Science%20%26%20AI%20Programme.%20Please%20share%20batch%20details%20and%20EMI%20options."
