@@ -686,11 +686,17 @@ const SprintDetails = () => {
                                       isTaskCompleted(task) ? "green" : "blue"
                                     }
                                     className="cursor-pointer hover:opacity-80 transition"
-                                    // onClick={(e) => {
-                                    //   e.stopPropagation();
-                                    //   setCurrentQuestions(task.questions);
-                                    //   setQuestionsModalVisible(true);
-                                    // }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (isTaskCompleted(task)) {
+                                        setCurrentQuestions(task.questions);
+                                        setQuestionsModalVisible(true);
+                                      } else {
+                                        message.info(
+                                          "Please submit the task first to view the questions Answer.",
+                                        );
+                                      }
+                                    }}
                                   >
                                     {task.questions.length} question
                                     {task.questions.length !== 1 ? "s" : ""}
