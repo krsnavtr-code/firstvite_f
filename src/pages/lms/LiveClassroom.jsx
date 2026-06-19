@@ -258,6 +258,32 @@ const LiveClassroom = () => {
       startScreenShareProcess();
     });
 
+    socket.current.on("screen-share-active", ({ userId, fullname, role }) => {
+      console.log(
+        `[SCREEN SHARE] Existing screen share by ${userId} (${fullname})`,
+      );
+      // New joiner requests screen share offer from the sharer
+      if (isMeTeacher ? !isRemoteTeacher(role) : isRemoteTeacher(role)) {
+        socket.current.emit("request-screen-share-offer", {
+          sessionId,
+          toUserId: userId,
+        });
+      }
+    });
+
+    socket.current.on(
+      "screen-share-offer-request",
+      ({ requesterId, requesterFullname }) => {
+        console.log(
+          `[SCREEN SHARE] Request from ${requesterFullname} (${requesterId}) to join screen share`,
+        );
+        // Screen sharer creates peer connection and sends offer to requester
+        if (screenShareStreamRef.current) {
+          createScreenSharePeerConnection(requesterId, true);
+        }
+      },
+    );
+
     socket.current.on("screen-share-offer", async ({ offer, fromUserId }) => {
       if (
         screenSharePeersRef.current[fromUserId] &&

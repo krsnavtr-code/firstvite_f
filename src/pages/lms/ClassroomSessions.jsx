@@ -26,6 +26,7 @@ const ClassroomSessions = () => {
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(null);
+  const [showEndConfirm, setShowEndConfirm] = useState(null);
 
   useEffect(() => {
     fetchBatches();
@@ -36,6 +37,14 @@ const ClassroomSessions = () => {
       fetchSessions(selectedBatch);
     }
   }, [selectedBatch]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkAndAutoStartSessions();
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [sessions]);
 
   const fetchBatches = async () => {
     try {
@@ -71,6 +80,28 @@ const ClassroomSessions = () => {
       alert("Failed to fetch classroom sessions");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkAndAutoStartSessions = async () => {
+    const now = new Date();
+    const scheduledSessions = sessions.filter(
+      (session) => session.status === "scheduled",
+    );
+
+    for (const session of scheduledSessions) {
+      const startTime = new Date(session.startTime);
+      if (now >= startTime) {
+        try {
+          await startClassroomSession(session._id);
+          console.log(`Auto-started session: ${session._id}`);
+          if (selectedBatch) {
+            fetchSessions(selectedBatch);
+          }
+        } catch (error) {
+          console.error("Error auto-starting session:", error);
+        }
+      }
     }
   };
 
@@ -115,9 +146,13 @@ const ClassroomSessions = () => {
   };
 
   const handleEndSession = async (sessionId) => {
+    setShowEndConfirm(sessionId);
+  };
+
+  const confirmEndSession = async (sessionId) => {
     try {
       await endClassroomSession(sessionId);
-      alert("Classroom session ended");
+      setShowEndConfirm(null);
       fetchSessions(selectedBatch);
     } catch (error) {
       console.error("Error ending session:", error);
@@ -372,7 +407,7 @@ const ClassroomSessions = () => {
               <thead className="bg-gray-50 dark:bg-slate-700">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Date & Time
+                    Start Time
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Duration
@@ -593,6 +628,37 @@ const ClassroomSessions = () => {
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(null)}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* End Session Confirmation Modal */}
+      {showEndConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                End Classroom Session
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Are you sure you want to end this classroom session for all
+                students?
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => confirmEndSession(showEndConfirm)}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  OK
+                </button>
+                <button
+                  onClick={() => setShowEndConfirm(null)}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancel
