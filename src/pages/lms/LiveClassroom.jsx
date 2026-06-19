@@ -171,10 +171,16 @@ const LiveClassroom = () => {
         if (isMeTeacher && !isRemoteTeacher(role)) {
           setTimeout(() => {
             createPeerConnection(userId, true);
+          }, 100);
+        }
 
-            if (screenShareStreamRef.current) {
-              createScreenSharePeerConnection(userId, true);
-            }
+        // If I'm screen sharing, create peer connection to new joiner regardless of role
+        if (screenShareStreamRef.current) {
+          console.log(
+            `[SCREEN SHARE] New user ${userId} joined, creating screen share peer connection`,
+          );
+          setTimeout(() => {
+            createScreenSharePeerConnection(userId, true);
           }, 100);
         }
       },
@@ -193,12 +199,20 @@ const LiveClassroom = () => {
           if (!isRemoteTeacher(p.role)) {
             setTimeout(() => {
               createPeerConnection(p.userId, true);
-
-              if (screenShareStreamRef.current) {
-                createScreenSharePeerConnection(p.userId, true);
-              }
             }, 100);
           }
+        });
+      }
+
+      // If I'm screen sharing, create peer connections to all participants
+      if (screenShareStreamRef.current) {
+        console.log(
+          `[SCREEN SHARE] Creating screen share peer connections to all participants`,
+        );
+        otherParticipants.forEach((p) => {
+          setTimeout(() => {
+            createScreenSharePeerConnection(p.userId, true);
+          }, 100);
         });
       }
     });
@@ -260,15 +274,19 @@ const LiveClassroom = () => {
 
     socket.current.on("screen-share-active", ({ userId, fullname, role }) => {
       console.log(
-        `[SCREEN SHARE] Existing screen share by ${userId} (${fullname})`,
+        `[SCREEN SHARE] Existing screen share by ${userId} (${fullname}) as ${role}`,
       );
-      // New joiner requests screen share offer from the sharer
-      if (isMeTeacher ? !isRemoteTeacher(role) : isRemoteTeacher(role)) {
-        socket.current.emit("request-screen-share-offer", {
-          sessionId,
-          toUserId: userId,
-        });
-      }
+      console.log(
+        `[SCREEN SHARE] My role: ${currentUser?.role}, isMeTeacher: ${isMeTeacher}`,
+      );
+      // Screen share should be visible to ALL participants regardless of role
+      console.log(
+        `[SCREEN SHARE] Requesting screen share offer from ${userId}`,
+      );
+      socket.current.emit("request-screen-share-offer", {
+        sessionId,
+        toUserId: userId,
+      });
     });
 
     socket.current.on(
@@ -277,9 +295,53 @@ const LiveClassroom = () => {
         console.log(
           `[SCREEN SHARE] Request from ${requesterFullname} (${requesterId}) to join screen share`,
         );
+        console.log(
+          `[SCREEN SHARE] Screen share stream available: ${!!screenShareStreamRef.current}`,
+        );
+        console.log(`[SCREEN SHARE] isScreenSharing state: ${isScreenSharing}`);
         // Screen sharer creates peer connection and sends offer to requester
         if (screenShareStreamRef.current) {
+          console.log(
+            `[SCREEN SHARE] Creating peer connection to requester ${requesterId}`,
+          );
           createScreenSharePeerConnection(requesterId, true);
+        } else {
+          console.error(
+            `[SCREEN SHARE ERROR] No screen share stream available for ${requesterId}, isScreenSharing: ${isScreenSharing}`,
+          );
+          // Try to restart screen share process if stream is missing but state says we're sharing
+          if (isScreenSharing) {
+            console.log(
+              `[SCREEN SHARE] Attempting to recover screen share stream`,
+            );
+            // Notify requester that screen share is not available
+            socket.current.emit("screen-share-unavailable", {
+              sessionId,
+              toUserId: requesterId,
+            });
+          }
+        }
+      },
+    );
+
+    socket.current.on(
+      "new-joiner-for-screen-share",
+      ({ newJoinerId, newJoinerFullname, newJoinerRole }) => {
+        console.log(
+          `[SCREEN SHARE] New joiner ${newJoinerFullname} (${newJoinerId}) joined while I'm screen sharing`,
+        );
+        // Screen sharer creates peer connection to new joiner
+        if (screenShareStreamRef.current) {
+          console.log(
+            `[SCREEN SHARE] Creating peer connection to new joiner ${newJoinerId}`,
+          );
+          setTimeout(() => {
+            createScreenSharePeerConnection(newJoinerId, true);
+          }, 100);
+        } else {
+          console.error(
+            `[SCREEN SHARE ERROR] No screen share stream available for new joiner ${newJoinerId}`,
+          );
         }
       },
     );
@@ -404,7 +466,16 @@ const LiveClassroom = () => {
     isInitiator,
     incomingOffer = null,
   ) => {
-    if (screenSharePeersRef.current[remoteUserId]) return;
+    if (screenSharePeersRef.current[remoteUserId]) {
+      console.log(
+        `[SCREEN SHARE] Peer connection already exists for ${remoteUserId}`,
+      );
+      return;
+    }
+
+    console.log(
+      `[SCREEN SHARE] Creating peer connection to ${remoteUserId}, initiator: ${isInitiator}, hasStream: ${!!screenShareStreamRef.current}`,
+    );
 
     const peer = new SimplePeer({
       initiator: isInitiator,
@@ -421,6 +492,9 @@ const LiveClassroom = () => {
           : data.type === "answer"
             ? "screen-share-answer"
             : "screen-share-ice-candidate";
+      console.log(
+        `[SCREEN SHARE] Sending ${type} to ${remoteUserId}, data type: ${data.type}`,
+      );
       socket.current?.emit(type, {
         sessionId,
         [data.type || "candidate"]: data.type ? data : data.candidate,
@@ -429,11 +503,30 @@ const LiveClassroom = () => {
     });
 
     peer.on("stream", (incomingScreenStream) => {
+      console.log(`[SCREEN SHARE] Received screen stream from ${remoteUserId}`);
       remoteStreamsRef.current[`screen-${remoteUserId}`] = incomingScreenStream;
       triggerUpdate();
     });
 
-    if (incomingOffer) peer.signal(incomingOffer);
+    peer.on("error", (err) => {
+      console.error(
+        `[SCREEN SHARE ERROR] Peer connection error with ${remoteUserId}:`,
+        err,
+      );
+    });
+
+    peer.on("connect", () => {
+      console.log(
+        `[SCREEN SHARE] Peer connection established with ${remoteUserId}`,
+      );
+    });
+
+    if (incomingOffer) {
+      console.log(
+        `[SCREEN SHARE] Signaling incoming offer from ${remoteUserId}`,
+      );
+      peer.signal(incomingOffer);
+    }
     screenSharePeersRef.current[remoteUserId] = peer;
   };
 
@@ -481,16 +574,21 @@ const LiveClassroom = () => {
       screenShareStreamRef.current = stream;
       setIsScreenSharing(true);
 
-      // 🔥 FIX 4: Used participantsRef.current instead of stale participants state
-      participantsRef.current
-        .filter((p) =>
-          isMeTeacher ? !isRemoteTeacher(p.role) : isRemoteTeacher(p.role),
-        )
-        .forEach((p) => createScreenSharePeerConnection(p.userId, true));
+      console.log(
+        `[SCREEN SHARE] Started by ${currentUser._id}, notifying server`,
+      );
+      // Notify server that screen share has started
+      socket.current.emit("screen-share-started", { sessionId });
+
+      // Send screen share to ALL participants regardless of role
+      participantsRef.current.forEach((p) => {
+        console.log(`[SCREEN SHARE] Creating peer connection to ${p.userId}`);
+        createScreenSharePeerConnection(p.userId, true);
+      });
 
       stream.getVideoTracks()[0].onended = () => stopScreenShareProcess();
     } catch (err) {
-      console.error(err);
+      console.error("[SCREEN SHARE ERROR]", err);
     }
   };
 
