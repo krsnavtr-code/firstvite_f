@@ -20,9 +20,39 @@ const QuestionCard = ({
   onAnswerSelect,
   showResults,
 }) => {
-  const isCorrect = question.options.every((opt) =>
-    opt.isCorrect ? answer?.includes(opt.text) : !answer?.includes(opt.text),
-  );
+  const isCorrect = (() => {
+    if (question.questionType === "true_false") {
+      const correctOpt = question.options?.find((o) => o.isCorrect)?.text;
+      return answer === correctOpt;
+    }
+    if (
+      question.questionType === "short_answer" ||
+      question.questionType === "fill_in_blank"
+    ) {
+      return (
+        answer?.trim().toLowerCase() ===
+        question.correctAnswer?.trim().toLowerCase()
+      );
+    }
+    if (question.questionType === "essay") {
+      if (question.correctAnswer) {
+        return (
+          answer?.trim().toLowerCase() ===
+          question.correctAnswer?.trim().toLowerCase()
+        );
+      }
+      return answer?.trim().length > 0;
+    }
+    // Default (MCQ)
+    return (
+      Array.isArray(answer) &&
+      question.options?.every((opt) =>
+        opt.isCorrect
+          ? answer?.includes(opt.text)
+          : !answer?.includes(opt.text),
+      )
+    );
+  })();
 
   return (
     <div
@@ -46,60 +76,105 @@ const QuestionCard = ({
           {question.question}
         </p>
 
-        {/* Options List */}
+        {/* Options List / Text Fields */}
         <div className="space-y-3">
-          {question.options.map((option, optIndex) => {
-            const isSelected =
-              question.questionType === "true_false"
-                ? answer === option.text
-                : answer?.includes(option.text);
+          {question.questionType === "short_answer" ? (
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Your Short Answer:
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white font-medium shadow-sm transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none"
+                placeholder="Type your answer here..."
+                value={answer || ""}
+                disabled={showResults}
+                onChange={(e) => onAnswerSelect(index, e.target.value, false)}
+              />
+            </div>
+          ) : question.questionType === "essay" ? (
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Your Detailed Response:
+              </label>
+              <textarea
+                rows={5}
+                className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white font-medium shadow-sm transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none resize-y"
+                placeholder="Type your response here..."
+                value={answer || ""}
+                disabled={showResults}
+                onChange={(e) => onAnswerSelect(index, e.target.value, false)}
+              />
+            </div>
+          ) : question.questionType === "fill_in_blank" ? (
+            <div className="space-y-3 bg-slate-50/40 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl">
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
+                Type Correct Word for the Blank:
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white font-semibold shadow-sm transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none"
+                placeholder="Type correct word here..."
+                value={answer || ""}
+                disabled={showResults}
+                onChange={(e) => onAnswerSelect(index, e.target.value, false)}
+              />
+            </div>
+          ) : (
+            question.options?.map((option, optIndex) => {
+              const isSelected =
+                question.questionType === "true_false"
+                  ? answer === option.text
+                  : answer?.includes(option.text);
 
-            return (
-              <div
-                key={optIndex}
-                className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between group ${
-                  isSelected
-                    ? "border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 text-blue-900 dark:text-blue-300 font-semibold shadow-sm"
-                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-blue-300 dark:hover:border-blue-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
-                }`}
-                onClick={() =>
-                  onAnswerSelect(
-                    index,
-                    option.text,
-                    question.questionType !== "true_false",
-                  )
-                }
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold leading-none shrink-0 transition-colors ${
+              return (
+                <div
+                  key={optIndex}
+                  className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between group ${
+                    isSelected
+                      ? "border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 text-blue-900 dark:text-blue-300 font-semibold shadow-sm"
+                      : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-blue-300 dark:hover:border-blue-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+                  }`}
+                  onClick={() =>
+                    !showResults &&
+                    onAnswerSelect(
+                      index,
+                      option.text,
+                      question.questionType !== "true_false",
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold leading-none shrink-0 transition-colors ${
+                        isSelected
+                          ? "bg-blue-500 text-white"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/40 group-hover:text-blue-500"
+                      }`}
+                    >
+                      {String.fromCharCode(65 + optIndex)}
+                    </span>
+                    <span className="text-sm md:text-base font-medium leading-normal pr-1">
+                      {option.text}
+                    </span>
+                  </div>
+
+                  {/* Animated indicator on the far right */}
+                  <div
+                    className={`w-5 h-5 rounded-full border mr-1 flex items-center justify-center shrink-0 transition-all duration-200 ${
                       isSelected
-                        ? "bg-blue-500 text-white"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/40 group-hover:text-blue-500"
+                        ? "bg-blue-500 border-blue-500 scale-110"
+                        : "border-slate-300 dark:border-slate-600 bg-white dark:bg-transparent"
                     }`}
                   >
-                    {String.fromCharCode(65 + optIndex)}
-                  </span>
-                  <span className="text-sm md:text-base font-medium leading-normal pr-1">
-                    {option.text}
-                  </span>
+                    {isSelected && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                    )}
+                  </div>
                 </div>
-
-                {/* Animated indicator on the far right */}
-                <div
-                  className={`w-5 h-5 rounded-full border mr-1 flex items-center justify-center shrink-0 transition-all duration-200 ${
-                    isSelected
-                      ? "bg-blue-500 border-blue-500 scale-110"
-                      : "border-slate-300 dark:border-slate-600 bg-white dark:bg-transparent"
-                  }`}
-                >
-                  {isSelected && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
         {/* Results / Explanation Section */}
@@ -124,6 +199,32 @@ const QuestionCard = ({
                 </>
               )}
             </div>
+
+            {!isCorrect && (
+              <div className="text-sm font-semibold text-slate-750 dark:text-slate-200 mt-1">
+                {question.questionType === "short_answer" ||
+                question.questionType === "fill_in_blank" ||
+                (question.questionType === "essay" &&
+                  question.correctAnswer) ? (
+                  <span>
+                    Expected Answer:{" "}
+                    <span className="text-emerald-600 dark:text-emerald-400 font-mono bg-emerald-50/50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/50">
+                      {question.correctAnswer}
+                    </span>
+                  </span>
+                ) : (
+                  <span>
+                    Expected Answer(s):{" "}
+                    <span className="text-emerald-600 dark:text-emerald-400 font-mono bg-emerald-50/50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/50">
+                      {question.options
+                        ?.filter((o) => o.isCorrect)
+                        .map((o) => o.text)
+                        .join(", ")}
+                    </span>
+                  </span>
+                )}
+              </div>
+            )}
 
             {question.explanation && (
               <div className="text-sm leading-relaxed border-t border-slate-200/20 dark:border-slate-700/20 pt-2.5">
@@ -172,7 +273,17 @@ const TaskTest = () => {
           const initAns = {};
           if (taskData.questions && Array.isArray(taskData.questions)) {
             taskData.questions.forEach((q, i) => {
-              initAns[i] = q.questionType === "true_false" ? null : [];
+              if (q.questionType === "true_false") {
+                initAns[i] = null;
+              } else if (
+                q.questionType === "short_answer" ||
+                q.questionType === "essay" ||
+                q.questionType === "fill_in_blank"
+              ) {
+                initAns[i] = "";
+              } else {
+                initAns[i] = [];
+              }
             });
           }
           setAnswers(initAns);
@@ -237,18 +348,42 @@ const TaskTest = () => {
     let correct = 0;
     task?.questions.forEach((q, i) => {
       const userAns = answers[i];
-      const correctAns = q.options
-        .filter((o) => o.isCorrect)
-        .map((o) => o.text);
 
       if (q.questionType === "true_false") {
-        if (userAns === correctAns[0]) correct++;
+        const correctOpt = q.options?.find((o) => o.isCorrect)?.text;
+        if (userAns === correctOpt) correct++;
       } else if (
-        Array.isArray(userAns) &&
-        userAns.length === correctAns.length &&
-        userAns.every((a) => correctAns.includes(a))
+        q.questionType === "short_answer" ||
+        q.questionType === "fill_in_blank"
       ) {
-        correct++;
+        if (
+          userAns?.trim().toLowerCase() ===
+          q.correctAnswer?.trim().toLowerCase()
+        ) {
+          correct++;
+        }
+      } else if (q.questionType === "essay") {
+        if (q.correctAnswer) {
+          if (
+            userAns?.trim().toLowerCase() ===
+            q.correctAnswer?.trim().toLowerCase()
+          ) {
+            correct++;
+          }
+        } else if (userAns?.trim().length > 0) {
+          correct++;
+        }
+      } else {
+        // MCQ
+        const correctAns =
+          q.options?.filter((o) => o.isCorrect).map((o) => o.text) || [];
+        if (
+          Array.isArray(userAns) &&
+          userAns.length === correctAns.length &&
+          userAns.every((a) => correctAns.includes(a))
+        ) {
+          correct++;
+        }
       }
     });
     return Math.round((correct / task.questions.length) * 100);

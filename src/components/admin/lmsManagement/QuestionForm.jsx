@@ -35,7 +35,11 @@ const QuestionForm = ({ name, form }) => {
           { text: "False", isCorrect: false },
         ],
       );
-    } else if (questionType === "short_answer" || questionType === "essay") {
+    } else if (
+      questionType === "short_answer" ||
+      questionType === "essay" ||
+      questionType === "fill_in_blank"
+    ) {
       form.setFieldValue(["questions", name, "options"], []);
     } else if (
       questionType === "multiple_choice" &&
@@ -185,27 +189,26 @@ const QuestionForm = ({ name, form }) => {
             name={[name, "correctAnswer"]}
             label={
               <span className="text-xs font-black uppercase text-slate-400 tracking-wider">
-                Correct Answer (use _____ for blanks)
+                Correct Answer
               </span>
             }
             rules={[
               {
                 required: true,
-                message: "Please provide the correct answer with blanks",
+                message: "Please provide the correct answer",
               },
             ]}
             help={
               <span className="text-[10px] text-indigo-500 font-medium block mt-1">
-                Use underscores (_____) to indicate where the blanks should
-                appear in the question.
+                Enter the exact word or phrase that correctly fills the
+                blank(s). Matches are case-insensitive.
               </span>
             }
             className="mb-0"
           >
-            <TextArea
-              rows={2}
-              placeholder="E.g., The capital of France is _____"
-              className="px-4 py-2.5 rounded-xl border border-slate-200 outline-none text-slate-800 font-medium placeholder:text-slate-400 resize-none"
+            <Input
+              placeholder="E.g., Paris"
+              className="px-4 py-2.5 rounded-xl border border-slate-200 outline-none text-slate-800 font-medium placeholder:text-slate-400"
             />
           </Form.Item>
         );
