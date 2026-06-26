@@ -87,7 +87,7 @@ const DataScienceLanding = () => {
   };
 
   // Trainer Image Base64 (Truncated for clean code, replace with actual or keep original)
-  const trainerImg = "";
+  const trainerImg = "https://www.eklabya.com/api/upload/file/WhatsApp-Image-2026-06-26-at-4-07-53-PM-2161.jpeg";
   return (
     <div className="font-['Inter',sans-serif] text-[#1E293B] bg-white overflow-x-hidden scroll-smooth">
       {/* MODAL OVERLAY */}
