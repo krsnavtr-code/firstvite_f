@@ -34,8 +34,8 @@ function Footer() {
           url: "https://www.eklabya.com/course/data-science-and-data-analytics-course",
         },
         {
-          name: "Data Science Eklabya Program",
-          url: "https://www.eklabya.com/course/data-analytics-certification-program",
+          name: "Data Science, Analytics & Power BI Program",
+          url: "https://www.eklabya.com/course/data-science-and-power-bi",
         },
       ],
     },
