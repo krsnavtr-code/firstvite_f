@@ -141,7 +141,7 @@ const BlogListPage = () => {
           <Link to={`/admin/blog/edit/${record._id}`}>
             <Button type="link" icon={<EditOutlined />} />
           </Link>
-          <Popconfirm
+          {/* <Popconfirm
             title="Are you sure you want to delete this post?"
             onConfirm={() => handleDelete(record._id)}
             okText="Yes"
@@ -149,7 +149,7 @@ const BlogListPage = () => {
             okButtonProps={{ danger: true }}
           >
             <Button type="text" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          </Popconfirm> */}
         </Space>
       ),
     },
