@@ -541,13 +541,13 @@ const Users = () => {
                         >
                           <FaKey />
                         </button>
-                        <button
+                        {/* <button
                           onClick={() => handleDeleteUser(user._id)}
                           className="text-red-600 hover:text-red-900"
                           title="Delete User"
                         >
                           <FaTrash />
-                        </button>
+                        </button> */}
                         <button
                           onClick={() => handleEnrollClick(user)}
                           className="text-green-600 hover:text-green-900"
