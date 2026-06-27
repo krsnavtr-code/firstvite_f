@@ -60,6 +60,7 @@ import TestimonialsPage from "./pages/TestimonialsPage";
 import DataScience from "./pages/landingpages/DataScience.jsx";
 import CareerManagement from "./pages/admin/career/CareerManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
+import LoginRecords from "./pages/admin/LoginRecords";
 import lmsRoutes from "./routes/lmsRoutes";
 import JoinClassroom from "./pages/lms/JoinClassroom";
 
@@ -632,6 +633,9 @@ function App() {
 
             {/* Test QA Management */}
             <Route path="/admin/test-qa" element={<TestQAPage />} />
+
+            {/* Login Records */}
+            <Route path="/admin/login-records" element={<LoginRecords />} />
           </Route>
 
           {/* LMS Routes */}
