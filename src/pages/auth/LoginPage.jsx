@@ -10,7 +10,10 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  const [showOTP, setShowOTP] = useState(false);
+  const [adminEmail, setAdminEmail] = useState("");
+  const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+  const { login, isAuthenticated, setUserFromTokens } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -28,6 +31,12 @@ const LoginPage = () => {
     register: registerForgot,
     handleSubmit: handleForgotSubmit,
     formState: { errors: forgotErrors },
+  } = useForm();
+
+  const {
+    register: registerOTP,
+    handleSubmit: handleOTPSubmit,
+    formState: { errors: otpErrors },
   } = useForm();
 
   useEffect(() => {
@@ -50,6 +59,15 @@ const LoginPage = () => {
     try {
       setIsLoading(true);
       const loginResponse = await login(formData.email, formData.password);
+
+      // Check if login requires OTP (admin user)
+      if (loginResponse?.requiresOTP) {
+        setShowOTP(true);
+        setAdminEmail(loginResponse.email);
+        toast.success("OTP sent to your email for admin verification");
+        return;
+      }
+
       if (loginResponse) {
         navigate(from, { replace: true });
       }
@@ -57,6 +75,29 @@ const LoginPage = () => {
       toast.error(error.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const onOTPSubmit = async (formData) => {
+    try {
+      setIsVerifyingOTP(true);
+      const response = await userApi.verifyAdminOTP(adminEmail, formData.otp);
+
+      if (response.success) {
+        // Use AuthContext to set user and tokens
+        setUserFromTokens(response.token, response.refreshToken, response.user);
+
+        toast.success("Admin login verified successfully!");
+
+        // Redirect to admin dashboard
+        navigate("/admin", { replace: true });
+      }
+    } catch (error) {
+      toast.error(
+        error.message || "OTP verification failed. Please try again.",
+      );
+    } finally {
+      setIsVerifyingOTP(false);
     }
   };
 
@@ -196,6 +237,65 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Admin OTP Verification Modal */}
+      {showOTP && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">
+              Admin Login Verification
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Enter the OTP sent to your email for admin verification.
+            </p>
+            <form onSubmit={handleOTPSubmit(onOTPSubmit)} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="otp"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  OTP Code
+                </label>
+                <input
+                  id="otp"
+                  type="text"
+                  placeholder="Enter 6-digit OTP"
+                  maxLength="6"
+                  {...registerOTP("otp", {
+                    required: "OTP is required",
+                    pattern: {
+                      value: /^\d{6}$/,
+                      message: "OTP must be 6 digits",
+                    },
+                  })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-center text-2xl tracking-widest"
+                />
+                {otpErrors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {otpErrors.otp.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowOTP(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isVerifyingOTP}
+                  className="flex-1 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50"
+                >
+                  {isVerifyingOTP ? "Verifying..." : "Verify OTP"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Forgot Password Modal */}
       {showForgotPassword && (

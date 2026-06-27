@@ -256,6 +256,20 @@ const userApi = {
       throw error.response?.data || error;
     }
   },
+
+  // Verify admin login OTP
+  verifyAdminOTP: async (email, otp) => {
+    try {
+      const response = await api.post("/auth/verify-admin-otp", {
+        email,
+        otp,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error verifying admin OTP:", error);
+      throw error.response?.data || error;
+    }
+  },
 };
 
 export default userApi;

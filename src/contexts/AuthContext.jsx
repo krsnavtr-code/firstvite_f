@@ -85,7 +85,7 @@ export function AuthProvider({ children }) {
                   token: newToken,
                   refreshToken: newRefreshToken,
                   user,
-                } = refreshResponse.data; 
+                } = refreshResponse.data;
 
                 // Update tokens in localStorage
                 localStorage.setItem("token", newToken);
@@ -187,6 +187,11 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       const response = await api.post("/auth/login", { email, password });
+
+      // Check if login requires OTP (admin user)
+      if (response.data && response.data.success && response.data.requiresOTP) {
+        return response.data;
+      }
 
       if (
         response.data &&
@@ -321,6 +326,31 @@ export function AuthProvider({ children }) {
     });
   };
 
+  // Set user from tokens (for OTP verification)
+  const setUserFromTokens = (token, refreshToken, user) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("refreshToken", refreshToken);
+
+    const userData = {
+      _id: user._id,
+      fullname: user.fullname || "",
+      email: user.email || "",
+      role: user.role || "user",
+      isApproved: user.isApproved,
+      isActive: user.isActive !== false,
+      phone: user.phone || "",
+      address: user.address || "",
+      adminRoleId: user.adminRoleId,
+      adminPermissions: user.adminPermissions || {},
+    };
+
+    localStorage.setItem("user", JSON.stringify(userData));
+    setCurrentUser(userData);
+
+    // Set the auth header for future requests
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  };
+
   const value = {
     currentUser,
     isAuthenticated: !!currentUser,
@@ -331,6 +361,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     updateUser,
+    setUserFromTokens,
   };
 
   return (
