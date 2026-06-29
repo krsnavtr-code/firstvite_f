@@ -58,6 +58,7 @@ import ThankYouPage from "./pages/ThankYouPage";
 import CandidateInviteForm from "./pages/CandidateInviteForm";
 import TestimonialsPage from "./pages/TestimonialsPage";
 import DataScience from "./pages/landingpages/DataScience.jsx";
+import NoCodeAIML from "./pages/landingpages/NoCodeAIML.jsx";
 import CareerManagement from "./pages/admin/career/CareerManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import LoginRecords from "./pages/admin/LoginRecords";
@@ -129,7 +130,7 @@ const MainLayout = ({ children }) => {
     location.pathname.startsWith("/jobfair") ||
     location.pathname.startsWith("/scholarship-test");
   // Check if the current route is a landing page
-  const landingPageUrls = ["/data-science-ai-programme"];
+  const landingPageUrls = ["/data-science-ai-programme", "/ai-ml-certificate-treaning-program"];
   const isLandingPage = landingPageUrls.some((url) =>
     location.pathname.startsWith(url),
   );
@@ -341,6 +342,15 @@ function App() {
             element={
               <MainLayout>
                 <DataScience />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/ai-ml-certificate-treaning-program"
+            element={
+              <MainLayout>
+                <NoCodeAIML />
               </MainLayout>
             }
           />
