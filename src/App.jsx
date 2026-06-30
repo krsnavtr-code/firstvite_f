@@ -130,7 +130,7 @@ const MainLayout = ({ children }) => {
     location.pathname.startsWith("/jobfair") ||
     location.pathname.startsWith("/scholarship-test");
   // Check if the current route is a landing page
-  const landingPageUrls = ["/data-science-ai-programme", "/ai-ml-certificate-treaning-program"];
+  const landingPageUrls = ["/data-science-ai-programme", "/ai-machine-learning-program"];
   const isLandingPage = landingPageUrls.some((url) =>
     location.pathname.startsWith(url),
   );
@@ -347,7 +347,7 @@ function App() {
           />
 
           <Route
-            path="/ai-ml-certificate-treaning-program"
+            path="/ai-machine-learning-program"
             element={
               <MainLayout>
                 <NoCodeAIML />
