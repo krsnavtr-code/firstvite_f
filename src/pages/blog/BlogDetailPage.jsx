@@ -55,7 +55,7 @@ export default function BlogDetailPage() {
       } catch (err) {
         console.error("Error fetching blog post:", err);
         setError(
-          "Failed to load blog post. It may have been moved or deleted."
+          "Failed to load blog post. It may have been moved or deleted.",
         );
         setIsLoading(false);
       }
@@ -166,24 +166,29 @@ export default function BlogDetailPage() {
   } = post;
 
   // Generate SEO metadata based on the blog post
-  const seoTitle = post ? `${post.title} | Eklabya Blog` : 'Blog Post | Eklabya';
-  const seoDescription = post?.excerpt || 'Read this article on Eklabya';
-  const seoKeywords = post?.tags?.join(', ') || 'blog, article, education, learning';
-  const canonicalUrl = post ? `https://eklabya.com/blog/${post.slug}` : 'https://eklabya.com/blog';
+  const seoTitle = post
+    ? `${post.title} | Eklabya Blog`
+    : "Blog Post | Eklabya";
+  const seoDescription = post?.excerpt || "Read this article on Eklabya";
+  const seoKeywords =
+    post?.tags?.join(", ") || "blog, article, education, learning";
+  const canonicalUrl = post
+    ? `https://eklabya.com/blog/${post.slug}`
+    : "https://eklabya.com/blog";
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <SEO 
+      <SEO
         title={seoTitle}
         description={seoDescription}
         keywords={seoKeywords}
         canonical={canonicalUrl}
         og={{
-          title: post?.title || 'Eklabya Blog',
-          description: post?.excerpt || 'Read this article on Eklabya',
-          type: 'article',
+          title: post?.title || "Eklabya Blog",
+          description: post?.excerpt || "Read this article on Eklabya",
+          type: "article",
           image: post?.imageUrl,
-          url: canonicalUrl
+          url: canonicalUrl,
         }}
       />
       {/* Header with back button and share */}
@@ -217,134 +222,125 @@ export default function BlogDetailPage() {
         {/* Left: Blog Content (75%) */}
         <section className="lg:col-span-3">
           <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-            {/* Keep your entire blog article section here (image, title, author, markdown, tags etc.) */}
-            <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-              {/* Featured Image */}
-              {featuredImage && (
-                <div className="w-full h-96 overflow-hidden">
-                  <img
-                    src={featuredImage}
-                    alt={title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+            {/* Featured Image */}
+            {featuredImage && (
+              <div className="w-full h-96 overflow-hidden">
+                <img
+                  src={featuredImage}
+                  alt={title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
 
-              {/* Article Header */}
-              <div className="p-3 sm:p-6 md:p-12">
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {categories?.map((category) => (
-                    <Link
-                      key={category._id}
-                      to={`/blog?category=${category.slug}`}
-                      className="inline-block"
-                    >
-                      <Tag color="blue" className="text-sm">
-                        {category.name}
-                      </Tag>
-                    </Link>
-                  ))}
-                </div>
-
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3">
-                  {title}
-                </h1>
-
-                <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
-                  <div className="flex items-center mr-6 mb-2 sm:mb-0">
-                    <UserOutlined className="mr-1" />
-                    <span>{author?.name || "Eklabya"}</span>
-                  </div>
-                  <div className="flex items-center mr-6 mb-2 sm:mb-0">
-                    <CalendarOutlined className="mr-1" />
-                    <time dateTime={createdAt}>
-                      {dayjs(createdAt).format("MMMM D, YYYY")}
-                    </time>
-                  </div>
-                  <div className="flex items-center">
-                    <ClockCircleOutlined className="mr-1" />
-                    <span>{Math.ceil(readingTime || 5)} min read</span>
-                  </div>
-                </div>
-
-                {excerpt && (
-                  <p className="text-xl text-gray-600 dark:text-gray-300 mb-3 font-medium">
-                    {excerpt}
-                  </p>
-                )}
+            {/* Article Header */}
+            <div className="p-3 sm:p-6 md:p-12">
+              <div className="flex flex-wrap gap-2 mb-2">
+                {categories?.map((category) => (
+                  <Link
+                    key={category._id}
+                    to={`/blog?category=${category.slug}`}
+                    className="inline-block"
+                  >
+                    <Tag color="blue" className="text-sm">
+                      {category.name}
+                    </Tag>
+                  </Link>
+                ))}
               </div>
 
-              {/* Article Content */}
-              <div className="px-3 sm:px-6 md:px-12 pb-6">
-                <div className="text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw]}
-                    components={{
-                      img: ({ node, ...props }) => (
-                        <img
-                          {...props}
-                          className="rounded-lg shadow-md my-6 w-full h-auto"
-                          alt={props.alt || ""}
-                        />
-                      ),
-                      a: ({ node, ...props }) => (
-                        <a
-                          {...props}
-                          className="text-blue-600 dark:text-blue-400 hover:underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        />
-                      ),
-                      code: ({
-                        node,
-                        inline,
-                        className,
-                        children,
-                        ...props
-                      }) => {
-                        const match = /language-(\w+)/.exec(className || "");
-                        return !inline && match ? (
-                          <pre className="bg-white p-4 rounded-lg overflow-x-auto">
-                            <code className={className} {...props}>
-                              {children}
-                            </code>
-                          </pre>
-                        ) : (
-                          <code className="bg-white px-1.5 py-0.5 rounded text-sm">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+                {title}
+              </h1>
+
+              <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                <div className="flex items-center mr-6 mb-2 sm:mb-0">
+                  <UserOutlined className="mr-1" />
+                  <span>{author?.name || "Eklabya"}</span>
+                </div>
+                <div className="flex items-center mr-6 mb-2 sm:mb-0">
+                  <CalendarOutlined className="mr-1" />
+                  <time dateTime={createdAt}>
+                    {dayjs(createdAt).format("MMMM D, YYYY")}
+                  </time>
+                </div>
+                <div className="flex items-center">
+                  <ClockCircleOutlined className="mr-1" />
+                  <span>{Math.ceil(readingTime || 5)} min read</span>
+                </div>
+              </div>
+
+              {excerpt && (
+                <p className="text-xl text-gray-600 dark:text-gray-300 mb-3 font-medium">
+                  {excerpt}
+                </p>
+              )}
+            </div>
+
+            {/* Article Content */}
+            <div className="px-3 sm:px-6 md:px-12 pb-6">
+              <div className="markdown-body text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeRaw]}
+                  components={{
+                    img: ({ node, ...props }) => (
+                      <img
+                        {...props}
+                        className="rounded-lg shadow-md my-6 w-full h-auto"
+                        alt={props.alt || ""}
+                      />
+                    ),
+                    a: ({ node, ...props }) => (
+                      <a
+                        {...props}
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    ),
+                    code: ({ node, inline, className, children, ...props }) => {
+                      const match = /language-(\w+)/.exec(className || "");
+                      return !inline && match ? (
+                        <pre className="bg-white p-4 rounded-lg overflow-x-auto">
+                          <code className={className} {...props}>
                             {children}
                           </code>
-                        );
-                      },
-                    }}
-                  >
-                    {content}
-                  </ReactMarkdown>
-                </div>
+                        </pre>
+                      ) : (
+                        <code className="bg-white px-1.5 py-0.5 rounded text-sm">
+                          {children}
+                        </code>
+                      );
+                    },
+                  }}
+                >
+                  {content}
+                </ReactMarkdown>
               </div>
+            </div>
 
-              {/* Tags */}
-              {tags?.length > 0 && (
-                <div className="px-3 sm:px-6 md:px-12 pb-6">
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <TagOutlined className="text-gray-500 mr-2" />
-                      {tags.map((tag, index) => (
-                        <Link
-                          key={index}
-                          to={`/blog?tag=${encodeURIComponent(tag)}`}
-                          className="inline-block"
-                        >
-                          <Tag className="text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            {tag}
-                          </Tag>
-                        </Link>
-                      ))}
-                    </div>
+            {/* Tags */}
+            {tags?.length > 0 && (
+              <div className="px-3 sm:px-6 md:px-12 pb-6">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <TagOutlined className="text-gray-500 mr-2" />
+                    {tags.map((tag, index) => (
+                      <Link
+                        key={index}
+                        to={`/blog?tag=${encodeURIComponent(tag)}`}
+                        className="inline-block"
+                      >
+                        <Tag className="text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                          {tag}
+                        </Tag>
+                      </Link>
+                    ))}
                   </div>
                 </div>
-              )}
-            </article>
+              </div>
+            )}
           </article>
 
           {/* Related Posts */}
@@ -423,17 +419,6 @@ export default function BlogDetailPage() {
                   ))}
                 </div>
               )}
-            </section>
-          )}
-
-          {/* Related Posts Full Width */}
-          {relatedPosts.length > 0 && (
-            <section className="">
-              <Divider orientation="left" className="text-xl font-semibold">
-                Related Articles
-              </Divider>
-              {/* Related Posts Grid */}
-              ...
             </section>
           )}
         </section>

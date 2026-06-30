@@ -80,7 +80,7 @@ export default function BlogListPage() {
         <h2 className="text-xl font-semibold mb-3 dark:text-white">
           <Link 
             to={`/blog/${post.slug}`} 
-            className="hover:text-blue-600 text-black dark:hover:text-blue-400 transition-colors line-clamp-2"
+            className="hover:text-blue-600 text-black dark:text-white dark:hover:text-blue-400 transition-colors line-clamp-2"
           >
             {post.title}
           </Link>
