@@ -36,7 +36,7 @@ const Assessment = () => {
             take the next step toward career success by enrolling in
             <strong> professional certification courses</strong> online that are designed to meet
             modern industry standards. eklabya also provides advanced learning
-            opportunities through globally recognized <strong>SAP online certification
+            opportunities through globally recognized <strong>online certification
             courses</strong>, helping students build job-ready skills and enhance their
             professional credibility. With expert guidance, flexible online
             learning, and career-focused programs, eklabya bridges the gap
