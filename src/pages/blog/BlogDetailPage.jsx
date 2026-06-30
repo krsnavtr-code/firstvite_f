@@ -17,7 +17,6 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { getBlogPostBySlug, getPostsByCategory } from "../../api/blogApi";
 import "github-markdown-css/github-markdown.css";
-import "./BlogDetailPage.css";
 
 dayjs.extend(relativeTime);
 
@@ -279,11 +278,42 @@ export default function BlogDetailPage() {
 
             {/* Article Content */}
             <div className="px-3 sm:px-6 md:px-12 pb-6">
-              <div className="markdown-body text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <div className="markdown-body bg-white dark:bg-transparent text-gray-900 dark:text-white rounded-lg shadow-sm">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeRaw]}
                   components={{
+                    p: ({ node, ...props }) => (
+                      <p
+                        {...props}
+                        className="text-gray-800 dark:text-gray-200 mb-4 leading-relaxed"
+                      />
+                    ),
+                    h1: ({ node, ...props }) => (
+                      <h1
+                        {...props}
+                        className="text-gray-900 dark:text-white font-bold my-4"
+                      />
+                    ),
+                    h2: ({ node, ...props }) => (
+                      <h2
+                        {...props}
+                        className="text-gray-900 dark:text-white font-semibold my-3"
+                      />
+                    ),
+                    h3: ({ node, ...props }) => (
+                      <h3
+                        {...props}
+                        className="text-gray-900 dark:text-white font-medium my-2"
+                      />
+                    ),
+                    li: ({ node, ...props }) => (
+                      <li
+                        {...props}
+                        className="text-gray-800 dark:text-gray-200"
+                      />
+                    ),
+
                     img: ({ node, ...props }) => (
                       <img
                         {...props}
@@ -291,24 +321,16 @@ export default function BlogDetailPage() {
                         alt={props.alt || ""}
                       />
                     ),
-                    a: ({ node, ...props }) => (
-                      <a
-                        {...props}
-                        className="text-blue-600 dark:text-blue-400 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      />
-                    ),
                     code: ({ node, inline, className, children, ...props }) => {
                       const match = /language-(\w+)/.exec(className || "");
                       return !inline && match ? (
-                        <pre className="bg-white p-4 rounded-lg overflow-x-auto">
+                        <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">
                           <code className={className} {...props}>
                             {children}
                           </code>
                         </pre>
                       ) : (
-                        <code className="bg-white px-1.5 py-0.5 rounded text-sm">
+                        <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm text-gray-800 dark:text-gray-200">
                           {children}
                         </code>
                       );
@@ -323,7 +345,7 @@ export default function BlogDetailPage() {
             {/* Tags */}
             {tags?.length > 0 && (
               <div className="px-3 sm:px-6 md:px-12 pb-6">
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
+                <div className="markdown-body bg-white dark:bg-transparent text-gray-900 dark:text-white rounded-lg shadow-sm">
                   <div className="flex flex-wrap items-center gap-2">
                     <TagOutlined className="text-gray-500 mr-2" />
                     {tags.map((tag, index) => (
