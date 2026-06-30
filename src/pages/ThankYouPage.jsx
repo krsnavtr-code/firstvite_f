@@ -8,20 +8,8 @@ const ThankYouPage = () => {
   const navigate = useNavigate();
   const { state } = location;
 
-  // Track Google Ads conversion
-  useEffect(() => {
-    if (window.gtag) {
-      window.gtag("event", "conversion", {
-        send_to: "AW-16986190204/pOYXCKjcwfwaEPzi0qM_",
-        transaction_id: "",
-        value: 1.0,
-        currency: "INR",
-        event_callback: function () {
-          console.log("Conversion tracked on thank you page");
-        },
-      });
-    }
-  }, []);
+  // Track Google Ads conversion Added bt GTM
+ 
 
   return (
     <>
