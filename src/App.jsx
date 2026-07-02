@@ -60,6 +60,9 @@ import TestimonialsPage from "./pages/TestimonialsPage";
 import DataScience from "./pages/landingpages/DataScience.jsx";
 import NoCodeAIML from "./pages/landingpages/NoCodeAIML.jsx";
 import StudentTestimonials from "./pages/landingpages/StudentTestimonials.jsx";
+import DataScienceThankYou from "./pages/landingpages/DataScienceThankYou.jsx";
+import NoCodeAIMLThankYou from "./pages/landingpages/NoCodeAIMLThankYou.jsx";
+import StudentTestimonialsThankYou from "./pages/landingpages/StudentTestimonialsThankYou.jsx";
 import CareerManagement from "./pages/admin/career/CareerManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import LoginRecords from "./pages/admin/LoginRecords";
@@ -133,8 +136,11 @@ const MainLayout = ({ children }) => {
   // Check if the current route is a landing page
   const landingPageUrls = [
     "/data-science-ai-programme",
+    "/data-science-ai-programme/thank-you",
     "/ai-machine-learning-program",
+    "/ai-machine-learning-program/thank-you",
     "/success-stories",
+    "/success-stories/thank-you",
   ];
   const isLandingPage = landingPageUrls.some((url) =>
     location.pathname.startsWith(url),
@@ -352,6 +358,11 @@ function App() {
           />
 
           <Route
+            path="/data-science-ai-programme/thank-you"
+            element={<DataScienceThankYou />}
+          />
+
+          <Route
             path="/ai-machine-learning-program"
             element={
               <MainLayout>
@@ -361,12 +372,22 @@ function App() {
           />
 
           <Route
+            path="/ai-machine-learning-program/thank-you"
+            element={<NoCodeAIMLThankYou />}
+          />
+
+          <Route
             path="/success-stories"
             element={
               <MainLayout>
                 <StudentTestimonials />
               </MainLayout>
             }
+          />
+
+          <Route
+            path="/success-stories/thank-you"
+            element={<StudentTestimonialsThankYou />}
           />
 
           <Route

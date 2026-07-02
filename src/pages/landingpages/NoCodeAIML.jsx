@@ -70,7 +70,7 @@ const NoCodeAIML = () => {
         });
         setIsModalOpen(false);
 
-        navigate("/thank-you", {
+        navigate("/ai-machine-learning-program/thank-you", {
           state: {
             message:
               "Thank you for applying to the No-Code AI & Machine Learning Program! Our counsellor will call you with batch details & EMI options.",
@@ -697,10 +697,10 @@ const NoCodeAIML = () => {
       <footer className="bg-[#0F0F1A] border-t border-white/10 py-8 px-[4%] sm:px-[5%] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
         <div className="font-['Syne',sans-serif] text-[18px] font-extrabold text-white">
           <img
-              src="http://www.eklabya.com/api/upload/file/eKlabya-fit-logo-8874.png"
-              alt="Logo"
-              className="h-[40px]"
-            />
+            src="http://www.eklabya.com/api/upload/file/eKlabya-fit-logo-8874.png"
+            alt="Logo"
+            className="h-[40px]"
+          />
         </div>
         <p className="text-[12px] sm:text-[13px] text-white/40 order-3 sm:order-2">
           © 2026 eKlabya. All rights reserved.

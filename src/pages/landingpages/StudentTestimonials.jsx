@@ -70,7 +70,7 @@ const EklabyaTestimonials = () => {
         });
         setIsModalOpen(false);
 
-        navigate("/thank-you", {
+        navigate("/success-stories/thank-you", {
           state: {
             message:
               "Thank you for your interest! Our team will connect you with alumni/learners who can share their experience with you.",
