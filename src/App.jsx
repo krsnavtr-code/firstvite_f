@@ -165,6 +165,25 @@ const MainLayout = ({ children }) => {
 
 function App() {
   const { ContactFormPopup } = useContactFormPopup();
+  const location = useLocation();
+
+  // Track user visits for hot lead alerts
+  useEffect(() => {
+    const trackingId = localStorage.getItem("user_tracker_id");
+
+    // If user has a tracking ID, send visit data to backend
+    if (trackingId) {
+      axios
+        .post("/api/contacts/track-visit", {
+          trackingId: trackingId,
+          pageUrl: location.pathname,
+        })
+        .catch((err) => {
+          // Silently fail - don't interrupt user experience
+          console.log("Tracking error:", err);
+        });
+    }
+  }, [location.pathname]); // Run on every route change
 
   return (
     <HelmetProvider>

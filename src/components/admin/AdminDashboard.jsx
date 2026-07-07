@@ -6,6 +6,7 @@ import { getCategories } from "../../api/categoryApi";
 import { getCourses, deleteCourse } from "../../api/courseApi";
 import userApi from "../../api/userApi";
 import { toast } from "react-hot-toast";
+import { io } from "socket.io-client";
 
 const AdminDashboard = () => {
   const { currentUser } = useAuth();
@@ -73,8 +74,28 @@ const AdminDashboard = () => {
     };
 
     fetchData();
-  }, []);
 
+    // Setup socket connection for hot lead alerts
+    const socket = io(import.meta.env.VITE_API_URL, {
+      withCredentials: true,
+    });
+
+    socket.on("hot-lead-alert", (data) => {
+      toast.info(`🔥 ${data.message} | Call: ${data.phone}`, {
+        duration: 10000, // Show for 10 seconds
+        position: "top-right",
+        style: {
+          background: "#FEF3C7",
+          color: "#92400E",
+          border: "2px solid #F59E0B",
+        },
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -100,7 +121,15 @@ const AdminDashboard = () => {
     },
   ];
 
-  const totalRevenue = courses.reduce((acc, course) => acc + (course.directPayments || []).reduce((acc2, payment) => acc2 + payment.paymentAmount, 0), 0);
+  const totalRevenue = courses.reduce(
+    (acc, course) =>
+      acc +
+      (course.directPayments || []).reduce(
+        (acc2, payment) => acc2 + payment.paymentAmount,
+        0,
+      ),
+    0,
+  );
   return (
     <div className="p-6">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">
@@ -228,7 +257,9 @@ const AdminDashboard = () => {
               <h3 className="text-gray-500 text-sm font-medium">
                 Total Revenue
               </h3>
-              <p className="text-2xl font-semibold text-gray-800">{totalRevenue}</p>
+              <p className="text-2xl font-semibold text-gray-800">
+                {totalRevenue}
+              </p>
             </div>
           </div>
         </div>
@@ -249,20 +280,20 @@ const AdminDashboard = () => {
               >
                 <svg
                   className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              {action.label}
-            </Link>
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                {action.label}
+              </Link>
             ))}
           </div>
         </div>

@@ -53,7 +53,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
     // Prevent rapid submissions (5 second cooldown)
     const now = Date.now();
     if (now - lastSubmitTime < 5000) {
-      toast.warning('Please wait a few seconds before submitting again');
+      toast.warning("Please wait a few seconds before submitting again");
       return;
     }
 
@@ -61,7 +61,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
       toast.error("Please accept the terms & conditions and privacy policy");
       return;
     }
-    
+
     setLastSubmitTime(now);
 
     setIsSubmitting(true);
@@ -83,6 +83,11 @@ const ContactFormModal = ({ isOpen, onClose }) => {
       const result = await submitContactForm(submissionData);
 
       if (result.success) {
+        // Save trackingId to localStorage for future visit tracking
+        if (result.data?.trackingId) {
+          localStorage.setItem("user_tracker_id", result.data.trackingId);
+        }
+
         // Reset form data
         setFormData({
           name: "",
@@ -95,15 +100,16 @@ const ContactFormModal = ({ isOpen, onClose }) => {
 
         // Close the modal and redirect to thank you page
         onClose();
-        navigate('/thank-you', {
+        navigate("/thank-you", {
           state: {
-            message: result.message || 'Your message has been sent successfully!',
+            message:
+              result.message || "Your message has been sent successfully!",
             conversionData: {
-              transaction_id: '',
+              transaction_id: "",
               value: 1.0,
-              currency: 'INR'
-            }
-          }
+              currency: "INR",
+            },
+          },
         });
       } else {
         // Handle API validation errors
@@ -113,7 +119,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
           });
         } else {
           toast.error(
-            result.message || "Failed to send message. Please try again."
+            result.message || "Failed to send message. Please try again.",
           );
         }
       }
@@ -122,7 +128,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
       toast.error(
         error.message ||
           error.response?.data?.message ||
-          "Failed to send message. Please try again later."
+          "Failed to send message. Please try again later.",
       );
     } finally {
       setIsSubmitting(false);
