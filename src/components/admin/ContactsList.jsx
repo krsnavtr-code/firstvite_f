@@ -362,6 +362,12 @@ const ContactsList = () => {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                Tracking Info
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Courses
               </th>
               <th
@@ -415,6 +421,29 @@ const ContactsList = () => {
                         <span className="text-blue-600">Message:</span>{" "}
                         {contact.message}
                       </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {contact.trackingId ? (
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓ Tracked</span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Visits: {contact.visitHistory?.length || 1}
+                        </div>
+                        {contact.visitHistory &&
+                          contact.visitHistory.length > 0 && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Last:{" "}
+                              {contact.visitHistory[
+                                contact.visitHistory.length - 1
+                              ]?.pageUrl || "N/A"}
+                            </div>
+                          )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">Not tracked</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm text-black">
