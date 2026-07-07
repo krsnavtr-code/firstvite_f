@@ -53,6 +53,11 @@ const NoCodeAIML = () => {
       const result = await submitContactForm(submissionData);
 
       if (result.success) {
+        // Save trackingId to localStorage for future visit tracking
+        if (result.data?.trackingId) {
+          localStorage.setItem("user_tracker_id", result.data.trackingId);
+        }
+
         toast.success("Application saved successfully!");
 
         const msg = `Hi, I want to enroll in the No-Code AI & Machine Learning Program.\nName: ${formData.name}\nPhone: ${formData.countryCode} ${formData.phone}\nExperience: ${formData.experience}`;

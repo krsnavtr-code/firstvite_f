@@ -114,7 +114,13 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      await submitContactForm(formData);
+      const result = await submitContactForm(formData);
+
+      // Save trackingId to localStorage for future visit tracking
+      if (result.data?.trackingId) {
+        localStorage.setItem("user_tracker_id", result.data.trackingId);
+      }
+
       setIsSuccess(true);
       setFormData({
         name: "",

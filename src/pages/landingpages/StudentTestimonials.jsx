@@ -54,6 +54,11 @@ const EklabyaTestimonials = () => {
       const result = await submitContactForm(submissionData);
 
       if (result.success) {
+        // Save trackingId to localStorage for future visit tracking
+        if (result.data?.trackingId) {
+          localStorage.setItem("user_tracker_id", result.data.trackingId);
+        }
+
         toast.success("Application saved successfully!");
 
         const msg = `Hi, I want to connect with alumni/learners to know more about their experience.\nName: ${formData.name}\nPhone: ${formData.phone}\nBackground: ${formData.status}`;
