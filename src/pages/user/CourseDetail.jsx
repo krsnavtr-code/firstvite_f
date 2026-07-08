@@ -1602,9 +1602,8 @@ const CourseDetail = () => {
                       </>
                     ) : (
                       <>
-                        <FaShoppingCart className="mr-2" />
                         Enroll Now -{" "}
-                        {course.price ? `$${course.price.toFixed(2)}` : "Free"}
+                        {course.price ? `₹${course.price.toFixed(2)}` : "Free"}
                       </>
                     )}
                   </button>
