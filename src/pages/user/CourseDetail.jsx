@@ -775,12 +775,12 @@ const CourseDetail = () => {
                         />
                       ),
                     )}
-                    <span className="ml-2 text-gray-700 dark:text-gray-300 font-medium">
+                    {/* <span className="ml-2 text-gray-700 dark:text-gray-300 font-medium">
                       {course.rating?.toFixed(1) || "4"}
                       <span className="text-gray-500 font-normal">
                         ({course.reviews?.length || 18} Ratings)
                       </span>
-                    </span>
+                    </span> */}
                   </div>
                   {/* <span className="mx-3 text-gray-300 dark:text-gray-600">
                     •
@@ -1049,11 +1049,11 @@ const CourseDetail = () => {
 
       {/* Course Tabs */}
       <div className="container mx-auto px-4 py-8">
-        <div className="border-b border-gray-200 dark:border-gray-700 mb-8 sticky top-16 z-10 bg-white dark:bg-slate-900">
+        <div className="border-b border-gray-200 dark:border-gray-700 mb-8 sticky top-16 md:top-20 z-10 bg-white dark:bg-slate-900">
           <nav className="flex flex-wrap -mb-px whitespace-nowrap space-x-1">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
+              className={`py-2 px-3 md:px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "overview"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
@@ -1063,7 +1063,7 @@ const CourseDetail = () => {
             </button>
             <button
               onClick={() => setActiveTab("curriculum")}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
+              className={`py-2 px-3 md:px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "curriculum"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
@@ -1073,7 +1073,7 @@ const CourseDetail = () => {
             </button>
             <button
               onClick={() => setActiveTab("skills")}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
+              className={`py-2 px-3 md:px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "skills"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
@@ -1083,13 +1083,21 @@ const CourseDetail = () => {
             </button>
             <button
               onClick={() => setActiveTab("faq")}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
+              className={`py-2 px-3 md:px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === "faq"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-black dark:text-white hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
               FAQ
+            </button>
+            <button
+              onClick={() => {
+                setShowCheckoutOptions(true);
+              }}
+              className="my-1 py-1 px-3 md:px-6 text-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg shadow-md transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 active:translate-y-0"
+            >
+              Apply Now
             </button>
           </nav>
         </div>
@@ -1629,7 +1637,7 @@ const CourseDetail = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 text-white"
                     placeholder="Your name"
                   />
                 </div>
@@ -1651,7 +1659,7 @@ const CourseDetail = () => {
                     required
                     className={`w-full px-3 py-1 border ${
                       currentUser ? "cursor-not-allowed" : ""
-                    } border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white`}
+                    } border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 text-white`}
                     placeholder="your@email.com"
                   />
                 </div>
@@ -1670,7 +1678,7 @@ const CourseDetail = () => {
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 text-white"
                     placeholder="+91 8080808080"
                   />
                 </div>
@@ -1696,7 +1704,7 @@ const CourseDetail = () => {
                     rows="1"
                     value={formData.message}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 text-white"
                     placeholder="Tell us how we can help you..."
                   ></textarea>
                 </div>
