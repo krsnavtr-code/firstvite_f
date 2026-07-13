@@ -4,7 +4,6 @@ import userApi from "../../api/userApi";
 import { FaEdit, FaKey, FaTrash, FaBook } from "react-icons/fa";
 import EnrollUserModal from "./EnrollUserModal";
 
-
 // Modal components
 const UserModal = ({ user, onClose, onSave, isOpen }) => {
   const [formData, setFormData] = useState({
@@ -153,7 +152,7 @@ const ChangePasswordModal = ({ userId, onClose, onSave, isOpen }) => {
         onClose();
       } catch (error) {
         toast.error(
-          error.response?.data?.message || "Failed to change password"
+          error.response?.data?.message || "Failed to change password",
         );
       }
     }
@@ -238,6 +237,7 @@ const Users = () => {
   const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
+  const [editingDiscountId, setEditingDiscountId] = useState(null);
   // Fetch users on component mount
   useEffect(() => {
     fetchUsers();
@@ -323,13 +323,13 @@ const Users = () => {
     try {
       await userApi.updateStatus(userId, !currentStatus);
       toast.success(
-        `User ${currentStatus ? "deactivated" : "activated"} successfully`
+        `User ${currentStatus ? "deactivated" : "activated"} successfully`,
       );
       await fetchUsers();
     } catch (error) {
       console.error("Error toggling user status:", error);
       toast.error(
-        error.response?.data?.message || "Failed to update user status"
+        error.response?.data?.message || "Failed to update user status",
       );
     }
   };
@@ -337,13 +337,13 @@ const Users = () => {
     try {
       await userApi.updateLMSStatus(userId, !currentStatus);
       toast.success(
-        `User ${currentStatus ? "deactivated" : "activated"} successfully`
+        `User ${currentStatus ? "deactivated" : "activated"} successfully`,
       );
       await fetchUsers();
     } catch (error) {
       console.error("Error toggling user status:", error);
       toast.error(
-        error.response?.data?.message || "Failed to update user status"
+        error.response?.data?.message || "Failed to update user status",
       );
     }
   };
@@ -353,7 +353,7 @@ const Users = () => {
       await userApi.adminEnrollUser(userId, courseId, status);
       return true;
     } catch (error) {
-      console.error('Error enrolling user in course:', error);
+      console.error("Error enrolling user in course:", error);
       throw error;
     }
   };
@@ -361,6 +361,26 @@ const Users = () => {
   const handleEnrollClick = (user) => {
     setCurrentUser(user);
     setIsEnrollModalOpen(true);
+  };
+
+  const handleDiscountChange = async (userId, discountValue) => {
+    const discount = Math.min(100, Math.max(0, Number(discountValue)));
+    try {
+      await userApi.updateDiscount(userId, discount);
+      toast.success("Discount updated successfully");
+      await fetchUsers();
+      setEditingDiscountId(null);
+    } catch (error) {
+      console.error("Error updating discount:", error);
+      toast.error(error.response?.data?.message || "Failed to update discount");
+    }
+  };
+
+  const handleDiscountKeyDown = (e, userId, discountValue) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleDiscountChange(userId, discountValue);
+    }
   };
 
   const handleEditClick = (user) => {
@@ -435,6 +455,9 @@ const Users = () => {
                   LMS Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Discount (%)
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -462,9 +485,6 @@ const Users = () => {
                             {user.fullname || "N/A"}
                           </div>
                           {/* Enrolled Course name */}
-                          
-                          
-                          
                         </div>
                       </div>
                     </td>
@@ -481,8 +501,8 @@ const Users = () => {
                           user.role === "admin"
                             ? "bg-purple-100 text-purple-800"
                             : user.role === "teacher"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-blue-100 text-blue-800"
                         }`}
                       >
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
@@ -523,6 +543,48 @@ const Users = () => {
                           {user.isApproved ? "Approved" : "Not Approved"}
                         </span>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editingDiscountId === user._id ? (
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={user.discount || ""}
+                            onChange={(e) =>
+                              setUsers(
+                                users.map((u) =>
+                                  u._id === user._id
+                                    ? { ...u, discount: e.target.value }
+                                    : u,
+                                ),
+                              )
+                            }
+                            onKeyDown={(e) =>
+                              handleDiscountKeyDown(e, user._id, e.target.value)
+                            }
+                            className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                            autoFocus
+                          />
+                          <button
+                            onClick={() =>
+                              handleDiscountChange(user._id, user.discount || 0)
+                            }
+                            className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => setEditingDiscountId(user._id)}
+                          className="flex items-center space-x-1 cursor-pointer hover:text-indigo-600"
+                        >
+                          <span className="text-sm">{user.discount || 0}%</span>
+                          <FaEdit className="text-xs" />
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">

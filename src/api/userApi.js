@@ -216,6 +216,17 @@ const userApi = {
     }
   },
 
+  // Update user discount percentage
+  updateDiscount: async (userId, discount) => {
+    try {
+      const response = await api.put(`/users/${userId}/discount`, { discount });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user discount:", error);
+      throw error;
+    }
+  },
+
   // Admin enrolls a user in a course
   adminEnrollUser: async (userId, courseId, status = "active") => {
     try {
