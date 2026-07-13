@@ -52,6 +52,7 @@ export function AuthProvider({ children }) {
               address: response.data.user.address || "",
               adminRoleId: response.data.user.adminRoleId,
               adminPermissions: response.data.user.adminPermissions || {},
+              discount: response.data.user.discount || 0,
             };
 
             localStorage.setItem("user", JSON.stringify(userData));
@@ -109,6 +110,7 @@ export function AuthProvider({ children }) {
                   address: user.address || "",
                   adminRoleId: user.adminRoleId,
                   adminPermissions: user.adminPermissions || {},
+                  discount: user.discount || 0,
                 };
 
                 localStorage.setItem("user", JSON.stringify(userData));
@@ -221,6 +223,7 @@ export function AuthProvider({ children }) {
           address: user.address || "",
           adminRoleId: user.adminRoleId,
           adminPermissions: user.adminPermissions || {},
+          discount: user.discount || 0,
         };
 
         localStorage.setItem("user", JSON.stringify(userData));
@@ -342,6 +345,7 @@ export function AuthProvider({ children }) {
       address: user.address || "",
       adminRoleId: user.adminRoleId,
       adminPermissions: user.adminPermissions || {},
+      discount: user.discount || 0,
     };
 
     localStorage.setItem("user", JSON.stringify(userData));

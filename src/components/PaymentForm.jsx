@@ -16,7 +16,7 @@ const PaymentForm = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, updateUser } = useAuth();
   const userType = location.state?.userType || "student";
   const {
     isCompanyRegistration,
@@ -25,6 +25,7 @@ const PaymentForm = ({
   } = location.state || {};
 
   const [paymentType, setPaymentType] = useState("full"); // 'registration' or 'full'
+  const [discountApplied, setDiscountApplied] = useState(false);
   const [formData, setFormData] = useState(() => {
     const data = initialData || {};
     return {
@@ -74,6 +75,9 @@ const PaymentForm = ({
 
   // Load Razorpay script and courses when component mounts
   useEffect(() => {
+    console.log("PaymentForm mounted - Current user:", currentUser);
+    console.log("PaymentForm mounted - User discount:", currentUser?.discount);
+
     // Load Razorpay
     loadRazorpay().then((success) => {
       if (!success) {
@@ -81,6 +85,33 @@ const PaymentForm = ({
       }
       setIsRazorpayLoaded(success);
     });
+
+    // Fetch current user data to get latest discount
+    const fetchCurrentUser = async () => {
+      try {
+        console.log("Fetching current user profile...");
+        const response = await api.get("/auth/profile");
+        console.log("Profile response:", response.data);
+        if (response.data?.user) {
+          console.log(
+            "User discount from server:",
+            response.data.user.discount,
+          );
+          // Update currentUser in AuthContext with latest data including discount
+          updateUser({
+            discount: response.data.user.discount || 0,
+          });
+          console.log(
+            "Updated currentUser discount:",
+            response.data.user.discount,
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
 
     const fetchCourses = async () => {
       try {
@@ -212,12 +243,27 @@ const PaymentForm = ({
         paymentAmount: totalPrice,
       }));
     } else if (paymentType === "full" && price) {
-      setFormData((prev) => ({
-        ...prev,
-        paymentAmount: String(Number(price) * 1.18),
-      }));
+      const basePrice = Number(price);
+      const gstAmount = Math.round(basePrice * 0.18);
+      const totalPrice = basePrice + gstAmount;
+
+      if (discountApplied && currentUser?.discount) {
+        const discountAmount = Math.round(
+          totalPrice * (currentUser.discount / 100),
+        );
+        const discountedPrice = totalPrice - discountAmount;
+        setFormData((prev) => ({
+          ...prev,
+          paymentAmount: discountedPrice,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          paymentAmount: totalPrice,
+        }));
+      }
     }
-  }, [paymentType, price]);
+  }, [paymentType, price, discountApplied, currentUser?.discount]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -420,10 +466,10 @@ const PaymentForm = ({
   }, [isCompanyRegistration, companyAmount, initialData]);
 
   return createPortal(
-    <div className="z-[99999] fixed inset-0 bg-transparent flex items-center justify-center p-4">
+    <div className="z-[99999] fixed inset-0 bg-transparent flex items-center justify-center p-2 md:p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
+        <div className="p-2 md:p-4">
+          <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800">
               {initialData?.isJobFair
                 ? "Make Payment to book JobFair slot"
@@ -451,7 +497,10 @@ const PaymentForm = ({
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-2">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-1 max-h-[70vh] overflow-y-auto pr-2"
+          >
             <div>
               <label
                 htmlFor="name"
@@ -466,7 +515,7 @@ const PaymentForm = ({
                 value={formData.name}
                 onChange={handleChange}
                 readOnly={initialData?.isJobFair}
-                className={`p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${
+                className={`px-2 py-0.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${
                   initialData?.isJobFair
                     ? "bg-gray-600 text-gray-100 cursor-not-allowed"
                     : "bg-gray-700 text-white"
@@ -489,7 +538,7 @@ const PaymentForm = ({
                 value={formData.email}
                 onChange={handleChange}
                 readOnly={initialData?.isJobFair}
-                className={`p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black ${
+                className={`px-2 py-0.5 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black ${
                   initialData?.isJobFair
                     ? "bg-gray-600 text-gray-100 cursor-not-allowed"
                     : "bg-gray-700 text-white"
@@ -499,7 +548,7 @@ const PaymentForm = ({
             </div>
 
             <div>
-              <div className="space-y-1">
+              <div className="">
                 <label
                   htmlFor="phone"
                   className="block text-sm font-medium text-black"
@@ -512,14 +561,18 @@ const PaymentForm = ({
                     value={formData.countryCode}
                     onChange={handleChange}
                     disabled={initialData?.isJobFair}
-                    className={`flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-black dark:text-white rounded-l-md border border-r-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 h-10 px-2 bg-gray-50 border-gray-800 text-black ${
+                    className={`flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-black dark:text-white rounded-l-md border border-r-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 h-10 px-2 py-0.5 bg-gray-50 border-gray-800 text-black ${
                       initialData?.isJobFair
                         ? "bg-gray-600 text-gray-100 cursor-not-allowed"
                         : "bg-gray-700 text-white"
                     }`}
                   >
                     {countryCodes.map((country) => (
-                      <option key={country.code} value={country.code}>
+                      <option
+                        className="py-0.5"
+                        key={country.code}
+                        value={country.code}
+                      >
                         {country.flag} {country.code}
                       </option>
                     ))}
@@ -545,7 +598,7 @@ const PaymentForm = ({
                     inputMode="numeric"
                     maxLength={10}
                     readOnly={initialData?.isJobFair}
-                    className={`flex-1 min-w-0 block w-full px-3 py-1 rounded-none bg-gray-700 rounded-r-md border border-l-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 border-gray-800 text-white ${
+                    className={`flex-1 min-w-0 block w-full px-3 py-0.5 rounded-none bg-gray-700 rounded-r-md border border-l-0 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 border-gray-800 text-white ${
                       initialData?.isJobFair
                         ? "bg-gray-600 text-gray-100 cursor-not-allowed"
                         : "bg-gray-700 text-white"
@@ -573,7 +626,7 @@ const PaymentForm = ({
                   name="course"
                   value={formData.course}
                   readOnly
-                  className="p-2 block w-full rounded-md border border-gray-300 shadow-sm bg-gray-100 text-black cursor-not-allowed"
+                  className="px-2 py-0.5 block w-full rounded-md border border-gray-300 shadow-sm bg-gray-100 text-black cursor-not-allowed"
                   required
                 />
               ) : loadingCourses ? (
@@ -588,7 +641,7 @@ const PaymentForm = ({
                     value={formData.course}
                     onChange={handleCourseChange}
                     disabled={initialData?.isJobFair}
-                    className={`p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${
+                    className={`px-2 py-0.5 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${
                       initialData?.isJobFair
                         ? "bg-gray-600 text-gray-100 cursor-not-allowed"
                         : "bg-gray-700 text-white"
@@ -622,10 +675,10 @@ const PaymentForm = ({
 
             {courseName && (
               <div>
-                <label className="block text-sm font-medium text-black mb-2">
+                <label className="block text-sm font-medium text-black">
                   Payment Type
                 </label>
-                <div className="flex space-x-4">
+                <div className="flex flex-col gap-2">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="radio"
@@ -652,6 +705,27 @@ const PaymentForm = ({
                       Full Payment (₹{Number(price).toLocaleString()} + GST)
                     </span>
                   </label>
+                  {paymentType === "full" &&
+                    currentUser?.discount &&
+                    currentUser.discount > 0 &&
+                    !discountApplied && (
+                      <button
+                        type="button"
+                        onClick={() => setDiscountApplied(true)}
+                        className="px-3 py-1 mx-auto bg-green-600 text-white text-xs rounded hover:bg-green-700"
+                      >
+                        Apply Discount ({currentUser.discount}%)
+                      </button>
+                    )}
+                  {paymentType === "full" && discountApplied && (
+                    <button
+                      type="button"
+                      onClick={() => setDiscountApplied(false)}
+                      className="px-3 py-1 mx-auto bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                    >
+                      Remove Discount
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -673,13 +747,67 @@ const PaymentForm = ({
                 step="0.01"
                 placeholder="Enter amount"
                 readOnly={initialData?.isJobFair}
-                className={`p-2 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black ${
+                className={`px-2 py-0.5 block w-full text-white bg-gray-700 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 border-gray-800 text-black ${
                   initialData?.isJobFair
                     ? "bg-gray-600 text-gray-100 cursor-not-allowed"
                     : "bg-gray-700 text-white"
                 }`}
                 required
               />
+              {courseName && (
+                <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                  {paymentType === "registration" ? (
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span>Registration Fee:</span>
+                        <span>₹2,000</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>GST (18%):</span>
+                        <span>₹360</span>
+                      </div>
+                      <div className="flex justify-between font-semibold border-t pt-1">
+                        <span>Total:</span>
+                        <span>₹2,360</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span>Base Price:</span>
+                        <span>₹{Number(price).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>GST (18%):</span>
+                        <span>
+                          ₹{Math.round(Number(price) * 0.18).toLocaleString()}
+                        </span>
+                      </div>
+                      {discountApplied && currentUser?.discount && (
+                        <>
+                          <div className="flex justify-between text-green-600">
+                            <span>Discount ({currentUser.discount}%):</span>
+                            <span>
+                              -₹
+                              {Math.round(
+                                Number(price) *
+                                  1.18 *
+                                  (currentUser.discount / 100),
+                              ).toLocaleString()}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      <div className="flex justify-between font-semibold border-t pt-1">
+                        <span>Total:</span>
+                        <span>
+                          ₹{Number(formData.paymentAmount).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center space-x-1">
