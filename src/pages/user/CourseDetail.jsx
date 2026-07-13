@@ -34,6 +34,7 @@ import { formatDuration, formatPrice } from "../../utils/format";
 import { getImageUrl } from "../../utils/imageUtils";
 import { useCart } from "../../contexts/CartContext";
 import PaymentForm from "../../components/PaymentForm";
+import BrochureDownloadModal from "../../components/common/BrochureDownloadModal";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -57,6 +58,7 @@ const CourseDetail = () => {
   const [expandedSections, setExpandedSections] = useState({});
   const [showCertificate, setShowCertificate] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showBrochureModal, setShowBrochureModal] = useState(false);
 
   // Initialize expanded sections when course data is loaded
   useEffect(() => {
@@ -911,15 +913,7 @@ const CourseDetail = () => {
               {/* Course Action Buttons */}
               <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={() => {
-                    // if (!isAuthenticated) {
-                    //   // Redirect to login page with a return URL
-                    //   navigate("/login", { state: { from: `/courses/${id}` } });
-                    //   toast.info("Please log in to enroll in this course");
-                    //   return;
-                    // }
-                    setShowCheckoutOptions(true);
-                  }}
+                  onClick={() => setShowBrochureModal(true)}
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
                 >
                   Download Brochure <FaArrowRight className="ml-2" />
@@ -929,7 +923,7 @@ const CourseDetail = () => {
                     onClick={handleVideoPreview}
                     className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center"
                   >
-                    <FaPlay className="mr-2" /> Preview this course
+                    <FaPlay className="mr-2" /> Demo Video
                   </button>
                 )}
               </div>
@@ -1774,6 +1768,14 @@ const CourseDetail = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* Brochure Download Modal */}
+      <BrochureDownloadModal
+        isOpen={showBrochureModal}
+        onClose={() => setShowBrochureModal(false)}
+        courseTitle={course?.title}
+        courseId={course?._id}
+      />
 
       {/* Certificate Modal */}
       <CertificateModal
