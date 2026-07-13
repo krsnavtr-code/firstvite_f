@@ -10,6 +10,7 @@ import {
   getCourseById,
   getCategoriesForForm,
   uploadCourseImage,
+  deleteUploadedFile,
 } from "../../../api/courseApi";
 import userApi from "../../../api/userApi";
 
@@ -181,6 +182,178 @@ const FileUploadInput = ({ onFileSelect, thumbnail, onRemove }) => {
   );
 };
 
+// Component for PDF brochure upload
+const BrochureUploadInput = ({ onFileSelect, brochureUrl, onRemove }) => {
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+
+      // Validate file type (PDF only)
+      if (file.type !== "application/pdf") {
+        toast.error("Only PDF files are allowed for brochures.");
+        return;
+      }
+
+      // Validate file size (10MB max for PDFs)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size too large. Maximum size is 10MB.");
+        return;
+      }
+
+      // Reset file input to allow re-uploading the same file
+      e.target.value = "";
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await uploadCourseImage(formData);
+
+      if (!response || !response.success) {
+        throw new Error(response?.message || "Upload failed");
+      }
+
+      const filePath = response.location;
+      onFileSelect(filePath);
+      toast.success("Brochure uploaded successfully");
+    } catch (error) {
+      console.error("Error in brochure upload:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to upload brochure",
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!brochureUrl) return;
+
+    try {
+      setIsDeleting(true);
+
+      // Delete file from server
+      await deleteUploadedFile(brochureUrl);
+
+      // Call parent's onRemove to update form state
+      onRemove();
+
+      toast.success("Brochure removed successfully");
+    } catch (error) {
+      console.error("Error deleting brochure:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete brochure",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const getBrochureUrl = (url) => {
+    if (!url) return "";
+    try {
+      if (url.startsWith("http")) return url;
+      const baseUrl = import.meta.env.VITE_API_URL;
+      const path = url.startsWith("/") ? url : `/${url}`;
+      return `${baseUrl}${path}`;
+    } catch (error) {
+      console.error("Error creating brochure URL:", error);
+      return "";
+    }
+  };
+
+  const fullBrochureUrl = getBrochureUrl(brochureUrl);
+
+  return (
+    <div className="flex items-center space-x-6">
+      {/* Brochure Preview/Info */}
+      <div className="flex-shrink-0">
+        <div className="w-40 h-32 bg-gray-100 rounded-md overflow-hidden border border-gray-300 flex items-center justify-center">
+          {brochureUrl ? (
+            <div className="text-center p-2">
+              <svg
+                className="w-12 h-12 mx-auto text-red-500 mb-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 8v2a1 1 0 110 2V8a1 1 0 00-.293-.707l-3.3-3.3A1 1 0 0012.414 3H6a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1v-2a1 1 0 110-2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-xs text-gray-600">PDF Uploaded</span>
+            </div>
+          ) : (
+            <span className="text-gray-400 text-sm">No brochure</span>
+          )}
+        </div>
+      </div>
+
+      {/* Upload Controls */}
+      <div className="flex-1">
+        <div className="flex items-center space-x-4">
+          <label
+            className={`relative cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+              isUploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={(e) => {
+              if (isUploading) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
+          >
+            {isUploading ? "Uploading..." : "Choose PDF"}
+            <input
+              type="file"
+              className="sr-only"
+              accept="application/pdf"
+              disabled={isUploading}
+              onChange={handleFileChange}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </label>
+          {brochureUrl && (
+            <>
+              <a
+                href={fullBrochureUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                View
+              </a>
+              <button
+                type="button"
+                onClick={handleRemove}
+                disabled={isDeleting}
+                className={`text-sm text-red-600 hover:text-red-800 ${
+                  isDeleting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {isDeleting ? "Removing..." : "Remove"}
+              </button>
+            </>
+          )}
+        </div>
+        <p className="mt-2 text-sm text-gray-500">
+          Upload course brochure (PDF only, max 10MB)
+        </p>
+      </div>
+    </div>
+  );
+};
+
 // Component to handle each week in the curriculum
 const WeekItem = ({
   week,
@@ -309,6 +482,7 @@ export const CourseForm = ({ isEdit = false }) => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [instructors, setInstructors] = useState([]);
+  const [brochureFile, setBrochureFile] = useState("");
 
   const {
     register,
@@ -347,6 +521,7 @@ export const CourseForm = ({ isEdit = false }) => {
       image: "",
       thumbnail: "",
       previewVideo: "",
+      brochureUrl: "",
       whatYouWillLearn: ["Learn valuable skills"],
       requirements: ["No special requirements"],
       whoIsThisFor: ["Anyone interested in learning"],
@@ -563,6 +738,9 @@ export const CourseForm = ({ isEdit = false }) => {
         price: price,
         originalPrice: originalPrice,
         totalHours: Math.max(0, Number(formData.totalHours) || 0),
+
+        // Include brochure URL
+        brochureUrl: formData.brochureUrl || "",
 
         // Ensure arrays are properly formatted
         benefits: Array.isArray(formData.benefits)
@@ -1397,6 +1575,24 @@ export const CourseForm = ({ isEdit = false }) => {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Course Brochure */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+          <h3 className="text-lg font-semibold mb-4">Course Brochure</h3>
+          <ErrorBoundary>
+            <BrochureUploadInput
+              onFileSelect={(url) => {
+                setBrochureFile(url);
+                setValue("brochureUrl", url);
+              }}
+              brochureUrl={watch("brochureUrl")}
+              onRemove={() => {
+                setBrochureFile("");
+                setValue("brochureUrl", "");
+              }}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Form Actions */}
