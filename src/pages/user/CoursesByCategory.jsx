@@ -428,7 +428,7 @@ const CourseCard = ({ course }) => {
             {course.title}
           </h3>
 
-          <div className="flex items-center text-sm text-black dark:text-gray-300 mb-2">
+          {/* <div className="flex items-center text-sm text-black dark:text-gray-300 mb-2">
             <span className="flex items-center mr-4">
               <FaStar className="text-yellow-400 mr-1" />
               {course.rating?.toFixed(1) || "New"}
@@ -437,7 +437,7 @@ const CourseCard = ({ course }) => {
               <FaUsers className="mr-1 text-gray-600 dark:text-gray-300" />
               {course.enrolledStudents || 0} students
             </span>
-          </div>
+          </div> */}
 
           <div className="flex items-center text-sm text-black dark:text-gray-300 mb-3">
             <FaClock className="mr-1 text-gray-600 dark:text-gray-300" />
@@ -454,7 +454,7 @@ const CourseCard = ({ course }) => {
               )}
             </span>
             <button className="w-1/2 self-end px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors duration-200">
-              Enroll Now
+              Check Details
             </button>
           </div>
         </div>
