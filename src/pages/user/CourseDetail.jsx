@@ -746,7 +746,7 @@ const CourseDetail = () => {
                 </button>
                 {course.brochureUrl && (
                   <button
-                    onClick={downloadBrochure}
+                    onClick={() => setShowBrochureModal(true)}
                     className="text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 transition-colors"
                     aria-label="Download brochure"
                     title="Download course brochure"

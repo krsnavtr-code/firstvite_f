@@ -5,10 +5,18 @@ import { Link } from "react-router-dom";
 import api from "../api/axios";
 import { createPortal } from "react-dom";
 import { loadRazorpay, initRazorpayPayment } from "../utils/razorpay";
+import { useAuth } from "../contexts/AuthContext";
 
-const PaymentForm = ({ onClose, initialData = {} }) => {
+const PaymentForm = ({
+  onClose,
+  initialData = {},
+  courseId,
+  courseName,
+  price,
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const userType = location.state?.userType || "student";
   const {
     isCompanyRegistration,
@@ -16,16 +24,29 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
     description,
   } = location.state || {};
 
+  const [paymentType, setPaymentType] = useState("full"); // 'registration' or 'full'
   const [formData, setFormData] = useState(() => {
     const data = initialData || {};
     return {
-      name: data.name || "",
-      email: data.email || "",
+      name: data.name || currentUser?.fullname || "",
+      email: data.email || currentUser?.email || "",
       countryCode: data.countryCode || "+91",
-      phone: data.phone ? data.phone.replace(/^\+91/, "") : "",
-      course: data.course || "",
-      coursePrice: data.amount ? String(Number(data.amount) * 1.18) : "",
-      paymentAmount: data.amount ? String(Number(data.amount) * 1.18) : "",
+      phone: data.phone
+        ? data.phone.replace(/^\+91/, "")
+        : currentUser?.phone
+          ? currentUser.phone.replace(/^\+91/, "")
+          : "",
+      course: courseName || data.course || "",
+      coursePrice: price
+        ? String(Number(price) * 1.18)
+        : data.amount
+          ? String(Number(data.amount) * 1.18)
+          : "",
+      paymentAmount: price
+        ? String(Number(price) * 1.18)
+        : data.amount
+          ? String(Number(data.amount) * 1.18)
+          : "",
       terms: false,
     };
   });
@@ -179,6 +200,24 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
       paymentAmount: selectedCourse?.price || "",
     }));
   };
+
+  // Update payment amount when payment type changes
+  useEffect(() => {
+    if (paymentType === "registration") {
+      const registrationFee = 2000;
+      const gstAmount = Math.round(registrationFee * 0.18);
+      const totalPrice = registrationFee + gstAmount;
+      setFormData((prev) => ({
+        ...prev,
+        paymentAmount: totalPrice,
+      }));
+    } else if (paymentType === "full" && price) {
+      setFormData((prev) => ({
+        ...prev,
+        paymentAmount: String(Number(price) * 1.18),
+      }));
+    }
+  }, [paymentType, price]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -527,7 +566,17 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
               >
                 Program Name
               </label>
-              {loadingCourses ? (
+              {courseName ? (
+                <input
+                  type="text"
+                  id="course"
+                  name="course"
+                  value={formData.course}
+                  readOnly
+                  className="p-2 block w-full rounded-md border border-gray-300 shadow-sm bg-gray-100 text-black cursor-not-allowed"
+                  required
+                />
+              ) : loadingCourses ? (
                 <div className="animate-pulse">
                   <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
                 </div>
@@ -570,6 +619,42 @@ const PaymentForm = ({ onClose, initialData = {} }) => {
                 </>
               )}
             </div>
+
+            {courseName && (
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">
+                  Payment Type
+                </label>
+                <div className="flex space-x-4">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="paymentType"
+                      value="registration"
+                      checked={paymentType === "registration"}
+                      onChange={(e) => setPaymentType(e.target.value)}
+                      className="text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="text-sm text-black">
+                      Registration Fee (₹2,000 + GST)
+                    </span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="paymentType"
+                      value="full"
+                      checked={paymentType === "full"}
+                      onChange={(e) => setPaymentType(e.target.value)}
+                      className="text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="text-sm text-black">
+                      Full Payment (₹{Number(price).toLocaleString()} + GST)
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
 
             <div>
               <label
