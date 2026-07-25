@@ -9,6 +9,10 @@ import { enrollInCourse } from "../../api/enrollmentApi";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import {
+  generateCourseSchema,
+  generateBreadcrumbSchema,
+} from "../../utils/schemaGenerators";
+import {
   FaStar,
   FaClock,
   FaPlay,
@@ -643,6 +647,44 @@ const CourseDetail = () => {
     ? `https://www.eklabya.com/course/${course.slug || course._id || id}`
     : "https://www.eklabya.com/courses";
 
+  // Generate Course Schema
+  const courseSchema = course
+    ? generateCourseSchema({
+        name: course.title,
+        description:
+          course.shortDescription ||
+          course.description?.replace(/<[^>]*>?/gm, "").substring(0, 500),
+        url: canonicalUrl,
+        image: courseImage,
+        provider: "eklabya centre of excellence",
+        providerUrl: "https://eklabya.com",
+        instructor: course.instructor || "eklabya Expert Faculty",
+        courseCode: course.courseCode,
+        category: course.category?.name,
+        price: course.price,
+        currency: "INR",
+        duration: course.duration ? `PT${course.duration}W` : undefined,
+        ratingValue: course.rating || 4.5,
+        reviewCount: course.reviews?.length || 18,
+        availability: "https://schema.org/InStock",
+      })
+    : null;
+
+  // Generate Breadcrumb Schema
+  const breadcrumbSchema = course
+    ? generateBreadcrumbSchema([
+        { name: "Home", url: "/" },
+        { name: "Courses", url: "/courses" },
+        { name: course.title, url: canonicalUrl },
+      ])
+    : null;
+
+  // Combine schemas
+  const combinedSchema =
+    courseSchema && breadcrumbSchema
+      ? [courseSchema, breadcrumbSchema]
+      : courseSchema || breadcrumbSchema;
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       <SEO
@@ -657,6 +699,7 @@ const CourseDetail = () => {
           image: courseImage,
           url: canonicalUrl,
         }}
+        schema={combinedSchema}
       />
       {/* Course Header */}
       <div className="">

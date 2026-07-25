@@ -1,5 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import SchemaGenerator from "./SchemaGenerator";
 
 /**
  * SEO Component
@@ -19,7 +20,8 @@ import { Helmet } from "react-helmet-async";
  * @param {string} [props.twitter.card] - Twitter card type (defaults to 'summary_large_image')
  * @param {string} [props.twitter.site] - Twitter @username for the website
  * @param {string} [props.twitter.creator] - Twitter @username for content creator
- * @returns {JSX.Element} - Returns Helmet component with meta tags
+ * @param {Object} [props.schema] - Structured data schema object for JSON-LD
+ * @returns {JSX.Element} - Returns Helmet component with meta tags and schema
  */
 const SEO = ({
   title = "eklabya - Online Learning Platform",
@@ -29,6 +31,7 @@ const SEO = ({
   robots = "index, follow",
   og = {},
   twitter = {},
+  schema,
 }) => {
   const siteName = "eklabya";
   const siteUrl = "https://eklabya.com";
@@ -53,35 +56,38 @@ const SEO = ({
   const twitterCreator = twitter.creator || "@eklabya";
 
   return (
-    <Helmet>
-      {/* Primary Meta Tags */}
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="robots" content={robots} />
-      <link rel="canonical" href={canonicalUrl} />
+    <>
+      <Helmet>
+        {/* Primary Meta Tags */}
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="robots" content={robots} />
+        <link rel="canonical" href={canonicalUrl} />
 
-      {/* Open Graph / Facebook */}
-      <meta property="og:title" content={ogTitle} />
-      <meta property="og:description" content={ogDescription} />
-      <meta property="og:image" content={ogImage} />
-      <meta property="og:type" content={ogType} />
-      <meta property="og:url" content={ogUrl} />
-      <meta property="og:site_name" content={siteName} />
-      {og.type === "course" && (
-        <meta property="og:course:availability" content="available" />
-      )}
+        {/* Open Graph / Facebook */}
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:url" content={ogUrl} />
+        <meta property="og:site_name" content={siteName} />
+        {og.type === "course" && (
+          <meta property="og:course:availability" content="available" />
+        )}
 
-      {/* Twitter */}
-      <meta name="twitter:card" content={twitterCard} />
-      <meta name="twitter:title" content={ogTitle} />
-      <meta name="twitter:description" content={ogDescription} />
-      <meta name="twitter:image" content={ogImage} />
-      {twitterSite && <meta name="twitter:site" content={twitterSite} />}
-      {twitterCreator && (
-        <meta name="twitter:creator" content={twitterCreator} />
-      )}
-    </Helmet>
+        {/* Twitter */}
+        <meta name="twitter:card" content={twitterCard} />
+        <meta name="twitter:title" content={ogTitle} />
+        <meta name="twitter:description" content={ogDescription} />
+        <meta name="twitter:image" content={ogImage} />
+        {twitterSite && <meta name="twitter:site" content={twitterSite} />}
+        {twitterCreator && (
+          <meta name="twitter:creator" content={twitterCreator} />
+        )}
+      </Helmet>
+      <SchemaGenerator schema={schema} />
+    </>
   );
 };
 
