@@ -519,6 +519,19 @@ const CourseDetail = () => {
 
   const rating = course.rating || 4;
 
+  // Get custom headings with fallback to defaults
+  const customHeadings = course.customHeadings || {
+    aboutCourse: "About This Course",
+    whatYouWillLearn: "What You'll Learn",
+    requirements: "Requirements",
+    whoIsThisFor: "Who is this course for?",
+    curriculum: "Full Curriculum",
+    skills: "Skills Student Will Learn",
+    topics: "Topics Student Will Learn",
+    prerequisites: "Requirements",
+    faq: "Frequently Asked Questions",
+  };
+
   // Handle video preview
   const handleVideoPreview = () => {
     setShowVideoModal(true);
@@ -1149,7 +1162,9 @@ const CourseDetail = () => {
         <div className="mb-12">
           {activeTab === "overview" && (
             <div className="text-black dark:text-white prose max-w-none dark:prose-invert">
-              <h2 className="text-2xl font-bold mb-4">About This Course</h2>
+              <h2 className="text-2xl font-bold mb-4">
+                {customHeadings.aboutCourse}
+              </h2>
               <div
                 className="mb-6"
                 dangerouslySetInnerHTML={{
@@ -1157,7 +1172,9 @@ const CourseDetail = () => {
                 }}
               />
 
-              <h3 className="text-xl font-semibold mb-4">What You'll Learn</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                {customHeadings.whatYouWillLearn}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {course.whatYouWillLearn?.map((item, index) => (
                   <div key={index} className="flex items-start">
@@ -1179,7 +1196,9 @@ const CourseDetail = () => {
                 )) || <p>No learning objectives specified.</p>}
               </div>
 
-              <h3 className="text-xl font-semibold mb-4">Requirements</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                {customHeadings.requirements}
+              </h3>
               <ul className="list-disc pl-5 space-y-2 mb-8">
                 {course.prerequisites?.map((req, index) => (
                   <li key={index}>{req}</li>
@@ -1187,21 +1206,22 @@ const CourseDetail = () => {
               </ul>
 
               <h3 className="text-xl font-semibold mb-4">
-                Who is this course for?
+                {customHeadings.whoIsThisFor}
               </h3>
-              {/* <ul className="list-disc pl-5 space-y-2">
+              <ul className="list-disc pl-5 space-y-2">
                 {course.whoIsThisFor?.map((item, index) => (
                   <li key={index}>{item}</li>
-                )) || <li>Anyone interested in learning about this topic</li>}
-              </ul> */}
-              <li>Anyone interested in learning about this topic.</li>
+                )) && <li>Anyone interested in learning about this topic</li>}
+              </ul>
             </div>
           )}
 
           {activeTab === "curriculum" && (
             <div className="text-black dark:text-white">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Full Curriculum</h2>
+                <h2 className="text-2xl font-bold">
+                  {customHeadings.curriculum}
+                </h2>
                 <div className="flex space-x-2 mt-3 sm:mt-0">
                   <button
                     onClick={expandAllSections}
@@ -1335,7 +1355,7 @@ const CourseDetail = () => {
             <div className="flex flex-col gap-8">
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-bold mb-6 text-black dark:text-white">
-                  Skills Student Will Learn
+                  {customHeadings.skills}
                 </h3>
                 {course.skills?.length > 0 ? (
                   <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1370,7 +1390,7 @@ const CourseDetail = () => {
               {/* What Students Will Learn */}
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-bold mb-6 text-black dark:text-white">
-                  Topics Student Will Learn
+                  {customHeadings.topics}
                 </h3>
                 {course.whatYouWillLearn?.length > 0 ? (
                   <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1405,7 +1425,7 @@ const CourseDetail = () => {
               {/* prerequisites/ Requremnts */}
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-bold mb-6 text-black dark:text-white">
-                  Requremnts
+                  {customHeadings.prerequisites}
                 </h3>
                 {course.prerequisites?.length > 0 ? (
                   <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1442,7 +1462,7 @@ const CourseDetail = () => {
           {activeTab === "faq" && (
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-black dark:text-white mb-6">
-                Frequently Asked Questions
+                {customHeadings.faq}
               </h3>
 
               {course.faqs?.length > 0 ? (

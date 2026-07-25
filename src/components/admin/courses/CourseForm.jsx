@@ -537,6 +537,17 @@ export const CourseForm = ({ isEdit = false }) => {
           topics: ["Course introduction"],
         },
       ],
+      customHeadings: {
+        aboutCourse: "About This Course",
+        whatYouWillLearn: "What You'll Learn",
+        requirements: "Requirements",
+        whoIsThisFor: "Who is this course for?",
+        curriculum: "Full Curriculum",
+        skills: "Skills Student Will Learn",
+        topics: "Topics Student Will Learn",
+        prerequisites: "Requirements",
+        faq: "Frequently Asked Questions",
+      },
     },
   });
 
@@ -611,6 +622,18 @@ export const CourseForm = ({ isEdit = false }) => {
               isPublished: Boolean(courseData.isPublished),
               showOnHome: Boolean(courseData.showOnHome),
               certificateIncluded: courseData.certificateIncluded !== false, // default to true if not set
+              // Handle custom headings
+              customHeadings: courseData.customHeadings || {
+                aboutCourse: "About This Course",
+                whatYouWillLearn: "What You'll Learn",
+                requirements: "Requirements",
+                whoIsThisFor: "Who is this course for?",
+                curriculum: "Full Curriculum",
+                skills: "Skills Student Will Learn",
+                topics: "Topics Student Will Learn",
+                prerequisites: "Requirements",
+                faq: "Frequently Asked Questions",
+              },
             };
 
             reset(formattedData);
@@ -805,6 +828,19 @@ export const CourseForm = ({ isEdit = false }) => {
           : "Beginner",
         language: formData.language?.toString().trim() || "English",
         duration: formData.duration?.toString().trim() || "0 min",
+
+        // Include custom headings
+        customHeadings: formData.customHeadings || {
+          aboutCourse: "About This Course",
+          whatYouWillLearn: "What You'll Learn",
+          requirements: "Requirements",
+          whoIsThisFor: "Who is this course for?",
+          curriculum: "Full Curriculum",
+          skills: "Skills Student Will Learn",
+          topics: "Topics Student Will Learn",
+          prerequisites: "Requirements",
+          faq: "Frequently Asked Questions",
+        },
       };
 
       if (isEdit) {
@@ -1062,6 +1098,125 @@ export const CourseForm = ({ isEdit = false }) => {
                 {errors.metaDescription.message}
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Custom Headings */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Custom Headings</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Customize the section headings that appear on the course detail
+            page. Leave blank to use default headings.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                About Course Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.aboutCourse")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="About This Course"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                What You'll Learn Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.whatYouWillLearn")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="What You'll Learn"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Requirements Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.requirements")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="Requirements"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Who Is This For Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.whoIsThisFor")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="Who is this course for?"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Curriculum Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.curriculum")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="Full Curriculum"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Skills Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.skills")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="Skills Student Will Learn"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Topics Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.topics")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="Topics Student Will Learn"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Prerequisites Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.prerequisites")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="Requirements"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                FAQ Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.faq")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="Frequently Asked Questions"
+              />
+            </div>
           </div>
         </div>
 
