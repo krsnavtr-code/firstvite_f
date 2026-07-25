@@ -522,6 +522,7 @@ const CourseDetail = () => {
   // Get custom headings with fallback to defaults
   const customHeadings = course.customHeadings || {
     aboutCourse: "About This Course",
+    aboutCourseInIndia: "About the course in India",
     whatYouWillLearn: "What You'll Learn",
     requirements: "Requirements",
     whoIsThisFor: "Who is this course for?",
@@ -1315,6 +1316,20 @@ const CourseDetail = () => {
                   __html: course.description || "No description available",
                 }}
               />
+
+              {course.aboutCourseInIndia && (
+                <>
+                  <h3 className="text-xl font-semibold mb-4">
+                    {customHeadings.aboutCourseInIndia}
+                  </h3>
+                  <div
+                    className="mb-6"
+                    dangerouslySetInnerHTML={{
+                      __html: course.aboutCourseInIndia,
+                    }}
+                  />
+                </>
+              )}
 
               <h3 className="text-xl font-semibold mb-4">
                 {customHeadings.whatYouWillLearn}

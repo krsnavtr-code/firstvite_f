@@ -539,6 +539,7 @@ export const CourseForm = ({ isEdit = false }) => {
       ],
       customHeadings: {
         aboutCourse: "About This Course",
+        aboutCourseInIndia: "About the course in India",
         whatYouWillLearn: "What You'll Learn",
         requirements: "Requirements",
         whoIsThisFor: "Who is this course for?",
@@ -548,6 +549,7 @@ export const CourseForm = ({ isEdit = false }) => {
         prerequisites: "Requirements",
         faq: "Frequently Asked Questions",
       },
+      aboutCourseInIndia: "",
     },
   });
 
@@ -625,6 +627,7 @@ export const CourseForm = ({ isEdit = false }) => {
               // Handle custom headings
               customHeadings: courseData.customHeadings || {
                 aboutCourse: "About This Course",
+                aboutCourseInIndia: "About the course in India",
                 whatYouWillLearn: "What You'll Learn",
                 requirements: "Requirements",
                 whoIsThisFor: "Who is this course for?",
@@ -634,6 +637,8 @@ export const CourseForm = ({ isEdit = false }) => {
                 prerequisites: "Requirements",
                 faq: "Frequently Asked Questions",
               },
+              // Handle about course in India content
+              aboutCourseInIndia: courseData.aboutCourseInIndia || "",
             };
 
             reset(formattedData);
@@ -832,6 +837,7 @@ export const CourseForm = ({ isEdit = false }) => {
         // Include custom headings
         customHeadings: formData.customHeadings || {
           aboutCourse: "About This Course",
+          aboutCourseInIndia: "About the course in India",
           whatYouWillLearn: "What You'll Learn",
           requirements: "Requirements",
           whoIsThisFor: "Who is this course for?",
@@ -841,6 +847,10 @@ export const CourseForm = ({ isEdit = false }) => {
           prerequisites: "Requirements",
           faq: "Frequently Asked Questions",
         },
+
+        // Include about course in India content
+        aboutCourseInIndia:
+          formData.aboutCourseInIndia?.toString().trim() || "",
       };
 
       if (isEdit) {
@@ -1036,6 +1046,51 @@ export const CourseForm = ({ isEdit = false }) => {
               </p>
             )}
           </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              About Course in India
+            </label>
+            <div className="prose max-w-none">
+              <Controller
+                name="aboutCourseInIndia"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <ReactQuill
+                    theme="snow"
+                    value={value || ""}
+                    onChange={onChange}
+                    modules={{
+                      toolbar: [
+                        [{ header: [1, 2, 3, false] }],
+                        ["bold", "italic", "underline", "strike"],
+                        [{ list: "ordered" }, { list: "bullet" }],
+                        ["link", "image"],
+                        ["clean"],
+                      ],
+                    }}
+                    formats={[
+                      "header",
+                      "bold",
+                      "italic",
+                      "underline",
+                      "strike",
+                      "list",
+                      "bullet",
+                      "link",
+                      "image",
+                    ]}
+                    placeholder="Enter information about this course in India..."
+                    className="h-64 bg-gray-300"
+                  />
+                )}
+              />
+            </div>
+            <p className="mt-1 text-sm text-gray-500">
+              Optional: Add specific information about this course in the Indian
+              context
+            </p>
+          </div>
         </div>
 
         {/* SEO & Meta Information */}
@@ -1119,6 +1174,18 @@ export const CourseForm = ({ isEdit = false }) => {
                 {...register("customHeadings.aboutCourse")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
                 placeholder="About This Course"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                About Course in India Heading
+              </label>
+              <input
+                type="text"
+                {...register("customHeadings.aboutCourseInIndia")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                placeholder="About the course in India"
               />
             </div>
 
