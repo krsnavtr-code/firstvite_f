@@ -716,7 +716,7 @@ const CourseDetail = () => {
       />
       {/* Course Header */}
       <div className="">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-1.5 md:px-4">
           <nav className="flex overflow-x-auto py-2" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-2 text-sm">
               <li className="flex items-center">
@@ -748,12 +748,12 @@ const CourseDetail = () => {
       </div>
 
       {/* Course Detail */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-1.5 md:px-4 py-2.5 md:py-6">
         <div className="">
           {/* Main Content */}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Course Header */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 lg:w-2/3">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-1.5 md:p-6 mb-6 lg:w-2/3">
               {/* Course Meta */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {course.category?.name && (
@@ -814,7 +814,7 @@ const CourseDetail = () => {
 
               {/* Course Title */}
               <div className="space-y-4">
-                <h1 className="text-3xl md:text-4xl font-bold text-black dark:text-white leading-tight">
+                <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white leading-tight">
                   {course.title}
                 </h1>
 
@@ -970,7 +970,7 @@ const CourseDetail = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => setShowBrochureModal(true)}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-2 md:px-6 py-1 md:py-3 rounded-lg font-medium flex items-center transition-colors"
                 >
                   Download Brochure <FaArrowRight className="ml-2" />
                 </button>
@@ -983,6 +983,150 @@ const CourseDetail = () => {
                   </button>
                 )}
               </div>
+
+              {/* Static Certificate View */}
+              {course.certificateIncluded && (
+                <div className="mt-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-xl p-1 md:p-6 border border-blue-100 dark:border-slate-700">
+                  <div className="flex flex-col md:flex-row gap-6 items-center">
+                    <div className="w-full md:w-1/2">
+                      <div
+                        className="relative rounded-lg overflow-hidden shadow-lg bg-white dark:bg-slate-800 select-none"
+                        onContextMenu={(e) => e.preventDefault()}
+                        onDragStart={(e) => e.preventDefault()}
+                      >
+                        {/* Protective overlay */}
+                        <div
+                          className="absolute inset-0 z-20 pointer-events-none"
+                          style={{
+                            backgroundImage:
+                              "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px)",
+                            mixBlendMode: "multiply",
+                          }}
+                        />
+                        <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+                          <div className="text-3xl font-bold text-gray-400 opacity-20 transform -rotate-45 select-none">
+                            SAMPLE ONLY
+                          </div>
+                        </div>
+                        {/* Noise overlay */}
+                        <div
+                          className="absolute inset-0 z-20 pointer-events-none"
+                          style={{
+                            background:
+                              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E\")",
+                            mixBlendMode: "overlay",
+                          }}
+                        />
+                        {/* Certificate image with protection */}
+                        <div
+                          className="relative z-10"
+                          style={{
+                            filter: "blur(0.5px)",
+                            userSelect: "none",
+                            WebkitUserSelect: "none",
+                            MozUserSelect: "none",
+                            msUserSelect: "none",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <img
+                            src="http://www.eklabya.com/api/upload/file/eklabya-certificate-4563.png"
+                            alt="Sample Certificate"
+                            className="w-full h-auto object-cover"
+                            style={{
+                              WebkitUserSelect: "none",
+                              MozUserSelect: "none",
+                              msUserSelect: "none",
+                              userSelect: "none",
+                              pointerEvents: "none",
+                            }}
+                            onContextMenu={(e) => e.preventDefault()}
+                            onDragStart={(e) => e.preventDefault()}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src =
+                                "/images/certificate-placeholder.jpg";
+                            }}
+                          />
+                        </div>
+                        {/* Gradient overlay with text */}
+                        <div className="absolute inset-0 z-30 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 pointer-events-none">
+                          <span className="text-white text-sm font-medium">
+                            Sample Certificate - Not for Distribution
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-full md:w-1/2">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                        Certificate of Completion
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">
+                        Upon successful completion of this course, you will
+                        receive a professional certificate that validates your
+                        skills and knowledge.
+                      </p>
+                      <ul className="space-y-2 mb-6">
+                        <li className="flex items-center text-gray-700 dark:text-gray-300">
+                          <svg
+                            className="h-5 w-5 text-green-500 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Industry-recognized certificate
+                        </li>
+                        <li className="flex items-center text-gray-700 dark:text-gray-300">
+                          <svg
+                            className="h-5 w-5 text-green-500 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Shareable on LinkedIn
+                        </li>
+                        <li className="flex items-center text-gray-700 dark:text-gray-300">
+                          <svg
+                            className="h-5 w-5 text-green-500 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Verifiable credentials
+                        </li>
+                      </ul>
+                      <button
+                        onClick={() => setShowContactForm(true)}
+                        className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-2 md:px-6 py-1.5 md:py-3 rounded-lg font-medium flex items-center justify-center transition-colors shadow-md hover:shadow-lg"
+                      >
+                        <MessageSquare className="mr-2 h-5 w-5" />
+                        Contact for Certificate Details
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Course Sidebar On Right */}
@@ -1077,7 +1221,7 @@ const CourseDetail = () => {
                             icon: (
                               <FaCalendar className="text-amber-500 w-5 h-5 flex-shrink-0" />
                             ),
-                            text: "1 year full access",
+                            text: "2 year full access",
                           },
                           {
                             icon: (
