@@ -10,6 +10,7 @@ import {
   FaTwitter,
   FaInstagram,
   FaLinkedin,
+  FaPinterest,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { submitContactForm } from "../api/contactApi";
@@ -251,24 +252,38 @@ export default function Contact() {
                     name: "Facebook",
                     icon: FaFacebook,
                     color: "text-blue-600",
+                    url: "https://www.facebook.com/profile.php?id=61589473389916",
                   },
-                  { name: "Twitter", icon: FaTwitter, color: "text-blue-400" },
+                  {
+                    name: "Twitter",
+                    icon: FaTwitter,
+                    color: "text-blue-400",
+                    url: "https://x.com/eklabyaofficial",
+                  },
                   {
                     name: "Instagram",
                     icon: FaInstagram,
                     color: "text-pink-500",
+                    url: "https://www.instagram.com/eklabya_official",
                   },
                   {
                     name: "LinkedIn",
                     icon: FaLinkedin,
                     color: "text-blue-700",
+                    url: "https://www.linkedin.com/company/eklabya-elearning",
+                  },
+                  {
+                    name: "Pinterest",
+                    icon: FaPinterest,
+                    color: "text-red-600",
+                    url: "https://in.pinterest.com/eklabyaofficial",
                   },
                 ].map((social) => {
                   const Icon = social.icon;
                   return (
                     <a
                       key={social.name}
-                      href={`#${social.name.toLowerCase()}`}
+                      href={social.url}
                       className={`${social.color} hover:opacity-80 transition-opacity`}
                       aria-label={social.name}
                       target="_blank"

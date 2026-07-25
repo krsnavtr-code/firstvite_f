@@ -275,7 +275,10 @@ export const generateOrganizationSchema = ({
   foundingDate = "2020",
   sameAs = [
     "https://www.linkedin.com/company/eklabya-elearning",
-    "https://www.facebook.com/eklabya",
+    "https://www.facebook.com/profile.php?id=61589473389916",
+    "https://www.instagram.com/eklabya_official",
+    "https://x.com/eklabyaofficial",
+    "https://in.pinterest.com/eklabyaofficial",
   ],
 } = {}) => {
   return {

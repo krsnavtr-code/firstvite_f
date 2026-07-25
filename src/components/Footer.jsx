@@ -7,6 +7,8 @@ import {
   FaBook,
   FaWhatsapp,
   FaFacebook,
+  FaInstagram,
+  FaPinterest,
 } from "react-icons/fa";
 
 function Footer() {
@@ -175,7 +177,7 @@ function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://wa.me/919891030303"
+                href="https://wa.me/919891030303?text=Hi%2C%20I%20am%20interested%20in%20learning%20more%20about%20your%20courses."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
@@ -183,7 +185,7 @@ function Footer() {
                 <FaWhatsapp className="h-6 w-6" />
               </a>
               <a
-                href="/"
+                href="https://x.com/eklabyaofficial"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
@@ -191,7 +193,7 @@ function Footer() {
                 <FaTwitter className="h-6 w-6" />
               </a>
               <a
-                href="/"
+                href="https://www.linkedin.com/company/eklabya-elearning"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
@@ -199,12 +201,28 @@ function Footer() {
                 <FaLinkedin className="h-6 w-6" />
               </a>
               <a
-                href="/"
+                href="https://www.facebook.com/profile.php?id=61589473389916"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
               >
                 <FaFacebook className="h-6 w-6" />
+              </a>
+              <a
+                href="https://www.instagram.com/eklabya_official"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
+              >
+                <FaInstagram className="h-6 w-6" />
+              </a>
+              <a
+                href="https://in.pinterest.com/eklabyaofficial"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
+              >
+                <FaPinterest className="h-6 w-6" />
               </a>
             </div>
           </div>
