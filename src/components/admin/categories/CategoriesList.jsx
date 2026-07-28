@@ -1,23 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
-import { getCategories, deleteCategory } from '../../../api/categoryApi';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { FaSearch, FaEdit, FaTrash } from "react-icons/fa";
+import { getCategories, deleteCategory } from "../../../api/categoryApi";
 
 const CategoriesList = () => {
   const [categories, setCategories] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
-  const [showHomeFilter, setShowHomeFilter] = useState('all'); // 'all', 'yes', 'no'
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
-  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({
+    key: "name",
+    direction: "asc",
+  });
+  const [showHomeFilter, setShowHomeFilter] = useState("all"); // 'all', 'yes', 'no'
+  const [statusFilter, setStatusFilter] = useState("all"); // 'all', 'active', 'inactive'
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectAll, setSelectAll] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const navigate = useNavigate();
-const location = useLocation();
+  const location = useLocation();
 
   useEffect(() => {
     fetchCategories();
@@ -26,39 +29,39 @@ const location = useLocation();
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      
+
       // Build query params
       const params = {
         limit: itemsPerPage,
         page: currentPage,
-        status: statusFilter === 'all' ? undefined : statusFilter
+        status: "all",
       };
-      
+
       const response = await getCategories(params);
-      
+
       if (response?.success && response?.data) {
         setCategories(response.data);
         setTotalCount(response.pagination?.total || response.data.length);
       } else {
-        throw new Error('Invalid response format from server');
+        throw new Error("Invalid response format from server");
       }
     } catch (err) {
-      console.error('Error in fetchCategories:', err);
-      setError(err.message || 'Failed to fetch categories');
-      toast.error(err.message || 'Failed to fetch categories');
+      console.error("Error in fetchCategories:", err);
+      setError(err.message || "Failed to fetch categories");
+      toast.error(err.message || "Failed to fetch categories");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
+    if (window.confirm("Are you sure you want to delete this category?")) {
       try {
         await deleteCategory(id);
-        toast.success('Category deleted successfully');
+        toast.success("Category deleted successfully");
         fetchCategories();
       } catch (err) {
-        console.error('Error deleting category:', err);
+        console.error("Error deleting category:", err);
         // Error toast will be shown by the API interceptor
       }
     }
@@ -69,20 +72,28 @@ const location = useLocation();
   };
 
   // Filter categories based on search term and showOnHome filter
-  const filteredCategories = Array.isArray(categories) ? categories.filter(category => {
-    const matchesSearch = category?.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-      (category?.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesHomeFilter = showHomeFilter === 'all' || 
-      (showHomeFilter === 'yes' && category?.showOnHome) || 
-      (showHomeFilter === 'no' && !category?.showOnHome);
-    
-    const matchesStatusFilter = statusFilter === 'all' || 
-      (statusFilter === 'active' && category?.isActive) || 
-      (statusFilter === 'inactive' && !category?.isActive);
-    
-    return matchesSearch && matchesHomeFilter && matchesStatusFilter;
-  }) : [];
+  const filteredCategories = Array.isArray(categories)
+    ? categories.filter((category) => {
+        const matchesSearch =
+          category?.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+          (category?.description &&
+            category.description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()));
+
+        const matchesHomeFilter =
+          showHomeFilter === "all" ||
+          (showHomeFilter === "yes" && category?.showOnHome) ||
+          (showHomeFilter === "no" && !category?.showOnHome);
+
+        const matchesStatusFilter =
+          statusFilter === "all" ||
+          (statusFilter === "active" && category?.isActive) ||
+          (statusFilter === "inactive" && !category?.isActive);
+
+        return matchesSearch && matchesHomeFilter && matchesStatusFilter;
+      })
+    : [];
 
   if (loading) {
     return <div className="flex justify-center p-8">Loading categories...</div>;
@@ -97,7 +108,7 @@ const location = useLocation();
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl text-black font-bold">Categories</h2>
         <button
-          onClick={() => navigate('new')}
+          onClick={() => navigate("new")}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <FaEdit className="text-sm" />
@@ -121,7 +132,7 @@ const location = useLocation();
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
+
               <div className="flex gap-2">
                 <select
                   className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -132,7 +143,7 @@ const location = useLocation();
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
-                
+
                 <select
                   className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={itemsPerPage}
@@ -183,13 +194,21 @@ const location = useLocation();
                     <div className="flex items-center">
                       {category.image && (
                         <div className="flex-shrink-0 h-10 w-10">
-                          <img className="h-10 w-10 rounded-full object-cover" src={category.image} alt={category.name} />
+                          <img
+                            className="h-10 w-10 rounded-full object-cover"
+                            src={category.image}
+                            alt={category.name}
+                          />
                         </div>
                       )}
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {category.name}
+                        </div>
                         {category.description && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs">{category.description}</div>
+                          <div className="text-sm text-gray-500 truncate max-w-xs">
+                            {category.description}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -206,10 +225,14 @@ const location = useLocation();
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      category.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {category.isActive ? 'Active' : 'Inactive'}
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        category.isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {category.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -239,20 +262,20 @@ const location = useLocation();
           </table>
         </div>
       </div>
-      
+
       {/* Pagination */}
       {totalCount > itemsPerPage && (
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
               Previous
             </button>
             <button
-              onClick={() => setCurrentPage(p => p + 1)}
+              onClick={() => setCurrentPage((p) => p + 1)}
               disabled={currentPage * itemsPerPage >= totalCount}
               className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
@@ -262,13 +285,21 @@ const location = useLocation();
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-500">
-                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalCount)}</span> of <span className="font-medium">{totalCount}</span> categories
+                Showing{" "}
+                <span className="font-medium">
+                  {(currentPage - 1) * itemsPerPage + 1}-
+                  {Math.min(currentPage * itemsPerPage, totalCount)}
+                </span>{" "}
+                of <span className="font-medium">{totalCount}</span> categories
               </p>
             </div>
             <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <nav
+                className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                aria-label="Pagination"
+              >
                 <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                   className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                 >
@@ -279,7 +310,7 @@ const location = useLocation();
                   Page {currentPage} of {Math.ceil(totalCount / itemsPerPage)}
                 </div>
                 <button
-                  onClick={() => setCurrentPage(p => p + 1)}
+                  onClick={() => setCurrentPage((p) => p + 1)}
                   disabled={currentPage * itemsPerPage >= totalCount}
                   className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                 >
