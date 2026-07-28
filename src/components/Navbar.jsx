@@ -270,28 +270,28 @@ function Navbar() {
                     <div className="space-y-2 text-gray-700">
                       <div className="flex justify-between border-y py-2">
                         <span className="font-medium">Bank Name</span>
-                        <strong>ICICI Bank</strong>
+                        <strong>IndusInd Bank</strong>
                       </div>
 
                       <div className="flex justify-between border-b pb-2">
                         <span className="font-medium">Account Number</span>
-                        <strong>2530 5010 216</strong>
+                        <strong>201037792463</strong>
                       </div>
 
                       <div className="flex justify-between border-b pb-2">
                         <span className="font-medium">IFSC Code</span>
-                        <strong>ICIC0000253</strong>
+                        <strong>INDB0000588</strong>
                       </div>
 
                       <div className="flex justify-between border-b pb-2">
                         <span className="font-medium">Branch</span>
-                        <strong>Noida</strong>
+                        <strong>Noida Sector 62</strong>
                       </div>
 
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <span className="font-medium">UPI Number</span>
                         <strong>9891030303</strong>
-                      </div>
+                      </div> */}
                     </div>
 
                     <div className="mt-2 bg-yellow-50 border border-yellow-200 rounded-xl p-2">
@@ -422,28 +422,28 @@ function Navbar() {
                     <div className="space-y-2 text-gray-700">
                       <div className="flex justify-between border-y py-2">
                         <span className="font-medium">Bank Name</span>
-                        <strong>ICICI Bank</strong>
+                        <strong>IndusInd Bank</strong>
                       </div>
 
                       <div className="flex justify-between border-b pb-2">
                         <span className="font-medium">Account Number</span>
-                        <strong>2530 5010 216</strong>
+                        <strong>201037792463</strong>
                       </div>
 
                       <div className="flex justify-between border-b pb-2">
                         <span className="font-medium">IFSC Code</span>
-                        <strong>ICIC0000253</strong>
+                        <strong>INDB0000588</strong>
                       </div>
 
                       <div className="flex justify-between border-b pb-2">
                         <span className="font-medium">Branch</span>
-                        <strong>Noida</strong>
+                        <strong>Noida Sector 62</strong>
                       </div>
 
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <span className="font-medium">UPI Number</span>
                         <strong>9891030303</strong>
-                      </div>
+                      </div> */}
                     </div>
 
                     <div className="mt-2 bg-yellow-50 border border-yellow-200 rounded-xl p-2">
@@ -785,36 +785,36 @@ function Navbar() {
                       <span className="text-gray-500 dark:text-gray-400">
                         Bank Name
                       </span>
-                      <span className="font-medium">ICICI Bank</span>
+                      <span className="font-medium">IndusInd Bank</span>
                     </div>
 
                     <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <span className="text-gray-500 dark:text-gray-400">
                         Account Number
                       </span>
-                      <span className="font-medium">2530 5010 216</span>
+                      <span className="font-medium">201037792463</span>
                     </div>
 
                     <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <span className="text-gray-500 dark:text-gray-400">
                         IFSC Code
                       </span>
-                      <span className="font-medium">ICIC0000253</span>
+                      <span className="font-medium">INDB0000588</span>
                     </div>
 
                     <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <span className="text-gray-500 dark:text-gray-400">
                         Branch
                       </span>
-                      <span className="font-medium">Noida</span>
+                      <span className="font-medium">Noida Sector 62</span>
                     </div>
 
-                    <div className="flex justify-between py-2">
+                    {/* <div className="flex justify-between py-2">
                       <span className="text-gray-500 dark:text-gray-400">
                         UPI Number
                       </span>
                       <span className="font-medium">9891030303</span>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="mt-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
