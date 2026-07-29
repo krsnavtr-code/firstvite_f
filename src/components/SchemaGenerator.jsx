@@ -11,10 +11,10 @@ const SchemaGenerator = ({ schema }) => {
   return (
     <Helmet>
       {schemas.map((s, index) => (
-        <script 
-          key={index} 
+        <script
+          key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} 
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }}
         />
       ))}
     </Helmet>
