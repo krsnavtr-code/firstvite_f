@@ -86,13 +86,17 @@ export const generateCourseSchema = ({
   }
 
   if (price !== undefined) {
-    schema.offers = {
-      "@type": "Offer",
-      category: "Paid",
-      priceCurrency: currency,
-      price: price,
-      availability,
-      ...(offers && { url: offers }),
+    schema.hasCourseInstance = {
+      "@type": "CourseInstance",
+      courseMode: "Online",
+      offers: {
+        "@type": "Offer",
+        category: "Paid",
+        priceCurrency: currency,
+        price: price,
+        availability,
+        ...(offers && { url: offers }),
+      },
     };
   }
 
@@ -231,7 +235,7 @@ export const generateArticleSchema = ({
   }
 
   if (articleSection) {
-    articleSection: articleSection;
+    schema.articleSection = articleSection;
   }
 
   if (wordCount) {

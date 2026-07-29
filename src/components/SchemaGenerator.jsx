@@ -1,15 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 
-/**
- * SchemaGenerator Component
- *
- * Injects JSON-LD structured data into the page head for SEO
- *
- * @param {Object} props - Component props
- * @param {Object} props.schema - The schema object to convert to JSON-LD
- * @returns {JSX.Element} - Returns Helmet component with JSON-LD script
- */
 const SchemaGenerator = ({ schema }) => {
   if (!schema) return null;
 
@@ -20,9 +11,12 @@ const SchemaGenerator = ({ schema }) => {
   return (
     <Helmet>
       {schemas.map((s, index) => (
-        <script key={index} type="application/ld+json">
-          {JSON.stringify(s)}
-        </script>
+        <script
+          key={index}
+          type="application/ld+json"
+          // Is line ko add karein taaki React JSON ko corrupt na kare
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }}
+        />
       ))}
     </Helmet>
   );
