@@ -16,7 +16,7 @@ const LoadingFallback = () => (
   </div>
 );
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const app = (
   <React.StrictMode>
     <Suspense fallback={<LoadingFallback />}>
       <I18nextProvider i18n={i18n}>
@@ -35,3 +35,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </Suspense>
   </React.StrictMode>
 );
+
+const rootElement = document.getElementById("root");
+
+// If react-snap has pre-rendered static HTML into #root, hydrate it
+// instead of wiping and re-rendering from scratch (React 18 hydration).
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrateRoot(rootElement, app);
+} else {
+  ReactDOM.createRoot(rootElement).render(app);
+}
