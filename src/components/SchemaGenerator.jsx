@@ -11,11 +11,10 @@ const SchemaGenerator = ({ schema }) => {
   return (
     <Helmet>
       {schemas.map((s, index) => (
-        <script
-          key={index}
+        <script 
+          key={index} 
           type="application/ld+json"
-          // Is line ko add karein taaki React JSON ko corrupt na kare
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} 
         />
       ))}
     </Helmet>
