@@ -8,6 +8,7 @@ import {
   generateBreadcrumbSchema,
   generateFAQSchema,
   generateWebPageSchema,
+  generateOrganizationSchema,
 } from "../../utils/schemaGenerators";
 
 const DataScienceLanding = () => {
@@ -79,11 +80,14 @@ const DataScienceLanding = () => {
     url: "/data-science-ai-programme",
   });
 
+  const organizationSchema = generateOrganizationSchema();
+
   const combinedSchemas = [
     courseSchema,
     breadcrumbsSchema,
     faqSchema,
     webPageSchema,
+    organizationSchema,
   ].filter(Boolean);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

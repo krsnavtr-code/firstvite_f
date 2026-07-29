@@ -13,23 +13,17 @@ import { Helmet } from "react-helmet-async";
 const SchemaGenerator = ({ schema }) => {
   if (!schema) return null;
 
-  // Handle array of schemas - output multiple script tags
-  if (Array.isArray(schema)) {
-    return (
-      <>
-        {schema.map((s, index) => (
-          <Helmet key={index}>
-            <script type="application/ld+json">{JSON.stringify(s)}</script>
-          </Helmet>
-        ))}
-      </>
-    );
-  }
+  const schemas = Array.isArray(schema) ? schema.filter(Boolean) : [schema];
 
-  // Handle single schema object
+  if (schemas.length === 0) return null;
+
   return (
     <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
+      {schemas.map((s, index) => (
+        <script key={index} type="application/ld+json">
+          {JSON.stringify(s)}
+        </script>
+      ))}
     </Helmet>
   );
 };
