@@ -50,6 +50,10 @@ export default defineConfig({
     outDir: "dist",
     assetsDir: "assets",
     sourcemap: false,
+    // react-snap's bundled Puppeteer uses an old Chromium that cannot parse
+    // modern syntax like optional chaining (?.) / nullish coalescing (??).
+    // Target es2019 so esbuild transpiles that syntax away during prerendering.
+    target: "es2019",
     rollupOptions: {
       output: {
         manualChunks: {
