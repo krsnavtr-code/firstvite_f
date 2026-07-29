@@ -485,3 +485,40 @@ export const generateWebSiteSchema = ({
     },
   };
 };
+
+/**
+ * Generate WebPage Schema
+ *
+ * @param {Object} pageData - WebPage information
+ * @param {string} pageData.name - Page name
+ * @param {string} pageData.description - Page description
+ * @param {string} pageData.url - Page URL
+ * @param {string} [pageData.publisher] - Publisher name (default: "eklabya centre of excellence")
+ * @param {string} [pageData.publisherUrl] - Publisher URL
+ * @returns {Object} - WebPage schema object
+ */
+export const generateWebPageSchema = ({
+  name,
+  description,
+  url,
+  publisher = "eklabya centre of excellence",
+  publisherUrl = siteUrl,
+} = {}) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name,
+    description,
+    url: url.startsWith("http") ? url : `${siteUrl}${url}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "eklabya",
+      url: publisherUrl,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: publisher,
+      url: publisherUrl,
+    },
+  };
+};

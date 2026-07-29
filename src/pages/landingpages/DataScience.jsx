@@ -2,9 +2,89 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { submitContactForm } from "../../api/contactApi";
+import SEO from "../../components/SEO";
+import {
+  generateCourseSchema,
+  generateBreadcrumbSchema,
+  generateFAQSchema,
+  generateWebPageSchema,
+} from "../../utils/schemaGenerators";
 
 const DataScienceLanding = () => {
   const navigate = useNavigate();
+
+  const courseSchema = generateCourseSchema({
+    name: "Data Science & AI Programme",
+    description:
+      "Become a Data Scientist in 6 Months. Learn from Sumit Choudhary — 10+ year industry expert. Master Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance.",
+    url: "/data-science-ai-programme",
+    image:
+      "https://www.eklabya.com/api/upload/file/WhatsApp-Image-2026-06-26-at-4-07-53-PM-2161.jpeg",
+    instructor: "Sumit Choudhary",
+    instructorUrl: "https://www.linkedin.com/in/sumitchoudhary-data-expert",
+    courseCode: "DS-AI-01",
+    category: "Data Science",
+    price: 44100,
+    currency: "INR",
+    duration: "P6M",
+    ratingValue: 4.8,
+    reviewCount: 510,
+    availability: "https://schema.org/InStock",
+  });
+
+  const breadcrumbsSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Data Science & AI Programme", url: "/data-science-ai-programme" },
+  ]);
+
+  const faqsList = [
+    {
+      question: "Do I need coding experience to join?",
+      answer:
+        "Not at all! This course is designed for absolute beginners. Python and all tools are taught from scratch. BBA, B.Com, B.Sc, Engineering — anyone can join and succeed.",
+    },
+    {
+      question: "How long is the course?",
+      answer:
+        "The course is 6 months long — live classes + hands-on projects. You can choose weekday or weekend batches based on your schedule. Recordings are always available.",
+    },
+    {
+      question: "How does the EMI work?",
+      answer:
+        "After 10% discount, total fee is ₹44,100 divided across 6 months = ₹7,350/month. Zero cost — no hidden charges. Pay ₹2,000 now to register and lock your seat.",
+    },
+    {
+      question: "Is placement guaranteed?",
+      answer:
+        "We provide 100% Placement Assistance — resume building, LinkedIn optimization, mock interviews, and direct company referrals. Our December batch alone placed 10 students at companies like Accenture, IBM, TCS, EY, and more.",
+    },
+    {
+      question: "Can I earn through freelancing during the course?",
+      answer:
+        "Yes! Sumit sir covers freelancing as part of the curriculum — how to get clients on Fiverr/Upwork, price projects, and deliver professional work. Many students earn ₹15,000–₹60,000 while still learning!",
+    },
+    {
+      question: "Are classes online or offline?",
+      answer:
+        "Classes are live online via Zoom/Google Meet. Recorded backups are provided for every session — so you never miss anything even with a busy schedule.",
+    },
+  ];
+
+  const faqSchema = generateFAQSchema(faqsList);
+
+  const webPageSchema = generateWebPageSchema({
+    name: "Data Science & AI Programme - eklabya",
+    description:
+      "Become a Data Scientist in 6 Months. Learn Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance. Mentor: Sumit Choudhary.",
+    url: "/data-science-ai-programme",
+  });
+
+  const combinedSchemas = [
+    courseSchema,
+    breadcrumbsSchema,
+    faqSchema,
+    webPageSchema,
+  ].filter(Boolean);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -96,6 +176,13 @@ const DataScienceLanding = () => {
     "https://www.eklabya.com/api/upload/file/WhatsApp-Image-2026-06-26-at-4-07-53-PM-2161.jpeg";
   return (
     <div className="font-['Inter',sans-serif] text-[#1E293B] bg-white overflow-x-hidden scroll-smooth">
+      <SEO
+        title="Become a Data Scientist in 6 Months | Data Science & AI Programme"
+        description="Become a Data Scientist in 6 Months. Learn from Sumit Choudhary — 10+ year industry expert. Master Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance."
+        keywords="Data Science Course, Machine Learning, Artificial Intelligence, Generative AI, Python for Data Science, Power BI, SQL, Sumit Choudhary, eklabya, 100% Placement Assistance"
+        canonical="https://eklabya.com/data-science-ai-programme"
+        schema={combinedSchemas}
+      />
       {/* MODAL OVERLAY */}
       <div
         className={`fixed inset-0 bg-black/65 z-[2000] flex items-center justify-center p-5 overflow-y-auto transition-opacity duration-300 ${isModalOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
