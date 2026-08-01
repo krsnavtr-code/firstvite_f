@@ -42,6 +42,11 @@ export default defineConfig({
           });
         },
       },
+      "/demo-data-science-ai-programme": {
+        target: "http://localhost:4002",
+        changeOrigin: true,
+        secure: false,
+      },
     },
     port: 5173,
     open: true,
