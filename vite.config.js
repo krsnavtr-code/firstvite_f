@@ -42,7 +42,7 @@ export default defineConfig({
           });
         },
       },
-      "/demo-data-science-ai-programme": {
+      "/data-science-ai-programme": {
         target: "http://localhost:4002",
         changeOrigin: true,
         secure: false,
