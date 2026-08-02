@@ -135,8 +135,8 @@ const MainLayout = ({ children }) => {
     location.pathname.startsWith("/scholarship-test");
   // Check if the current route is a landing page
   const landingPageUrls = [
-    "/data-science-ai-programme",
-    "/data-science-ai-programme/thank-you",
+    "/data-science-programme",
+    "/data-science-programme/thank-you",
     "/ai-machine-learning-program",
     "/ai-machine-learning-program/thank-you",
     "/success-stories",
@@ -368,7 +368,7 @@ function App() {
           />
 
           <Route
-            path="/data-science-ai-programme"
+            path="/data-science-programme"
             element={
               <MainLayout>
                 <DataScience />
@@ -377,7 +377,7 @@ function App() {
           />
 
           <Route
-            path="/data-science-ai-programme/thank-you"
+            path="/data-science-programme/thank-you"
             element={<DataScienceThankYou />}
           />
 

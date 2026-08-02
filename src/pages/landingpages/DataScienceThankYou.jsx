@@ -69,7 +69,7 @@ const DataScienceThankYou = () => {
 
           <div className="border-t border-gray-200 pt-6">
             <button
-              onClick={() => navigate("/data-science-ai-programme")}
+              onClick={() => navigate("/data-science-programme")}
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               ← Back to Data Science Programme

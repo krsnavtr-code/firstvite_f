@@ -18,7 +18,7 @@ const DataScienceLanding = () => {
     name: "Data Science & AI Programme",
     description:
       "Become a Data Scientist in 6 Months. Learn from Sumit Choudhary — 10+ year industry expert. Master Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance.",
-    url: "/data-science-ai-programme",
+    url: "/data-science-programme",
     image:
       "https://www.eklabya.com/api/upload/file/WhatsApp-Image-2026-06-26-at-4-07-53-PM-2161.jpeg",
     instructor: "Sumit Choudhary",
@@ -35,7 +35,7 @@ const DataScienceLanding = () => {
 
   const breadcrumbsSchema = generateBreadcrumbSchema([
     { name: "Home", url: "/" },
-    { name: "Data Science & AI Programme", url: "/data-science-ai-programme" },
+    { name: "Data Science & AI Programme", url: "/data-science-programme" },
   ]);
 
   const faqsList = [
@@ -77,7 +77,7 @@ const DataScienceLanding = () => {
     name: "Data Science & AI Programme - eklabya",
     description:
       "Become a Data Scientist in 6 Months. Learn Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance. Mentor: Sumit Choudhary.",
-    url: "/data-science-ai-programme",
+    url: "/data-science-programme",
   });
 
   const organizationSchema = generateOrganizationSchema();
@@ -158,7 +158,7 @@ const DataScienceLanding = () => {
         setIsModalOpen(false);
 
         // Redirect to Thank You page
-        navigate("/data-science-ai-programme/thank-you", {
+        navigate("/data-science-programme/thank-you", {
           state: {
             message:
               "Thank you for applying to the Data Science & AI Programme! Our counsellor will call you with batch details & EMI options.",
@@ -184,7 +184,7 @@ const DataScienceLanding = () => {
         title="Become a Data Scientist in 6 Months | Data Science & AI Programme"
         description="Become a Data Scientist in 6 Months. Learn from Sumit Choudhary — 10+ year industry expert. Master Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance."
         keywords="Data Science Course, Machine Learning, Artificial Intelligence, Generative AI, Python for Data Science, Power BI, SQL, Sumit Choudhary, eklabya, 100% Placement Assistance"
-        canonical="https://eklabya.com/data-science-ai-programme"
+        canonical="https://eklabya.com/data-science-programme"
         schema={combinedSchemas}
       />
       {/* MODAL OVERLAY */}

@@ -14,7 +14,7 @@
     "source": "dist",
     "include": [
       "/",
-      "/data-science-ai-programme",
+      "/data-science-programme",
       "/ai-machine-learning-program",
       "/success-stories",
       "/about",
