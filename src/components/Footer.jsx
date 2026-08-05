@@ -273,6 +273,14 @@ function Footer() {
                   Testimonials
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/media-mentions"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+                >
+                  Media Mentions
+                </Link>
+              </li>
             </ul>
           </div>
 

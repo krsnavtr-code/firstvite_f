@@ -75,6 +75,11 @@ import BlogDetailPage from "./pages/blog/BlogDetailPage";
 import BlogPostList from "./pages/admin/BlogListPage";
 import BlogPostForm from "./pages/admin/BlogPostForm";
 
+// Media Mention Components
+import MediaMentionList from "./pages/admin/MediaMentionList";
+import MediaMentionForm from "./pages/admin/MediaMentionForm";
+import MediaMentionsPage from "./pages/MediaMentionsPage";
+
 // LMS Components
 import LMSLayout from "./components/lms/LMSLayout";
 import RegisterPage from "./pages/auth/RegisterPage";
@@ -363,6 +368,15 @@ function App() {
             element={
               <MainLayout>
                 <TestimonialsPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/media-mentions"
+            element={
+              <MainLayout>
+                <MediaMentionsPage />
               </MainLayout>
             }
           />
@@ -658,6 +672,20 @@ function App() {
             <Route path="/admin/blog" element={<BlogPostList />} />
             <Route path="/admin/blog/new" element={<BlogPostForm />} />
             <Route path="/admin/blog/edit/:id" element={<BlogPostForm />} />
+
+            {/* Media Mention Admin Routes */}
+            <Route
+              path="/admin/media-mentions"
+              element={<MediaMentionList />}
+            />
+            <Route
+              path="/admin/media-mentions/new"
+              element={<MediaMentionForm />}
+            />
+            <Route
+              path="/admin/media-mentions/edit/:id"
+              element={<MediaMentionForm />}
+            />
 
             {/* Career Management */}
 
