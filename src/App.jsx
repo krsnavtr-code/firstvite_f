@@ -80,6 +80,11 @@ import MediaMentionList from "./pages/admin/MediaMentionList";
 import MediaMentionForm from "./pages/admin/MediaMentionForm";
 import MediaMentionsPage from "./pages/MediaMentionsPage";
 
+// Award Components
+import AwardList from "./pages/admin/AwardList";
+import AwardForm from "./pages/admin/AwardForm";
+import AwardsPage from "./pages/AwardsPage";
+
 // LMS Components
 import LMSLayout from "./components/lms/LMSLayout";
 import RegisterPage from "./pages/auth/RegisterPage";
@@ -377,6 +382,15 @@ function App() {
             element={
               <MainLayout>
                 <MediaMentionsPage />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/awards"
+            element={
+              <MainLayout>
+                <AwardsPage />
               </MainLayout>
             }
           />
@@ -686,6 +700,11 @@ function App() {
               path="/admin/media-mentions/edit/:id"
               element={<MediaMentionForm />}
             />
+
+            {/* Award Admin Routes */}
+            <Route path="/admin/awards" element={<AwardList />} />
+            <Route path="/admin/awards/new" element={<AwardForm />} />
+            <Route path="/admin/awards/edit/:id" element={<AwardForm />} />
 
             {/* Career Management */}
 

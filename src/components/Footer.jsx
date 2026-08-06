@@ -275,6 +275,14 @@ function Footer() {
               </li>
               <li>
                 <Link
+                  to="/awards"
+                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+                >
+                  Awards
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/media-mentions"
                   className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                 >
