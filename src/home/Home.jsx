@@ -8,10 +8,12 @@ import Stats from "../components/home/Stats";
 import Testimonials from "../components/home/Testimonials";
 import Newsletter from "../components/home/Newsletter";
 import ContactSection from "../components/home/ContactSection";
-import WhyLearnWithEklabya from "../components/home/WhyLearnWithFirstVITE";
+import WhyLearnWithEklabya from "../components/home/WhyLearnWithEklabya";
 import HowWillYourTrainingWork from "../components/home/HowWillYourTrainingWork";
 import Content from "../components/home/Content";
 import StudentPlacements from "../components/home/StudentPlacements";
+import ScholarshipProgram from "../components/home/ScholarshipProgram";
+import FAQ from "../components/home/FAQ";
 import {
   generateOrganizationSchema,
   generateWebSiteSchema,
@@ -57,6 +59,9 @@ function Home() {
         {/* Featured Books */}
         <Assessment />
 
+        {/* Scholarship Program */}
+        <ScholarshipProgram />
+
         {/* Why learn with Eklabya? */}
         <WhyLearnWithEklabya />
 
@@ -77,6 +82,9 @@ function Home() {
 
         {/* Newsletter */}
         <Newsletter />
+
+        {/* FAQ */}
+        <FAQ />
 
         {/* Contact Section */}
         <ContactSection />

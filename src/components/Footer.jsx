@@ -9,6 +9,9 @@ import {
   FaFacebook,
   FaInstagram,
   FaPinterest,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaEnvelope,
 } from "react-icons/fa";
 
 function Footer() {
@@ -17,7 +20,7 @@ function Footer() {
   // Course data organized by categories
   const courseCategories = [
     {
-      title: "Data Science and ML Courses",
+      title: "Data Science & ML",
       courses: [
         {
           name: "LLMOps Large Language Model Operations",
@@ -67,7 +70,7 @@ function Footer() {
       ],
     },
     {
-      title: "Programming Languages Courses",
+      title: "Programming Languages",
       courses: [
         {
           name: "Python Programming Mastery",
@@ -100,7 +103,7 @@ function Footer() {
       ],
     },
     {
-      title: "Full Stack Development Courses",
+      title: "Full Stack Development",
       courses: [
         {
           name: "Full Stack MERN Stack",
@@ -135,23 +138,25 @@ function Footer() {
   ];
 
   return (
-    <footer className="bg-gray-50 text-black dark:text-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-12">
-      {/* Footer Top for Internal Link */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 text-center">
-            Popular Courses
+    <footer className="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-gray-200 border-t border-slate-200 dark:border-slate-800 mt-12 transition-colors duration-300 text-xs sm:text-sm">
+      {/* Footer Top for Popular Courses */}
+      <div className="bg-white dark:bg-gray-800/80 border-b border-slate-200 dark:border-slate-800 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mb-6 uppercase tracking-wider text-center">
+            Popular Course Categories
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {courseCategories.map((category, index) => (
-              <div key={index}>
-                <h4 className="text-sm font-semibold mb-4">{category.title}</h4>
-                <ul className="space-y-2">
+              <div key={index} className="space-y-3">
+                <h4 className="text-xs font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider">
+                  {category.title}
+                </h4>
+                <ul className="space-y-1.5">
                   {category.courses.map((course, courseIndex) => (
                     <li key={courseIndex}>
                       <a
                         href={course.url}
-                        className="text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-1"
                       >
                         {course.name}
                       </a>
@@ -164,318 +169,181 @@ function Footer() {
         </div>
       </div>
 
+      {/* Main Footer Links & About */}
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
+            <h3 className="text-xs font-black text-slate-900 dark:text-white tracking-wider uppercase">
               About Us
             </h3>
-            <p className="text-base text-black dark:text-white">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               Empowering learners with high-quality courses and resources to
-              achieve their educational goals.
+              achieve their educational and career goals.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="https://wa.me/919891030303?text=Hi%2C%20I%20am%20interested%20in%20learning%20more%20about%20your%20courses."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
-              >
-                <FaWhatsapp className="h-6 w-6" />
-              </a>
-              <a
-                href="https://x.com/eklabyaofficial"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
-              >
-                <FaTwitter className="h-6 w-6" />
-              </a>
-              <a
-                href="https://www.linkedin.com/company/eklabya-elearning"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
-              >
-                <FaLinkedin className="h-6 w-6" />
-              </a>
-              <a
-                href="https://www.facebook.com/profile.php?id=61589473389916"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
-              >
-                <FaFacebook className="h-6 w-6" />
-              </a>
-              <a
-                href="https://www.instagram.com/eklabya_official"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
-              >
-                <FaInstagram className="h-6 w-6" />
-              </a>
-              <a
-                href="https://in.pinterest.com/eklabyaofficial"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-orange-400 dark:hover:text-orange-400"
-              >
-                <FaPinterest className="h-6 w-6" />
-              </a>
+
+            {/* Social Icons */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {[
+                {
+                  icon: FaWhatsapp,
+                  href: "https://wa.me/919891030303?text=Hi%2C%20I%20am%20interested%20in%20learning%20more%20about%20your%20courses.",
+                },
+                { icon: FaTwitter, href: "https://x.com/eklabyaofficial" },
+                {
+                  icon: FaLinkedin,
+                  href: "https://www.linkedin.com/company/eklabya-elearning",
+                },
+                {
+                  icon: FaFacebook,
+                  href: "https://www.facebook.com/profile.php?id=61589473389916",
+                },
+                {
+                  icon: FaInstagram,
+                  href: "https://www.instagram.com/eklabya_official",
+                },
+                {
+                  icon: FaPinterest,
+                  href: "https://in.pinterest.com/eklabyaofficial",
+                },
+              ].map((social, idx) => (
+                <a
+                  key={idx}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-xl bg-slate-200/60 dark:bg-gray-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all shadow-2xs"
+                >
+                  <social.icon className="h-3.5 w-3.5" />
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
+          <div className="space-y-3">
+            <h3 className="text-xs font-black text-slate-900 dark:text-white tracking-wider uppercase">
               Quick Links
             </h3>
-            <ul className="mt-4 space-y-2">
-              <li>
-                <Link
-                  to="/courses"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Browse Courses
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/about"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/contact"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/blog"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/testimonials"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Testimonials
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/awards"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Awards
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/media-mentions"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Media Mentions
-                </Link>
-              </li>
+            <ul className="space-y-2">
+              {[
+                { name: "Browse Courses", to: "/courses" },
+                { name: "About Us", to: "/about" },
+                { name: "Contact", to: "/contact" },
+                { name: "Blog", to: "/blog" },
+                { name: "Testimonials", to: "/testimonials" },
+                { name: "Awards", to: "/awards" },
+                { name: "Media Mentions", to: "/media-mentions" },
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link
+                    to={link.to}
+                    className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Resources */}
-          <div>
-            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
+          <div className="space-y-3">
+            <h3 className="text-xs font-black text-slate-900 dark:text-white tracking-wider uppercase">
               Resources
             </h3>
-            <ul className="mt-4 space-y-2">
-              <li>
-                <Link
-                  to="/faq"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/privacy-policy"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/terms-of-service"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/faq"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  FAQs
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/payment-terms-and-conditions"
-                  className="text-base text-black hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                >
-                  Payment T&C
-                </Link>
-              </li>
+            <ul className="space-y-2">
+              {[
+                { name: "Privacy Policy", to: "/privacy-policy" },
+                { name: "Terms of Service", to: "/terms-of-service" },
+                { name: "FAQs", to: "/faq" },
+                { name: "Payment T&C", to: "/payment-terms-and-conditions" },
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link
+                    to={link.to}
+                    className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-sm font-semibold text-black dark:text-white tracking-wider uppercase">
+          {/* Contact Us */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-black text-slate-900 dark:text-white tracking-wider uppercase">
               Contact Us
             </h3>
-            <ul className="mt-4 space-y-2">
-              <li className="flex items-center">
-                <svg
-                  className="h-12 w-12 text-black dark:text-white mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400 text-xs">
+            <ul className="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              <li className="flex items-start gap-2.5">
+                <FaMapMarkerAlt className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                <span>
                   H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar
                   Uttar Pradesh 201301
                 </span>
               </li>
-              <li className="flex items-center">
-                <svg
-                  className="h-12 w-12 text-black dark:text-white mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <li className="flex items-center gap-2.5">
+                <FaPhone className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                <a
+                  href="tel:+919891030303"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 8h10M7 12h6m5 8l-5-5H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v12z"
-                  />
-                </svg>
-                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400 text-xs">
-                  I hereby agree to receive the promotional emails & messages
-                  through WhatApp/RCS/SMS{" "}
-                  <Link
-                    to="/terms-of-service"
-                    className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-                  >
-                    T&C
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    to="/privacy-policy"
-                    className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-                  >
-                    Privacy Policy
-                  </Link>
-                </span>
+                  +91 9891030303
+                </a>
               </li>
-              <li className="flex items-center">
-                <svg
-                  className="h-5 w-5 text-black dark:text-white mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <li className="flex items-center gap-2.5">
+                <FaEnvelope className="h-3.5 w-3.5 text-purple-500 shrink-0" />
+                <a
+                  href="mailto:info@eklabya.com"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.12 3.37a1 1 0 01-.24 1.04l-2.06 2.06a16 16 0 006.59 6.59l2.06-2.06a1 1 0 011.04-.24l3.37 1.12a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.16 21 3 14.84 3 7V6a2 2 0 012-1z"
-                  />
-                </svg>
-                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="tel:+919891030303">Phone: +91 9891030303</a>
-                </span>
+                  info@eklabya.com
+                </a>
               </li>
-              <li className="flex items-center">
-                <svg
-                  className="h-5 w-5 text-black dark:text-white mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <li className="flex items-center gap-2.5">
+                <FaEnvelope className="h-3.5 w-3.5 text-purple-500 shrink-0" />
+                <a
+                  href="mailto:anand@eklabya.com"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="mailto:info@eklabya.com">Email: info@eklabya.com</a>
-                </span>
-              </li>
-              <li className="flex items-center">
-                <svg
-                  className="h-5 w-5 text-black dark:text-white mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                <span className="text-black dark:text-white hover:text-orange-600 dark:hover:text-orange-400">
-                  <a href="mailto:anand@eklabya.com">
-                    Email: anand@eklabya.com
-                  </a>
-                </span>
+                  anand@eklabya.com
+                </a>
               </li>
             </ul>
           </div>
         </div>
 
+        {/* Regulatory & Consent Notice Note */}
+        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p>
+            I hereby agree to receive the promotional emails & messages through
+            WhatsApp/RCS/SMS{" "}
+            <Link
+              to="/terms-of-service"
+              className="text-blue-600 dark:text-blue-400 underline"
+            >
+              T&C
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/privacy-policy"
+              className="text-blue-600 dark:text-blue-400 underline"
+            >
+              Privacy Policy
+            </Link>
+          </p>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-base text-black dark:text-white">
-              &copy; {currentYear} eKlabya. All rights reserved.
-            </p>
-            <div className="flex items-center mt-4 md:mt-0">
-              <FaBook className="h-5 w-5 text-blue-500 mr-2" />
-              <span className="text-sm font-medium text-black dark:text-white">
-                Learn something new today
-              </span>
-            </div>
+        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            &copy; {currentYear} eKlabya. All rights reserved.
+          </p>
+          <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
+            <FaBook className="h-4 w-4 text-blue-500" />
+            <span>Learn something new today</span>
           </div>
         </div>
       </div>

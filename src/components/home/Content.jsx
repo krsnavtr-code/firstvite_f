@@ -1,149 +1,176 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import {
+  FaGraduationCap,
+  FaLaptop,
+  FaHandsHelping,
+  FaAward,
+  FaArrowRight,
+} from "react-icons/fa";
 import { getCardBgColor } from "../../utils/gradients";
 
 const Content = () => {
   const bgColor = getCardBgColor();
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-black dark:text-white">
-      <div className="text-center mb-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white text-center">
-          Welcome to eklabya – Your Online Learning Partner
-        </h2>
-        <p className="mt-4">
-          eklabya is a trusted and innovative online learning platform
-          designed to empower students and working professionals with
-          industry-ready skills. Our goal is to remove barriers of time,
-          location, and background by delivering high-quality education that
-          fits modern lifestyles. As one of the leading providers of{" "}
-          <strong>online skill training courses in India</strong>, eklabya
-          offers certified courses and degree programs that focus on real-world
-          applications and career growth. From Digital Marketing and Data
-          Science to Business Administration and Information Technology, our
-          programs are carefully structured to meet current industry demands. We
-          believe learning should be flexible, practical, and result-driven.
-          That’s why eklabya stands out as a{" "}
-          <strong>job oriented online training platform</strong>, helping
-          learners gain relevant skills that employers value. With expert
-          mentors, flexible schedules, and career-focused curricula, eklabya
-          is your reliable partner in building a successful and future-ready
-          career—all from the comfort of your home.
-        </p>
-      </div>
 
-      {/* Why Choose eklabya */}
-      <div className="mb-16">
-        <h3 className="text-2xl font-semibold text-black dark:text-white mb-6 text-center">
-          Why Choose eklabya?
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div
-            className={`${bgColor} p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
-          >
-            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">
-              💻 100% Online Learning
-            </h4>
-            <p className="text-gray-800 dark:text-gray-300">
-              Attend live interactive sessions or learn at your own pace with
-              recorded lectures.
-            </p>
+  return (
+    <section className="py-6 md:py-10 bg-gradient-to-b from-white via-slate-50/50 to-white dark:from-gray-900 dark:via-gray-900/80 dark:to-gray-900 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-2">
+        {/* --- Header & Brand Story --- */}
+        <div className="text-center max-w-5xl mx-auto space-y-1">
+          <div className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 px-3 py-1 rounded-full text-blue-600 dark:text-blue-400 text-xs font-extrabold uppercase tracking-wider">
+            <FaGraduationCap className="text-xs" /> About Eklabya
           </div>
-          <div
-            className={`${bgColor} p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
-          >
-            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">
-              🎯 Career Support
-            </h4>
-            <p className="text-gray-800 dark:text-gray-300">
-              Get professional assistance with job placements, resume building,
-              and interview preparation.
-            </p>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            Eklabya Centre of Excellence – Your Online Learning Partner
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+            Eklabya is an ISO-certified, NSDC and NIELIT-recognized online
+            learning platform built to make career-ready education accessible,
+            regardless of your city, schedule, or background. We started with a
+            simple belief: high-quality, job-relevant education shouldn't
+            require relocating, quitting your job, or paying a fortune. Every
+            program is designed around one question:{" "}
+            <em>does this skill actually get someone hired?</em>
+          </p>
+        </div>
+
+        {/* --- Why Choose Eklabya (Compact 4-grid) --- */}
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-4 text-center">
+            Why Choose Eklabya?
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            <div
+              className={`${bgColor} p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1.5`}
+            >
+              <div className="text-blue-600 text-base">💻</div>
+              <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                Online, Your Rules
+              </h4>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                Attend live interactive sessions or catch up at your own pace
+                with recordings.
+              </p>
+            </div>
+
+            <div
+              className={`${bgColor} p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1.5`}
+            >
+              <div className="text-amber-500 text-base">🎯</div>
+              <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                Career Support
+              </h4>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                Placement team helps with resume building, mock interviews, and
+                real opportunities.
+              </p>
+            </div>
+
+            <div
+              className={`${bgColor} p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1.5`}
+            >
+              <div className="text-purple-500 text-base">👨‍🏫</div>
+              <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                Expert Trainers
+              </h4>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                Industry pros with real-world experience, not just slide
+                recruiters.
+              </p>
+            </div>
+
+            <div
+              className={`${bgColor} p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1.5`}
+            >
+              <div className="text-emerald-500 text-base">📜</div>
+              <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                Verified Certifications
+              </h4>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                Respected credentials backed by ISO, NSDC, and NIELIT
+                partnerships.
+              </p>
+            </div>
           </div>
+        </div>
+
+        {/* --- 3 Simple Steps & Community Joined (Two Column Compact Layout) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Steps Box */}
           <div
-            className={`${bgColor} p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
+            className={`${bgColor} p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4`}
           >
-            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">
-              👨‍🏫 Expert Trainers
-            </h4>
-            <p className="text-gray-800 dark:text-gray-300">
-              Learn from highly experienced trainers and industry professionals
-              with hands-on expertise.
-            </p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              Start Learning in 3 Simple Steps
+            </h3>
+            <ol className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 list-decimal list-inside">
+              <li className="leading-snug">
+                <strong className="text-slate-900 dark:text-white">
+                  Browse Programs:
+                </strong>{" "}
+                Explore 110+ career-ready courses across business, tech, and
+                marketing.
+              </li>
+              <li className="leading-snug">
+                <strong className="text-slate-900 dark:text-white">
+                  Easy Enrollment:
+                </strong>{" "}
+                Pay conveniently via card, EMI, or education loan options.
+              </li>
+              <li className="leading-snug">
+                <strong className="text-slate-900 dark:text-white">
+                  Start Learning:
+                </strong>{" "}
+                Attend live/recorded sessions, complete projects, and earn your
+                certificate.
+              </li>
+            </ol>
           </div>
+
+          {/* Community Box */}
           <div
-            className={`${bgColor} p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
+            className={`${bgColor} p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-3 flex flex-col justify-between`}
           >
-            <h4 className="font-bold mb-2 text-gray-900 dark:text-white">
-              📜 Recognized Certification
-            </h4>
-            <p className="text-gray-800 dark:text-gray-300">
-              Receive valid, verifiable certificates upon successful course
-              completion.
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">
+                Join a Growing Community Across India
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Thousands of students and working professionals have upskilled
+                or switched careers. Eklabya is built to be your complete
+                learning partner, offering current course content, real
+                mentorship, and placement assistance.
+              </p>
+            </div>
+            <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 italic">
+              "From learning to employable, fast."
             </p>
           </div>
         </div>
-      </div>
 
-      {/* Start Learning in 3 Easy Steps */}
-      <div
-        className={`${bgColor} mb-16 text-gray-900 dark:text-white p-6 rounded-lg shadow dark:shadow-none hover:shadow-md dark:hover:shadow-lg transition`}
-      >
-        <h3 className="text-2xl font-semibold text-black dark:text-white mb-6 text-center">
-          Start Learning in 3 Easy Steps
-        </h3>
-        <ol className="space-y-6 max-w-4xl mx-auto text-lg text-black dark:text-white list-decimal list-inside">
-          <li>
-            <strong>Browse Courses:</strong> Explore a wide range of 100+
-            career-ready programs across business, technology, marketing, and
-            more.
-          </li>
-          <li>
-            <strong>Enroll Online:</strong> Choose your preferred course and pay
-            conveniently via credit/debit card, EMI options, or education loans.
-          </li>
-          <li>
-            <strong>Start Learning:</strong> Access live and recorded classes,
-            complete assignments, take assessments, and earn a recognized
-            certificate.
-          </li>
-        </ol>
+        {/* --- Small Compact CTA Box --- */}
+        <div
+          className={`${bgColor} p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-md max-w-2xl mx-auto space-y-3`}
+        >
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+            Ready to Start Your Learning Journey?
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
+            Empower your future with Eklabya. No classroom needed—just a device,
+            internet, and the passion to grow.
+          </p>
+          <div>
+            <Link
+              to="/courses"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-blue-600/20 active:scale-98"
+            >
+              <span>Explore Courses</span>
+              <FaArrowRight className="text-xs" />
+            </Link>
+          </div>
+        </div>
       </div>
-
-      {/* Join Learners */}
-      <div className="text-center mb-16">
-        <h3 className="text-2xl font-semibold text-black dark:text-white mb-4">
-          Join 10,000+ Successful Learners Across India
-        </h3>
-        <p className="text-lg text-black dark:text-white mx-auto">
-          Thousands of learners have upskilled through our practical and
-          flexible programs. Whether you're a student looking to get ahead or a
-          working professional aiming for a career shift, our online education
-          solutions help you stay competitive in today's fast-changing job
-          market.
-        </p>
-        <p className="mt-4 text-lg text-black dark:text-white mx-auto">
-          From up-to-date course content and expert mentorship to placement
-          assistance and lifetime access to learning material — eklabya is
-          your complete learning companion.
-        </p>
-      </div>
-
-      {/* Call to Action */}
-      <div
-        className={`${bgColor} p-8 rounded-xl shadow-lg dark:shadow-none text-center`}
-      >
-        <h3 className="text-2xl font-bold text-blue-800 dark:text-white mb-4">
-          Enroll Now & Start Your Learning Journey Today!
-        </h3>
-        <p className="text-lg text-black dark:text-white max-w-2xl mx-auto">
-          Empower your future with eklabya — where education meets
-          opportunity. No classroom needed. Just a device, internet, and the
-          passion to grow.
-        </p>
-        <button className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-          Explore Courses
-        </button>
-      </div>
-    </div>
+    </section>
   );
 };
 

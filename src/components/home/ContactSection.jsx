@@ -5,6 +5,7 @@ import {
   FaEnvelope,
   FaPaperPlane,
   FaCheck,
+  FaHeadset,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -30,35 +31,39 @@ const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
 
-      // Reset submission status after 5 seconds
       setTimeout(() => setIsSubmitted(false), 5000);
     }, 1500);
   };
 
   const contactInfo = [
     {
-      icon: <FaMapMarkerAlt className="text-2xl text-blue-500" />,
+      icon: (
+        <FaMapMarkerAlt className="text-xl text-blue-600 dark:text-blue-400" />
+      ),
       title: "Our Location",
       description:
-        "H-161 BSI Sector-63 Noida Gautam Budh Nagar Uttar Pradesh 201301",
+        "H161, BSI Business Park, Sector-63, Noida, Gautam Budh Nagar, Uttar Pradesh 201301",
       link: "#",
       linkText: "View on map",
     },
     {
-      icon: <FaPhone className="text-2xl text-green-500" />,
+      icon: (
+        <FaPhone className="text-xl text-emerald-600 dark:text-emerald-400" />
+      ),
       title: "Phone Number",
       description: "+91 9891030303",
       link: "tel:+919891030303",
       linkText: "Call us",
     },
     {
-      icon: <FaEnvelope className="text-2xl text-purple-500" />,
+      icon: (
+        <FaEnvelope className="text-xl text-purple-600 dark:text-purple-400" />
+      ),
       title: "Email Address",
       description: "info@eklabya.com",
       link: "mailto:info@eklabya.com",
@@ -67,45 +72,49 @@ const ContactSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50 dark:bg-gray-900">
+    <section className="py-6 md:py-10 bg-gradient-to-b from-white via-slate-50/50 to-white dark:from-gray-900 dark:via-gray-900/80 dark:to-gray-900 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-black dark:text-white sm:text-4xl">
-            Get In Touch
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+          <div className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 px-3.5 py-1 rounded-full text-blue-600 dark:text-blue-400 text-xs font-extrabold uppercase tracking-wider">
+            <FaHeadset className="text-xs" /> Get In Touch
+          </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            We’d Love to Hear From You
           </h2>
-          <p className="mt-4 text-xl text-black dark:text-white">
-            We'd love to hear from you. Send us a message and we'll respond as
-            soon as possible.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+            Have a question before you enroll? Send us a message and we'll
+            respond as soon as possible.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Contact Information */}
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Contact Information Cards (Col 4) */}
+          <div className="lg:col-span-4 space-y-4">
             {contactInfo.map((item, index) => (
               <motion.div
                 key={index}
-                className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
-                whileHover={{ y: -5 }}
+                className="bg-white dark:bg-gray-800/90 p-5 rounded-2xl shadow-xs border border-slate-200/80 dark:border-slate-800 hover:shadow-md transition-all duration-300"
+                whileHover={{ y: -3 }}
               >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 p-3 bg-blue-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-start space-x-3.5">
+                  <div className="flex-shrink-0 p-3 bg-slate-50 dark:bg-gray-700/60 rounded-xl border border-slate-100 dark:border-gray-700">
                     {item.icon}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-black dark:text-white">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">
                       {item.title}
                     </h3>
-                    <p className="mt-1 text-black dark:text-gray-300">
+                    <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                       {item.description}
                     </p>
                     <a
                       href={item.link}
-                      className="mt-2 inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline"
+                      className="mt-2 inline-flex items-center text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       {item.linkText}
                       <svg
-                        className="w-4 h-4 ml-1"
+                        className="w-3.5 h-3.5 ml-1"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"
@@ -123,129 +132,121 @@ const ContactSection = () => {
             ))}
           </div>
 
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm">
+          {/* Contact Form (Col 8) */}
+          <div className="lg:col-span-8">
+            <div className="bg-white dark:bg-gray-800/90 p-6 sm:p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800">
               {isSubmitted ? (
-                <div className="text-center py-12">
-                  <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900">
-                    <FaCheck className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <div className="text-center py-10 space-y-4">
+                  <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800">
+                    <FaCheck className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <h3 className="mt-4 text-xl font-medium text-black dark:text-white">
-                    Message Sent!
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Message Sent Successfully!
                   </h3>
-                  <p className="mt-2 text-black dark:text-gray-300">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-sm mx-auto">
                     Thank you for contacting us. We'll get back to you soon!
                   </p>
                   <button
                     onClick={() => setIsSubmitted(false)}
-                    className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="mt-2 inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md shadow-blue-600/20 active:scale-98"
                   >
                     Send another message
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label
                         htmlFor="name"
-                        className="block text-sm font-medium text-black dark:text-white"
+                        className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
                       >
-                        Full Name <span className="text-red-500">*</span>
+                        Full Name <span className="text-rose-500">*</span>
                       </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          name="name"
-                          id="name"
-                          required
-                          value={formData.name}
-                          onChange={handleChange}
-                          className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                          placeholder="John Doe"
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        required
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                        placeholder="John Doe"
+                      />
                     </div>
 
                     <div>
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-black dark:text-white"
+                        className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
                       >
-                        Email Address <span className="text-red-500">*</span>
+                        Email Address <span className="text-rose-500">*</span>
                       </label>
-                      <div className="mt-1">
-                        <input
-                          type="email"
-                          name="email"
-                          id="email"
-                          required
-                          value={formData.email}
-                          onChange={handleChange}
-                          className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                          placeholder="you@example.com"
-                        />
-                      </div>
+                      <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                        placeholder="you@example.com"
+                      />
                     </div>
                   </div>
 
                   <div>
                     <label
                       htmlFor="subject"
-                      className="block text-sm font-medium text-black dark:text-white"
+                      className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
                     >
-                      Subject <span className="text-red-500">*</span>
+                      Subject <span className="text-rose-500">*</span>
                     </label>
-                    <div className="mt-1">
-                      <input
-                        type="text"
-                        name="subject"
-                        id="subject"
-                        required
-                        value={formData.subject}
-                        onChange={handleChange}
-                        className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                        placeholder="How can we help you?"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      name="subject"
+                      id="subject"
+                      required
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                      placeholder="How can we help you?"
+                    />
                   </div>
 
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-sm font-medium text-black dark:text-white"
+                      className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
                     >
-                      Your Message <span className="text-red-500">*</span>
+                      Your Message <span className="text-rose-500">*</span>
                     </label>
-                    <div className="mt-1">
-                      <textarea
-                        id="message"
-                        name="message"
-                        rows={5}
-                        required
-                        value={formData.message}
-                        onChange={handleChange}
-                        className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                        placeholder="Type your message here..."
-                      />
-                    </div>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={4}
+                      required
+                      value={formData.message}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all resize-none"
+                      placeholder="Type your message here..."
+                    />
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="flex justify-end pt-2">
                     <motion.button
                       type="submit"
                       disabled={isSubmitting}
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
-                      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-blue-600/20 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
                     >
                       {isSubmitting ? (
                         "Sending..."
                       ) : (
                         <>
-                          <FaPaperPlane className="mr-2" />
-                          Send Message
+                          <FaPaperPlane className="text-xs" />
+                          <span>Send Message</span>
                         </>
                       )}
                     </motion.button>

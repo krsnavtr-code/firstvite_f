@@ -10,49 +10,42 @@ import {
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 const bannerImg =
   "https://www.eklabya.com/api/upload/file/Home-Page-Image-9212.png";
+const logoImg = "https://www.eklabya.com/api/upload/file/eKlabya-0644.png";
 
-const logoImg =
-  "https://www.eklabya.com/api/upload/file/eKlabya-0644.png";
 import "./Banner.css";
 import "../styles/typography.css";
 
 const CertificateModal = ({ isOpen, onClose }) => {
-  // Prevent right-click context menu
   useEffect(() => {
     const handleContextMenu = (e) => {
-      if (isOpen) {
-        e.preventDefault();
-      }
+      if (isOpen) e.preventDefault();
     };
-
     document.addEventListener("contextmenu", handleContextMenu);
-    return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-    };
+    return () => document.removeEventListener("contextmenu", handleContextMenu);
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-3"
       onContextMenu={(e) => e.preventDefault()}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-[550px] w-full max-h-[550px] overflow-auto relative">
+      <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-[500px] w-full max-h-[500px] overflow-auto relative shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white z-20"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white z-20 transition-all"
         >
-          <FaTimes className="text-2xl" />
+          <FaTimes className="text-sm" />
         </button>
-        <div className="p-6 relative">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Simple Certificate
+        <div className="p-5 relative">
+          <h3 className="text-lg font-black text-gray-900 dark:text-white mb-3 tracking-tight">
+            Verified Certificate
           </h3>
-          {/* Image Container with Protection */}
-          <div className="relative">
+          <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
             <div
               className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 z-10 pointer-events-none"
               style={{
@@ -62,60 +55,26 @@ const CertificateModal = ({ isOpen, onClose }) => {
               }}
             />
             <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-              <div className="text-2xl font-bold text-gray-400 opacity-30 transform -rotate-45 select-none">
+              <div className="text-xl font-black text-gray-400/40 transform -rotate-45 select-none tracking-widest">
                 SAMPLE CERTIFICATE
               </div>
             </div>
-            <div className="relative">
-              {/* This is a decoy element that will appear in dev tools */}
-              <div
-                className="hidden"
-                data-decoysrc="ignore-this-decoysrc"
-                style={{ display: "none" }}
-              >
-                <img
-                  src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-                  alt="dev"
-                />
-              </div>
-
-              {/* Actual image with obfuscated attributes */}
-              <div
-                className="certificate-image-container"
-                style={{
-                  backgroundImage:
-                    "url('http://eklabya.com/api/upload/file/eklabya-certificate-4563.png')",
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center",
-                  width: "100%",
-                  aspectRatio: "4/3",
-                  filter: "blur(1px)",
-                  WebkitUserSelect: "none",
-                  MozUserSelect: "none",
-                  msUserSelect: "none",
-                  userSelect: "none",
-                  pointerEvents: "none",
-                  WebkitTouchCallout: "none",
-                }}
-                onContextMenu={(e) => e.preventDefault()}
-              />
-
-              {/* Add some noise to make screenshotting harder */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background:
-                    "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E\")",
-                  pointerEvents: "none",
-                  mixBlendMode: "overlay",
-                }}
-              />
-            </div>
+            <div
+              className="certificate-image-container"
+              style={{
+                backgroundImage:
+                  "url('http://eklabya.com/api/upload/file/eklabya-certificate-4563.png')",
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+                width: "100%",
+                aspectRatio: "4/3",
+                filter: "blur(1px)",
+                userSelect: "none",
+                pointerEvents: "none",
+              }}
+              onContextMenu={(e) => e.preventDefault()}
+            />
           </div>
         </div>
       </div>
@@ -126,11 +85,11 @@ const CertificateModal = ({ isOpen, onClose }) => {
 function Banner() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courseCount, setCourseCount] = useState(0);
+  const [showCertificate, setShowCertificate] = useState(false);
 
   useEffect(() => {
     const fetchCourseCount = async () => {
-      const API_URL =
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:4002/api";
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       try {
         const response = await axios.get(`${API_URL}/courses?fields=_id`);
         setCourseCount(response.data.length + 100);
@@ -138,132 +97,147 @@ function Banner() {
         console.error("Error fetching course count:", error);
       }
     };
-
     fetchCourseCount();
   }, []);
 
-  const [showCertificate, setShowCertificate] = useState(false);
-
   const features = [
     {
-      icon: <FaBookOpen className="text-2xl text-[#F47C26]" />,
-      title: `${courseCount}+ Courses`,
-      desc: "Wide range of topics",
+      icon: <FaBookOpen className="text-lg text-blue-600 dark:text-blue-400" />,
+      title: "180+ Courses",
+      desc: "Across IT, data, business & design",
     },
     {
-      icon: <FaUsers className="text-2xl text-[#F47C26]" />,
-      title: "Expert Instructors",
-      desc: "Learn from the best",
+      icon: (
+        <FaUsers className="text-lg text-emerald-600 dark:text-emerald-400" />
+      ),
+      title: "Expert Mentors",
+      desc: "Industry practitioners, not just trainers",
     },
     {
-      icon: <FaCertificate className="text-2xl text-[#F47C26]" />,
-      title: "Certification",
-      desc: "Get certified",
+      icon: (
+        <FaCertificate className="text-lg text-amber-600 dark:text-amber-400" />
+      ),
+      title: "ISO & NSDC/NIELIT Certification",
+      desc: "Recognized, verifiable credentials",
       onClick: () => setShowCertificate(true),
+    },
+    {
+      icon: (
+        <FaArrowRight className="text-lg text-purple-600 dark:text-purple-400" />
+      ),
+      title: "98% Placement Support Rate",
+      desc: "Real outcomes, not just promises",
     },
   ];
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 py-16 transition-colors duration-300">
+    <div className="bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-slate-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 py-6 md:py-10 transition-colors duration-300 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
           {/* Left Content */}
-          <div className="lg:w-1/2 space-y-8">
-            <div className="space-y-2 w-full">
-              <div className="flex items-center gap-1 text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
-                {/* <img src={logoImg} alt="eklabya – Your Online Learning Partner" className="h-6" /> */}
-                <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
-                  Be The First
+          <div className="lg:w-[55%] space-y-4">
+            {/* Top Badge */}
+            <div className="inline-flex items-center">
+              <span className="text-blue-600 dark:text-blue-400 tracking-wider font-extrabold uppercase text-[11px] md:text-xs bg-blue-100/80 dark:bg-blue-950/80 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800 shadow-2xs">
+                ✦ Career Acceleration Platform
+              </span>
+            </div>
+
+            {/* --- REFINED PREMIUM STAIRCASE DESIGN --- */}
+            <div className="space-y-2 w-full font-sans">
+              <h1 className="flex flex-col space-y-2 tracking-tight text-xl sm:text-2xl md:text-3xl font-black">
+                {/* Step 1 */}
+                <span className="flex items-center gap-3 text-slate-900 dark:text-white">
+                  <span className="w-2 h-2 rounded-full bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-950 shrink-0"></span>
+                  <span>
+                    Learn{" "}
+                    <span className="text-blue-600 dark:text-blue-400">
+                      Job-Ready Skills.
+                    </span>
+                  </span>
                 </span>
-              </div>
-              <h1 className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
-                <span className="whitespace-nowrap">Learn</span>
-                <span className="text-[#F47C26] whitespace-nowrap">
-                  {" "}
-                  Anytime,
+
+                {/* Step 2 (Slightly Indented) */}
+                <span className="flex items-center gap-3 pl-5 sm:pl-8 text-amber-600 dark:text-amber-400">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 ring-4 ring-amber-100 dark:ring-amber-950 shrink-0"></span>
+                  <span>Get Certified.</span>
+                </span>
+
+                {/* Step 3 (Further Indented) */}
+                <span className="flex items-center gap-3 pl-10 sm:pl-16 text-emerald-600 dark:text-emerald-400">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 dark:ring-emerald-950 animate-pulse shrink-0"></span>
+                  <span>Get Hired. 🚀</span>
                 </span>
               </h1>
-              <div className="text-xl-mobile text-lg-tablet text-xl-desktop font-bold text-gray-900 dark:text-white leading-tight">
-                <div className="flex items-start">
-                  <div className="w-12 xs:w-16 sm:w-20 md:w-24 flex-shrink-0"></div>
-                  <div>
-                    <span className="whitespace-nowrap">Grow</span>
-                    <span className="text-[#F47C26] whitespace-nowrap">
-                      {" "}
-                      Every Day
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
-            <p className="text-sm-mobile text-base-tablet text-base-desktop text-thin text-black dark:text-white">
-              No schedule limits, no boundaries. Learn anytime you choose and
-              make progress every day with simple, effective online education
-              built for real growth.
+
+            {/* Description */}
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-xl pt-1">
+              Eklabya is an ISOcertified, NSDC & NIELITrecognized online learning platform helping students and working professionals build in-demand skills in IT, data, business, and design, with live mentorship, handson projects, and dedicated placement support. No fixed schedules, no boundaries, just structured, career-focused learning you can start today.
+
             </p>
 
-            {/* Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+            {/* Features Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
               {features.map((feature, index) => (
                 <div
                   key={index}
                   onClick={feature.onClick}
-                  className={`flex flex-nowrap items-start p-2.5 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg hover:shadow-md dark:hover:shadow-gray-700 transition-all duration-300 border border-gray-100 dark:border-gray-700 ${
+                  className={`flex flex-col p-2.5 bg-white dark:bg-gray-800/90 rounded-2xl shadow-xs border border-slate-200/80 dark:border-slate-800 transition-all duration-200 hover:-translate-y-0.5 ${
                     feature.onClick
-                      ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750"
+                      ? "cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 shadow-sm"
                       : ""
                   }`}
                 >
-                  <div className="flex-shrink-0 p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full mr-3">
-                    {feature.icon}
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="font-semibold text-black dark:text-white text-[13px] sm:text-[15px] leading-tight">
-                      {feature.title}
-                    </h4>
-                    <p className="text-[11px] sm:text-[13px] text-black dark:text-gray-400 leading-tight mt-0.5">
-                      {feature.desc}
-                    </p>
-                  </div>
+                  <div className="mb-1.5">{feature.icon}</div>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-xs leading-tight">
+                    {feature.title}
+                  </h4>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                    {feature.desc}
+                  </p>
                 </div>
               ))}
             </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-2">
+
+            {/* Action Buttons */}
+            <div className="flex flex-row items-center gap-3 pt-2">
               <Link
                 to="/courses"
-                className="group bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium text-lg transition duration-300 flex items-center w-full sm:w-auto justify-center"
+                className="group bg-blue-600 hover:bg-blue-700 text-white px-2 md:px-6 py-1.5 md:py-3 rounded-lg font-bold text-xs md:text-sm transition-all duration-200 flex items-center justify-center shadow-md shadow-blue-600/20"
               >
                 <span>Start Learning</span>
-                <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                <FaArrowRight className="ml-2 text-xs group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
               <Link
-                to="/about"
-                className="border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 px-8 py-3 rounded-lg font-medium text-lg transition duration-300 flex items-center justify-center w-full sm:w-auto"
+                to="/courses"
+                className="border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 px-2 md:px-6 py-1.5 md:py-3 rounded-lg font-bold text-xs md:text-sm transition-all duration-200 flex items-center justify-center bg-white/50 dark:bg-gray-800/50"
               >
-                Learn More
+                Explore Career Paths
               </Link>
             </div>
           </div>
 
-          {/* Right Content */}
-          <div className="lg:w-1/2 mt-8 lg:mt-0">
-            <div className="relative">
-              <div className="w-[80%] hidden lg:block mx-auto mask-inset-corners hover:scale-105 transition-transform duration-500 shadow-xl dark:shadow-gray-900/50">
+          {/* Right Content - Banner Image */}
+          <div className="lg:w-[45%] flex justify-center mt-6 lg:mt-0">
+            <div className="relative w-full max-w-[400px]">
+              {/* Image Card Container with Smooth Rounded Corners & Premium Shadow */}
+              <div className="relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-gray-800 shadow-xl shadow-blue-500/5 hover:scale-[1.02] transition-transform duration-300">
                 <img
                   src={bannerImg}
                   alt="Skill Development and Online Training Courses"
-                  className="w-full h-auto rounded-none"
+                  className="w-full h-auto object-cover block"
                 />
               </div>
 
-              {/* Decorative elements */}
-              <div className="absolute -top-6 -right-6 w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-              <div className="absolute -bottom-8 right-20 w-24 h-24 bg-purple-100 dark:bg-purple-900/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-              <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-yellow-100 dark:bg-yellow-900/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+              {/* Background Glows */}
+              <div className="absolute -top-6 -right-6 w-28 h-28 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+              <div className="absolute -bottom-6 -left-6 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
             </div>
           </div>
         </div>
       </div>
+
       <CertificateModal
         isOpen={showCertificate}
         onClose={() => setShowCertificate(false)}
