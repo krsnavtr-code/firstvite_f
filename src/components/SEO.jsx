@@ -1,6 +1,5 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
-import SchemaGenerator from "./SchemaGenerator";
 
 /**
  * SEO Component
@@ -20,8 +19,7 @@ import SchemaGenerator from "./SchemaGenerator";
  * @param {string} [props.twitter.card] - Twitter card type (defaults to 'summary_large_image')
  * @param {string} [props.twitter.site] - Twitter @username for the website
  * @param {string} [props.twitter.creator] - Twitter @username for content creator
- * @param {Object} [props.schema] - Structured data schema object for JSON-LD
- * @returns {JSX.Element} - Returns Helmet component with meta tags and schema
+ * @returns {JSX.Element} - Returns Helmet component with meta tags
  */
 const SEO = ({
   title = "eklabya - Online Learning Platform",
@@ -31,7 +29,6 @@ const SEO = ({
   robots = "index, follow",
   og = {},
   twitter = {},
-  schema,
 }) => {
   const siteName = "eklabya";
   const siteUrl = "https://eklabya.com";
@@ -86,7 +83,6 @@ const SEO = ({
           <meta name="twitter:creator" content={twitterCreator} />
         )}
       </Helmet>
-      <SchemaGenerator schema={schema} />
     </>
   );
 };

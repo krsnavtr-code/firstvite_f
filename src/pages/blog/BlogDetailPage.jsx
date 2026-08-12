@@ -16,10 +16,6 @@ import rehypeRaw from "rehype-raw";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { getBlogPostBySlug, getPostsByCategory } from "../../api/blogApi";
-import {
-  generateArticleSchema,
-  generateBreadcrumbSchema,
-} from "../../utils/schemaGenerators";
 import "github-markdown-css/github-markdown.css";
 
 dayjs.extend(relativeTime);
@@ -179,40 +175,6 @@ export default function BlogDetailPage() {
     ? `https://eklabya.com/blog/${post.slug}`
     : "https://eklabya.com/blog";
 
-  // Generate Article Schema
-  const articleSchema = post
-    ? generateArticleSchema({
-        headline: post.title,
-        description:
-          post.excerpt ||
-          post.content?.replace(/<[^>]*>?/gm, "").substring(0, 200),
-        url: canonicalUrl,
-        image: post.featuredImage || post.imageUrl,
-        author: post.author?.name || "Eklabya",
-        authorUrl: post.author?.url,
-        datePublished: post.createdAt,
-        dateModified: post.updatedAt || post.createdAt,
-        articleSection: post.categories?.[0]?.name,
-        wordCount:
-          post.content?.replace(/<[^>]*>?/gm, "").split(/\s+/).length || 500,
-      })
-    : null;
-
-  // Generate Breadcrumb Schema
-  const breadcrumbSchema = post
-    ? generateBreadcrumbSchema([
-        { name: "Home", url: "/" },
-        { name: "Blog", url: "/blog" },
-        { name: post.title, url: canonicalUrl },
-      ])
-    : null;
-
-  // Combine schemas
-  const combinedSchema =
-    articleSchema && breadcrumbSchema
-      ? [articleSchema, breadcrumbSchema]
-      : articleSchema || breadcrumbSchema;
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
@@ -227,7 +189,6 @@ export default function BlogDetailPage() {
           image: post?.imageUrl,
           url: canonicalUrl,
         }}
-        schema={combinedSchema}
       />
       {/* Header with back button and share */}
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">

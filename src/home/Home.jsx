@@ -14,21 +14,8 @@ import Content from "../components/home/Content";
 import StudentPlacements from "../components/home/StudentPlacements";
 import ScholarshipProgram from "../components/home/ScholarshipProgram";
 import FAQ from "../components/home/FAQ";
-import {
-  generateOrganizationSchema,
-  generateWebSiteSchema,
-} from "../utils/schemaGenerators";
 
 function Home() {
-  // Generate Organization Schema
-  const organizationSchema = generateOrganizationSchema();
-
-  // Generate WebSite Schema
-  const websiteSchema = generateWebSiteSchema();
-
-  // Combine schemas
-  const combinedSchema = [organizationSchema, websiteSchema];
-
   return (
     <>
       <SEO
@@ -44,7 +31,6 @@ function Home() {
           image:
             "https://www.eklabya.com/api/upload/file/img-1753961989896-7541613.png",
         }}
-        schema={combinedSchema}
       />
       <div className="flex flex-col min-h-screen">
         {/* Hero Banner */}

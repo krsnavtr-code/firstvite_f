@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import SEO from "../components/SEO";
 import { getFAQs } from "../api/faqApi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { generateFAQSchema } from "../utils/schemaGenerators";
 
 const FAQPage = () => {
   const [faqs, setFaqs] = useState([]);
@@ -62,17 +61,6 @@ const FAQPage = () => {
     );
   }
 
-  // Generate FAQ Schema
-  const faqSchema =
-    faqs.length > 0
-      ? generateFAQSchema(
-          faqs.map((faq) => ({
-            question: faq.question,
-            answer: faq.answer?.replace(/<[^>]*>?/gm, "") || faq.answer,
-          })),
-        )
-      : null;
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
@@ -85,7 +73,6 @@ const FAQPage = () => {
             "Get answers to common questions about our courses, payments, and learning platform. Everything you need to know about Eklabya in one place.",
           type: "website",
         }}
-        schema={faqSchema}
       />
       <div className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">

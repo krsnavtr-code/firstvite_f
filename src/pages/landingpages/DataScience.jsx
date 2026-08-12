@@ -3,40 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { submitContactForm } from "../../api/contactApi";
 import SEO from "../../components/SEO";
-import {
-  generateCourseSchema,
-  generateBreadcrumbSchema,
-  generateFAQSchema,
-  generateWebPageSchema,
-  generateOrganizationSchema,
-} from "../../utils/schemaGenerators";
 
 const DataScienceLanding = () => {
   const navigate = useNavigate();
-
-  const courseSchema = generateCourseSchema({
-    name: "Data Science & AI Programme",
-    description:
-      "Become a Data Scientist in 6 Months. Learn from Sumit Choudhary — 10+ year industry expert. Master Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance.",
-    url: "/data-science-programme",
-    image:
-      "https://www.eklabya.com/api/upload/file/WhatsApp-Image-2026-06-26-at-4-07-53-PM-2161.jpeg",
-    instructor: "Sumit Choudhary",
-    instructorUrl: "https://www.linkedin.com/in/sumitchoudhary-data-expert",
-    courseCode: "DS-AI-01",
-    category: "Data Science",
-    price: 44100,
-    currency: "INR",
-    duration: "P6M",
-    ratingValue: 4.8,
-    reviewCount: 510,
-    availability: "https://schema.org/InStock",
-  });
-
-  const breadcrumbsSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "/" },
-    { name: "Data Science & AI Programme", url: "/data-science-programme" },
-  ]);
 
   const faqsList = [
     {
@@ -71,24 +40,6 @@ const DataScienceLanding = () => {
     },
   ];
 
-  const faqSchema = generateFAQSchema(faqsList);
-
-  const webPageSchema = generateWebPageSchema({
-    name: "Data Science & AI Programme - eklabya",
-    description:
-      "Become a Data Scientist in 6 Months. Learn Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance. Mentor: Sumit Choudhary.",
-    url: "/data-science-programme",
-  });
-
-  const organizationSchema = generateOrganizationSchema();
-
-  const combinedSchemas = [
-    courseSchema,
-    breadcrumbsSchema,
-    faqSchema,
-    webPageSchema,
-    organizationSchema,
-  ].filter(Boolean);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -185,7 +136,6 @@ const DataScienceLanding = () => {
         description="Become a Data Scientist in 6 Months. Learn from Sumit Choudhary — 10+ year industry expert. Master Python, SQL, Machine Learning, AI & Generative AI with 100% placement assistance."
         keywords="Data Science Course, Machine Learning, Artificial Intelligence, Generative AI, Python for Data Science, Power BI, SQL, Sumit Choudhary, eklabya, 100% Placement Assistance"
         canonical="https://eklabya.com/data-science-programme"
-        schema={combinedSchemas}
       />
       {/* MODAL OVERLAY */}
       <div
