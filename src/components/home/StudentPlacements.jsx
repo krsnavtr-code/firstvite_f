@@ -123,31 +123,7 @@ const StudentPlacements = () => {
           </div>
         </div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="relative bg-gray-900 dark:bg-gray-800/90 rounded-2xl p-6 sm:p-8 md:p-10 text-center overflow-hidden border border-slate-800 shadow-xl"
-        >
-          <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white dark:text-gray-100 tracking-tight">
-              Your Dream Career Is Just One Step Away
-            </h3>
-            <p className="text-gray-400 dark:text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-lg mx-auto">
-              Join our next cohort and get personalized career coaching,
-              portfolio reviews, and direct referrals to hiring partners.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-700 hover:scale-102 transition-all shadow-md shadow-blue-600/20 active:scale-98">
-                Apply for Admission
-              </button>
-              <button className="bg-white/10 backdrop-blur-md text-white border border-white/20 dark:border-gray-600/30 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-white/20 transition-all active:scale-98">
-                Talk to an Expert
-              </button>
-            </div>
-          </div>
-        </motion.div>
+       
       </div>
     </section>
   );

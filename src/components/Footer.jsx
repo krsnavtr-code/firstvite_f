@@ -192,7 +192,7 @@ function Footer() {
                 { icon: FaTwitter, href: "https://x.com/eklabyaofficial" },
                 {
                   icon: FaLinkedin,
-                  href: "https://www.linkedin.com/company/eklabya-elearning",
+                  href: "https://www.linkedin.com/company/eklabya-centre-of-excellence/",
                 },
                 {
                   icon: FaFacebook,
@@ -280,7 +280,7 @@ function Footer() {
               <li className="flex items-start gap-2.5">
                 <FaMapMarkerAlt className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
                 <span>
-                  H-161 BSI Business Park Sector-63 Noida Gautam Budh Nagar
+                  G-25, Block G, Sector 3, Noida,
                   Uttar Pradesh 201301
                 </span>
               </li>

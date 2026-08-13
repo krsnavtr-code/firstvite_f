@@ -1,92 +1,117 @@
 import React, { useState } from "react";
-import { FaPaperPlane, FaCheckCircle, FaEnvelope } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { submitContactForm } from "../../api/contactApi";
+import ContactFormModal from "../common/ContactFormModal";
 
 const Newsletter = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubscribed(true);
-    setEmail("");
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
 
-    setTimeout(() => {
-      setIsSubscribed(false);
-    }, 5000);
+    setIsSubmitting(true);
+    try {
+      await submitContactForm({
+        email,
+        type: "newsletter",
+      });
+      toast.success("Successfully subscribed to newsletter!");
+      setEmail("");
+    } catch (error) {
+      toast.error("Failed to subscribe. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <section className="py-16 md:py-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-800 dark:from-gray-900 dark:via-blue-950 dark:to-gray-900 relative overflow-hidden transition-colors duration-300">
-      {/* Decorative Glows */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <div className="max-w-2xl mx-auto space-y-4">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider shadow-2xs">
-            <FaEnvelope className="text-xs" /> Stay Ahead of the Curve
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
-            Never Miss an Update
-          </h2>
-
-          <p className="text-xs sm:text-sm md:text-base text-blue-100 dark:text-gray-300 leading-relaxed font-normal">
-            Get new course launches, scholarship deadlines, free masterclasses,
-            and career tips delivered straight to your inbox. No spam, just
-            things worth your time.
-          </p>
-
-          {isSubscribed ? (
-            <div
-              className="bg-emerald-500/20 border border-emerald-400/40 text-white backdrop-blur-md px-5 py-3.5 rounded-2xl flex items-center justify-center gap-2.5 max-w-md mx-auto shadow-lg"
-              role="alert"
-            >
-              <FaCheckCircle className="text-emerald-400 text-lg shrink-0" />
-              <div className="text-xs sm:text-sm text-left">
-                <strong className="font-bold">Thank you! </strong>
-                <span className="text-emerald-100">
-                  You've been subscribed to our newsletter.
-                </span>
-              </div>
-            </div>
-          ) : (
+    <section className="py-12 md:py-16 bg-gradient-to-b from-white via-slate-50/50 to-white dark:from-gray-900 dark:via-gray-900/80 dark:to-gray-900">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Newsletter Subscription */}
+          {/* <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-900 dark:to-blue-800 rounded-2xl p-6 sm:p-8 md:p-10 text-center shadow-xl"
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3">
+              Stay Updated with Eklabya
+            </h2>
+            <p className="text-blue-100 dark:text-blue-200 text-sm md:text-base mb-6 max-w-2xl mx-auto">
+              Subscribe to our newsletter for the latest courses, career tips,
+              and exclusive offers delivered to your inbox.
+            </p>
             <form
               onSubmit={handleSubmit}
-              className="mt-6 sm:flex items-center justify-center gap-2 max-w-xl mx-auto"
+              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
             >
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
               <input
-                id="email-address"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-blue-200 dark:placeholder-gray-400 focus:ring-2 focus:ring-white focus:outline-none rounded-xl text-xs sm:text-sm shadow-inner transition-all"
-                placeholder="Enter your email address"
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-3 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 outline-none"
+                disabled={isSubmitting}
               />
-              <div className="mt-3 sm:mt-0 sm:shrink-0">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-gray-900 dark:bg-gray-700 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Subscribing..." : "Subscribe"}
+              </button>
+            </form>
+          </motion.div> */}
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative bg-gray-900 dark:bg-gray-800/90 rounded-2xl p-6 sm:p-8 md:p-10 text-center overflow-hidden border border-slate-800 shadow-xl"
+          >
+            <div className="relative z-10 max-w-2xl mx-auto space-y-4">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white dark:text-gray-100 tracking-tight">
+                Your Dream Career Is Just One Step Away
+              </h3>
+              <p className="text-gray-400 dark:text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-lg mx-auto">
+                Join our next cohort and get personalized career coaching,
+                portfolio reviews, and direct referrals to hiring partners.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                 <button
-                  type="submit"
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-blue-50 text-blue-700 font-bold text-xs sm:text-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-98"
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-700 hover:scale-102 transition-all shadow-md shadow-blue-600/20 active:scale-98"
                 >
-                  <FaPaperPlane className="text-xs" />
-                  <span>Subscribe</span>
+                  Apply for Admission
+                </button>
+                <button
+                  onClick={() => navigate("/contact")}
+                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 dark:border-gray-600/30 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-white/20 transition-all active:scale-98"
+                >
+                  Talk to an Expert
                 </button>
               </div>
-            </form>
-          )}
-
-          <p className="text-[11px] sm:text-xs text-blue-200 dark:text-gray-400 pt-1">
-            We respect your privacy. Unsubscribe at any time.
-          </p>
+            </div>
+          </motion.div>
         </div>
       </div>
+
+      {/* Contact Form Modal */}
+      <ContactFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };

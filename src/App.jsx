@@ -6,6 +6,7 @@ import { checkRedirect } from "./utils/redirectUtils";
 import Courses from "./components/Courses";
 import LoginPage from "./pages/auth/LoginPage";
 import FreeCourses from "./pages/FreeCourses";
+import Scholarship from "./pages/Scholarship";
 import { Toaster } from "react-hot-toast";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
@@ -292,6 +293,15 @@ function App() {
             element={
               <MainLayout>
                 <FreeCourses />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/scholarship"
+            element={
+              <MainLayout>
+                <Scholarship />
               </MainLayout>
             }
           />

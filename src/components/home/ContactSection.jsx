@@ -8,6 +8,8 @@ import {
   FaHeadset,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { submitContactForm } from "../../api/contactApi";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -27,17 +29,30 @@ const ContactSection = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
+    try {
+      const result = await submitContactForm(formData);
 
-      setTimeout(() => setIsSubmitted(false), 5000);
-    }, 1500);
+      if (result.success) {
+        toast.success("Message sent successfully!");
+        setIsSubmitted(true);
+        setFormData({ name: "", email: "", subject: "", message: "" });
+
+        setTimeout(() => setIsSubmitted(false), 5000);
+      } else {
+        toast.error(
+          result.message || "Failed to send message. Please try again.",
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      toast.error(error.message || "Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -46,9 +61,8 @@ const ContactSection = () => {
         <FaMapMarkerAlt className="text-xl text-blue-600 dark:text-blue-400" />
       ),
       title: "Our Location",
-      description:
-        "H161, BSI Business Park, Sector-63, Noida, Gautam Budh Nagar, Uttar Pradesh 201301",
-      link: "#",
+      description: "G-25, Block G, Sector 3, Noida, Uttar Pradesh 201301",
+      link: "https://maps.app.goo.gl/2q1X99HQBRMHJpBDA",
       linkText: "View on map",
     },
     {
