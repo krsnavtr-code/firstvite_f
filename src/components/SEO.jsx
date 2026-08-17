@@ -35,17 +35,14 @@ const SEO = ({
   const defaultImage = `${siteUrl}/images/firstvite-logo.png`;
 
   // Auto-generate canonical URL from current page if not provided
-  const canonicalUrl =
-    canonical ||
-    (typeof window !== "undefined" ? window.location.href : siteUrl);
+  const canonicalUrl = canonical || siteUrl;
 
   // Default Open Graph values
   const ogTitle = og.title || title;
   const ogDescription = og.description || description;
   const ogImage = og.image || defaultImage;
   const ogType = og.type || "website";
-  const ogUrl =
-    og.url || (typeof window !== "undefined" ? window.location.href : siteUrl);
+  const ogUrl = og.url || siteUrl;
 
   // Default Twitter card values
   const twitterCard = twitter.card || "summary_large_image";
