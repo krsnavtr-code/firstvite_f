@@ -113,6 +113,8 @@ const AdminManagement = () => {
       if (editingUser) {
         await adminApi.updateAdminUserRole(editingUser._id, {
           adminRoleId: userForm.adminRoleId,
+          fullname: userForm.fullname,
+          email: userForm.email,
         });
         toast.success("User role updated successfully");
       } else {
