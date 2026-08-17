@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "./home/Home";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { checkRedirect } from "./utils/redirectUtils";
 import Courses from "./components/Courses";
 import LoginPage from "./pages/auth/LoginPage";
 import FreeCourses from "./pages/FreeCourses";
@@ -99,48 +98,6 @@ import Sprint from "./components/admin/lmsManagement/Sprint.jsx";
 import LmsManagement from "./components/admin/lmsManagement/LmsManagement.jsx";
 import Assessment from "./components/admin/lmsManagement/Assessment.jsx";
 import CandidatesPage from "./pages/admin/CandidatesPage.jsx";
-
-// Redirect Handler Component
-const RedirectHandler = () => {
-  const location = useLocation();
-  const isCheckingRedirect = useRef(false);
-
-  useEffect(() => {
-    const handleRedirect = async () => {
-      // Prevent multiple simultaneous redirect checks
-      if (isCheckingRedirect.current) {
-        return;
-      }
-
-      // Skip redirect check for API routes and static assets
-      if (
-        location.pathname.startsWith("/api") ||
-        location.pathname.startsWith("/uploads") ||
-        location.pathname.startsWith("/pdfs") ||
-        location.pathname.startsWith("/candidate_profile")
-      ) {
-        return;
-      }
-
-      isCheckingRedirect.current = true;
-      try {
-        const redirect = await checkRedirect(location.pathname);
-        if (redirect && redirect.targetUrl) {
-          // Only redirect if the target URL is different from current URL
-          if (redirect.targetUrl !== window.location.href) {
-            window.location.href = redirect.targetUrl;
-          }
-        }
-      } finally {
-        isCheckingRedirect.current = false;
-      }
-    };
-
-    handleRedirect();
-  }, [location.pathname]);
-
-  return null;
-};
 
 // Create a layout component that conditionally renders Navbar and Footer
 const MainLayout = ({ children }) => {
@@ -247,7 +204,6 @@ function App() {
           draggable
           pauseOnHover
         />
-        <RedirectHandler />
         <Routes>
           {/* Account Status Pages */}
           <Route path="/suspended" element={<SuspendedAccount />} />

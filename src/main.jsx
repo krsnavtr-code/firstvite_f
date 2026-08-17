@@ -35,11 +35,4 @@ const app = (
 );
 
 const rootElement = document.getElementById("root");
-
-// If react-snap has pre-rendered static HTML into #root, hydrate it
-// instead of wiping and re-rendering from scratch (React 18 hydration).
-if (rootElement.hasChildNodes()) {
-  ReactDOM.hydrateRoot(rootElement, app);
-} else {
-  ReactDOM.createRoot(rootElement).render(app);
-}
+ReactDOM.createRoot(rootElement).render(app);

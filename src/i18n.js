@@ -1,25 +1,21 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 
-// Initialize i18n
+// Initialize i18n without HTTP backend to avoid console errors
 i18n
-  // Enable language detection
-  .use(LanguageDetector)
-  // Enable loading translations via HTTP
-  .use(Backend)
   // Pass the i18n instance to react-i18next
   .use(initReactI18next)
   // Initialize i18next
   .init({
-    fallbackLng: 'en',
-    debug: true,
+    fallbackLng: "en",
+    debug: false,
     interpolation: {
       escapeValue: false, // Not needed for React as it escapes by default
     },
-    backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
+    resources: {
+      en: {
+        translation: {},
+      },
     },
     react: {
       useSuspense: false,
