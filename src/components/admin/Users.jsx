@@ -13,6 +13,24 @@ const UserModal = ({ user, onClose, onSave, isOpen }) => {
     ...(user ? {} : { password: "" }), // Only show password field for new users
   });
 
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        fullname: user.fullname || "",
+        email: user.email || "",
+        role: user.role || "student",
+      });
+    } else {
+      setFormData({
+        fullname: "",
+        email: "",
+        role: "student",
+        password: "",
+      });
+    }
+  }, [user]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -23,7 +41,21 @@ const UserModal = ({ user, onClose, onSave, isOpen }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    // When editing, only send fields that should be updated
+    if (user) {
+      const updateData = {
+        fullname: formData.fullname,
+        role: formData.role,
+      };
+      // Only include password if it's provided (for new users)
+      if (formData.password) {
+        updateData.password = formData.password;
+      }
+      onSave(updateData);
+    } else {
+      // For new users, send all fields including password and email
+      onSave(formData);
+    }
   };
 
   if (!isOpen) return null;
@@ -58,10 +90,16 @@ const UserModal = ({ user, onClose, onSave, isOpen }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
                 required
                 disabled={!!user}
+                readOnly={!!user}
               />
+              {user && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Email cannot be changed
+                </p>
+              )}
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -603,13 +641,13 @@ const Users = () => {
                         >
                           <FaKey />
                         </button>
-                        {/* <button
+                        <button
                           onClick={() => handleDeleteUser(user._id)}
                           className="text-red-600 hover:text-red-900"
                           title="Delete User"
                         >
                           <FaTrash />
-                        </button> */}
+                        </button>
                         <button
                           onClick={() => handleEnrollClick(user)}
                           className="text-green-600 hover:text-green-900"
