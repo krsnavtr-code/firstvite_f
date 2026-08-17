@@ -17,23 +17,21 @@ const LoadingFallback = () => (
 );
 
 const app = (
-  <React.StrictMode>
-    <Suspense fallback={<LoadingFallback />}>
-      <I18nextProvider i18n={i18n}>
-        <BrowserRouter>
-          <HelmetProvider>
-            <AuthProvider>
-              <LMSProvider>
-                <div className="dark:bg-slate-900 dark:text-white">
-                  <App />
-                </div>
-              </LMSProvider>
-            </AuthProvider>
-          </HelmetProvider>
-        </BrowserRouter>
-      </I18nextProvider>
-    </Suspense>
-  </React.StrictMode>
+  <Suspense fallback={<LoadingFallback />}>
+    <I18nextProvider i18n={i18n}>
+      <BrowserRouter>
+        <HelmetProvider>
+          <AuthProvider>
+            <LMSProvider>
+              <div className="dark:bg-slate-900 dark:text-white">
+                <App />
+              </div>
+            </LMSProvider>
+          </AuthProvider>
+        </HelmetProvider>
+      </BrowserRouter>
+    </I18nextProvider>
+  </Suspense>
 );
 
 const rootElement = document.getElementById("root");

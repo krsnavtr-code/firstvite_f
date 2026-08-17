@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { message } from "antd";
 import api from "../api/axios";
 
@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Check if user is authenticated on app load
   useEffect(() => {
@@ -16,6 +17,12 @@ export function AuthProvider({ children }) {
 
     const checkAuth = async () => {
       try {
+        // Check if we're on the client side before accessing localStorage
+        if (typeof window === "undefined") {
+          setLoading(false);
+          return;
+        }
+
         const token = localStorage.getItem("token");
         const refreshToken = localStorage.getItem("refreshToken");
 
@@ -26,9 +33,11 @@ export function AuthProvider({ children }) {
             setLoading(false);
           }
           // Clear any partial data
-          localStorage.removeItem("token");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("user");
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+            localStorage.removeItem("refreshToken");
+            localStorage.removeItem("user");
+          }
           return;
         }
 
@@ -58,13 +67,13 @@ export function AuthProvider({ children }) {
             localStorage.setItem("user", JSON.stringify(userData));
             setCurrentUser(userData);
 
-            // Handle redirects based on user status
+            // Handle redirects based on user status using React Router
             if (!userData.isActive) {
-              if (window.location.pathname !== "/suspended") {
-                window.location.href = "/suspended";
+              if (location.pathname !== "/suspended") {
+                navigate("/suspended", { replace: true });
               }
-            } else if (window.location.pathname === "/suspended") {
-              window.location.href = "/";
+            } else if (location.pathname === "/suspended") {
+              navigate("/", { replace: true });
             }
 
             setLoading(false);
@@ -89,9 +98,11 @@ export function AuthProvider({ children }) {
                 } = refreshResponse.data;
 
                 // Update tokens in localStorage
-                localStorage.setItem("token", newToken);
-                if (newRefreshToken) {
-                  localStorage.setItem("refreshToken", newRefreshToken);
+                if (typeof window !== "undefined") {
+                  localStorage.setItem("token", newToken);
+                  if (newRefreshToken) {
+                    localStorage.setItem("refreshToken", newRefreshToken);
+                  }
                 }
 
                 // Update the authorization header
@@ -113,7 +124,9 @@ export function AuthProvider({ children }) {
                   discount: user.discount || 0,
                 };
 
-                localStorage.setItem("user", JSON.stringify(userData));
+                if (typeof window !== "undefined") {
+                  localStorage.setItem("user", JSON.stringify(userData));
+                }
 
                 if (isMounted) {
                   setCurrentUser(userData);
@@ -124,16 +137,18 @@ export function AuthProvider({ children }) {
             } catch (refreshError) {
               console.error("Token refresh failed:", refreshError);
               // Clear auth data on refresh failure
-              localStorage.removeItem("token");
-              localStorage.removeItem("refreshToken");
-              localStorage.removeItem("user");
+              if (typeof window !== "undefined") {
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("user");
+              }
 
               if (isMounted) {
                 setCurrentUser(null);
                 setLoading(false);
 
                 // Only redirect if not already on login page
-                if (!window.location.pathname.includes("/login")) {
+                if (!location.pathname.includes("/login")) {
                   navigate("/login", { replace: true });
                 }
               }
@@ -146,12 +161,14 @@ export function AuthProvider({ children }) {
               setCurrentUser(null);
               setLoading(false);
             }
-            localStorage.removeItem("token");
-            localStorage.removeItem("refreshToken");
-            localStorage.removeItem("user");
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("token");
+              localStorage.removeItem("refreshToken");
+              localStorage.removeItem("user");
+            }
 
             // Only redirect if not already on login page
-            if (!window.location.pathname.includes("/login")) {
+            if (!location.pathname.includes("/login")) {
               navigate("/login", { replace: true });
             }
           }
@@ -166,12 +183,14 @@ export function AuthProvider({ children }) {
           setCurrentUser(null);
           setLoading(false);
         }
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+        }
 
         // Only redirect if not already on login page
-        if (!window.location.pathname.includes("/login")) {
+        if (!location.pathname.includes("/login")) {
           navigate("/login", { replace: true });
         }
       }
@@ -204,8 +223,10 @@ export function AuthProvider({ children }) {
         const { token, refreshToken, user } = response.data;
 
         // Store tokens
-        localStorage.setItem("token", token);
-        localStorage.setItem("refreshToken", refreshToken);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", token);
+          localStorage.setItem("refreshToken", refreshToken);
+        }
 
         if (!user) {
           throw new Error("User data not found in response");
@@ -226,7 +247,9 @@ export function AuthProvider({ children }) {
           discount: user.discount || 0,
         };
 
-        localStorage.setItem("user", JSON.stringify(userData));
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(userData));
+        }
         setCurrentUser(userData);
 
         // Set the auth header for future requests
@@ -236,7 +259,7 @@ export function AuthProvider({ children }) {
         message.success("Login successful!");
 
         // Redirect to dashboard or the originally requested page
-        const searchParams = new URLSearchParams(window.location.search);
+        const searchParams = new URLSearchParams(location.search);
         const redirectTo = searchParams.get("redirect") || "/dashboard";
         navigate(redirectTo, { replace: true });
 
@@ -293,9 +316,11 @@ export function AuthProvider({ children }) {
   const logout = () => {
     try {
       // Clear all auth-related data from localStorage
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+      }
 
       // Clear auth header
       delete api.defaults.headers.common["Authorization"];
@@ -323,7 +348,9 @@ export function AuthProvider({ children }) {
       };
 
       // Also update localStorage to persist the changes
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
 
       return updatedUser;
     });
@@ -331,8 +358,10 @@ export function AuthProvider({ children }) {
 
   // Set user from tokens (for OTP verification)
   const setUserFromTokens = (token, refreshToken, user) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("refreshToken", refreshToken);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken", refreshToken);
+    }
 
     const userData = {
       _id: user._id,
@@ -348,7 +377,9 @@ export function AuthProvider({ children }) {
       discount: user.discount || 0,
     };
 
-    localStorage.setItem("user", JSON.stringify(userData));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
     setCurrentUser(userData);
 
     // Set the auth header for future requests

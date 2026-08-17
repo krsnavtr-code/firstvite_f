@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "./home/Home";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
@@ -103,9 +103,15 @@ import CandidatesPage from "./pages/admin/CandidatesPage.jsx";
 // Redirect Handler Component
 const RedirectHandler = () => {
   const location = useLocation();
+  const isCheckingRedirect = useRef(false);
 
   useEffect(() => {
     const handleRedirect = async () => {
+      // Prevent multiple simultaneous redirect checks
+      if (isCheckingRedirect.current) {
+        return;
+      }
+
       // Skip redirect check for API routes and static assets
       if (
         location.pathname.startsWith("/api") ||
@@ -116,10 +122,17 @@ const RedirectHandler = () => {
         return;
       }
 
-      const redirect = await checkRedirect(location.pathname);
-      if (redirect && redirect.targetUrl) {
-        // Perform the redirect using window.location for a full page reload
-        window.location.href = redirect.targetUrl;
+      isCheckingRedirect.current = true;
+      try {
+        const redirect = await checkRedirect(location.pathname);
+        if (redirect && redirect.targetUrl) {
+          // Only redirect if the target URL is different from current URL
+          if (redirect.targetUrl !== window.location.href) {
+            window.location.href = redirect.targetUrl;
+          }
+        }
+      } finally {
+        isCheckingRedirect.current = false;
       }
     };
 
