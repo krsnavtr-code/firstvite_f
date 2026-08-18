@@ -208,12 +208,12 @@ function Banner() {
                 <span>Start Learning</span>
                 <FaArrowRight className="ml-2 text-xs group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
-              <Link
+              {/* <Link
                 to="/courses"
                 className="border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 px-2 md:px-6 py-1.5 md:py-3 rounded-lg font-bold text-xs md:text-sm transition-all duration-200 flex items-center justify-center bg-white/50 dark:bg-gray-800/50"
               >
                 Explore Career Paths
-              </Link>
+              </Link> */}
             </div>
           </div>
 

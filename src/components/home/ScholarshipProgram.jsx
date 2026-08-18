@@ -91,13 +91,13 @@ const WhyEklabya = () => {
               </div>
 
               <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-700/60">
-                <Link
+                {/* <Link
                   to="/courses"
                   className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-xl transition-all duration-300 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 active:scale-98"
                 >
                   <span>Explore Job-Focused Courses</span>
                   <FaArrowRight className="text-xs" />
-                </Link>
+                </Link> */}
                 <Link
                   to="/scholarship"
                   className="w-full text-center border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-bold py-2 px-3 rounded-xl transition-all duration-300 flex items-center justify-center bg-white/50 dark:bg-gray-800/50"

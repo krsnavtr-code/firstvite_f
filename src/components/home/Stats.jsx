@@ -161,13 +161,13 @@ const Stats = () => {
                 </p>
               </div>
             </div>
-            <Link
+            {/* <Link
               to="/alumni-stories"
               className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 shrink-0"
             >
               <span>Read Success Stories</span>
               <FaArrowRight className="text-[10px]" />
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

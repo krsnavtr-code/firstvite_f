@@ -132,13 +132,13 @@ const Testimonials = () => {
 
         {/* CTA Button */}
         <div className="mt-4 text-center">
-          <Link
+          {/* <Link
             to="/placements"
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all duration-300 shadow-md shadow-blue-600/20 active:scale-98"
           >
             <span>Read More Alumni Stories</span>
             <FaArrowRight className="text-xs" />
-          </Link>
+          </Link> */}
         </div>
       </div>
     </section>
