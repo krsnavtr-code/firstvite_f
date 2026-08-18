@@ -257,7 +257,6 @@ const SendBrochure = () => {
         setVideos(response.data);
       } catch (error) {
         console.error("Error fetching videos:", error);
-        toast.error("Failed to load videos");
       }
     };
 
