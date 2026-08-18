@@ -1,22 +1,24 @@
 import React, { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const BrochureDownloadModal = ({ isOpen, onClose, courseTitle, courseId }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    agreedToTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -25,6 +27,11 @@ const BrochureDownloadModal = ({ isOpen, onClose, courseTitle, courseId }) => {
 
     if (!formData.name || !formData.email || !formData.phone) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!formData.agreedToTerms) {
+      toast.error("Please accept the terms & conditions and privacy policy");
       return;
     }
 
@@ -55,6 +62,7 @@ const BrochureDownloadModal = ({ isOpen, onClose, courseTitle, courseId }) => {
           name: "",
           email: "",
           phone: "",
+          agreedToTerms: false,
         });
 
         // Close modal after 2 seconds
@@ -182,6 +190,41 @@ const BrochureDownloadModal = ({ isOpen, onClose, courseTitle, courseId }) => {
                     className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 border-gray-800 text-black"
                     placeholder="+91 8080808080"
                   />
+                </div>
+
+                <div className="flex items-start space-x-2">
+                  <input
+                    id="agreedToTerms"
+                    name="agreedToTerms"
+                    type="checkbox"
+                    checked={formData.agreedToTerms}
+                    onChange={handleChange}
+                    className="mt-1 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 bg-gray-50 border-gray-800 text-black"
+                    required
+                  />
+                  <div className="text-xs">
+                    <label
+                      htmlFor="agreedToTerms"
+                      className="font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      I hereby agree to receive the promotional emails &
+                      messages through WhatsApp/RCS/SMS{" "}
+                      <Link
+                        to="/terms-of-service"
+                        className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
+                        T&C
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        to="/privacy-policy"
+                        className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
+                        Privacy Policy
+                      </Link>
+                      <span className="text-red-500">*</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="mt-4">

@@ -280,8 +280,7 @@ function Footer() {
               <li className="flex items-start gap-2.5">
                 <FaMapMarkerAlt className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
                 <span>
-                  G-25, Block G, Sector 3, Noida,
-                  Uttar Pradesh 201301
+                  G-25, Block G, Sector 3, Noida, Uttar Pradesh 201301
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
@@ -313,27 +312,6 @@ function Footer() {
               </li>
             </ul>
           </div>
-        </div>
-
-        {/* Regulatory & Consent Notice Note */}
-        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-          <p>
-            I hereby agree to receive the promotional emails & messages through
-            WhatsApp/RCS/SMS{" "}
-            <Link
-              to="/terms-of-service"
-              className="text-blue-600 dark:text-blue-400 underline"
-            >
-              T&C
-            </Link>{" "}
-            and{" "}
-            <Link
-              to="/privacy-policy"
-              className="text-blue-600 dark:text-blue-400 underline"
-            >
-              Privacy Policy
-            </Link>
-          </p>
         </div>
 
         {/* Bottom Bar */}

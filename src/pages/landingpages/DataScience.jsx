@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { submitContactForm } from "../../api/contactApi";
 import SEO from "../../components/SEO";
@@ -47,10 +47,15 @@ const DataScienceLanding = () => {
     phone: "",
     email: "",
     status: "",
+    agreedToTerms: false,
   });
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
   const submitForm = async () => {
@@ -63,6 +68,11 @@ const DataScienceLanding = () => {
       toast.error(
         "Please fill in all required fields (Name, Phone, Email, Experience Level).",
       );
+      return;
+    }
+
+    if (!formData.agreedToTerms) {
+      toast.error("Please accept the terms & conditions and privacy policy");
       return;
     }
 
@@ -105,6 +115,7 @@ const DataScienceLanding = () => {
           phone: "",
           email: "",
           status: "",
+          agreedToTerms: false,
         });
         setIsModalOpen(false);
 
@@ -231,6 +242,40 @@ const DataScienceLanding = () => {
                 <option value="3+ Years Experience">3+ Years Experience</option>
                 <option value="Non-IT Professional">Non-IT Professional</option>
               </select>
+            </div>
+            <div className="flex items-start space-x-2 mb-3.5">
+              <input
+                id="agreedToTerms"
+                name="agreedToTerms"
+                type="checkbox"
+                checked={formData.agreedToTerms}
+                onChange={handleInputChange}
+                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                required
+              />
+              <div className="text-xs">
+                <label
+                  htmlFor="agreedToTerms"
+                  className="font-medium text-gray-700"
+                >
+                  I hereby agree to receive the promotional emails & messages
+                  through WhatsApp/RCS/SMS{" "}
+                  <Link
+                    to="/terms-of-service"
+                    className="text-blue-600 hover:text-blue-500"
+                  >
+                    T&C
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    to="/privacy-policy"
+                    className="text-blue-600 hover:text-blue-500"
+                  >
+                    Privacy Policy
+                  </Link>
+                  <span className="text-red-500">*</span>
+                </label>
+              </div>
             </div>
             <button
               className="w-full bg-gradient-to-br from-[#FF5C00] to-[#FF8C42] text-white border-none rounded-xl py-3.5 text-[16px] font-bold cursor-pointer shadow-[0_6px_24px_rgba(255,92,0,0.35)] hover:-translate-y-[1px] transition-transform mb-2.5 disabled:opacity-50 disabled:cursor-not-allowed"

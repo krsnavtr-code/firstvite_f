@@ -477,7 +477,7 @@ export default function Contact() {
                         className="font-medium text-black dark:text-white"
                       >
                         I hereby agree to receive the promotional emails &
-                        messages through WhatApp/RCS/SMS{" "}
+                        messages through WhatsApp/RCS/SMS{" "}
                         <Link
                           to="/terms-of-service"
                           className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"

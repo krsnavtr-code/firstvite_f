@@ -10,6 +10,7 @@ import {
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { submitContactForm } from "../../api/contactApi";
+import { Link } from "react-router-dom";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -17,20 +18,27 @@ const ContactSection = () => {
     email: "",
     subject: "",
     message: "",
+    agreedToTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.agreedToTerms) {
+      toast.error("Please accept the terms & conditions and privacy policy");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -39,7 +47,13 @@ const ContactSection = () => {
       if (result.success) {
         toast.success("Message sent successfully!");
         setIsSubmitted(true);
-        setFormData({ name: "", email: "", subject: "", message: "" });
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+          agreedToTerms: false,
+        });
 
         setTimeout(() => setIsSubmitted(false), 5000);
       } else {
@@ -245,6 +259,41 @@ const ContactSection = () => {
                       className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all resize-none"
                       placeholder="Type your message here..."
                     />
+                  </div>
+
+                  <div className="flex items-start space-x-2">
+                    <input
+                      id="agreedToTerms"
+                      name="agreedToTerms"
+                      type="checkbox"
+                      checked={formData.agreedToTerms}
+                      onChange={handleChange}
+                      className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                      required
+                    />
+                    <div className="text-xs">
+                      <label
+                        htmlFor="agreedToTerms"
+                        className="font-medium text-slate-700 dark:text-slate-300"
+                      >
+                        I hereby agree to receive the promotional emails &
+                        messages through WhatsApp/RCS/SMS{" "}
+                        <Link
+                          to="/terms-of-service"
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          T&C
+                        </Link>{" "}
+                        and{" "}
+                        <Link
+                          to="/privacy-policy"
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          Privacy Policy
+                        </Link>
+                        <span className="text-rose-500">*</span>
+                      </label>
+                    </div>
                   </div>
 
                   <div className="flex justify-end pt-2">

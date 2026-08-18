@@ -335,7 +335,7 @@ const ContactFormModal = ({ isOpen, onClose }) => {
                       className="font-medium text-gray-700 dark:text-gray-300"
                     >
                       I hereby agree to receive the promotional emails &
-                      messages through WhatApp/RCS/SMS{" "}
+                      messages through WhatsApp/RCS/SMS{" "}
                       <Link
                         to="/terms-of-service"
                         className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
