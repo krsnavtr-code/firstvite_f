@@ -202,8 +202,7 @@ export default function Contact() {
                       Address
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-300">
-                      H-161 BSI Sector-63 Noida Gautam Budh Nagar <br /> Uttar
-                      Pradesh 201301
+                      G-25, Block G, Sector 3, Noida <br /> Uttar Pradesh 201301
                     </p>
                   </div>
                 </div>

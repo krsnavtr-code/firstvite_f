@@ -1,12 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import SEO from '../components/SEO';
+import React from "react";
+import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
 
 const TermsOfService = () => {
-  const lastUpdated = new Date().toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  const lastUpdated = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
@@ -92,9 +92,9 @@ const TermsOfService = () => {
               5. Limitation of Liability
             </h2>
             <p className="text-black dark:text-white mb-4">
-              Eklabya shall not be liable for any indirect, incidental,
-              special, consequential, or punitive damages resulting from your
-              access to or use of our services.
+              Eklabya shall not be liable for any indirect, incidental, special,
+              consequential, or punitive damages resulting from your access to
+              or use of our services.
             </p>
 
             <h2 className="text-2xl font-semibold text-black dark:text-white mt-8 mb-4">
@@ -134,9 +134,9 @@ const TermsOfService = () => {
             <address className="not-italic text-black dark:text-white mb-8">
               Eklabya
               <br />
-              H-161 BSI Sector-63
+              G-25, Block G, Sector 3
               <br />
-              Noida, Gautam Budh Nagar
+              Noida
               <br />
               Uttar Pradesh 201301
               <br />
