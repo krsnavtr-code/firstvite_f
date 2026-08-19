@@ -81,6 +81,54 @@ const AdminManagement = () => {
     });
   };
 
+  const handleSelectAllForPage = (page, selectAll) => {
+    setRoleForm((prev) => {
+      const existingPermission = prev.permissions.find((p) => p.page === page);
+
+      if (existingPermission) {
+        return {
+          ...prev,
+          permissions: prev.permissions.map((p) =>
+            p.page === page
+              ? {
+                  ...p,
+                  canView: selectAll,
+                  canCreate: selectAll,
+                  canEdit: selectAll,
+                  canDelete: selectAll,
+                }
+              : p,
+          ),
+        };
+      } else {
+        return {
+          ...prev,
+          permissions: [
+            ...prev.permissions,
+            {
+              page,
+              canView: selectAll,
+              canCreate: selectAll,
+              canEdit: selectAll,
+              canDelete: selectAll,
+            },
+          ],
+        };
+      }
+    });
+  };
+
+  const isAllSelectedForPage = (page) => {
+    const permission = roleForm.permissions.find((p) => p.page === page);
+    if (!permission) return false;
+    return (
+      permission.canView &&
+      permission.canCreate &&
+      permission.canEdit &&
+      permission.canDelete
+    );
+  };
+
   const handleRoleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -418,8 +466,24 @@ const AdminManagement = () => {
                           key={page.key}
                           className="mb-3 pb-3 border-b border-gray-100 last:border-b-0"
                         >
-                          <div className="font-medium text-gray-900 mb-1">
-                            {page.label}
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-medium text-gray-900">
+                              {page.label}
+                            </div>
+                            <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800">
+                              <input
+                                type="checkbox"
+                                checked={isAllSelectedForPage(page.key)}
+                                onChange={(e) =>
+                                  handleSelectAllForPage(
+                                    page.key,
+                                    e.target.checked,
+                                  )
+                                }
+                                className="mr-1"
+                              />
+                              <span>Select All</span>
+                            </label>
                           </div>
                           <div className="flex space-x-4 text-sm">
                             {[
