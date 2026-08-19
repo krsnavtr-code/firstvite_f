@@ -19,6 +19,8 @@ const CustomEmailSender = () => {
   const [recipients, setRecipients] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
+  const [plainTextBody, setPlainTextBody] = useState("");
+  const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const [emailHistory, setEmailHistory] = useState([]);
@@ -169,6 +171,18 @@ const CustomEmailSender = () => {
     const template = emailTemplates[templateKey];
     setSubject(template.subject);
     setBody(template.body);
+    setPlainTextBody(""); // Clear plain text when using HTML template
+    setIsHtmlMode(true); // Templates are HTML, so switch to HTML mode
+  };
+
+  const handleFormatChange = (isHtml) => {
+    setIsHtmlMode(isHtml);
+    // Clear the field that's not being used to avoid confusion
+    if (isHtml) {
+      setPlainTextBody("");
+    } else {
+      setBody("");
+    }
   };
 
   useEffect(() => {
@@ -209,15 +223,30 @@ const CustomEmailSender = () => {
   const handleSendEmail = async (e) => {
     e.preventDefault();
 
-    if (!recipients || !subject || !body) {
+    if (!recipients || !subject) {
       toast.error("Please fill in all required fields");
       return;
     }
 
+    const currentBody = isHtmlMode ? body : plainTextBody;
+
+    if (!currentBody) {
+      toast.error(
+        `Please fill in the ${isHtmlMode ? "HTML" : "plain text"} body`,
+      );
+      return;
+    }
+
+    // For plain text, ensure line breaks are preserved (convert \n to \r\n for email standards)
+    const formattedBody = isHtmlMode
+      ? body
+      : plainTextBody.replace(/\n/g, "\r\n");
+
     const formData = new FormData();
     formData.append("recipients", recipients);
     formData.append("subject", subject);
-    formData.append("body", body);
+    formData.append("body", formattedBody);
+    formData.append("isHtml", isHtmlMode);
 
     attachments.forEach((file) => {
       formData.append("attachments", file);
@@ -235,7 +264,9 @@ const CustomEmailSender = () => {
       setRecipients("");
       setSubject("");
       setBody("");
+      setPlainTextBody("");
       setAttachments([]);
+      setIsHtmlMode(false);
 
       // Refresh email history
       fetchEmailHistory();
@@ -373,17 +404,69 @@ const CustomEmailSender = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Body (HTML supported) *
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Body Format *
                 </label>
-                <textarea
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  placeholder="Write your email content here..."
-                  rows={8}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  required
-                />
+                <div className="flex space-x-4 mb-3">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="emailFormat"
+                      checked={!isHtmlMode}
+                      onChange={() => handleFormatChange(false)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Plain Text</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="emailFormat"
+                      checked={isHtmlMode}
+                      onChange={() => handleFormatChange(true)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">HTML</span>
+                  </label>
+                </div>
+
+                {isHtmlMode ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Body (HTML supported) *
+                    </label>
+                    <textarea
+                      value={body}
+                      onChange={(e) => setBody(e.target.value)}
+                      placeholder="Write your HTML email content here..."
+                      rows={8}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Use HTML tags for formatting. This will be sent as HTML
+                      email.
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Body (Plain Text) *
+                    </label>
+                    <textarea
+                      value={plainTextBody}
+                      onChange={(e) => setPlainTextBody(e.target.value)}
+                      placeholder="Write your email content here..."
+                      rows={8}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Plain text format. No HTML tags will be processed. This is
+                      the default format.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>

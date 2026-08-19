@@ -202,14 +202,14 @@ const LoginPage = () => {
               )}
 
               <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center text-black gap-2">
+                {/* <label className="flex items-center text-black gap-2">
                   <input
                     type="checkbox"
                     {...register("rememberMe")}
                     className="h-4 w-4"
                   />
                   Remember me
-                </label>
+                </label> */}
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
