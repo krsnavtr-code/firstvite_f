@@ -241,6 +241,7 @@ api.interceptors.response.use(
 
       if (status === 401 && !isPublicRoute) {
         // Don't show toast here as it might be a background request
+        // Let the AuthContext handle the redirect
         localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");

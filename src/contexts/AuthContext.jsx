@@ -25,6 +25,7 @@ export function AuthProvider({ children }) {
 
         const token = localStorage.getItem("token");
         const refreshToken = localStorage.getItem("refreshToken");
+        const userStr = localStorage.getItem("user");
 
         // If no tokens, clear everything and return
         if (!token || !refreshToken) {
@@ -41,142 +42,33 @@ export function AuthProvider({ children }) {
           return;
         }
 
+        // Try to restore user from localStorage first (for faster load)
+        if (userStr && isMounted) {
+          try {
+            const userData = JSON.parse(userStr);
+            setCurrentUser(userData);
+            setLoading(false);
+
+            // Set the auth header for future requests
+            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+            // Still verify with backend in background
+            verifyWithBackend(token, refreshToken, isMounted);
+            return;
+          } catch (parseError) {
+            console.error(
+              "Failed to parse user from localStorage:",
+              parseError,
+            );
+            // Continue with backend verification
+          }
+        }
+
         // Set the auth header for the initial request
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        try {
-          // Get fresh user data
-          const response = await api.get("/auth/profile");
-
-          if (response.data && response.data.user && isMounted) {
-            // Store the updated user data
-            const userData = {
-              _id: response.data.user._id,
-              fullname: response.data.user.fullname,
-              email: response.data.user.email,
-              role: response.data.user.role,
-              isApproved: response.data.user.isApproved,
-              isActive: response.data.user.isActive !== false,
-              phone: response.data.user.phone || "",
-              address: response.data.user.address || "",
-              adminRoleId: response.data.user.adminRoleId,
-              adminPermissions: response.data.user.adminPermissions || {},
-              discount: response.data.user.discount || 0,
-            };
-
-            localStorage.setItem("user", JSON.stringify(userData));
-            setCurrentUser(userData);
-
-            // Handle redirects based on user status using React Router
-            if (!userData.isActive) {
-              if (location.pathname !== "/suspended") {
-                navigate("/suspended", { replace: true });
-              }
-            } else if (location.pathname === "/suspended") {
-              navigate("/", { replace: true });
-            }
-
-            setLoading(false);
-            return;
-          }
-        } catch (error) {
-          console.error("Auth verification failed:", error);
-
-          // If we get a 401, the interceptor will handle token refresh
-          if (error.response?.status === 401) {
-            try {
-              // Try to refresh the token
-              const refreshResponse = await api.post("/auth/refresh-token", {
-                refreshToken: localStorage.getItem("refreshToken"),
-              });
-
-              if (refreshResponse.data.token) {
-                const {
-                  token: newToken,
-                  refreshToken: newRefreshToken,
-                  user,
-                } = refreshResponse.data;
-
-                // Update tokens in localStorage
-                if (typeof window !== "undefined") {
-                  localStorage.setItem("token", newToken);
-                  if (newRefreshToken) {
-                    localStorage.setItem("refreshToken", newRefreshToken);
-                  }
-                }
-
-                // Update the authorization header
-                api.defaults.headers.common["Authorization"] =
-                  `Bearer ${newToken}`;
-
-                // Update user data
-                const userData = {
-                  _id: user._id,
-                  fullname: user.fullname,
-                  email: user.email,
-                  role: user.role,
-                  isActive: user.isActive !== false, // Default to true if not specified
-                  isApproved: user.isApproved,
-                  phone: user.phone || "",
-                  address: user.address || "",
-                  adminRoleId: user.adminRoleId,
-                  adminPermissions: user.adminPermissions || {},
-                  discount: user.discount || 0,
-                };
-
-                if (typeof window !== "undefined") {
-                  localStorage.setItem("user", JSON.stringify(userData));
-                }
-
-                if (isMounted) {
-                  setCurrentUser(userData);
-                  setLoading(false);
-                }
-                return;
-              }
-            } catch (refreshError) {
-              console.error("Token refresh failed:", refreshError);
-              // Clear auth data on refresh failure
-              if (typeof window !== "undefined") {
-                localStorage.removeItem("token");
-                localStorage.removeItem("refreshToken");
-                localStorage.removeItem("user");
-              }
-
-              if (isMounted) {
-                setCurrentUser(null);
-                setLoading(false);
-
-                // Only redirect if not already on login page
-                if (!location.pathname.includes("/login")) {
-                  navigate("/login", { replace: true });
-                }
-              }
-              return;
-            }
-          } else {
-            console.error("Network or server error during auth check:", error);
-            // For other errors, we'll still clear the auth data to be safe
-            if (isMounted) {
-              setCurrentUser(null);
-              setLoading(false);
-            }
-            if (typeof window !== "undefined") {
-              localStorage.removeItem("token");
-              localStorage.removeItem("refreshToken");
-              localStorage.removeItem("user");
-            }
-
-            // Only redirect if not already on login page
-            if (!location.pathname.includes("/login")) {
-              navigate("/login", { replace: true });
-            }
-          }
-        }
-
-        if (isMounted) {
-          setLoading(false);
-        }
+        // Verify with backend
+        await verifyWithBackend(token, refreshToken, isMounted);
       } catch (error) {
         console.error("Unexpected error during auth check:", error);
         if (isMounted) {
@@ -192,6 +84,138 @@ export function AuthProvider({ children }) {
         // Only redirect if not already on login page
         if (!location.pathname.includes("/login")) {
           navigate("/login", { replace: true });
+        }
+      }
+    };
+
+    const verifyWithBackend = async (token, refreshToken, isMounted) => {
+      try {
+        // Get fresh user data
+        const response = await api.get("/auth/profile");
+
+        if (response.data && response.data.user && isMounted) {
+          // Store the updated user data
+          const userData = {
+            _id: response.data.user._id,
+            fullname: response.data.user.fullname,
+            email: response.data.user.email,
+            role: response.data.user.role,
+            isApproved: response.data.user.isApproved,
+            isActive: response.data.user.isActive !== false,
+            phone: response.data.user.phone || "",
+            address: response.data.user.address || "",
+            adminRoleId: response.data.user.adminRoleId,
+            adminPermissions: response.data.user.adminPermissions || {},
+            discount: response.data.user.discount || 0,
+          };
+
+          localStorage.setItem("user", JSON.stringify(userData));
+          setCurrentUser(userData);
+
+          // Handle redirects based on user status using React Router
+          if (!userData.isActive) {
+            if (location.pathname !== "/suspended") {
+              navigate("/suspended", { replace: true });
+            }
+          } else if (location.pathname === "/suspended") {
+            navigate("/", { replace: true });
+          }
+
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error("Auth verification failed:", error);
+
+        // If we get a 401, the interceptor will handle token refresh
+        if (error.response?.status === 401) {
+          try {
+            // Try to refresh the token
+            const refreshResponse = await api.post("/auth/refresh-token", {
+              refreshToken: localStorage.getItem("refreshToken"),
+            });
+
+            if (refreshResponse.data.token) {
+              const {
+                token: newToken,
+                refreshToken: newRefreshToken,
+                user,
+              } = refreshResponse.data;
+
+              // Update tokens in localStorage
+              if (typeof window !== "undefined") {
+                localStorage.setItem("token", newToken);
+                if (newRefreshToken) {
+                  localStorage.setItem("refreshToken", newRefreshToken);
+                }
+              }
+
+              // Update the authorization header
+              api.defaults.headers.common["Authorization"] =
+                `Bearer ${newToken}`;
+
+              // Update user data
+              const userData = {
+                _id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                role: user.role,
+                isActive: user.isActive !== false, // Default to true if not specified
+                isApproved: user.isApproved,
+                phone: user.phone || "",
+                address: user.address || "",
+                adminRoleId: user.adminRoleId,
+                adminPermissions: user.adminPermissions || {},
+                discount: user.discount || 0,
+              };
+
+              if (typeof window !== "undefined") {
+                localStorage.setItem("user", JSON.stringify(userData));
+              }
+
+              if (isMounted) {
+                setCurrentUser(userData);
+                setLoading(false);
+              }
+              return;
+            }
+          } catch (refreshError) {
+            console.error("Token refresh failed:", refreshError);
+            // Clear auth data on refresh failure
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("token");
+              localStorage.removeItem("refreshToken");
+              localStorage.removeItem("user");
+            }
+
+            if (isMounted) {
+              setCurrentUser(null);
+              setLoading(false);
+
+              // Only redirect if not already on login page
+              if (!location.pathname.includes("/login")) {
+                navigate("/login", { replace: true });
+              }
+            }
+            return;
+          }
+        } else {
+          console.error("Network or server error during auth check:", error);
+          // For other errors, we'll still clear the auth data to be safe
+          if (isMounted) {
+            setCurrentUser(null);
+            setLoading(false);
+          }
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+            localStorage.removeItem("refreshToken");
+            localStorage.removeItem("user");
+          }
+
+          // Only redirect if not already on login page
+          if (!location.pathname.includes("/login")) {
+            navigate("/login", { replace: true });
+          }
         }
       }
     };
