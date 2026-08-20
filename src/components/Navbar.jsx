@@ -160,7 +160,7 @@ function Navbar() {
     { to: "/categories", label: "Categories" },
     // { to: "/free-course", label: "Free Courses" },
     { to: "/testimonials", label: "Testimonials" },
-    { to: "/scholarship-test", label: "Scholarship" },
+    { to: "/scholarship", label: "Scholarship" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ];
 
