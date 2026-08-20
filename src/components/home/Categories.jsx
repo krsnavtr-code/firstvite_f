@@ -198,9 +198,10 @@ const Categories = () => {
             {categories.map((category) => (
               <Link
                 key={category._id}
-                to={`/courses/category/${category.name
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`}
+                to={`/courses/${
+                  category.slug ||
+                  category.name.toLowerCase().replace(/\s+/g, "-")
+                }`}
                 className={`group relative p-3 md:p-4 rounded-2xl bg-white dark:bg-gray-800/90 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-blue-500/30 dark:hover:border-blue-500/40 transition-all duration-300 hover:-translate-y-1 ${getCardBgColor(
                   category,
                 )}`}

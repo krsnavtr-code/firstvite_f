@@ -95,12 +95,14 @@ const Newsletter = () => {
                 >
                   Apply for Admission
                 </button>
-                <button
-                  onClick={() => navigate("/contact")}
-                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 dark:border-gray-600/30 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-white/20 transition-all active:scale-98"
+                <a
+                  href="https://wa.me/919891030303?text=Hi%2C%20I%20would%20like%20to%20talk%20to%20an%20expert%20about%20career%20guidance%20and%20course%20recommendations."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 dark:border-gray-600/30 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-white/20 transition-all active:scale-98 text-center"
                 >
                   Talk to an Expert
-                </button>
+                </a>
               </div>
             </div>
           </motion.div>

@@ -76,18 +76,18 @@ function Footer() {
           name: "Python Programming Mastery",
           url: "https://www.eklabya.com/course/python-programming-mastery-basics-to-advanced",
         },
-        {
-          name: "Java Programming Mastery",
-          url: "https://www.eklabya.com/course/java-programming-mastery-basics-to-advanced",
-        },
+        // {
+        //   name: "Java Programming Mastery",
+        //   url: "https://www.eklabya.com/course/java-programming-mastery-basics-to-advanced",
+        // },
         {
           name: "RESTful Web Services API Design",
           url: "https://www.eklabya.com/course/restful-web-services-api-design-mastery",
         },
-        {
-          name: "SOAP Web Services Certification",
-          url: "https://www.eklabya.com/course/soap-web-services-certification-training",
-        },
+        // {
+        //   name: "SOAP Web Services Certification",
+        //   url: "https://www.eklabya.com/course/soap-web-services-certification-training",
+        // },
         {
           name: "Node.js Backend Architecture",
           url: "https://www.eklabya.com/course/node-js-mastery-backend-architecture",
@@ -109,38 +109,38 @@ function Footer() {
           name: "Full Stack MERN Stack",
           url: "https://www.eklabya.com/course/full-stack-web-development-mern-stack",
         },
-        {
-          name: "Full Stack MERN Mastery",
-          url: "https://www.eklabya.com/course/full-stack-web-development-mastery-mern-stack",
-        },
+        // {
+        //   name: "Full Stack MERN Mastery",
+        //   url: "https://www.eklabya.com/course/full-stack-web-development-mastery-mern-stack",
+        // },
         {
           name: "React Native Full Stack",
           url: "https://www.eklabya.com/course/react-native-full-stack-developer-mastery",
         },
-        {
-          name: "Full Stack Architect Path",
-          url: "https://www.eklabya.com/course/full-stack-web-development-mastery-architect-path",
-        },
-        {
-          name: "Frontend Web Development React",
-          url: "https://www.eklabya.com/course/frontend-web-development-react-js",
-        },
+        // {
+        //   name: "Full Stack Architect Path",
+        //   url: "https://www.eklabya.com/course/full-stack-web-development-mastery-architect-path",
+        // },
+        // {
+        //   name: "Frontend Web Development React",
+        //   url: "https://www.eklabya.com/course/frontend-web-development-react-js",
+        // },
         {
           name: "Frontend Mastery HTML CSS JS React",
           url: "https://www.eklabya.com/course/frontend-web-development",
         },
-        {
-          name: "Microsoft .NET Full Stack",
-          url: "https://www.eklabya.com/course/microsoft-dotnet-full-stack-developer-mastery",
-        },
+        // {
+        //   name: "Microsoft .NET Full Stack",
+        //   url: "https://www.eklabya.com/course/microsoft-dotnet-full-stack-developer-mastery",
+        // },
       ],
     },
   ];
 
   return (
-    <footer className="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-gray-200 border-t border-slate-200 dark:border-slate-800 mt-12 transition-colors duration-300 text-xs sm:text-sm">
+    <footer className="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-gray-200 border-t border-slate-200 dark:border-slate-800 transition-colors duration-300 text-xs sm:text-sm">
       {/* Footer Top for Popular Courses */}
-      <div className="bg-white dark:bg-gray-800/80 border-b border-slate-200 dark:border-slate-800 py-8">
+      <div className="bg-slate-50 dark:bg-gray-900 py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mb-6 uppercase tracking-wider text-center">
             Popular Course Categories
@@ -170,7 +170,7 @@ function Footer() {
       </div>
 
       {/* Main Footer Links & About */}
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-4">
