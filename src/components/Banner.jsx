@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import ContactFormModal from "./common/ContactFormModal";
 
 const bannerImg =
   "https://www.eklabya.com/api/upload/file/Home-Page-Image-9212.png";
@@ -86,6 +87,7 @@ function Banner() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courseCount, setCourseCount] = useState(0);
   const [showCertificate, setShowCertificate] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   useEffect(() => {
     const fetchCourseCount = async () => {
@@ -173,7 +175,12 @@ function Banner() {
 
             {/* Description */}
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-xl pt-1">
-              Eklabya is an ISO certified, NSDC & NIELIT recognized online learning platform helping students and working professionals build in-demand skills in IT, data, business, and design, with live mentorship, hand-on projects, and dedicated placement support. No fixed schedules, no boundaries, just structured, career-focused learning you can start today.
+              Eklabya is an ISO certified, NSDC & NIELIT recognized online
+              learning platform helping students and working professionals build
+              in-demand skills in IT, data, business, and design, with live
+              mentorship, hand-on projects, and dedicated placement support. No
+              fixed schedules, no boundaries, just structured, career-focused
+              learning you can start today.
             </p>
 
             {/* Features Grid */}
@@ -201,18 +208,18 @@ function Banner() {
 
             {/* Action Buttons */}
             <div className="flex flex-row items-center gap-3 pt-2">
-              <Link
-                to="/courses"
+              <button
+                onClick={() => setShowContactModal(true)}
                 className="group bg-blue-600 hover:bg-blue-700 text-white px-2 md:px-6 py-1.5 md:py-3 rounded-lg font-bold text-xs md:text-sm transition-all duration-200 flex items-center justify-center shadow-md shadow-blue-600/20"
               >
                 <span>Start Learning</span>
                 <FaArrowRight className="ml-2 text-xs group-hover:translate-x-1 transition-transform duration-200" />
-              </Link>
+              </button>
               {/* <Link
-                to="/courses"
+                
                 className="border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 px-2 md:px-6 py-1.5 md:py-3 rounded-lg font-bold text-xs md:text-sm transition-all duration-200 flex items-center justify-center bg-white/50 dark:bg-gray-800/50"
               >
-                Explore Career Paths
+                Download Brochure
               </Link> */}
             </div>
           </div>
@@ -240,6 +247,10 @@ function Banner() {
       <CertificateModal
         isOpen={showCertificate}
         onClose={() => setShowCertificate(false)}
+      />
+      <ContactFormModal
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
       />
     </div>
   );

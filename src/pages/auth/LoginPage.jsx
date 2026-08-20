@@ -68,9 +68,8 @@ const LoginPage = () => {
         return;
       }
 
-      if (loginResponse) {
-        navigate(from, { replace: true });
-      }
+      // AuthContext handles redirect on successful login
+      // No need to redirect here
     } catch (error) {
       toast.error(error.message || "Login failed. Please try again.");
     } finally {
