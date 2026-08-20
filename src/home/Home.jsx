@@ -36,11 +36,12 @@ function Home() {
         {/* Hero Banner */}
         <Banner />
 
+        {/* Popular Courses */}
+        <PopularCourses />
+        
         {/* Categories Section */}
         <Categories />
 
-        {/* Popular Courses */}
-        <PopularCourses />
 
         {/* Featured Books */}
         <Assessment />

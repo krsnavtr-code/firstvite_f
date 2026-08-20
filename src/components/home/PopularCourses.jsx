@@ -211,7 +211,7 @@ const PopularCourses = () => {
         const response = await axios.get("/courses", {
           params: {
             showOnHome: "true",
-            limit: 8,
+            limit: 6,
             sort: "-createdAt",
             isPublished: "true",
           },
@@ -253,7 +253,8 @@ const PopularCourses = () => {
         {/* Section Header */}
         <div className="text-center max-w-6xl mx-auto mb-4 space-y-1">
           <div className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 px-3 py-1 rounded-full text-blue-600 dark:text-blue-400 text-xs font-extrabold uppercase tracking-wider">
-            <FaLaptopCode className="text-xs" />Course Overview
+            <FaLaptopCode className="text-xs" />
+            Course Overview
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
             Online Certification Courses Built for Real Careers
@@ -353,8 +354,8 @@ const PopularCourses = () => {
 
         {/* Courses Grid / States */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
               <div
                 key={index}
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 overflow-hidden animate-pulse"
@@ -376,7 +377,7 @@ const PopularCourses = () => {
             <p className="text-red-500 font-semibold text-sm">{error}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => (
               <CourseCard key={course._id} course={course} />
             ))}

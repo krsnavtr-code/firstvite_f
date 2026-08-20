@@ -1,53 +1,115 @@
 import React from "react";
-import { FaQuoteLeft, FaArrowRight, FaStar, FaRegStar } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { FaQuoteLeft, FaStar, FaRegStar } from "react-icons/fa";
 import { getCardBgColor } from "../../utils/gradients";
 
 const Testimonials = () => {
   const testimonials = [
     {
       id: 1,
-      name: "Rahul Kumar",
-      role: "Data Analyst, TCS",
+      name: "Aman Verma",
+      role: "Data Science | Eklabya",
       content:
-        "The Data Science course at Eklabya was practical from day one. The trainers didn't just explain concepts, they built real projects with us, which made all the difference when I sat for interviews.",
+        "The Data Science course was practical and easy to understand. I especially liked the hands-on projects and real-world examples.",
       avatar: "https://www.eklabya.com/api/upload/file/1777960745027-1855.png",
       rating: 5,
     },
     {
       id: 2,
       name: "Priya Sharma",
-      role: "Business Analyst, Infosys",
+      role: "Digital Marketing | Eklabya",
       content:
-        "I came in with zero background in tech and left with a job offer. The structured curriculum and the placement team's support made a career switch that felt impossible to actually happen.",
+        "A great course for learning SEO, Google Ads and social media marketing. The practical approach made everything easier to understand.",
       avatar: "https://www.eklabya.com/api/upload/file/1777960745036-6410.png",
       rating: 5,
     },
     {
       id: 3,
-      name: "Amit Patel",
-      role: "Cloud Engineer, Wipro",
+      name: "Rahul Mehta",
+      role: "Full Stack Development | Eklabya",
       content:
-        "What stood out was how current the course content was. We weren't learning outdated tools, everything mapped to what companies are using right now, which made the transition to a cloud role smooth.",
+        "The development training helped me understand frontend and backend concepts through practical projects. Overall, a very useful learning experience.",
       avatar: "https://www.eklabya.com/api/upload/file/1777960745003-1010.png",
       rating: 5,
     },
     {
       id: 4,
-      name: "Sneha Verma",
-      role: "Software Developer, HCL",
+      name: "Neha Gupta",
+      role: "AI & Machine Learning | Eklabya",
       content:
-        "The live doubt-clearing sessions were a game-changer. I never felt stuck for more than a day, and the mentors genuinely cared whether I understood the material, not just whether I finished the module.",
+        "The AI and Machine Learning course explained complex topics in a simple way. The practical sessions were especially helpful.",
       avatar: "https://www.eklabya.com/api/upload/file/1777960745009-2116.png",
       rating: 5,
     },
     {
       id: 5,
-      name: "Vikram Singh",
-      role: "SAP Consultant, Capgemini",
+      name: "Rohit Kumar",
+      role: "Python | Eklabya",
       content:
-        "Eklabya's SAP certification gave me the exact skill set my company needed for an internal promotion. The ISO-certified credential also made the process of validating my new role much easier with HR.",
+        "I really enjoyed the Python training. The concepts were explained clearly and the practical exercises helped me build confidence.",
       avatar: "https://www.eklabya.com/api/upload/file/1777960744997-1415.png",
+      rating: 5,
+    },
+    {
+      id: 6,
+      name: "Pooja Verma",
+      role: "SAP FICO | Eklabya",
+      content:
+        "The SAP FICO training gave me a clear understanding of accounting concepts and their practical use in SAP.",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745027-1855.png",
+      rating: 5,
+    },
+    {
+      id: 7,
+      name: "Arjun Singh",
+      role: "Web Development | Eklabya",
+      content:
+        "A good learning experience with practical web development projects. The training helped me improve my technical skills.",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745036-6410.png",
+      rating: 5,
+    },
+    {
+      id: 8,
+      name: "Anjali Sharma",
+      role: "Cyber Security | Eklabya",
+      content:
+        "The Cyber Security course covered important concepts in an easy-to-understand way. I found the practical learning very useful.",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745003-1010.png",
+      rating: 5,
+    },
+    {
+      id: 9,
+      name: "Vikash Gupta",
+      role: "Data Analytics | Eklabya",
+      content:
+        "The Data Analytics training helped me understand data visualization and analysis through practical examples and projects.",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745009-2116.png",
+      rating: 5,
+    },
+    {
+      id: 10,
+      name: "Simran Kaur",
+      role: "Digital Marketing & SEO | Eklabya",
+      content:
+        "The Digital Marketing training gave me practical knowledge of SEO, paid advertising and social media marketing. A useful course for beginners.",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960744997-1415.png",
+      rating: 5,
+    },
+    {
+      id: 11,
+      name: "Nitin Sharma",
+      role: "React Development | Eklabya",
+      content:
+        "The React training was structured well and focused on practical development. I gained much more confidence after working on projects.",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745027-1855.png",
+      rating: 5,
+    },
+    {
+      id: 12,
+      name: "Kavya Singh",
+      role: "Overall Experience | Eklabya",
+      content:
+        "Eklabya offers a practical learning environment with courses covering technology, digital marketing and professional skills. I had a positive learning experience.",
+      avatar: "https://www.eklabya.com/api/upload/file/1777960745036-6410.png",
       rating: 5,
     },
   ];
@@ -58,57 +120,64 @@ const Testimonials = () => {
       .map((_, i) => (
         <span key={i}>
           {i < rating ? (
-            <FaStar className="w-4 h-4 text-amber-400" />
+            <FaStar className="w-3.5 h-3.5 text-amber-400" />
           ) : (
-            <FaRegStar className="w-4 h-4 text-amber-400" />
+            <FaRegStar className="w-3.5 h-3.5 text-amber-400" />
           )}
         </span>
       ));
   };
 
   return (
-    <section className="py-6 md:py-10 bg-gradient-to-b from-white via-slate-50/50 to-white dark:from-gray-900 dark:via-gray-900/80 dark:to-gray-900 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-10 md:py-16 bg-gradient-to-b from-white via-slate-50/50 to-white dark:from-gray-900 dark:via-gray-900/80 dark:to-gray-900 transition-colors duration-300 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
         {/* Section Header */}
-        <div className="text-center max-w-6xl mx-auto mb-6 space-y-1">
+        <div className="text-center max-w-3xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 px-3.5 py-1 rounded-full text-blue-600 dark:text-blue-400 text-xs font-extrabold uppercase tracking-wider">
             Testimonials
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
             What Our Learners Say
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
             Real outcomes from real students, not stock reviews.
           </p>
         </div>
+      </div>
 
-        {/* Testimonials Grid (3 columns for desktop, responsive layout) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-          {testimonials.map((testimonial) => {
+      {/* Infinite Scrolling Marquee Wrapper */}
+      <div className="relative w-full overflow-hidden py-4">
+        {/* Left & Right Gradient Fades for Smooth Edge Blending */}
+        <div className="absolute top-0 bottom-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-white dark:from-gray-900 to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-white dark:from-gray-900 to-transparent z-10 pointer-events-none" />
+
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+          {/* We duplicate the array to create a seamless infinite loop effect */}
+          {[...testimonials, ...testimonials].map((testimonial, idx) => {
             const cardBg = getCardBgColor(testimonial);
             return (
               <div
-                key={testimonial.id}
-                className={`${cardBg} group relative p-2 md:p-4 rounded-3xl bg-white dark:bg-gray-800/90 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between`}
+                key={`${testimonial.id}-${idx}`}
+                className={`${cardBg} group relative w-[320px] sm:w-[380px] mx-3 p-6 rounded-3xl bg-white dark:bg-gray-800/90 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between shrink-0`}
               >
                 <div>
-                  {/* Quote Icon Header */}
+                  {/* Quote Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex gap-1">
                       {renderStars(testimonial.rating)}
                     </div>
-                    <FaQuoteLeft className="text-blue-500/20 dark:text-blue-400/20 text-3xl group-hover:scale-110 transition-transform" />
+                    <FaQuoteLeft className="text-blue-500/20 dark:text-blue-400/20 text-2xl group-hover:scale-110 transition-transform" />
                   </div>
 
-                  {/* Review Content */}
-                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic mb-6">
+                  {/* Review Text */}
+                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic mb-6 line-clamp-4">
                     "{testimonial.content}"
                   </p>
                 </div>
 
                 {/* User Details Footer */}
-                <div className="flex items-center gap-3.5 pt-4 border-t border-slate-100 dark:border-slate-700/60">
-                  <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-blue-500/20 shrink-0">
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-700/60">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-blue-500/20 shrink-0">
                     <img
                       className="w-full h-full object-cover"
                       src={testimonial.avatar}
@@ -117,7 +186,7 @@ const Testimonials = () => {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">
+                    <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
                       {testimonial.name}
                     </h3>
                     <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 truncate mt-0.5">
@@ -129,18 +198,20 @@ const Testimonials = () => {
             );
           })}
         </div>
-
-        {/* CTA Button */}
-        <div className="mt-4 text-center">
-          {/* <Link
-            to="/placements"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all duration-300 shadow-md shadow-blue-600/20 active:scale-98"
-          >
-            <span>Read More Alumni Stories</span>
-            <FaArrowRight className="text-xs" />
-          </Link> */}
-        </div>
       </div>
+
+      {/* Tailwind Custom Marquee Animation Styling */}
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          display: flex;
+          width: max-content;
+          animation: marquee 35s linear infinite;
+        }
+      `}</style>
     </section>
   );
 };

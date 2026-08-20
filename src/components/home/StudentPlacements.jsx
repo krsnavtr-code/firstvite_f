@@ -104,11 +104,11 @@ const StudentPlacements = () => {
                 </p>
 
                 <div className="flex items-center gap-4 pt-3 border-t border-gray-50 dark:border-gray-700">
-                  <img
+                  {/* <img
                     src={story.image}
                     alt={story.name}
                     className="w-10 h-10 rounded-full object-cover shadow-md"
-                  />
+                  /> */}
                   <div>
                     <h4 className="font-bold text-gray-900 dark:text-white text-sm">
                       {story.name}
