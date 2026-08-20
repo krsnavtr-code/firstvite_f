@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
         const userStr = localStorage.getItem("user");
 
         // If no tokens, clear everything and return
-        if (!token || !refreshToken) {
+        if (!token) {
           if (isMounted) {
             setCurrentUser(null);
             setLoading(false);
@@ -52,8 +52,12 @@ export function AuthProvider({ children }) {
             // Set the auth header for future requests
             api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-            // Still verify with backend in background
-            verifyWithBackend(token, refreshToken, isMounted);
+            // Verify with backend in background (non-blocking)
+            verifyWithBackend(token, refreshToken, isMounted).catch((err) => {
+              console.error("Background auth verification failed:", err);
+              // Don't log out user on background verification failure
+              // Let the axios interceptor handle token refresh on actual API calls
+            });
             return;
           } catch (parseError) {
             console.error(
@@ -181,40 +185,43 @@ export function AuthProvider({ children }) {
             }
           } catch (refreshError) {
             console.error("Token refresh failed:", refreshError);
-            // Clear auth data on refresh failure
-            if (typeof window !== "undefined") {
-              localStorage.removeItem("token");
-              localStorage.removeItem("refreshToken");
-              localStorage.removeItem("user");
-            }
+            // Only clear auth data on refresh failure if it's a real auth error
+            if (
+              refreshError.response?.status === 401 ||
+              refreshError.message?.includes("token")
+            ) {
+              if (typeof window !== "undefined") {
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("user");
+              }
 
-            if (isMounted) {
-              setCurrentUser(null);
-              setLoading(false);
+              if (isMounted) {
+                setCurrentUser(null);
+                setLoading(false);
 
-              // Only redirect if not already on login page
-              if (!location.pathname.includes("/login")) {
-                navigate("/login", { replace: true });
+                // Only redirect if not already on login page
+                if (!location.pathname.includes("/login")) {
+                  navigate("/login", { replace: true });
+                }
+              }
+            } else {
+              // For network errors, don't log out - let user stay logged in
+              console.warn(
+                "Network error during token refresh, keeping user logged in",
+              );
+              if (isMounted) {
+                setLoading(false);
               }
             }
             return;
           }
         } else {
           console.error("Network or server error during auth check:", error);
-          // For other errors, we'll still clear the auth data to be safe
+          // For network errors, don't log out the user - keep them logged in
+          // The axios interceptor will handle token refresh on actual API calls
           if (isMounted) {
-            setCurrentUser(null);
             setLoading(false);
-          }
-          if (typeof window !== "undefined") {
-            localStorage.removeItem("token");
-            localStorage.removeItem("refreshToken");
-            localStorage.removeItem("user");
-          }
-
-          // Only redirect if not already on login page
-          if (!location.pathname.includes("/login")) {
-            navigate("/login", { replace: true });
           }
         }
       }
