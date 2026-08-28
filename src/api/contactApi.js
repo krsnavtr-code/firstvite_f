@@ -463,4 +463,47 @@ const getContacts = async (options = {}) => {
   }
 };
 
-export { submitContactForm, updateContactStatus, getContacts };
+/**
+ * Fetch secret contacts data (Full_Name, email, phone, courses only)
+ * @param {string} [secretKey] - Secret key for authentication
+ * @param {Object} [options] - Query options (limit, page, startDate, endDate, status, raw)
+ * @returns {Promise<{success: boolean, count?: number, data: Array<{Full_Name: string, email: string, phone: string, courses: string}>}>}
+ */
+const getSecretContactData = async (
+  secretKey = "eklabya_contact_secret_key_2026",
+  options = {},
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (options.limit) params.append("limit", options.limit.toString());
+    if (options.page) params.append("page", options.page.toString());
+    if (options.startDate) params.append("startDate", options.startDate);
+    if (options.endDate) params.append("endDate", options.endDate);
+    if (options.status) params.append("status", options.status);
+    if (options.raw) params.append("raw", options.raw.toString());
+
+    const key =
+      secretKey ||
+      import.meta.env.VITE_CONTACT_SECRET_KEY ||
+      "eklabya_contact_secret_key_2026";
+    const queryString = params.toString() ? `?${params.toString()}` : "";
+
+    const response = await api.get(`/api/contact-data${queryString}`, {
+      headers: {
+        "x-secret-key": key,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching secret contact data:", error);
+    throw error;
+  }
+};
+
+export {
+  submitContactForm,
+  updateContactStatus,
+  getContacts,
+  getSecretContactData,
+};
