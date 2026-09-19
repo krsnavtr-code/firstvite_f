@@ -1,10 +1,2 @@
 User-agent: *
-Disallow: /wp-admin/
-Disallow: /cart/
-Disallow: /checkout/
-Disallow: /my-account/
-Disallow: /?s=
-
-Allow: /
-
-Sitemap: https://eklabya.com/sitemap.xml
+Disallow: /

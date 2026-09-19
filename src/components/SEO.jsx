@@ -26,7 +26,7 @@ const SEO = ({
   description = "eklabya centre of excellence offers professional and management courses, including short programs and degree collaborations with international universities.",
   keywords = "online courses, e-learning, professional courses, management courses, online education, eklabya, skill development",
   canonical,
-  robots = "index, follow",
+  robots = "noindex, nofollow",
   og = {},
   twitter = {},
 }) => {
